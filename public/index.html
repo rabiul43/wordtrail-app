@@ -5835,7 +5835,20 @@ const Core = makeCore();
   const px = u => {
     try { const t = new URL(u, location.href); return PROXY && /^https?:$/.test(t.protocol) && PX_HOSTS.test(t.hostname) ? PROXY + '/?url=' + encodeURIComponent(t.href) : u; } catch (e) { return u; }
   };
-  { const f0 = window.fetch.bind(window); window.fetch = (input, init) => f0(typeof input === 'string' ? px(input) : input, init); }
+  /* Hugging Face refuses browser requests that come from some web addresses (the app's workers.dev address is one),
+     so those requests go through the wordtrail-hf Worker. If that Worker is down or unreachable the app asks
+     Hugging Face directly, exactly as before. Empty string = always ask directly. */
+  const HF_PROXY = 'https://wordtrail-hf.test-rabiulclaud-1.workers.dev';
+  { const f0 = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      if (HF_PROXY && typeof input === 'string') {
+        try {
+          const t = new URL(input, location.href);
+          if (t.hostname === 'huggingface.co') return f0(HF_PROXY + t.pathname + t.search, init).then(r => r.status >= 500 ? f0(input, init) : r, () => f0(input, init));
+        } catch (e) { /* fall through to a normal request */ }
+      }
+      return f0(typeof input === 'string' ? px(input) : input, init);
+    }; }
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { if (window.__wtRestoring) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
