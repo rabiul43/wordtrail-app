@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Audiobooks you can read along with.">
+<meta name="theme-color" content="#0F1220">
+<script>try{var __t=(JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{}).theme,__l=matchMedia('(prefers-color-scheme: light)').matches,__c=({light:'#FAF7F2',sepia:'#EFE6D0',contrast:'#000000',dark:'#0F1220'})[__t]||(__l?'#FAF7F2':'#0F1220');document.querySelector('meta[name="theme-color"]').setAttribute('content',__c);}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wordtrail">
 <link rel="preconnect" href="https://librivox.org" crossorigin>
 <link rel="dns-prefetch" href="https://archive.org">
 <title>Wordtrail</title>
@@ -3051,801 +3061,6 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
     </div>
   </div>
 </section>
-<script type="text/plain" id="scene-tests">
-## strength=strong|weak|normal checks how loud the weather is made: heavy rain / driving snow = strong, light drizzle / soft rain / distant thunder = weak.
-## Scene test fixtures. Format:
-##   === id | genres: a, b        starts a case (genres optional; trap marks a tricky case)
-##   # place=sea/harbour weather=none time=night mood=dread trans=door     expectations for the NEXT paragraph
-##   Paragraph text (a blank line ends it).
-## Values: a word, alternatives with /, or none (nothing should be detected). A key left out is not checked.
-## place = keys of the place list, weather = rain storm wind snow fog, time = night day, mood = dread danger peace sorrow merry
-## trans = door gate steps none (the transition sound from the previous paragraph's place to this one)
-## Replace or add cases with real Gutenberg paragraphs. Keep each excerpt to 1-3 paragraphs.
-
-=== sea-voyage | genres: adventure, sea
-# place=sea
-The ship rolled heavily on the long grey waves, and the spray came over the bow in sheets. The sailors hauled at the ropes while the captain stood at the wheel and watched the horizon.
-
-=== ships-cabin
-# place=cabin
-Below deck, in the narrow cabin, the lamp swung on its chain and the timbers creaked with every wave. He lay in his bunk and listened to the sea against the hull.
-
-=== harbour-morning
-# place=harbour
-The harbour was full of noise. Fishermen shouted from the quay, gulls wheeled over the boats, and the cargo was swung from the dock onto the waiting carts.
-
-=== castle-hall | genres: horror, gothic
-# place=castle
-The great hall of the castle was cold and vast, and the torches on the stone walls threw long shadows. The count led them up the winding stair toward the tower.
-
-=== graveyard-night | genres: horror
-# place=graveyard time=night
-It was midnight when he crossed the churchyard. The old gravestones leaned in the moonlight and an owl called from the yew tree above the graves.
-
-=== moor-wind
-# place=moor weather=wind
-They walked for hours over the bleak moor, where the heather lay flat under the wind. Not a tree stood on the whole wide heath.
-
-=== moor-storm
-# place=moor weather=storm
-The storm broke over the moor at dusk. Thunder rolled across the hills and the rain came down in torrents, driven by a wind that nearly tore the cloak from her shoulders.
-
-=== ballroom-evening
-# place=ballroom mood=merry
-The ballroom was ablaze with candles. The musicians struck up a waltz and the dancers whirled across the polished floor in their silks and satins, laughing as they went.
-
-=== drawing-room
-# place=hearth/manor
-They sat by the fire in the drawing room, and the old clock ticked on the mantel. The tea was poured and a log settled in the grate.
-
-=== garden-birds
-# place=garden/country
-The garden was full of roses, and the birds sang in the apple trees. She knelt beside the flower beds in the warm sun and pulled the weeds from between them.
-
-=== jungle
-# place=jungle
-The jungle closed in around them, green and steaming. Monkeys screamed in the high branches and the vines hung thick across the narrow path.
-
-=== river-bank
-# place=river
-They sat on the bank of the river and watched the water slide past. A heron stood in the shallows and the reeds moved gently in the current.
-
-=== schoolroom
-# place=school
-The schoolmaster rapped his desk and the class fell silent. The boys bent over their slates, and the only sound was the scratching of chalk and the ticking of the clock.
-
-=== laboratory
-# place=lab
-In the laboratory the retorts bubbled and the long tables were crowded with glass tubes and jars. The professor bent over his instruments, muttering figures to himself.
-
-=== dungeon
-# place=cellar/cave
-The dungeon was dark and wet. Water dripped from the low stone roof, and the prisoner lay on a heap of straw behind the iron bars of his cell.
-
-=== farm-yard
-# place=farm
-The farmer crossed the yard where the hens scratched in the dust. The cows were lowing in the barn, and the haystack stood against the fence by the pasture.
-
-=== city-street
-# place=city/market
-The street was crowded with carts and hurrying people. Hawkers cried their wares from the pavement, and the carriages rattled over the cobbles between the tall shops.
-
-=== tavern-night
-# place=tavern
-The tavern was loud with talk and the smell of ale. Men leaned over the long tables with their mugs, and the landlord bustled between them with a tray.
-
-=== church-service
-# place=church
-The bell tolled and the congregation filed into the church. The organ sounded softly under the high arches, and the vicar waited by the altar.
-
-=== trap-negated-weather | trap
-# weather=none
-No rain fell that whole summer, and there was not a breath of wind. The fields lay bright and dry under a cloudless sky.
-
-=== trap-metaphors | trap
-# place=none weather=none
-She looked out over a sea of faces and felt a storm of grief rise in her. Her heart was a stone, and the words would not come.
-
-=== trap-names | trap
-# place=none mood=none
-Rose and Grace Hunter met Mr. Wood and Miss Bell in the afternoon. Nobody had much to say to the others.
-
-=== trap-place-in-dialogue | trap
-# place=none/study
-"We shall sail to the sea tomorrow," said the clerk, without raising his head from the ledger. His employer sniffed and signed the paper.
-
-=== trap-remembered-place | trap
-# place=none/study
-At his desk in the dull office he thought of the old farm, and the river, and the long summers he had left behind. The ledger lay open before him and the pen was dry.
-
-=== trap-storm-ended | trap
-# weather=storm/rain
-The storm raged all night, and the rain beat against the shutters.
-
-# weather=none
-By morning the storm had passed and the rain had stopped. The air was still and clear.
-
-=== trap-no-fear | trap
-# mood=none
-He felt no fear as he walked through the dark wood. He whistled a tune and counted his steps.
-
-=== move-hearth-to-garden
-# place=hearth
-They sat by the fire in the drawing room, warm and quiet, while the clock ticked on the mantel.
-
-# place=garden trans=gate
-Presently she stepped out into the garden, where the roses hung heavy and the birds sang in the apple trees.
-
-=== move-house-to-forest
-# place=hearth
-He sat by the fire in his small cottage and stirred the embers, while the clock ticked on the shelf.
-
-# place=forest trans=door
-At dawn he left and walked into the forest, where the tall trees closed overhead and the birds began to sing.
-
-=== move-forest-to-mountain
-# place=forest
-The path wound through the dark forest, between tall pines and thick undergrowth.
-
-# place=mountain trans=steps
-Higher up the trees thinned out, and he climbed the steep slope of the mountain with the wind in his face.
-
-=== move-sea-to-harbour
-# place=sea
-The ship rolled on the grey waves with the spray flying over her bow.
-
-# place=harbour trans=none
-By evening they came into the harbour, and the sailors threw their ropes to the men on the quay.
-
-## ===== Real cases from Project Gutenberg books (labels written by hand; trap = a word that misleads) =====
-
-=== ti-205 | genres: adventure, pirate
-# place=harbour/forest/swamp/lake/river/sea
-The place was entirely land-locked, buried in woods, the trees coming right down to high-water mark, the shores mostly flat, and the hilltops standing round at a distance in a sort of amphitheatre, one here, one there. Two little rivers, or rather two swamps, emptied out into this pond, as you might call it; and the foliage round that part of the shore had a kind of poisonous brightness. From the ship we could see nothing of the house or stockade, for they were quite buried among trees; and if it had not been for the chart on the companion, we might have been the first that had ever anchored there since the island arose out of the seas.
-
-=== ti-204 | genres: adventure, pirate
-# place=sea/harbour/island/beach
-We brought up just where the anchor was in the chart, about a third of a mile from each shore, the mainland on one side and Skeleton Island on the other. The bottom was clean sand. The plunge of our anchor sent up clouds of birds wheeling and crying over the woods, but in less than a minute they were down again and all was once more silent.
-
-=== ti-200 | genres: adventure, pirate
-# place=sea/island/beach
-Perhaps it was this--perhaps it was the look of the island, with its grey, melancholy woods, and wild stone spires, and the surf that we could both see and hear foaming and thundering on the steep beach--at least, although the sun shone bright and hot, and the shore birds were fishing and crying all around us, and you would have thought anyone would have been glad to get to land after being so long at sea, my heart sank, as the saying is, into my boots; and from the first look onward, I hated the very thought of Treasure Island.
-
-=== ti-636 | genres: adventure, pirate
-# place=cave/beach/island
-Therefore the work was pushed on briskly. Gray and Ben Gunn came and went with the boat, while the rest during their absences piled treasure on the beach. Two of the bars, slung in a rope’s end, made a good load for a grown man--one that he was glad to walk slowly with. For my part, as I was not much use at carrying, I was kept busy all day in the cave packing the minted money into bread-bags.
-
-=== ti-493 | genres: adventure, pirate
-# place=forest/river/island
-So thinking, and in famous spirits, I began to set my face homeward for the block house and my companions. I remembered that the most easterly of the rivers which drain into Captain Kidd’s anchorage ran from the two-peaked hill upon my left, and I bent my course in that direction that I might pass the stream while it was small. The wood was pretty open, and keeping along the lower spurs, I had soon turned the corner of that hill, and not long after waded to the mid-calf across the watercourse.
-
-=== ti-405 | genres: adventure, pirate
-# place=sea
-By this time the schooner and her little consort were gliding pretty swiftly through the water; indeed, we had already fetched up level with the camp-fire. The ship was talking, as sailors say, loudly, treading the innumerable ripples with an incessant weltering splash; and until I got my eye above the window-sill I could not comprehend why the watchmen had taken no alarm. One glance, however, was sufficient; and it was only one glance that I durst take from that unsteady skiff. It showed me Hands and his companion locked together in deadly wrestle, each with a hand upon the other’s throat.
-
-=== ti-3 | genres: adventure, pirate
-# place=none/tavern
-Squire Trelawney, Dr. Livesey, and the rest of these gentlemen having asked me to write down the whole particulars about Treasure Island, from the beginning to the end, keeping nothing back but the bearings of the island, and that only because there is still treasure not yet lifted, I take up my pen in the year of grace 17—, and go back to the time when my father kept the Admiral Benbow inn and the brown old seaman with the sabre cut first took up his lodging under our roof.
-
-=== ti-166 | genres: adventure, pirate | trap
-# place=sea/none
-“Oh, I know’d Dick was square,” returned the voice of the coxswain, Israel Hands. “He’s no fool, is Dick.” And he turned his quid and spat. “But look here,” he went on, “here’s what I want to know, Barbecue: how long are we a-going to stand off and on like a blessed bumboat? I’ve had a’most enough o’ Cap’n Smollett; he’s hazed me long enough, by thunder! I want to go into that cabin, I do. I want their pickles and wines, and that.”
-
-=== ti-170 | genres: adventure, pirate | trap
-# place=none/sea
-“Why, how many tall ships, think ye, now, have I seen laid aboard? And how many brisk lads drying in the sun at Execution Dock?” cried Silver. “And all for this same hurry and hurry and hurry. You hear me? I seen a thing or two at sea, I have. If you would on’y lay your course, and a p’int to windward, you would ride in carriages, you would. But not you! I know you. You’ll have your mouthful of rum tomorrow, and go hang.”
-
-=== ti-552 | genres: adventure, pirate | trap
-# place=none/swamp/forest/island
-“That comes--as you call it--of being arrant asses,” retorted the doctor, “and not having sense enough to know honest air from poison, and the dry land from a vile, pestiferous slough. I think it most probable--though of course it’s only an opinion--that you’ll all have the deuce to pay before you get that malaria out of your systems. Camp in a bog, would you? Silver, I’m surprised at you. You’re less of a fool than many, take you all round; but you don’t appear to me to have the rudiments of a notion of the rules of health.
-
-=== ti-282 | genres: adventure, pirate | trap
-# place=sea/none
-They had the gun, by this time, slewed round upon the swivel, and Hands, who was at the muzzle with the rammer, was in consequence the most exposed. However, we had no luck, for just as Trelawney fired, down he stooped, the ball whistled over him, and it was one of the other four who fell.
-
-=== dr-35 | genres: horror, gothic
-# place=castle
-But I am not in heart to describe beauty, for when I had seen the view I explored further; doors, doors, doors everywhere, and all locked and bolted. In no place save from the windows in the castle walls is there an available exit.
-
-=== dr-51 | genres: horror, gothic
-# place=castle
-_28 May._--There is a chance of escape, or at any rate of being able to send word home. A band of Szgany have come to the castle, and are encamped in the courtyard. These Szgany are gipsies; I have notes of them in my book. They are peculiar to this part of the world, though allied to the ordinary gipsies all the world over. There are thousands of them in Hungary and Transylvania, who are almost outside all law. They attach themselves as a rule to some great noble or _boyar_, and call themselves by his name. They are fearless and without religion, save superstition, and they talk only their own varieties of the Romany tongue.
-
-=== dr-64 | genres: horror, gothic
-# place=castle/tower mood=dread/danger
-Somewhere high overhead, probably on the tower, I heard the voice of the Count calling in his harsh, metallic whisper. His call seemed to be answered from far and wide by the howling of wolves. Before many minutes had passed a pack of them poured, like a pent-up dam when liberated, through the wide entrance into the courtyard.
-
-=== dr-277 | genres: horror, gothic
-# place=graveyard/church
-And now we are all scattered; and for many a long day loneliness will sit over our roofs with brooding wings. Lucy lies in the tomb of her kin, a lordly death-house in a lonely churchyard, away from teeming London; where the air is fresh, and the sun rises over Hampstead Hill, and where wild flowers grow of their own accord.
-
-=== dr-116 | genres: horror, gothic
-# place=cabin/sea weather=rain/storm
-On 17 July, yesterday, one of the men, Olgaren, came to my cabin, and in an awestruck way confided to me that he thought there was a strange man aboard the ship. He said that in his watch he had been sheltering behind the deck-house, as there was a rain-storm, when he saw a tall, thin man, who was not like any of the crew, come up the companion-way, and go along the deck forward, and disappear. He followed cautiously, but when he got to bows found no one, and the hatchways were all closed. He was in a panic of superstitious fear, and I am afraid the panic may spread. To allay it, I shall to-day search entire ship carefully from stem to stern.
-
-=== dr-122 | genres: horror, gothic
-# place=sea
-_30 July_.--Last night. Rejoiced we are nearing England. Weather fine, all sails set. Retired worn out; slept soundly; awaked by mate telling me that both man of watch and steersman missing. Only self and mate and two hands left to work ship.
-
-=== dr-110 | genres: horror, gothic
-# weather=storm
-“I can’t make her out,” he said; “she’s a Russian, by the look of her; but she’s knocking about in the queerest way. She doesn’t know her mind a bit; she seems to see the storm coming, but can’t decide whether to run up north in the open, or to put in here. Look there again! She is steered mighty strangely, for she doesn’t mind the hand on the wheel; changes about with every puff of wind. We’ll hear more of her before this time to-morrow.”
-
-=== dr-1 | genres: horror, gothic
-# place=train/city
-_3 May. Bistritz._--Left Munich at 8:35 P. M., on 1st May, arriving at Vienna early next morning; should have arrived at 6:46, but train was an hour late. Buda-Pesth seems a wonderful place, from the glimpse which I got of it from the train and the little I could walk through the streets. I feared to go very far from the station, as we had arrived late and would start as near the correct time as possible. The impression I had was that we were leaving the West and entering the East; the most western of splendid bridges over the Danube, which is here of noble width and depth, took us among the traditions of Turkish rule.
-
-=== dr-434 | genres: horror, gothic
-# place=study/hearth
-When I came down again I found the others all gathered round the fire in the study. In the train I had written my diary so far, and simply read it off to them as the best means of letting them get abreast of my own information; when I had finished Van Helsing said:--
-
-=== dr-66 | genres: horror, gothic
-# time=night
-It has always been at night-time that I have been molested or threatened, or in some way in danger or in fear. I have not yet seen the Count in the daylight. Can it be that he sleeps when others wake, that he may be awake whilst they sleep? If I could only get into his room! But there is no possible way. The door is always locked, no way for me.
-
-=== dr-172 | genres: horror, gothic | trap
-# place=none/hearth/asylum
-Van Helsing returned in a couple of hours, and presently said to me: “Now you go home, and eat much and drink enough. Make yourself strong. I stay here to-night, and I shall sit up with little miss myself. You and I must watch the case, and we must have none other to know. I have grave reasons. No, do not ask them; think what you will. Do not fear to think even the most not-probable. Good-night.”
-
-=== dr-610 | genres: horror, gothic | trap
-# weather=none
-3. _By Water._--Here is the safest way, in one respect, but with most danger in another. On the water he is powerless except at night; even then he can only summon fog and storm and snow and his wolves. But were he wrecked, the living water would engulf him, helpless; and he would indeed be lost. He could have the vessel drive to land; but if it were unfriendly land, wherein he was not free to move, his position would still be desperate.
-
-=== dr-459 | genres: horror, gothic | trap
-# place=asylum/none/hearth
-When I came to Renfield’s room I found him lying on the floor on his left side in a glittering pool of blood. When I went to move him, it became at once apparent that he had received some terrible injuries; there seemed none of that unity of purpose between the parts of the body which marks even lethargic sanity. As the face was exposed I could see that it was horribly bruised, as though it had been beaten against the floor--indeed it was from the face wounds that the pool of blood originated. The attendant who was kneeling beside the body said to me as we turned him over:--
-
-=== dr-258 | genres: horror, gothic | trap
-# place=none/hearth/asylum
-Together we moved over to the bed, and I lifted the lawn from her face. God! how beautiful she was. Every hour seemed to be enhancing her loveliness. It frightened and amazed me somewhat; and as for Arthur, he fell a-trembling, and finally was shaken with doubt as with an ague. At last, after a long pause, he said to me in a faint whisper:--
-
-=== wh-777 | genres: romance, gothic
-# place=graveyard/moor
-I sought, and soon discovered, the three headstones on the slope next the moor: the middle one grey, and half buried in heath; Edgar Linton’s only harmonized by the turf and moss creeping up its foot; Heathcliff’s still bare.
-
-=== wh-25 | genres: romance, gothic
-# weather=snow/storm/wind time=night
-The business of eating being concluded, and no one uttering a word of sociable conversation, I approached a window to examine the weather. A sorrowful sight I saw: dark night coming down prematurely, and sky and hills mingled in one bitter whirl of wind and suffocating snow.
-
-=== wh-511 | genres: romance, gothic | trap
-# place=none/country/farm
-Catherine amused herself with dancing to and fro before the door, while I tried all the large keys in succession. I had applied the last, and found that none would do; so, repeating my desire that she would remain there, I was about to hurry home as fast as I could, when an approaching sound arrested me. It was the trot of a horse; Cathy’s dance stopped also.
-
-=== hb-129 | genres: detective, mystery
-# place=manor/hearth/castle
-The wheels died away down the drive while Sir Henry and I turned into the hall, and the door clanged heavily behind us. It was a fine apartment in which we found ourselves, large, lofty, and heavily raftered with huge baulks of age-blackened oak. In the great old-fashioned fireplace behind the high iron dogs a log-fire crackled and snapped. Sir Henry and I held out our hands to it, for we were numb from our long drive. Then we gazed round us at the high, thin window of old stained glass, the oak panelling, the stags’ heads, the coats of arms upon the walls, all dim and sombre in the subdued light of the central lamp.
-
-=== hb-217 | genres: detective, mystery
-# time=night weather=wind/rain
-In five minutes we were outside the door, starting upon our expedition. We hurried through the dark shrubbery, amid the dull moaning of the autumn wind and the rustle of the falling leaves. The night air was heavy with the smell of damp and decay. Now and again the moon peeped out for an instant, but clouds were driving over the face of the sky, and just as we came out on the moor a thin rain began to fall. The light still burned steadily in front.
-
-=== hb-218 | genres: detective, mystery
-# place=moor/swamp time=night mood=dread/danger
-As if in answer to his words there rose suddenly out of the vast gloom of the moor that strange cry which I had already heard upon the borders of the great Grimpen Mire. It came with the wind through the silence of the night, a long, deep mutter, then a rising howl, and then the sad moan in which it died away. Again and again it sounded, the whole air throbbing with it, strident, wild, and menacing. The baronet caught my sleeve and his face glimmered white through the darkness.
-
-=== hb-71 | genres: detective, mystery
-# place=city
-He quickened his pace until we had decreased the distance which divided us by about half. Then, still keeping a hundred yards behind, we followed into Oxford Street and so down Regent Street. Once our friends stopped and stared into a shop window, upon which Holmes did the same. An instant afterwards he gave a little cry of satisfaction, and, following the direction of his eager eyes, I saw that a hansom cab with a man inside which had halted on the other side of the street was now proceeding slowly onward again.
-
-=== jb-202
-# place=beach/sea
-After that, he learned to lie in a beach pool and let the wash of the waves just cover him and lift him up while he paddled, but he always kept his eye open for big waves that might hurt. He was two weeks learning to use his flippers; and all that while he floundered in and out of the water, and coughed and grunted and crawled up the beach and took catnaps on the sand, and went back again, until at last he found that he truly belonged to the water.
-
-=== jb-351
-# place=river/jungle time=night weather=fog
-The grass began to get squashy, and Kala Nag’s feet sucked and squelched as he put them down, and the night mist at the bottom of the valley chilled Little Toomai. There was a splash and a trample, and the rush of running water, and Kala Nag strode through the bed of a river, feeling his way at each step. Above the noise of the water, as it swirled round the elephant’s legs, Little Toomai could hear more splashing and some trumpeting both upstream and down--great grunts and angry snortings, and all the mist about him seemed to be full of rolling, wavy shadows.
-
-=== jb-50
-# place=jungle/cave
-Mowgli was far and far through the forest, running hard, and his heart was hot in him. He came to the cave as the evening mist rose, and drew breath, and looked down the valley. The cubs were out, but Mother Wolf, at the back of the cave, knew by his breathing that something was troubling her frog.
-
-=== jb-222
-# weather=storm/snow/rain
-He picked up with an old stumpy-tailed albatross, who told him that Kerguelen Island was the very place for peace and quiet, and when Kotick went down there he was all but smashed to pieces against some wicked black cliffs in a heavy sleet-storm with lightning and thunder. Yet as he pulled out against the gale he could see that even there had once been a seal nursery. And it was so in all the other islands that he visited.
-
-=== jb-180
-# place=village
-Buldeo hobbled away to the village as fast as he could, looking back over his shoulder in case Mowgli should change into something terrible. When he got to the village he told a tale of magic and enchantment and sorcery that made the priest look very grave.
-
-=== jb-48 | trap
-# place=jungle/none
-By Red Flower Bagheera meant fire, only no creature in the jungle will call fire by its proper name. Every beast lives in deadly fear of it, and invents a hundred ways of describing it.
-
-=== pp-532 | genres: romance
-# place=country/garden/forest/manor
-Elizabeth, as they drove along, watched for the first appearance of Pemberley Woods with some perturbation; and when at length they turned in at the lodge, her spirits were in a high flutter.
-
-=== pp-119 | genres: romance
-# place=hearth/manor
-The day passed much as the day before had done. Mrs. Hurst and Miss Bingley had spent some hours of the morning with the invalid, who continued, though slowly, to mend; and, in the evening, Elizabeth joined their party in the drawing-room. The loo table, however, did not appear. Mr. Darcy was writing, and Miss Bingley, seated near him, was watching the progress of his letter, and repeatedly calling off his attention by messages to his sister. Mr. Hurst and Mr. Bingley were at piquet, and Mrs. Hurst was observing their game.
-
-=== pp-138 | genres: romance
-# place=hearth/manor
-When the ladies removed after dinner Elizabeth ran up to her sister, and seeing her well guarded from cold, attended her into the drawing-room, where she was welcomed by her two friends with many professions of pleasure; and Elizabeth had never seen them so agreeable as they were during the hour which passed before the gentlemen appeared. Their powers of conversation were considerable. They could describe an entertainment with accuracy, relate an anecdote with humour, and laugh at their acquaintance with spirit.
-
-=== pp-389 | genres: romance
-# place=hearth/manor
-From the drawing-room they could distinguish nothing in the lane, and were indebted to Mr. Collins for the knowledge of what carriages went along, and how often especially Miss De Bourgh drove by in her phaeton, which he never failed coming to inform them of, though it happened almost every day. She not unfrequently stopped at the Parsonage, and had a few minutes’ conversation with Charlotte, but was scarcely ever prevailed on to get out.
-
-=== pp-421 | genres: romance | trap
-# place=none
-In her kind schemes for Elizabeth, she sometimes planned her marrying Colonel Fitzwilliam. He was, beyond comparison, the pleasantest man: he certainly admired her, and his situation in life was most eligible; but, to counterbalance these advantages, Mr. Darcy had considerable patronage in the church, and his cousin could have none at all.
-
-## ---- Cases from whole-book scans (Pride and Prejudice, Treasure Island, Dracula, Wuthering Heights, The Jungle Book) ----
-## Each is a paragraph where an earlier version of the detector guessed a wrong scene; the expectation lists what is acceptable.
-
-=== ppx-82 | genres: romance | trap
-# place=none/ballroom/hearth/country
-The evening altogether passed off pleasantly to the whole family. Mrs. Bennet had seen her eldest daughter much admired by the Netherfield party. Mr. Bingley had danced with her twice, and she had been distinguished by his sisters. Jane was as much gratified by this as her mother could be, though in a quieter way. Elizabeth felt Jane’s pleasure.
-
-=== ppx-565 | genres: romance | trap
-# place=none/hearth
-“My dear Miss Elizabeth, I have the highest opinion in the world of your excellent judgment in all matters within the scope of your understanding, but permit me to say that there must be a wide difference between the established forms of ceremony amongst the laity and those which regulate the clergy; for, give me leave to observe that I consider the clerical office as equal in point of dignity with the highest rank
-
-=== ppx-679 | genres: romance | trap
-# place=none/hearth
-Nothing less than the complaisance of a courtier could have borne without anger such treatment: but Sir William’s good-breeding carried him through it all; and though he begged leave to be positive as to the truth of his information, he listened to all their impertinence with the most forbearing courtesy.
-
-=== ppx-684 | genres: romance | trap
-# place=none/hearth
-Lady Lucas could not be insensible of triumph on being able to retort on Mrs. Bennet the comfort of having a daughter well married; and she called at Longbourn rather oftener than usual to say how happy she was, though Mrs. Bennet’s sour looks and ill-natured remarks might have been enough to drive happiness away.
-
-=== ppx-688 | genres: romance | trap
-# place=none/hearth
-Neither Jane nor Elizabeth were comfortable on this subject. Day after day passed away without bringing any other tidings of him than the report which shortly prevailed in Meryton of his coming no more to Netherfield the whole winter; a report which highly incensed Mrs. Bennet, and which she never failed to contradict as a most scandalous falsehood.
-
-=== ppx-952 | genres: romance | trap
-# place=none/hearth
-While settling this point, she was suddenly roused by the sound of the door-bell; and her spirits were a little fluttered by the idea of its being Colonel Fitzwilliam himself, who had once before called late in the evening, and might now come to inquire particularly after her. But this idea was soon banished, and her spirits were very differently affected, when, to her utter amazement, she saw Mr.
-
-=== ppx-1047 | genres: romance | trap
-# place=none/hearth
-Elizabeth was shocked to think that, however incapable of such coarseness of _expression_ herself, the coarseness of the _sentiment_ was little other than her own breast had formerly harboured and fancied liberal!
-
-=== ppx-1089 | genres: romance | trap
-# place=none/village
-The first week of their return was soon gone. The second began. It was the last of the regiment’s stay in Meryton, and all the young ladies in the neighbourhood were drooping apace. The dejection was almost universal. The elder Miss Bennets alone were still able to eat, drink, and sleep, and pursue the usual course of their employments.
-
-=== ppx-1096 | genres: romance | trap
-# place=none/village/hearth
-But the gloom of Lydia’s prospect was shortly cleared away; for she received an invitation from Mrs. Forster, the wife of the colonel of the regiment, to accompany her to Brighton. This invaluable friend was a very young woman, and very lately married. A resemblance in good-humour and good spirits had recommended her and Lydia to each other, and out of their _three_ months’ acquaintance they had been intimate _two_.
-
-=== ppx-1124 | genres: romance | trap
-# place=none/village
-When Elizabeth had rejoiced over Wickham’s departure, she found little other cause for satisfaction in the loss of the regiment.
-
-=== ppx-1273 | genres: romance | trap
-# place=none/hearth
-She had never perceived, while the regiment was in Hertfordshire, that Lydia had any partiality for him; but she was convinced that Lydia had wanted only encouragement to attach herself to anybody. Sometimes one officer, sometimes another, had been her favourite, as their attentions raised them in her opinion. Her affections had been continually fluctuating, but never without an object.
-
-=== ppx-1429 | genres: romance | trap
-# place=none/hearth
-“It was greatly my wish that he should do so,” he added, “as soon as his marriage was fixed on. And I think you will agree with me, in considering a removal from that corps as highly advisable, both on his account and my niece’s. It is Mr. Wickham’s intention to go into the Regulars; and, among his former friends, there are still some who are able and willing to assist him in the army.
-
-=== ppx-1451 | genres: romance | trap
-# place=none/hearth
-Their visitors were not to remain above ten days with them. Mr. Wickham had received his commission before he left London, and he was to join his regiment at the end of a fortnight.
-
-=== tix-614 | genres: adventure, pirate | trap
-# place=none/beach/island/forest/sea
-Here he was interrupted by a loud report, and a cannonball came tearing through the trees and pitched in the sand not a hundred yards from where we two were talking. The next moment each of us had taken to his heels in a different direction.
-
-=== tix-633 | genres: adventure, pirate | trap
-# place=none/beach/island/camp/hearth
-Before supper was eaten we buried old Tom in the sand and stood round him for a while bare-headed in the breeze. A good deal of firewood had been got in, but not enough for the captain’s fancy, and he shook his head over it and told us we “must get back to this tomorrow rather livelier.”
-
-=== tix-1015 | genres: adventure, pirate | trap
-# place=none/beach/island/forest/camp
-Very deliberately, then, did we advance across the sand to where the doctor awaited us on the other side of the stockade, and as soon as we were within easy speaking distance Silver stopped.
-
-=== tix-1035 | genres: adventure, pirate | trap
-# place=none/beach/island/camp/forest
-Just then a man hailed us from the fire that breakfast was ready, and we were soon seated here and there about the sand over biscuit and fried junk. They had lit a fire fit to roast an ox, and it was now grown so hot that they could only approach it from the windward, and even there not without precaution.
-
-=== drx-34 | genres: horror, gothic | trap
-# weather=none
-Then a dog began to howl somewhere in a farmhouse far down the road--a long, agonised wailing, as if from fear. The sound was taken up by another dog, and then another and another, till, borne on the wind which now sighed softly through the Pass, a wild howling began, which seemed to come from all over the country, as far as the imagination could grasp it through the gloom of the night.
-
-=== drx-160 | genres: horror, gothic | trap
-# weather=none
-There was no cry from the woman, and the howling of the wolves was but short. Before long they streamed away singly, licking their lips.
-
-=== drx-409 | genres: horror, gothic | trap
-# weather=none
-“I have not examined it yet,” I answered, and then and there proceeded to loose the band. Just over the external jugular vein there were two punctures, not large, but not wholesome-looking. There was no sign of disease, but the edges were white and worn-looking, as if by some trituration.
-
-=== whx-142 | genres: romance, gothic | trap
-# weather=none
-“What _can_ you mean by talking in this way to _me!_” thundered Heathcliff with savage vehemence. “How—how _dare_ you, under my roof?—God! he’s mad to speak so!” And he struck his forehead with rage.
-
-=== whx-561 | genres: romance, gothic | trap
-# weather=none
-“Do you suppose I’m going with that blow burning in my gullet?” he thundered. “By hell, no! I’ll crush his ribs in like a rotten hazel-nut before I cross the threshold! If I don’t floor him now, I shall murder him some time; so, as you value his existence, let me get at him!”
-
-=== whx-696 | genres: romance, gothic | trap
-# weather=none
-“No!” thundered Earnshaw; “should he offer to leave me, he’s a dead man: persuade him to attempt it, and you are a murderess! Am I to lose _all_, without a chance of retrieval? Is Hareton to be a beggar? Oh, damnation! I _will_ have it back; and I’ll have _his_ gold too; and then his blood; and hell shall have his soul! It will be ten times blacker with that guest than ever it was before!”
-
-=== whx-816 | genres: romance, gothic | trap
-# weather=none
-He dashed his head against the knotted trunk; and, lifting up his eyes, howled, not like a man, but like a savage beast being goaded to death with knives and spears. I observed several splashes of blood about the bark of the tree, and his hand and forehead were both stained; probably the scene I witnessed was a repetition of others acted during the night.
-
-=== whx-1618 | genres: romance, gothic | trap
-# weather=none
-“If Hareton does not turn you out of the room, I’ll strike him to hell,” thundered Heathcliff. “Damnable witch! dare you pretend to rouse him against me? Off with her! Do you hear? Fling her into the kitchen! I’ll kill her, Ellen Dean, if you let her come into my sight again!”
-
-=== jbx-54 | genres: adventure | trap
-# place=none/jungle/cave/forest
-A black shadow dropped down into the circle. It was Bagheera the Black Panther, inky black all over, but with the panther markings showing up in certain lights like the pattern of watered silk. Everybody knew Bagheera, and nobody cared to cross his path; for he was as cunning as Tabaqui, as bold as the wild buffalo, and as reckless as the wounded elephant.
-
-=== jbx-345 | genres: adventure | trap
-# weather=none
-An Indian grazing ground is all rocks and scrub and tussocks and little ravines, among which the herds scatter and disappear. The buffaloes generally keep to the pools and muddy places, where they lie wallowing or basking in the warm mud for hours.
-
-=== jbx-349 | genres: adventure | trap
-# weather=none
-Then Mowgli picked out a shady place, and lay down and slept while the buffaloes grazed round him. Herding in India is one of the laziest things in the world. The cattle move and crunch, and lie down, and move on again, and they do not even low.
-
-=== jbx-772 | genres: adventure | trap
-# place=none/camp/battle
-The baggage-camel had been bobbing his head to and fro for some time past, anxious to get a word in edgewise. Then I heard him say, as he cleared his throat, nervously:
-
-=== jbx-798 | genres: adventure | trap
-# place=none/camp/battle
-The bullocks and the camel said, half aloud, “Afraid of Two Tails--what nonsense!” And the bullocks went on, “We are sorry that you heard, but it is true. Two Tails, why are you afraid of the guns when they fire?”
-
-=== jbx-811 | genres: adventure | trap
-# place=none/camp/battle
-“But it is not here,” said the camel and the bullocks. “Why are you so stupid?”
-
-=== jbx-832 | genres: adventure | trap
-# place=none/camp/battle
-“Hukm hai!” (It is an order!), said the camel with a gurgle, and Two Tails and the bullocks repeated, “Hukm hai!”
-
-=== jbx-493 | genres: adventure | trap
-# place=none/sea/beach/reef
-“By the Great Combers of Magellan!” he said, beneath his mustache. “Who in the Deep Sea are these people?”
-
-## ---- Day and night: a time word that only refers to another time (last night, every night, dark hair) must not change the scene ----
-
-=== tit-1011 | genres: adventure, pirate | trap
-# time=none
-The explosion of disapproval, which nothing but Silver’s black looks had restrained, broke out immediately the doctor had left the house. Silver was roundly accused of playing double--of trying to make a separate peace for himself, of sacrificing the interests of his accomplices and victims, and, in one word, of the identical, exact thing that he was doing.
-
-=== drt-655 | genres: horror, gothic | trap
-# time=none
-_22 September._--It is all over. Arthur has gone back to Ring, and has taken Quincey Morris with him. What a fine fellow is Quincey! I believe in my heart of hearts that he suffered as much about Lucy’s death as any of us; but he bore himself through it like a moral Viking. If America can go on breeding men like that, she will be a power in the world indeed.
-
-=== hbt-477 | genres: mystery, detective | trap
-# time=none
-“Perhaps then he pays a visit every night to that particular window,” I suggested.
-
-=== wht-157 | genres: romance, gothic | trap
-# time=none
-My human fixture and her satellites rushed to welcome me; exclaiming, tumultuously, they had completely given me up: everybody conjectured that I perished last night; and they were wondering how they must set about the search for my remains.
-
-=== drt-1097 | genres: horror, gothic | trap
-# time=none
-_2 October._--I placed a man in the corridor last night, and told him to make an accurate note of any sound he might hear from Renfield’s room, and gave him instructions that if there should be anything strange he was to call me. After dinner, when we had all gathered round the fire in the study--Mrs. Harker having gone to bed--we discussed the attempts and discoveries of the day.
-
-=== wht-420 | genres: romance, gothic | trap
-# time=none
-“I never saw Heathcliff last night,” answered Catherine, beginning to sob bitterly: “and if you do turn him out of doors, I’ll go with him. But, perhaps, you’ll never have an opportunity: perhaps, he’s gone.” Here she burst into uncontrollable grief, and the remainder of her words were inarticulate.
-
-=== wht-664 | genres: romance, gothic | trap
-# time=none
-DEAR ELLEN, it begins,—I came last night to Wuthering Heights, and heard, for the first time, that Catherine has been, and is yet, very ill. I must not write to her, I suppose, and my brother is either too angry or too distressed to answer what I sent him. Still, I must write to somebody, and the only choice left me is you.
-
-=== hbt-844 | genres: mystery, detective | trap
-# time=none
-I was much astounded by this programme, though I remembered that Holmes had said to Stapleton on the night before that his visit would terminate next day. It had not crossed my mind however, that he would wish me to go with him, nor could I understand how we could both be absent at a moment which he himself declared to be critical.
-
-=== wht-192 | genres: romance, gothic | trap
-# time=none
-I hoped heartily we should have peace now. It hurt me to think the master should be made uncomfortable by his own good deed. I fancied the discontent of age and disease arose from his family disagreements; as he would have it that it did: really, you know, sir, it was in his sinking frame.
-
-=== wht-747 | genres: romance, gothic | trap
-# time=none
-“Put that down!” he interrupted, perceiving my intention to depart. “You are not going yet. Come here now, Nelly: I must either persuade or compel you to aid me in fulfilling my determination to see Catherine, and that without delay. I swear that I meditate no harm: I don’t desire to cause any disturbance, or to exasperate or insult Mr.
-
-=== ppt-769 | genres: romance | trap
-# time=none
-With no greater events than these in the Longbourn family, and otherwise diversified by little beyond the walks to Meryton, sometimes dirty and sometimes cold, did January and February pass away. March was to take Elizabeth to Hunsford.
-
-=== tit-18 | genres: adventure, pirate | trap
-# time=none
-How that personage haunted my dreams, I need scarcely tell you. On stormy nights, when the wind shook the four corners of the house and the surf roared along the cove and up the cliffs, I would see him in a thousand forms, and with a thousand diabolical expressions.
-
-=== wht-1699 | genres: romance, gothic | trap
-# time=none
-We buried him, to the scandal of the whole neighbourhood, as he wished. Earnshaw and I, the sexton, and six men to carry the coffin, comprehended the whole attendance. The six men departed when they had let it down into the grave: we stayed to see it covered.
-
-=== drt-859 | genres: horror, gothic | trap
-# time=none
-“Two nights hence you shall meet with me and dine together at seven of the clock with friend John. I shall entreat two others, two that you know not as yet; and I shall be ready to all our work show and our plans unfold. Friend John, you come with me home, for I have much to consult about, and you can help me. To-night I leave for Amsterdam, but shall return to-morrow night. And then begins our great quest.
-
-=== hbt-346 | genres: mystery, detective | trap
-# time=none
-I saw his dark face lit up with a boyish enthusiasm as he gazed about him. The light beat upon him where he stood, but long shadows trailed down the walls and hung like a black canopy above him. Barrymore had returned from taking our luggage to our rooms. He stood in front of us now with the subdued manner of a well-trained servant.
-
-=== tit-744 | genres: adventure, pirate
-# time=night
-The white rock, visible enough above the brush, was still some eighth of a mile further down the spit, and it took me a goodish while to get up with it, crawling, often on all fours, among the scrub. Night had almost come when I laid my hand on its rough sides.
-
-=== wht-65 | genres: romance, gothic
-# time=night
-The business of eating being concluded, and no one uttering a word of sociable conversation, I approached a window to examine the weather. A sorrowful sight I saw: dark night coming down prematurely, and sky and hills mingled in one bitter whirl of wind and suffocating snow.
-
-=== wht-464 | genres: romance, gothic
-# time=night
-About the middle of the night, I was wakened from my first nap by Mrs. Linton gliding into my chamber, taking a seat on my bedside, and pulling me by the hair to rouse me.
-
-=== tiw-4647 | genres: adventure, pirate | trap
-# weather=none
-by thunder, the old ship was gone! I never seen a pack o’ fools look
-
-=== tiw-3472 | genres: adventure, pirate | trap
-# weather=none
-“At ’em, all hands--all hands!” he roared in a voice of thunder.
-
-=== tiw-3577 | genres: adventure, pirate | trap
-# weather=none
-of his mouth and fairly forgot to put it back again, so thunder-struck
-
-=== tiw-2197 | genres: adventure, pirate | trap
-# weather=none
-it was plain, hung over us like a thunder-cloud.
-
-=== tiw-206 | genres: adventure, pirate | trap
-# weather=none
-doctor, with his powder as white as snow and his bright, black eyes and
-
-=== jbw-784 | genres: adventure | trap
-# weather=none
-“Listen, man-cub,” said the Bear, and his voice rumbled like thunder on
-
-=== whw-3927 | genres: romance, gothic | trap
-# weather=none
-tempest of passion with a kind of fit. That’s her account, at least:
-
-=== whw-9476 | genres: romance, gothic | trap
-# weather=none
-and scowled like a thunder-cloud, and kept his fists resolutely
-
-=== drw-10589 | genres: horror, gothic | trap
-# weather=none
-although she grew snowy white at times when danger had seemed to
-
-=== drw-282 | genres: horror, gothic | trap
-# weather=none
-the snowy peaks rose grandly. Here and there seemed mighty rifts in the
-
-=== whw-2519 | genres: romance, gothic
-# weather=storm
-Heights in full fury. There was a violent wind, as well as thunder, and
-
-=== drw-2671 | genres: horror, gothic
-# weather=storm
-Then without warning the tempest broke. With a rapidity which, at the
-
-=== drp-1296 | genres: horror, gothic | trap
-# place=none
-gloom-haunted rooms, but to sleep here, where, of old, ladies had sat
-
-=== tip-144 | genres: adventure, pirate | trap
-# place=none
-How that personage haunted my dreams, I need scarcely tell you. On
-
-=== whp-4506 | genres: romance, gothic | trap
-# place=none
-period of my life, I had a notion of the kind: it haunted me on my
-
-=== hbp-580 | genres: mystery, detective | trap
-# place=none
-constantly haunted him, and on more than one occasion he has
-
-=== whp-8641 | genres: romance, gothic | trap
-# place=none
-since then my presence is as potent on his nerves as a ghost; and I
-
-=== drp-3611 | genres: horror, gothic | trap
-# place=none
-to recall it. Sister Agatha, who is a good creature and a born nurse,
-
-=== drp-4463 | genres: horror, gothic | trap
-# place=none
-yourself. You want a wife to nurse and look after you a bit; that you
-
-=== whp-7378 | genres: romance, gothic | trap
-# place=none
-and she was the fondest nurse that ever watched. She must have had a
-
-=== colour-sea-blue-eyes | genres: romance | trap
-# place=none
-She looked up at him with her sea blue eyes, and smiled shyly across the table.
-
-=== colour-sea-blue-hyphen | genres: adventure | trap
-# place=none
-Her sea-blue eyes were full of tears, and the child clung to her hand.
-
-=== colour-sea-colour-of | genres: romance | trap
-# place=none
-She had eyes the colour of the sea, and he could not bring himself to look away from her.
-
-=== colour-sea-green-dress | trap
-# place=none
-The sea-green dress rustled softly as she turned to greet the visitors.
-
-=== colour-sea-real-shore | genres: adventure
-# place=sea/beach
-He stood on the sea shore and watched the grey waves break over the rocks.
-
-=== fixl-les-struck | genres: adventure | trap
-# weather=none
-The old man remained for several minutes motionless and as though struck by lightning, without the power to speak or breathe, as though a clenched fist grasped his heart.
-
-=== fixl-scarlet-struck | genres: mystery, detective | trap
-# weather=none
-His face was ghastly pale, and lifeless as if it had been struck by lightning.
-
-=== fixl-oliver-struck | trap
-# weather=none
-Staggering as if struck by lightning, he lost his balance and tumbled down the stairs.
-
-=== fixl-moby-tempered | genres: adventure, sea | trap
-# weather=none
-His death! Tempered in blood, and tempered by lightning are these things.
-
-=== fixl-mars-rapidity | genres: science fiction | trap
-# weather=none
-The blade was swinging with the rapidity of lightning as I sought to parry the blows.
-
-=== fixl-tempest-like | genres: horror, gothic | trap
-# weather=none
-These two base passions raged within him like a tempest. He walked on in silence.
-
-=== fixs-red-caps | trap
-# place=none
-On men's shoulders, with a confused sea of red caps heaving about him, he went along.
-
-=== fixs-pale-smoke | genres: war | trap
-# place=none
-The soldiers were floating to and fro upon a pale sea of smoke. Those behind the fence were silent.
-
-=== fixs-like-a-sea | trap
-# place=none
-The crowd roared at him, like a sea, or a wind, or a fire. Eager faces strained round the table.
-
-=== fixs-sea-colour-lead | trap
-# place=none
-He had gone to the very end of the world, a sea the colour of lead, a sky the colour of ash.
-
-=== fixw-ward-off | trap
-# place=none
-He would have been greatly angered had he had a lightning rod to ward off such a blow as that.
-
-=== fixw-nurse-baby | trap
-# place=none
-Natasha, who had long expected to be fetched to nurse her baby, now heard the nurse calling her and went upstairs.
-
-=== fixc-posture | genres: science fiction | trap
-# place=none
-He stood six feet, broad of shoulder and narrow of hip, with the carriage of a soldier.
-
-=== fixl-real-storm-control | genres: adventure
-# weather=storm
-A sudden storm broke over the hills, and the lightning struck a tree beside the road while the thunder rolled.
-
-=== fixs-real-sea-control | genres: adventure
-# place=sea
-The ship rolled heavily and the sea washed over the deck while the sailors hauled on the ropes.
-
-=== fixc-real-carriage-control | genres: romance
-# place=carriage
-She called for her in the carriage at ten, and they drove along the lane to the village.
-
-=== r2-than-snow | trap
-# weather=none
-I went into a field of flowers, whose petals are whiter than snow and whose hearts are pure gold.
-
-=== r2-like-ocean | trap
-# place=none
-My brother asked the birds to forgive him; that sounds senseless, but it is right; for all is like an ocean, all is flowing and blending; a touch in one place sets up movement at the other end of the earth.
-
-=== r2-like-forest | trap
-# place=none
-The roar rose like the sea, the hands rose like a forest, and three minutes afterwards Mr. Gabriel Syme, of the Secret Police Service, was elected to the post.
-
-=== r2-waste-as-sea | genres: adventure | trap
-# place=moor
-The mist rose and died away, and showed us that country lying as waste as the sea; only the moorfowl and the pewees crying upon it, and far over to the east, a line of heather and heath.
-
-=== r2-colour-wintry-sea | trap
-# place=none
-The Professor made no answer, but gazed in front of him with eyes the colour of a wintry sea; so Syme repeated his question.
-
-=== r2-chimney-pots | genres: children | trap
-# place=none
-Heidi saw beneath her a sea of roofs, towers, and chimney-pots; she quickly drew back her head and said in a sad, disappointed voice.
-
-=== r2-like-the-wind | genres: adventure | trap
-# weather=none
-The boy ran like the wind, and his friends came after him as fast as they could.
-
-=== r2-swift-as-wind | trap
-# weather=none
-He was as swift as the wind and as cold as the winter stone, and nobody could stop him.
-
-=== r2-real-mist-control | genres: mystery
-# weather=fog
-The fog thickened over the river, and the mist crept up the lane until the lamps vanished.
-
-=== r2-real-wind-control | genres: adventure
-# weather=wind
-The wind howled across the hill, the gale tore at the sail, and the wind drove them back from the shore.
-
-=== r3-bolt-simile | genres: science fiction | trap
-# weather=none
-Like a bolt of lightning it raced toward Helium until its very speed carried it far across the plain.
-
-=== r3-scathed | trap
-# weather=none
-He came to the place where the tree had been scathed by lightning, and the white wood laid bare.
-
-=== r3-blown-up | genres: adventure | trap
-# weather=none
-I was afraid of being destroyed at one blast, I mean my powder being blown up by lightning;
-
-=== r3-death-by | genres: adventure | trap
-# weather=none
-He wished for a death worthy of himself, a death by lightning, and not a slow end in a bed.
-
-=== r3-lightning-flashes-control | genres: horror
-# weather=storm
-By the lightning flashes I saw the black bulk of the house, and the thunder crashed over the roof.
-
-=== int-heavy-rain | genres: adventure
-# weather=rain strength=strong
-Heavy rain fell all night on the roof, and the streets ran with water.
-
-=== int-rain-hard
-# weather=rain strength=strong
-The rain came down hard and the gutters overflowed into the lane.
-
-=== int-downpour
-# weather=rain strength=strong
-A torrential downpour soaked the travellers to the skin before they reached the inn.
-
-=== int-violent-storm | genres: adventure
-# weather=storm strength=strong
-A violent storm broke over the ship, and the thunder crashed above the masts.
-
-=== int-light-drizzle
-# weather=rain strength=weak
-A light drizzle fell as they walked slowly home along the lane.
-
-=== int-rain-softly
-# weather=rain strength=weak
-The rain fell softly on the leaves, and the garden was still.
-
-=== int-distant-thunder
-# weather=storm strength=weak
-Distant thunder rumbled over the hills, and a faint rain began to fall.
-
-=== int-plain-rain
-# weather=rain strength=normal
-The rain fell on the roof and ran down the window panes all afternoon.
-
-=== int-lamp-light-rain
-# weather=rain strength=normal
-The light of the lamp shone on the rain, and the rain ran down the glass.
-
-=== int-heavy-with-rain
-# strength=normal/none
-The sky was heavy with rain, and the air smelled of it as they set out.
-
-</script>
-<script type="application/json" id="scene-baseline">{"sea-voyage#0#place":{"g":"sea","s":"ok"},"ships-cabin#0#place":{"g":"cabin","s":"ok"},"harbour-morning#0#place":{"g":"harbour","s":"ok"},"castle-hall#0#place":{"g":"castle","s":"ok"},"graveyard-night#0#place":{"g":"graveyard","s":"ok"},"graveyard-night#0#time":{"g":"night","s":"ok"},"moor-wind#0#place":{"g":"moor","s":"ok"},"moor-wind#0#weather":{"g":"none","s":"missed"},"moor-storm#0#place":{"g":"moor","s":"ok"},"moor-storm#0#weather":{"g":"storm","s":"ok"},"ballroom-evening#0#place":{"g":"ballroom","s":"ok"},"ballroom-evening#0#mood":{"g":"none","s":"missed"},"drawing-room#0#place":{"g":"hearth","s":"ok"},"garden-birds#0#place":{"g":"garden","s":"ok"},"jungle#0#place":{"g":"jungle","s":"ok"},"river-bank#0#place":{"g":"river","s":"ok"},"schoolroom#0#place":{"g":"school","s":"ok"},"laboratory#0#place":{"g":"lab","s":"ok"},"dungeon#0#place":{"g":"cellar","s":"ok"},"farm-yard#0#place":{"g":"farm","s":"ok"},"city-street#0#place":{"g":"city","s":"ok"},"tavern-night#0#place":{"g":"tavern","s":"ok"},"church-service#0#place":{"g":"church","s":"ok"},"trap-negated-weather#0#weather":{"g":"none","s":"ok"},"trap-metaphors#0#place":{"g":"none","s":"ok"},"trap-metaphors#0#weather":{"g":"none","s":"ok"},"trap-names#0#place":{"g":"none","s":"ok"},"trap-names#0#mood":{"g":"none","s":"ok"},"trap-place-in-dialogue#0#place":{"g":"none","s":"ok"},"trap-remembered-place#0#place":{"g":"none","s":"ok"},"trap-storm-ended#0#weather":{"g":"rain","s":"ok"},"trap-storm-ended#1#weather":{"g":"none","s":"ok"},"trap-no-fear#0#mood":{"g":"none","s":"ok"},"move-hearth-to-garden#0#place":{"g":"hearth","s":"ok"},"move-hearth-to-garden#1#place":{"g":"hearth","s":"late"},"move-hearth-to-garden#1#trans":{"g":"none","s":"missed"},"move-house-to-forest#0#place":{"g":"hearth","s":"ok"},"move-house-to-forest#1#place":{"g":"forest","s":"ok"},"move-house-to-forest#1#trans":{"g":"door","s":"ok"},"move-forest-to-mountain#0#place":{"g":"forest","s":"ok"},"move-forest-to-mountain#1#place":{"g":"forest","s":"late"},"move-forest-to-mountain#1#trans":{"g":"none","s":"missed"},"move-sea-to-harbour#0#place":{"g":"sea","s":"ok"},"move-sea-to-harbour#1#place":{"g":"sea","s":"late"},"move-sea-to-harbour#1#trans":{"g":"none","s":"ok"},"ti-205#0#place":{"g":"sea","s":"ok"},"ti-204#0#place":{"g":"sea","s":"ok"},"ti-200#0#place":{"g":"sea","s":"ok"},"ti-636#0#place":{"g":"beach","s":"ok"},"ti-493#0#place":{"g":"river","s":"ok"},"ti-405#0#place":{"g":"sea","s":"ok"},"ti-3#0#place":{"g":"tavern","s":"ok"},"ti-166#0#place":{"g":"none","s":"ok"},"ti-170#0#place":{"g":"sea","s":"ok"},"ti-552#0#place":{"g":"none","s":"ok"},"ti-282#0#place":{"g":"none","s":"ok"},"dr-35#0#place":{"g":"castle","s":"ok"},"dr-51#0#place":{"g":"castle","s":"ok"},"dr-64#0#place":{"g":"castle","s":"ok"},"dr-64#0#mood":{"g":"none","s":"missed"},"dr-277#0#place":{"g":"graveyard","s":"ok"},"dr-116#0#place":{"g":"sea","s":"ok"},"dr-116#0#weather":{"g":"rain","s":"ok"},"dr-122#0#place":{"g":"sea","s":"ok"},"dr-110#0#weather":{"g":"none","s":"missed"},"dr-1#0#place":{"g":"train","s":"ok"},"dr-434#0#place":{"g":"study","s":"ok"},"dr-66#0#time":{"g":"night","s":"ok"},"dr-172#0#place":{"g":"none","s":"ok"},"dr-610#0#weather":{"g":"none","s":"ok"},"dr-459#0#place":{"g":"none","s":"ok"},"dr-258#0#place":{"g":"none","s":"ok"},"wh-777#0#place":{"g":"moor","s":"ok"},"wh-25#0#weather":{"g":"snow","s":"ok"},"wh-25#0#time":{"g":"night","s":"ok"},"wh-511#0#place":{"g":"none","s":"ok"},"hb-129#0#place":{"g":"hearth","s":"ok"},"hb-217#0#time":{"g":"night","s":"ok"},"hb-217#0#weather":{"g":"rain","s":"ok"},"hb-218#0#place":{"g":"swamp","s":"ok"},"hb-218#0#time":{"g":"night","s":"ok"},"hb-218#0#mood":{"g":"dread","s":"ok"},"hb-71#0#place":{"g":"city","s":"ok"},"jb-202#0#place":{"g":"beach","s":"ok"},"jb-351#0#place":{"g":"river","s":"ok"},"jb-351#0#time":{"g":"night","s":"ok"},"jb-351#0#weather":{"g":"fog","s":"ok"},"jb-50#0#place":{"g":"cave","s":"ok"},"jb-222#0#weather":{"g":"storm","s":"ok"},"jb-180#0#place":{"g":"village","s":"ok"},"jb-48#0#place":{"g":"jungle","s":"ok"},"pp-532#0#place":{"g":"none","s":"missed"},"pp-119#0#place":{"g":"hearth","s":"ok"},"pp-138#0#place":{"g":"hearth","s":"ok"},"pp-389#0#place":{"g":"hearth","s":"ok"},"pp-421#0#place":{"g":"none","s":"ok"},"ppx-82#0#place":{"g":"none","s":"ok"},"ppx-565#0#place":{"g":"none","s":"ok"},"ppx-679#0#place":{"g":"none","s":"ok"},"ppx-684#0#place":{"g":"none","s":"ok"},"ppx-688#0#place":{"g":"none","s":"ok"},"ppx-952#0#place":{"g":"none","s":"ok"},"ppx-1047#0#place":{"g":"none","s":"ok"},"ppx-1089#0#place":{"g":"none","s":"ok"},"ppx-1096#0#place":{"g":"none","s":"ok"},"ppx-1124#0#place":{"g":"none","s":"ok"},"ppx-1273#0#place":{"g":"none","s":"ok"},"ppx-1429#0#place":{"g":"none","s":"ok"},"ppx-1451#0#place":{"g":"none","s":"ok"},"tix-614#0#place":{"g":"none","s":"ok"},"tix-633#0#place":{"g":"none","s":"ok"},"tix-1015#0#place":{"g":"none","s":"ok"},"tix-1035#0#place":{"g":"none","s":"ok"},"drx-34#0#weather":{"g":"none","s":"ok"},"drx-160#0#weather":{"g":"none","s":"ok"},"drx-409#0#weather":{"g":"none","s":"ok"},"whx-142#0#weather":{"g":"none","s":"ok"},"whx-561#0#weather":{"g":"none","s":"ok"},"whx-696#0#weather":{"g":"none","s":"ok"},"whx-816#0#weather":{"g":"none","s":"ok"},"whx-1618#0#weather":{"g":"none","s":"ok"},"jbx-54#0#place":{"g":"none","s":"ok"},"jbx-345#0#weather":{"g":"none","s":"ok"},"jbx-349#0#weather":{"g":"none","s":"ok"},"jbx-772#0#place":{"g":"none","s":"ok"},"jbx-798#0#place":{"g":"none","s":"ok"},"jbx-811#0#place":{"g":"none","s":"ok"},"jbx-832#0#place":{"g":"none","s":"ok"},"jbx-493#0#place":{"g":"none","s":"ok"},"tit-1011#0#time":{"g":"none","s":"ok"},"drt-655#0#time":{"g":"none","s":"ok"},"hbt-477#0#time":{"g":"none","s":"ok"},"wht-157#0#time":{"g":"none","s":"ok"},"drt-1097#0#time":{"g":"none","s":"ok"},"wht-420#0#time":{"g":"none","s":"ok"},"wht-664#0#time":{"g":"none","s":"ok"},"hbt-844#0#time":{"g":"none","s":"ok"},"wht-192#0#time":{"g":"none","s":"ok"},"wht-747#0#time":{"g":"none","s":"ok"},"ppt-769#0#time":{"g":"none","s":"ok"},"tit-18#0#time":{"g":"none","s":"ok"},"wht-1699#0#time":{"g":"none","s":"ok"},"drt-859#0#time":{"g":"none","s":"ok"},"hbt-346#0#time":{"g":"none","s":"ok"},"tit-744#0#time":{"g":"night","s":"ok"},"wht-65#0#time":{"g":"night","s":"ok"},"wht-464#0#time":{"g":"night","s":"ok"},"tiw-4647#0#weather":{"g":"none","s":"ok"},"tiw-3472#0#weather":{"g":"none","s":"ok"},"tiw-3577#0#weather":{"g":"none","s":"ok"},"tiw-2197#0#weather":{"g":"none","s":"ok"},"tiw-206#0#weather":{"g":"none","s":"ok"},"jbw-784#0#weather":{"g":"none","s":"ok"},"whw-3927#0#weather":{"g":"none","s":"ok"},"whw-9476#0#weather":{"g":"none","s":"ok"},"drw-10589#0#weather":{"g":"none","s":"ok"},"drw-282#0#weather":{"g":"none","s":"ok"},"whw-2519#0#weather":{"g":"storm","s":"ok"},"drw-2671#0#weather":{"g":"storm","s":"ok"},"drp-1296#0#place":{"g":"none","s":"ok"},"tip-144#0#place":{"g":"none","s":"ok"},"whp-4506#0#place":{"g":"none","s":"ok"},"hbp-580#0#place":{"g":"none","s":"ok"},"whp-8641#0#place":{"g":"none","s":"ok"},"drp-3611#0#place":{"g":"none","s":"ok"},"drp-4463#0#place":{"g":"none","s":"ok"},"whp-7378#0#place":{"g":"none","s":"ok"},"colour-sea-blue-eyes#0#place":{"g":"none","s":"ok"},"colour-sea-blue-hyphen#0#place":{"g":"none","s":"ok"},"colour-sea-colour-of#0#place":{"g":"none","s":"ok"},"colour-sea-green-dress#0#place":{"g":"none","s":"ok"},"colour-sea-real-shore#0#place":{"g":"sea","s":"ok"},"fixl-les-struck#0#weather":{"g":"none","s":"ok"},"fixl-scarlet-struck#0#weather":{"g":"none","s":"ok"},"fixl-oliver-struck#0#weather":{"g":"none","s":"ok"},"fixl-moby-tempered#0#weather":{"g":"none","s":"ok"},"fixl-mars-rapidity#0#weather":{"g":"none","s":"ok"},"fixl-tempest-like#0#weather":{"g":"none","s":"ok"},"fixs-red-caps#0#place":{"g":"none","s":"ok"},"fixs-pale-smoke#0#place":{"g":"none","s":"ok"},"fixs-like-a-sea#0#place":{"g":"none","s":"ok"},"fixs-sea-colour-lead#0#place":{"g":"none","s":"ok"},"fixw-ward-off#0#place":{"g":"none","s":"ok"},"fixw-nurse-baby#0#place":{"g":"none","s":"ok"},"fixc-posture#0#place":{"g":"none","s":"ok"},"fixl-real-storm-control#0#weather":{"g":"storm","s":"ok"},"fixs-real-sea-control#0#place":{"g":"sea","s":"ok"},"fixc-real-carriage-control#0#place":{"g":"carriage","s":"ok"},"r2-than-snow#0#weather":{"g":"none","s":"ok"},"r2-like-ocean#0#place":{"g":"none","s":"ok"},"r2-like-forest#0#place":{"g":"none","s":"ok"},"r2-waste-as-sea#0#place":{"g":"moor","s":"ok"},"r2-colour-wintry-sea#0#place":{"g":"none","s":"ok"},"r2-chimney-pots#0#place":{"g":"none","s":"ok"},"r2-like-the-wind#0#weather":{"g":"none","s":"ok"},"r2-swift-as-wind#0#weather":{"g":"none","s":"ok"},"r2-real-mist-control#0#weather":{"g":"fog","s":"ok"},"r2-real-wind-control#0#weather":{"g":"wind","s":"ok"},"r3-bolt-simile#0#weather":{"g":"none","s":"ok"},"r3-scathed#0#weather":{"g":"none","s":"ok"},"r3-blown-up#0#weather":{"g":"none","s":"ok"},"r3-death-by#0#weather":{"g":"none","s":"ok"},"r3-lightning-flashes-control#0#weather":{"g":"storm","s":"ok"},"int-heavy-rain#0#weather":{"g":"rain","s":"ok"},"int-heavy-rain#0#strength":{"g":"strong","s":"ok"},"int-rain-hard#0#weather":{"g":"rain","s":"ok"},"int-rain-hard#0#strength":{"g":"strong","s":"ok"},"int-downpour#0#weather":{"g":"rain","s":"ok"},"int-downpour#0#strength":{"g":"strong","s":"ok"},"int-violent-storm#0#weather":{"g":"storm","s":"ok"},"int-violent-storm#0#strength":{"g":"strong","s":"ok"},"int-light-drizzle#0#weather":{"g":"rain","s":"ok"},"int-light-drizzle#0#strength":{"g":"weak","s":"ok"},"int-rain-softly#0#weather":{"g":"rain","s":"ok"},"int-rain-softly#0#strength":{"g":"weak","s":"ok"},"int-distant-thunder#0#weather":{"g":"storm","s":"ok"},"int-distant-thunder#0#strength":{"g":"weak","s":"ok"},"int-plain-rain#0#weather":{"g":"rain","s":"ok"},"int-plain-rain#0#strength":{"g":"normal","s":"ok"},"int-lamp-light-rain#0#weather":{"g":"rain","s":"ok"},"int-lamp-light-rain#0#strength":{"g":"normal","s":"ok"},"int-heavy-with-rain#0#strength":{"g":"normal","s":"ok"}}</script>
 <script type="application/json" id="amb-map">
 {
  "v": 1,
@@ -4957,7 +4172,7 @@ The sky was heavy with rain, and the air smelled of it as they set out.
     </div>
     <div class="synccard">
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-archive"/></svg>Backup</h3>
-      <p class="help">Save your favourites, saved words, bookmarks, listening history and positions to a file, or restore them from one. Downloaded audio and the GitHub token are not included.</p>
+      <p class="help">Save your favourites, saved words, bookmarks, listening history and positions to a file, or restore them from one. Downloaded audio is not included.</p>
       <div class="row" style="justify-content:flex-start;gap:.5rem"><button id="b-bkdl" class="btn" type="button">Download backup</button><button id="b-bkrs" class="btn" type="button">Restore backup</button></div>
       <input id="in-bkfile" type="file" accept=".json,application/json" hidden>
     </div>
@@ -5012,9 +4227,6 @@ The sky was heavy with rain, and the air smelled of it as they set out.
         <div class="row" style="margin-top:.8rem"><label for="in-lowpower">Lower power while playing</label><input id="in-lowpower" type="checkbox"></div>
         <p class="help" style="margin-top:.3rem">Updates the highlight about 20 times a second instead of 60 and draws the sound wave less often, and lets the screen sleep when audio is paused and you have not touched the phone for 2 minutes. Highlighting looks the same. Leave it on; turn it off only if the highlight seems to lag.</p>
         <div class="row" style="display:none;margin-top:.8rem"><label for="in-ghrepo">Sync repository (name/repo)</label><input id="in-ghrepo" class="num" type="text" placeholder="rabiul43/wordtrail-data" style="width:11rem"></div>
-        <div class="row" style="display:none;margin-top:.5rem"><label for="in-ghtok">GitHub token</label><input id="in-ghtok" class="num" type="password" autocomplete="off" style="width:11rem"></div>
-        <div class="row" style="display:none;margin-top:.4rem;justify-content:flex-end;gap:.5rem"><button id="b-tokshow" class="btn" type="button">Show</button><button id="b-tokcopy" class="btn" type="button">Copy token</button></div>
-        <p class="help" style="display:none;margin-top:.4rem">The token needs Issues and Contents (read and write) access to this repository. Contents lets the first device to finish a book share the result, so other devices skip the alignment.</p>
         <div class="row" style="display:none;margin-top:.5rem"><label for="in-ntfy">Phone alert when sync finishes</label><input id="in-ntfy" type="checkbox"></div>
         <p id="ntfy-help" class="help" hidden></p>
         <div class="row" style="margin-top:.5rem"><label for="in-tim">Load a timing file (.json)</label><input id="in-tim" type="file" accept=".json,application/json" style="max-width:11rem"></div>
@@ -13388,8 +12600,10 @@ const Core = makeCore();
   /* ---------- Precise timing from speech recognition ----------
      A timing file (made by wordtrail_colab.py) holds every word the narrator said, with its
      time. Each sentence is matched to those words, so each start is measured, not estimated. */
-  /* Default sync repository (name/repo). Users can override it in Settings > Advanced. No token is stored in the app. */
-  const DEFAULT_REPO = 'rabiul43/wordtrail-data', TEST_TOKEN = '';
+  /* Default sync repository (name/repo). The repository name can be overridden through wt:gh. No token is stored in the app. */
+  const DEFAULT_REPO = 'rabiul43/wordtrail-data';
+  /* An earlier version let a GitHub token be saved in wt:gh. It is not used any more, so any saved token is deleted from this device. */
+  try { const o = JSON.parse(localStorage.getItem('wt:gh') || 'null'); if (o && typeof o === 'object' && 'token' in o) { delete o.token; localStorage.setItem('wt:gh', JSON.stringify(o)); } } catch (e) { /* storage unavailable */ }
   const ghCfg = () => { const c = store.get('wt:gh', {}) || {}; return { repo: c.repo || DEFAULT_REPO, token: '' }; };   /* GitHub sync was removed: timing now comes only from Hugging Face */
   const toks = s => (String(s).toLowerCase().match(/[a-z0-9]+(?:['\u2019][a-z]+)?/g) || []).map(w => w.replace(/['\u2019]/g, ''));
   /* Word-by-word alignment of book words B against spoken words A. The search runs inside a band. Without
@@ -14234,19 +13448,10 @@ const Core = makeCore();
     toast(list.length + ' books saved to books.csv' + (miss ? '. ' + miss + ' still need a Gutenberg id.' : '.'), 6000);
   }
   { const bb = document.getElementById('b-booklist'); if (bb) bb.addEventListener('click', exportBookList); }
-  { const g = store.get('wt:gh', {}) || {}, r = document.getElementById('in-ghrepo'), k = document.getElementById('in-ghtok');
-    if (r && k) { r.value = g.repo || ''; k.value = g.token || '';
-      const save = () => store.set('wt:gh', { repo: r.value.trim(), token: k.value.trim() });
-      ['input', 'change'].forEach(ev => { r.addEventListener(ev, save); k.addEventListener(ev, save); });
-      const sb = document.getElementById('b-syncnow');
-      if (sb) sb.addEventListener('click', () => { save(); syncNow(); });
-      const bs = document.getElementById('b-tokshow'), bc = document.getElementById('b-tokcopy');
-      if (bs) bs.addEventListener('click', () => { const hid = k.type === 'password'; k.type = hid ? 'text' : 'password'; bs.textContent = hid ? 'Hide' : 'Show'; });
-      if (bc) bc.addEventListener('click', async () => {
-        if (!k.value) { toast('No token saved yet.'); return; }
-        try { await navigator.clipboard.writeText(k.value); toast('Token copied.'); }
-        catch (e) { const t0 = k.type; k.type = 'text'; k.focus(); k.select(); k.setSelectionRange(0, 9999); let ok = false; try { ok = document.execCommand('copy'); } catch (x) { /* blocked */ } k.type = t0; toast(ok ? 'Token copied.' : 'Tap Show, then press and hold the token to copy it.', 4000); }
-      }); } }
+  { const g = store.get('wt:gh', {}) || {}, r = document.getElementById('in-ghrepo'), sb = document.getElementById('b-syncnow');
+    const save = () => { if (r) store.set('wt:gh', { repo: r.value.trim() }); }; // only the repository name is kept; no token is ever stored
+    if (r) { r.value = g.repo || ''; ['input', 'change'].forEach(ev => r.addEventListener(ev, save)); }
+    if (sb) sb.addEventListener('click', () => { save(); syncNow(); }); }
   { const cb = document.getElementById('in-ntfy'), hp = document.getElementById('ntfy-help');
     if (cb && hp) {
       const show = () => { const t = store.get('wt:ntfy', ''); cb.checked = !!t; hp.hidden = !t; hp.textContent = t ? 'Install the free "ntfy" app, tap +, and subscribe to this name: ' + t + '. You will get a push alert when a sync finishes, even if this app is closed. Applies to the next sync you start.' : ''; };
@@ -14489,7 +13694,8 @@ const Core = makeCore();
     else if (P.keepAwake !== false && WL.failed && !WL.sentinel && wantAwake()) msg = 'The phone refused to keep the screen on. Battery saver or a low battery can block it.';
     n.textContent = msg; n.hidden = !msg;
   }
-  async function wakeSync() {
+  async function wakeSync() { try { await wakeSyncRun(); } finally { wlWatchSync(); } }
+  async function wakeSyncRun() {
     if (!('wakeLock' in navigator)) { wakeNote(); return; }
     if (!wantAwake()) {
       if (WL.sentinel) { const t = WL.sentinel; WL.sentinel = null; t.release().catch(() => {}); }
@@ -14513,7 +13719,14 @@ const Core = makeCore();
     if (wantAwake() !== !!WL.sentinel && !WL.failed) wakeSync();
   }
   /* watchdog: while the screen should be on but no lock is held, try again every 8 seconds, with no tap needed */
-  setInterval(() => { if (wantAwake() && !WL.sentinel && !WL.busy) { WL.failed = 0; wakeSync(); } }, 8000);
+  /* It only needs to run while the screen should be on and no lock is held, so it starts and stops from wakeSync
+     (which every change that matters already calls: show/hide, play/pause, visibility, the settings switches). */
+  let wlWatchT = 0;
+  function wlWatchSync() {
+    const run = wantAwake() && !WL.sentinel;
+    if (run && !wlWatchT) wlWatchT = setInterval(() => { if (wantAwake() && !WL.sentinel && !WL.busy) { WL.failed = 0; wakeSync(); } else wlWatchSync(); }, 8000);
+    else if (!run && wlWatchT) { clearInterval(wlWatchT); wlWatchT = 0; }
+  }
   document.addEventListener('visibilitychange', wakeSync);
   document.addEventListener('click', () => { if (!WL.sentinel && !WL.busy && wantAwake() && Date.now() - WL.failed > 3000) wakeSync(); }, true);
   /* Lower power: nothing playing and no touch for 2 minutes = let the screen sleep. Playing audio keeps it awake as before; a touch or Play takes it again. */
@@ -17212,10 +16425,10 @@ const Core = makeCore();
       enh.gain.gain.setTargetAtTime(g, vctx.currentTime, 0.25);
     }
   }
-  function silSync() {
-    const need = !!P.silence || P.enh === 'voice';
+  function silSync() { // the 70 ms timer only runs while the audio is playing: when paused there is nothing to measure
+    const need = (!!P.silence || P.enh === 'voice') && !audio.paused;
     if (need && !silT) silT = setInterval(silTick, 70);
-    if (!need && silT) { clearInterval(silT); silT = 0; if (silOn) { silOn = false; audio.playbackRate = P.speed; } }
+    if (!need && silT) { clearInterval(silT); silT = 0; silQuiet = 0; if (silOn) { silOn = false; audio.playbackRate = P.speed; } }
   }
   function silSet(on) {
     P.silence = !!on; savePrefs(); silSync(); spdPaint();
@@ -17274,8 +16487,9 @@ const Core = makeCore();
     levGain(LEV.target - levLv, false);
     if (mem && levMs >= 20000 && Date.now() - levSaved > 15000) { mem[S.sec] = Math.round(levLv * 10) / 10; store.set('wt:lev:' + S.book.id, mem); levSaved = Date.now(); }
   }
-  function levSync() {
-    if (P.level && !levT) levT = setInterval(levTick, 100);
+  function levSync() { // the 100 ms timer only runs while playing; a pause stops the timer but keeps what was learned
+    if (P.level && !audio.paused && !levT) levT = setInterval(levTick, 100);
+    if (P.level && audio.paused && levT) { clearInterval(levT); levT = 0; }
     if (!P.level && levT) { clearInterval(levT); levT = 0; levSec = -1; levLv = null; levGain(0, false); }
   }
   function levSet(on) {
@@ -17433,6 +16647,7 @@ const Core = makeCore();
     qkPaint();
     $$('#card-styles .chip').forEach(b => b.addEventListener('click', () => { CARD.style = b.dataset.s; $$('#card-styles .chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); cardDraw(); }));
     $('#card-share').addEventListener('click', cardShare); $('#card-save').addEventListener('click', cardSave);
+    audio.addEventListener('play', () => { silSync(); levSync(); }); audio.addEventListener('pause', () => { silSync(); levSync(); });
     silSync(); levSync(); chInit(); hlCount();
   }
   function setSpeed(v) {
@@ -18255,7 +17470,7 @@ const Core = makeCore();
   /* ---------- Backup and restore ----------
      One .json file holds what cannot be fetched again: favourites, saved words, listening stats and history,
      bookmarks, positions, preferences, and each book's sync state and uploaded text (IndexedDB 's:' and 'f:').
-     Caches, downloaded audio and the GitHub token are left out. Restoring writes the file's items over the
+     Caches and downloaded audio are left out. Restoring writes the file's items over the
      matching ones on this device, then reloads; saving is paused meanwhile so the old in-memory state cannot
      overwrite what was just restored. */
   const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q'];
@@ -18469,12 +17684,16 @@ const Core = makeCore();
   /* ---------- Account: sign in with Google and sync across devices ----------
      Optional. Without signing in nothing changes and the Firebase code is never downloaded.
      Signed in, the same items the backup file keeps (settings, favourites, words, bookmarks, clips, highlights,
-     positions, stats) are copied to Firestore at users/{uid}/data/{encoded key} as { k, v: the JSON text, t: time }.
-     Downloaded audio, caches, the GitHub token and uploaded book texts stay on the device.
-     wt:acct     = { uid, email, name, photo, cats: {settings, library, marks, progress}, first, last }
-     wt:syncmeta = { key: time it last changed here }   (used to decide which copy is newer: last write wins)
+     positions, stats) are copied to Firestore at users/{uid}/data/{encoded key} as { k, v: the JSON text, t: time it changed, u: server time it was uploaded }.
+     Downloaded audio, caches and uploaded book texts stay on the device.
+     wt:acct     = { uid, email, name, photo, cats: {settings, library, marks, progress}, first, last, lastT, lastU, lastFull }
+                   (lastT: server time the last pull began; lastU: only cloud items uploaded after it are downloaded;
+                    lastFull: when everything was last downloaded)
+     wt:syncdirty = [keys changed here and not uploaded yet]
+     wt:syncmeta = { key: time it last changed here, in Firestore server time }   (decides which copy is newer: last write wins)
      Pull (app open, sign in, "Sync now"): newer cloud copies replace local ones, then the page reloads, the same
-     way Restore does, so the in-memory state cannot overwrite them. On the first sync of an account on a device,
+     way Restore does, so the in-memory state cannot overwrite them. While audio is playing the reload waits until
+     it pauses (see acPending). On the first sync of an account on a device,
      list items (favourites, words, recent searches, listening history) and daily stats are merged, not replaced.
      Push: changes are sent 8 seconds after the last change, and when the page is hidden. */
   const FB_CFG = {
@@ -18486,6 +17705,13 @@ const Core = makeCore();
     appId: '1:323294819807:web:5a11ede059ce9a05bd406a'
   };
   const FB_VER = '10.12.2', AC_KEY = 'wt:acct', AC_META = 'wt:syncmeta', AC_MAX = 900000;
+  /* App Check (optional). Firestore then only answers requests that come from this website, not from scripts that
+     copy the public Firebase key. Create a reCAPTCHA v3 key for the site, register it in Firebase console >
+     App Check > Apps > Web, paste the SITE key here, and only after the App Check metrics show your own requests
+     as verified, turn on enforcement for Cloud Firestore. Empty = App Check is not used. The firebase/firestore
+     rules (firebase/firestore.rules) are the real protection; App Check adds to them. */
+  const AC_APPCHECK_KEY = '';
+  const AC_CHUNK = 300000, AC_TOTAL = 3000000, AC_BIG = 'wt:syncbig';
   const AC_CATS = [
     ['settings', 'Settings', k => k === 'wt:prefs'],
     ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q'],
@@ -18493,11 +17719,48 @@ const Core = makeCore();
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
   ];
   let acFb = null, acLoading = null, acDb = null, acUser = null, acBusy = false, acTimer = null, acMsg = '', acErr = '';
-  const acDirty = new Set();
+  /* keys changed here and not uploaded yet. Kept in wt:syncdirty so a closed page or a restart cannot forget them
+     (an incremental sync only looks at changed cloud items, so it could not rediscover them). Not part of backups. */
+  const AC_DIRTY = 'wt:syncdirty', acDirty = new Set();
+  try { JSON.parse(localStorage.getItem(AC_DIRTY) || '[]').forEach(k => { if (typeof k === 'string') acDirty.add(k); }); } catch (e) { /* none saved */ }
+  const acDirtySave = () => { try { if (acDirty.size) localStorage.setItem(AC_DIRTY, JSON.stringify([...acDirty])); else localStorage.removeItem(AC_DIRTY); } catch (e) { /* storage unavailable */ } };
   const acInfo = () => { try { return JSON.parse(localStorage.getItem(AC_KEY) || 'null'); } catch (e) { return null; } };
   const acSaveInfo = o => { try { if (o) localStorage.setItem(AC_KEY, JSON.stringify(o)); else localStorage.removeItem(AC_KEY); } catch (e) { /* storage unavailable */ } };
   const acMeta = () => { try { return JSON.parse(localStorage.getItem(AC_META) || '{}') || {}; } catch (e) { return {}; } };
   const acSaveMeta = m => { try { localStorage.setItem(AC_META, JSON.stringify(m)); } catch (e) { /* storage unavailable */ } };
+  /* Server time. Change times are stamped with the Firestore server's clock, not this device's, so a phone whose
+     clock is wrong cannot make old data look newer. acOff = server time minus this device's clock, measured at each
+     sync and remembered in wt:clockoff (not part of backups). Before the first sync it is 0 (device clock). */
+  let acOff = 0; try { acOff = Number(localStorage.getItem('wt:clockoff')) || 0; } catch (e) { /* storage unavailable */ }
+  const acNow = () => Date.now() + acOff;
+  async function acClock() {
+    const ref = acCol().doc('__clock'), t0 = Date.now();
+    await ref.set({ t: acFb.firestore.FieldValue.serverTimestamp() });
+    const t1 = Date.now(), snap = await ref.get({ source: 'server' }), ts = snap.data() && snap.data().t;
+    if (!ts || typeof ts.toMillis !== 'function') return false;
+    acOff = Math.round(ts.toMillis() - (t0 + t1) / 2); // the write landed about halfway through its round trip
+    try { localStorage.setItem('wt:clockoff', String(acOff)); } catch (e) { /* storage unavailable */ }
+    return true;
+  }
+  /* Large items. A Firestore document holds under 1 MB, so a value over AC_MAX characters is cut into pieces of
+     AC_CHUNK characters (300,000 characters is under 1 MB even if every one takes 3 bytes). The piece documents are
+     'chunk:<key>:<n>' = { ck: key, i: n, v: piece }. The item's own document then has no v; it holds
+     { k, chunks: how many pieces, len: total length, t, u }, and is written in the same batch as the pieces, so
+     other devices never see half an item. Older copies of the app ignore both kinds of document. Above AC_TOTAL
+     characters an item is still skipped. wt:syncbig = { key: pieces this device knows the cloud holds }, used to
+     remove pieces that are no longer needed. */
+  const acBig = () => { try { return JSON.parse(localStorage.getItem(AC_BIG) || '{}') || {}; } catch (e) { return {}; } };
+  const acSaveBig = m => { try { if (Object.keys(m).length) localStorage.setItem(AC_BIG, JSON.stringify(m)); else localStorage.removeItem(AC_BIG); } catch (e) { /* storage unavailable */ } };
+  const acChunkId = (k, i) => 'chunk:' + encodeURIComponent(k) + ':' + i;
+  function acSplit(v) { // never cuts between the two halves of a character outside the basic range (an emoji, say)
+    const parts = []; let a = 0;
+    while (a < v.length) {
+      let b = Math.min(v.length, a + AC_CHUNK);
+      if (b < v.length) { const c = v.charCodeAt(b - 1); if (c >= 0xD800 && c <= 0xDBFF) b--; }
+      parts.push(v.slice(a, b)); a = b;
+    }
+    return parts;
+  }
   function acWanted(k) {
     const i = acInfo(); if (!i) return false;
     return AC_CATS.some(c => i.cats && i.cats[c[0]] === false ? false : c[2](k));
@@ -18507,8 +17770,8 @@ const Core = makeCore();
   /* called by store.set for every saved item */
   function acMark(k) {
     if (!acWanted(k)) return;
-    const m = acMeta(); m[k] = Date.now(); acSaveMeta(m);
-    acDirty.add(k);
+    const m = acMeta(); m[k] = acNow(); acSaveMeta(m);
+    if (!acDirty.has(k)) { acDirty.add(k); acDirtySave(); }
     clearTimeout(acTimer); acTimer = setTimeout(() => { acPush().catch(() => {}); }, 8000);
   }
   storeHook = k => { try { acMark(k); } catch (e) { /* never break saving */ } };
@@ -18522,8 +17785,9 @@ const Core = makeCore();
       s.onload = res; s.onerror = () => rej(new Error('Could not load the sign-in service. Check your connection.'));
       document.head.append(s);
     });
-    acLoading = one('app').then(() => Promise.all([one('auth'), one('firestore')])).then(() => {
+    acLoading = one('app').then(() => Promise.all([one('auth'), one('firestore'), AC_APPCHECK_KEY ? one('app-check').catch(() => {}) : 0])).then(() => {
       const fb = window.firebase; fb.initializeApp(FB_CFG);
+      if (AC_APPCHECK_KEY && fb.appCheck) { try { fb.appCheck().activate(AC_APPCHECK_KEY, true); } catch (e) { /* App Check unavailable: carry on without it */ } }
       acFb = fb; acDb = fb.firestore();
       fb.auth().onAuthStateChanged(acAuthChanged);
       fb.auth().getRedirectResult().catch(e => { acErr = acNice(e); renderAcctSync(); });
@@ -18589,8 +17853,8 @@ const Core = makeCore();
   async function acSignOut() {
     if (!confirm('Sign out? Your data stays on this device and in your account.')) return;
     try { if (acFb) await acFb.auth().signOut(); } catch (e) { /* ignore */ }
-    acUser = null; acSaveInfo(null); try { localStorage.removeItem(AC_META); } catch (e) { /* ignore */ }
-    acDirty.clear(); acMsg = ''; renderAcctSync();
+    acUser = null; acSaveInfo(null); try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
+    acDirty.clear(); acDirtySave(); acMsg = ''; renderAcctSync();
   }
 
   function acAuthChanged(u) {
@@ -18599,10 +17863,11 @@ const Core = makeCore();
     const old = acInfo(), same = old && old.uid === u.uid;
     acSaveInfo({ uid: u.uid, email: u.email || '', name: u.displayName || '', photo: u.photoURL || '',
       cats: same && old.cats ? old.cats : { settings: true, library: true, marks: true, progress: true },
-      first: same ? !!old.first : true, last: same ? old.last || 0 : 0 });
-    if (!same) { try { localStorage.removeItem(AC_META); } catch (e) { /* ignore */ } }
+      first: same ? !!old.first : true, last: same ? old.last || 0 : 0, lastT: same ? old.lastT || 0 : 0,
+      lastU: same ? old.lastU || 0 : 0, lastFull: same ? old.lastFull || 0 : 0 });
+    if (!same) { try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ } acDirty.clear(); acDirtySave(); }
     renderAcctSync();
-    acSync(!same).catch(() => {});
+    acSync(!same, !same).catch(() => {});
   }
 
   const acKeyOf = x => typeof x === 'object' && x ? (x.id !== undefined ? String(x.id) : x.w !== undefined ? String(x.w) : JSON.stringify(x)) : String(x);
@@ -18626,68 +17891,205 @@ const Core = makeCore();
     return JSON.stringify(out);
   }
 
+  /* Conflicts. When this device and the cloud both changed a key since the last sync, the newer copy used to replace
+     the other one and a bookmark, clip, highlight or listening position could be lost. These keys are merged instead:
+       wt:clips:*, wt:hl:*  items from both copies, matched by id (same id: the newer copy's version)
+       wt:lp:*              furthest point reached, per track
+       wt:book:*            the furthest position (track, then time); the other fields come from the newer copy
+       wt:lev:*             both copies' entries (same track: the newer copy's)
+     wt:bm:* is one bookmark per book, so the newer copy still wins there. */
+  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k);
+  const acIsObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+  function acResolve(k, a, b, mineNewer) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
+    let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
+    const N = mineNewer ? A : B, O = mineNewer ? B : A; // newer copy, older copy
+    if (/^wt:(clips|hl):/.test(k)) {
+      if (!Array.isArray(A) || !Array.isArray(B)) return null;
+      const map = new Map(); O.concat(N).forEach(x => map.set(acKeyOf(x), x));
+      let out = [...map.values()];
+      if (k.indexOf('wt:clips:') === 0) out.sort((x, y) => (y && y.ts || 0) - (x && x.ts || 0));
+      else out = out.sort((x, y) => (x && x.id || 0) - (y && y.id || 0)).slice(0, 500);
+      return JSON.stringify(out);
+    }
+    if (!acIsObj(A) || !acIsObj(B)) return null;
+    if (k.indexOf('wt:lp:') === 0) {
+      const out = {}; Object.keys(Object.assign({}, A, B)).forEach(i => { out[i] = Math.max(+A[i] || 0, +B[i] || 0); });
+      return JSON.stringify(out);
+    }
+    if (k.indexOf('wt:lev:') === 0) return JSON.stringify(Object.assign({}, O, N));
+    if (k.indexOf('wt:book:') === 0) {
+      if (typeof A.sec !== 'number' || typeof B.sec !== 'number') return null;
+      const ahead = A.sec > B.sec || (A.sec === B.sec && (A.time || 0) >= (B.time || 0)) ? A : B;
+      return JSON.stringify(Object.assign({}, O, N, { sec: ahead.sec, time: ahead.time }));
+    }
+    return null;
+  }
+
   const acCol = () => acDb.collection('users').doc(acUser.uid).collection('data');
-  async function acPushKeys(keys) {
-    const meta = acMeta(), col = acCol(), list = [...keys];
-    let skipped = 0;
-    for (let i = 0; i < list.length; i += 400) {
+  /* guard: before uploading a mergeable key that changed here, look at the cloud copy. If another device changed it
+     since our last sync, upload the merge instead of overwriting that device's change. (acSync already compared
+     against a fresh copy of the cloud, so it passes guard = false.) The local copy is left as it is; the next sync
+     pulls the merged one. */
+  async function acPushKeys(keys, guard) {
+    const meta = acMeta(), big = acBig(), col = acCol(), list = [...keys], lastT = (acInfo() || {}).lastT || 0, bigs = [];
+    let skipped = 0, bigChanged = false;
+    for (let i = 0; i < list.length; i += 250) {
       const batch = acDb.batch(); let n = 0;
-      list.slice(i, i + 400).forEach(k => {
-        const v = localStorage.getItem(k);
-        if (v === null) return;
-        if (v.length > AC_MAX) { skipped++; return; }
-        if (!meta[k]) meta[k] = Date.now();
-        batch.set(col.doc(encodeURIComponent(k)), { k, v, t: meta[k] }); n++;
-      });
+      for (const k of list.slice(i, i + 250)) {
+        let v = localStorage.getItem(k);
+        if (v === null) continue;
+        if (!meta[k]) meta[k] = acNow();
+        let t = meta[k];
+        if (guard && lastT && t > lastT && AC_MERGE(k)) {
+          try {
+            const r = (await col.doc(encodeURIComponent(k)).get()).data();
+            if (r && typeof r.v === 'string' && r.t > lastT && r.v !== v) {
+              const m = acResolve(k, v, r.v, t >= r.t);
+              if (m !== null) { v = m; t = acNow(); }
+            }
+          } catch (e) { /* could not check: upload as before */ }
+        }
+        if (v.length > AC_TOTAL) { skipped++; continue; }
+        if (v.length > AC_MAX) { bigs.push([k, v, t]); continue; }
+        if (big[k]) { for (let c = 0; c < big[k]; c++) { batch.delete(col.doc(acChunkId(k, c))); n++; } delete big[k]; bigChanged = true; } // it shrank: drop the old pieces
+        batch.set(col.doc(encodeURIComponent(k)), { k, v, t, u: acFb.firestore.FieldValue.serverTimestamp() }); n++;
+      }
       if (n) await batch.commit();
     }
+    for (const [k, v, t] of bigs) { // each large item in its own batch: pieces and header together
+      const parts = acSplit(v), old = big[k] || 0, batch = acDb.batch();
+      parts.forEach((part, c) => batch.set(col.doc(acChunkId(k, c)), { ck: k, i: c, v: part }));
+      for (let c = parts.length; c < old; c++) batch.delete(col.doc(acChunkId(k, c)));
+      batch.set(col.doc(encodeURIComponent(k)), { k, chunks: parts.length, len: v.length, t, u: acFb.firestore.FieldValue.serverTimestamp() });
+      await batch.commit(); big[k] = parts.length; bigChanged = true;
+    }
+    if (bigChanged) acSaveBig(big);
     acSaveMeta(meta);
-    list.forEach(k => acDirty.delete(k));
+    list.forEach(k => acDirty.delete(k)); acDirtySave();
     return skipped;
   }
   async function acPush() {
     if (!acUser || !acFb || !acInfo() || !acDirty.size || acBusy) return;
     try {
-      await acPushKeys(acDirty);
+      await acPushKeys([...acDirty].filter(acWanted), true);
       const i = acInfo(); if (i) { i.last = Date.now(); acSaveInfo(i); }
       acMsg = ''; acErr = '';
     } catch (e) { acErr = navigator.onLine ? 'Could not save to your account. It will retry.' : ''; acMsg = navigator.onLine ? '' : 'Offline. Changes will sync when you are back online.'; }
     renderAcctSync();
   }
 
-  async function acSync(manual) {
+  /* Pulled data used to reload the page at once, which cuts the audio. Now, while something is playing, the pulled
+     items wait in acPending (memory only: nothing is lost if the page closes, because the sync point is not moved
+     and the next sync downloads them again). They are applied, and the page reloaded, 6 seconds after playback
+     pauses or ends, or right away when the page is hidden and nothing is playing. Anything changed on this device
+     after the pull is left alone and merged by the next sync. */
+  let acPending = null, acFlushT = 0;
+  const acPlaying = () => { try { return (!audio.paused && !audio.ended) || !!(S && S.loadingAudio); } catch (e) { return false; } };
+  function acFlushSoon() { clearTimeout(acFlushT); acFlushT = acPending ? setTimeout(acFlush, 6000) : 0; }
+  function acFlush() {
+    clearTimeout(acFlushT); acFlushT = 0;
+    if (!acPending || acPlaying()) return;
+    if (acBusy) { acFlushT = setTimeout(acFlush, 3000); return; }
+    const p = acPending; acPending = null;
+    const meta = acMeta(), keys = Object.keys(p.items).filter(k => (meta[k] || 0) <= p.at);
+    if (!keys.length) return;
+    window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
+    keys.forEach(k => { const it = p.items[k]; try { localStorage.setItem(k, it.v); meta[k] = it.t; if (it.up) acDirty.add(k); } catch (e) { /* storage full: skip */ } });
+    acSaveMeta(meta); acDirtySave();
+    toast('Synced from your account. Reloading…', 2500); setTimeout(() => location.reload(), 900);
+  }
+  try {
+    audio.addEventListener('pause', acFlushSoon); audio.addEventListener('ended', acFlushSoon);
+    audio.addEventListener('play', () => { clearTimeout(acFlushT); acFlushT = 0; });
+  } catch (e) { /* no audio element yet */ }
+
+  /* full = download every cloud item. Otherwise only items uploaded since the last sync are downloaded: each upload
+     carries u, the server's upload time, and the query asks for u > lastU. A full download is done when asked for
+     (Sync now, a new account, a switched-on category), when there is no lastU yet, and at least once a week, which
+     also picks up items written by an older copy of the app that does not set u. */
+  const AC_FULL_EVERY = 7 * 864e5, AC_OVERLAP = 120000;
+  async function acSync(manual, full) {
     if (!acUser || !acDb || acBusy) return;
     acBusy = true; acErr = ''; acMsg = 'Syncing…'; renderAcctSync();
     let reload = false;
     try {
-      const info = acInfo() || {}, first = !!info.first, meta = acMeta();
-      const remote = {};
-      (await acCol().get()).forEach(d => { const x = d.data(); if (x && typeof x.k === 'string' && typeof x.v === 'string') remote[x.k] = x; });
-      const up = new Set(acDirty), apply = [];
+      let clockOk = false;
+      try { clockOk = await acClock(); } catch (e) { /* offline or blocked: keep the last known offset */ }
+      const info = acInfo() || {}, first = !!info.first, meta = acMeta(), lastT = info.lastT || 0, syncT = acNow();
+      const remote = {}, sinceU = info.lastU || 0;
+      const doFull = !!full || !sinceU || Date.now() - (info.lastFull || 0) > AC_FULL_EVERY;
+      const snap = await (doFull ? acCol() : acCol().where('u', '>', acFb.firestore.Timestamp.fromMillis(sinceU))).get();
+      let maxU = 0;
+      const bigMain = {}, pieces = {}, big = acBig(), unreadable = new Set(); let bigChanged = false;
+      snap.forEach(d => {
+        const x = d.data(); if (!x) return;
+        if (typeof x.ck === 'string') { if (typeof x.v === 'string') (pieces[x.ck] = pieces[x.ck] || {})[x.i] = x.v; return; } // a piece of a large item
+        if (typeof x.k === 'string' && typeof x.v === 'string') remote[x.k] = x;
+        else if (typeof x.k === 'string' && typeof x.chunks === 'number') bigMain[x.k] = x;
+        const u = x.u && typeof x.u.toMillis === 'function' ? x.u.toMillis() : 0; if (u > maxU) maxU = u;
+      });
+      for (const k of Object.keys(bigMain)) { // large items: put the pieces together, but only when this copy could be the newer one
+        const m = bigMain[k]; if (!acWanted(k)) continue;
+        if (big[k] !== m.chunks) { big[k] = m.chunks; bigChanged = true; }
+        const lt0 = meta[k] || 0, mine0 = localStorage.getItem(k);
+        if (!(mine0 === null || m.t > lt0 || first || (lt0 > lastT && m.t > lastT))) { remote[k] = { k, t: m.t }; continue; } // no v: only "which side is newer" is looked at below
+        try {
+          const parts = [];
+          await Promise.all(Array.from({ length: m.chunks }, (_, i) => pieces[k] && typeof pieces[k][i] === 'string' ? (parts[i] = pieces[k][i]) :
+            acCol().doc(acChunkId(k, i)).get().then(sn => { const y = sn.data(); if (y && typeof y.v === 'string') parts[i] = y.v; })));
+          let ok = true; for (let i = 0; i < m.chunks; i++) if (typeof parts[i] !== 'string') ok = false;
+          const v = ok ? parts.join('') : '';
+          if (ok && v.length === m.len) remote[k] = { k, v, t: m.t, u: m.u }; else unreadable.add(k);
+        } catch (e) { unreadable.add(k); /* could not read the pieces: leave this item for the next sync */ }
+      }
+      if (bigChanged) acSaveBig(big);
+      const up = new Set([...acDirty].filter(acWanted)), items = {}; // items: pulled values to apply, key -> { v, t, up }
       Object.keys(remote).forEach(k => {
         if (!acWanted(k)) return;
         const r = remote[k], lt = meta[k] || 0, mine = localStorage.getItem(k);
-        const union = mine !== null && (first || k === 'wt:stats') && r.v !== mine ? acUnion(k, mine, r.v) : null;
-        if (union !== null) { if (union !== mine) apply.push([k, union]); if (union !== r.v) up.add(k); meta[k] = Date.now(); }
-        else if (mine === null || r.t > lt) { if (r.v !== mine) apply.push([k, r.v]); meta[k] = r.t; }
+        if (r.v === undefined) { if (r.t < lt) up.add(k); return; } // a large item that is not newer than this copy
+        const conflict = mine !== null && r.v !== mine && lt > lastT && r.t > lastT; // both sides changed since the last sync
+        let union = null;
+        if (mine !== null && r.v !== mine) {
+          if (AC_MERGE(k) && (first || conflict)) union = acResolve(k, mine, r.v, lt >= r.t);
+          if (union === null && (first || k === 'wt:stats')) union = acUnion(k, mine, r.v);
+        }
+        if (union !== null) {
+          if (union !== mine) items[k] = { v: union, t: acNow(), up: union !== r.v };
+          else { if (union !== r.v) up.add(k); meta[k] = acNow(); }
+        }
+        else if (mine === null || r.t > lt) { if (r.v !== mine) items[k] = { v: r.v, t: r.t, up: false }; else meta[k] = r.t; }
         else if (r.t < lt) up.add(k);
       });
-      acLocalKeys().forEach(k => { if (!remote[k]) up.add(k); });
-      acSaveMeta(meta);
-      if (apply.length) {
+      if (doFull) acLocalKeys().forEach(k => { if (!remote[k] && !unreadable.has(k)) up.add(k); }); // items the cloud has never seen
+      const pulled = Object.keys(items), deferred = pulled.length > 0 && acPlaying();
+      if (deferred) {
+        acPending = { at: syncT, items }; // the newest pull replaces an older one: it was worked out from the same unchanged local state
+      } else if (pulled.length) {
         window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
-        apply.forEach(([k, v]) => { try { localStorage.setItem(k, v); } catch (e) { /* storage full: skip */ } });
+        pulled.forEach(k => { try { localStorage.setItem(k, items[k].v); meta[k] = items[k].t; if (items[k].up) up.add(k); } catch (e) { /* storage full: skip */ } });
         reload = true;
       }
+      acSaveMeta(meta);
       let skipped = 0;
-      try { skipped = await acPushKeys(up); } catch (e) { if (!reload) throw e; /* merged items are newer here, so the next sync uploads them */ }
-      info.first = false; info.last = Date.now(); acSaveInfo(info);
-      acMsg = skipped ? 'Synced. ' + skipped + ' item(s) were too large to upload.' : '';
-      if (reload) { toast('Synced from your account. Reloading…', 2500); setTimeout(() => location.reload(), 900); }
+      try { skipped = await acPushKeys(up, false); } catch (e) { if (!reload) throw e; /* merged items are newer here, so the next sync uploads them */ }
+      if (deferred) { // keep the sync point where it was, so the waiting items are downloaded again if the page closes first
+        acMsg = 'Newer data from your account is ready. It loads when you pause.';
+        toast('Newer data from your account is ready. It will load when you pause.', 4000);
+      } else {
+        info.first = false; info.last = Date.now(); info.lastT = syncT;
+        if (doFull) info.lastFull = Date.now();
+        // next time ask for items uploaded after this point (a little earlier, to be safe; seeing an item twice is harmless)
+        info.lastU = clockOk ? syncT - AC_OVERLAP : maxU ? Math.max(sinceU, maxU - AC_OVERLAP) : doFull ? 0 : sinceU;
+        acSaveInfo(info);
+        acMsg = skipped ? 'Synced. ' + skipped + ' item(s) were too large to upload (over 3 MB).' : '';
+      }
+      if (deferred) { /* told above */ }
+      else if (reload) { toast('Synced from your account. Reloading…', 2500); setTimeout(() => location.reload(), 900); }
       else if (manual) toast('Synced.', 2000);
     } catch (e) {
       window.__wtRestoring = false;
-      acMsg = ''; acErr = navigator.onLine ? 'Sync failed. ' + ((e && e.code === 'permission-denied') ? 'Check the Firestore rules.' : 'Try again in a moment.') : 'Offline. Sync will run when you are back online.';
+      acMsg = ''; acErr = navigator.onLine ? 'Sync failed. ' + ((e && e.code === 'permission-denied') ? 'Check the Firestore rules (and App Check, if it is turned on).' : 'Try again in a moment.') : 'Offline. Sync will run when you are back online.';
     } finally { acBusy = false; renderAcctSync(); }
   }
 
@@ -18697,6 +18099,7 @@ const Core = makeCore();
       const snap = await acCol().get(); let batch = acDb.batch(), n = 0;
       for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = acDb.batch(); } }
       await batch.commit();
+      try { localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
       toast('Cloud data deleted.', 2500);
     } catch (e) { toast('Could not delete the cloud data.', 3500); }
   }
@@ -18720,12 +18123,12 @@ const Core = makeCore();
     const last = info.last ? 'Synced ' + new Date(info.last).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not synced yet';
     const state = acBusy ? 'Syncing…' : (acMsg || last);
     const rows = AC_CATS.map(c => {
-      const cb = h('input', { type: 'checkbox', role: 'switch', onchange: e => { const i = acInfo(); if (!i) return; i.cats = Object.assign({}, i.cats, { [c[0]]: e.target.checked }); acSaveInfo(i); if (e.target.checked) acSync(false); } });
+      const cb = h('input', { type: 'checkbox', role: 'switch', onchange: e => { const i = acInfo(); if (!i) return; i.cats = Object.assign({}, i.cats, { [c[0]]: e.target.checked }); acSaveInfo(i); if (e.target.checked) acSync(false, true); } });
       cb.checked = !(info.cats && info.cats[c[0]] === false);
       return h('label', { class: 'acct-opt' }, h('span', {}, c[1]), cb, h('i', { class: 'acct-sw', 'aria-hidden': 'true' }));
     });
     const av = info.photo ? h('img', { class: 'acct-av', src: info.photo, alt: '', referrerpolicy: 'no-referrer' }) : h('span', { class: 'acct-av' }, (info.name || info.email || '?').slice(0, 1).toUpperCase());
-    const syncBtn = () => { if (!acUser) acLoad().then(() => acSync(true)).catch(e => { acErr = acNice(e); renderAcctSync(); }); else acSync(true); };
+    const syncBtn = () => { if (!acUser) acLoad().then(() => acSync(true, true)).catch(e => { acErr = acNice(e); renderAcctSync(); }); else acSync(true, true); };
     box.append(h('div', { class: 'acct-sync' },
       h('div', { class: 'acct-head' }, av,
         h('span', { class: 'acct-who' }, h('strong', {}, info.name || 'Signed in'), h('small', {}, info.email), h('em', {}, 'Signed in with Google'))),
@@ -18750,8 +18153,31 @@ const Core = makeCore();
   /* start: signed-in users reconnect a few seconds after the app opens; guests never download the sign-in code */
   setTimeout(() => { if (acInfo()) acLoad().catch(() => { acMsg = 'Offline. Changes will sync when you are back online.'; }); }, 2500);
   window.addEventListener('online', () => { if (acInfo()) acLoad().then(() => acPush()).catch(() => {}); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && acInfo()) { clearTimeout(acTimer); acPush().catch(() => {}); } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && acInfo()) { clearTimeout(acTimer); acPush().catch(() => {}); acFlush(); } });
   window.addEventListener('pagehide', () => { if (acInfo()) acPush().catch(() => {}); });
+  /* ===== Install and offline: service worker + browser/status-bar colour =====
+     sw.js (see src/pwa/) keeps the app page for offline use. The manifest and icons let a phone or desktop install
+     the app. Everything here is optional polish: if anything fails, the app works exactly as before. */
+
+  /* theme-color follows the app's own background, so the phone's status bar / browser bar matches whichever theme
+     is on (auto, light, dark, sepia, high contrast). The head sets a first guess before the page paints. */
+  function pwaThemeColor() {
+    try {
+      const m = document.querySelector('meta[name="theme-color"]'); if (!m) return;
+      const c = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if (/^#[0-9a-f]{3,8}$/i.test(c) && m.getAttribute('content') !== c) m.setAttribute('content', c);
+    } catch (e) { /* cosmetic only */ }
+  }
+  pwaThemeColor();
+  try { new MutationObserver(pwaThemeColor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) { /* not supported */ }
+  try { const mq = matchMedia('(prefers-color-scheme: light)'); if (mq.addEventListener) mq.addEventListener('change', pwaThemeColor); else if (mq.addListener) mq.addListener(pwaThemeColor); } catch (e) { /* not supported */ }
+
+  /* Service worker: registered after the page has finished loading, so it never competes with the first paint.
+     Needs https (or localhost); a page opened from a file just skips it. */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    const pwaRegister = () => navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(e => { try { if (window.__wtDiag) window.__wtDiag.add('sw', (e && e.message) || e); } catch (x) { /* ignore */ } });
+    if (document.readyState === 'complete') pwaRegister(); else window.addEventListener('load', pwaRegister, { once: true });
+  }
   /* ---------- wiring ---------- */
   function init() {
     // Lists cached before cover art was requested have no covers: drop them once so they reload with art.
@@ -18965,7 +18391,7 @@ const Core = makeCore();
       el.reader.addEventListener('touchcancel', () => { touching = false; mark(); }, { passive: true });
       el.reader.addEventListener('wheel', mark, { passive: true });
       el.reader.addEventListener('scroll', () => { if (!S.follow) mark(); }, { passive: true });
-      setInterval(() => {
+      const fwTick = () => {
         if (!S.book || el.player.hidden || audio.paused || touching || document.hidden) return;
         const sp = S.spans.get(S.curId); if (!sp || !sp.isConnected) return;
         if (!S.follow) {
@@ -18975,7 +18401,19 @@ const Core = makeCore();
         if (SCR.raf) return;
         const rr = el.reader.getBoundingClientRect(), sr = sp.getBoundingClientRect();
         if (rr.height > 0 && (sr.bottom < rr.top || sr.top > rr.bottom)) ensureVisible(sp, true);
-      }, 500);
+      };
+      /* The check only matters while the book is playing with the reader on screen, so the timer only runs then
+         (it used to wake the page twice a second all day). */
+      let fwT = 0;
+      const fwSync = () => {
+        const run = !el.player.hidden && !audio.paused && !document.hidden;
+        if (run && !fwT) fwT = setInterval(fwTick, 500);
+        else if (!run && fwT) { clearInterval(fwT); fwT = 0; }
+      };
+      audio.addEventListener('play', fwSync); audio.addEventListener('pause', fwSync);
+      document.addEventListener('visibilitychange', fwSync);
+      try { new MutationObserver(fwSync).observe(el.player, { attributes: true, attributeFilter: ['hidden'] }); } catch (e) { /* no observer */ }
+      fwSync();
     }
     let fpRaf = 0;
     el.reader.addEventListener('scroll', () => {
