@@ -18536,7 +18536,7 @@ const Core = makeCore();
      close without signing in). Paste the "Web client ID" from Firebase > Authentication > Sign-in method > Google >
      Web SDK configuration, and add this site's address under "Authorized JavaScript origins" of that client in
      Google Cloud > APIs & Services > Credentials. Leave empty to use the Firebase popup. */
-  const GIS_CLIENT_ID = '';
+  const GIS_CLIENT_ID = '323294819807-apcmd3aughqecjuspgtj71lsvmen5b47.apps.googleusercontent.com';
   function acGisPreload() {
     if (!GIS_CLIENT_ID || window.google && google.accounts || document.getElementById('gis-js')) return;
     const s = document.createElement('script'); s.id = 'gis-js'; s.src = 'https://accounts.google.com/gsi/client'; s.async = true; document.head.append(s);
