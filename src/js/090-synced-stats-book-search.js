@@ -206,7 +206,6 @@
     $('#acct-favs').textContent = String(getFavs().length);
     $('#acct-recents').textContent = String(P.recents.length);
     renderStats();
-    try { renderFollowing(); } catch (e) { /* authors list not ready */ }
     try { renderMyRatings(); } catch (e) { /* ratings not ready */ }
     const hist = $('#acct-history'), list = $('#acct-history-list');
     list.textContent = '';
@@ -409,12 +408,12 @@
     const goals = h('div', { class: 'ls-box' }, h('h3', {}, 'Daily goal'), h('div', { class: 'ls-chips' }, ST_GOALS.map(g => h('button', { class: 'ls-chip', type: 'button', 'aria-pressed': String(g === ST.goal), onclick: () => { ST.goal = g; stDirty = true; stSave(); renderStats(); } }, g + ' min'))));
     const marks = h('div', { class: 'ls-box' }, h('h3', {}, 'Milestones'), h('div', { class: 'ls-chips' }, badges.map(b => h('span', { class: 'ls-chip' + (b[0] ? ' on' : '') }, (b[0] ? '\u2713 ' : '') + b[1]))));
     if (P.calm === true) {
-      const ck = [h('h2', { id: 'ls-h' }, 'Your listening'), h('p', { class: 'ls-sub' }, 'Just for you. No goals, no streaks. Counted on this device only.'), tiles];
+      const ck = [h('h2', { id: 'ls-h' }, 'Your listening'), h('p', { class: 'ls-sub' }, 'Just for you. No goals, no streaks. Counted on this device only.'), tiles, wrBox()];
       if (m.done.length) ck.push(h('div', { class: 'ls-box' }, h('h3', {}, 'Books you finished'), h('div', { class: 'ls-done' }, m.done.slice(0, 5).map(b => h('div', {}, h('b', {}, b.title || 'Untitled'), h('span', {}, b.ts ? new Date(b.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''))))));
       ck.push(h('div', { class: 'ls-foot' }, h('span', {}, ''), h('button', { type: 'button', onclick: () => { if (confirm('Clear your listening stats on this device? Your books and positions are kept.')) { ST = { v: 1, days: {}, done: [], goal: ST.goal, cleared: Date.now() }; stDirty = true; stSave(); renderStats(); } } }, 'Clear stats')));
       box.textContent = ''; box.append(...ck); return;
     }
-    const kids = [h('h2', { id: 'ls-h' }, 'Your listening'), h('p', { class: 'ls-sub' }, 'Counted on this device only.'), h('div', { class: 'ls-hero' }, ring, streak), tiles, week, ...anBoxes(), goals, marks];
+    const kids = [h('h2', { id: 'ls-h' }, 'Your listening'), h('p', { class: 'ls-sub' }, 'Counted on this device only.'), h('div', { class: 'ls-hero' }, ring, streak), tiles, week, wrBox(), ...anBoxes(), goals, marks];
     if (m.done.length) kids.push(h('div', { class: 'ls-box' }, h('h3', {}, 'Recently finished'), h('div', { class: 'ls-done' }, m.done.slice(0, 5).map(b => h('div', {}, h('b', {}, b.title || 'Untitled'), h('span', {}, b.ts ? new Date(b.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''))))));
     kids.push(h('div', { class: 'ls-foot' }, h('span', {}, 'A streak day is 1 minute or more.'), h('button', { type: 'button', onclick: () => { if (confirm('Clear your listening stats on this device? Your books and positions are kept.')) { ST = { v: 1, days: {}, done: [], goal: ST.goal, cleared: Date.now() }; stDirty = true; stSave(); renderStats(); } } }, 'Clear stats')));
     box.textContent = ''; box.append(...kids);
