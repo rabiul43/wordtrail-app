@@ -463,8 +463,9 @@
     loadTod();
     let src = [];
     try {
-      const [m, bc, gs, tr] = await Promise.all([moodSources(), becauseSources(), genreSource().catch(() => null), trendingSource().catch(() => null)]);
+      const [m, bc, gs, tr, fo] = await Promise.all([moodSources(), becauseSources(), genreSource().catch(() => null), trendingSource().catch(() => null), folSource().catch(() => null)]);
       src = [gs, bc[0], m[0], tr, m[1], bc[1]].filter(Boolean);
+      if (fo) { if (fo.first) src.unshift(fo); else src.push(fo); }   // followed authors with new books come first
     } catch (e) { /* offline: hide */ }
     HSK.done.picks = true;
     sec.textContent = '';
@@ -475,6 +476,7 @@
       $$('button', chips).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === x.key)));
       line.textContent = x.line; row.setAttribute('aria-label', x.line);
       fillRow(row, x.books, x.more || null, 12);
+      if (x.fresh) $$('.tile', row).forEach(t => { const c = t.querySelector('.tile-cover'); if (c && x.fresh.has(String(t._wtId))) c.append(h('span', { class: 'tile-new' }, 'New')); });
     };
     src.forEach(x => { const b = h('button', { class: 'fchip', type: 'button', 'aria-pressed': 'false', onclick: () => draw(x) }, x.label); b.dataset.k = x.key; chips.append(b); });
     sec.append(h('div', { class: 'home-section-head mood-head' }, h('div', {}, h('h2', {}, 'Picked for you'), line)), ...(src.length > 1 ? [chips] : []), row);

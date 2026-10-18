@@ -31,7 +31,7 @@
   const AC_CHUNK = 300000, AC_TOTAL = 3000000, AC_BIG = 'wt:syncbig';
   const AC_CATS = [
     ['settings', 'Settings', k => k === 'wt:prefs'],
-    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q' || k === 'wt:myrt'],
+    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows'],
     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
   ];
@@ -198,7 +198,7 @@
       [].concat(A.done || [], B.done || []).forEach(x => { const q = acKeyOf(x); if (!seen.has(q)) { seen.add(q); done.push(x); } });
       return JSON.stringify(Object.assign({}, B, A, { days, done }));
     }
-    if (k === 'wt:myrt') {   // your ratings, one entry per book: the newer entry wins (a removed rating stays as { r: 0 } so it is not brought back)
+    if (k === 'wt:myrt' || k === 'wt:follows') {   // your ratings / followed authors, one entry per book: the newer entry wins (a removed rating stays as { r: 0 } so it is not brought back)
       if (!A || !B || typeof A !== 'object' || typeof B !== 'object' || Array.isArray(A) || Array.isArray(B)) return null;
       const out = Object.assign({}, B);
       Object.keys(A).forEach(i => { if (!out[i] || (A[i] && A[i].t || 0) >= (out[i] && out[i].t || 0)) out[i] = A[i]; });

@@ -206,6 +206,7 @@
     $('#acct-favs').textContent = String(getFavs().length);
     $('#acct-recents').textContent = String(P.recents.length);
     renderStats();
+    try { renderFollowing(); } catch (e) { /* authors list not ready */ }
     try { renderMyRatings(); } catch (e) { /* ratings not ready */ }
     const hist = $('#acct-history'), list = $('#acct-history-list');
     list.textContent = '';

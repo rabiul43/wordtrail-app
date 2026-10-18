@@ -4,7 +4,7 @@
      Caches and downloaded audio are left out. Restoring writes the file's items over the
      matching ones on this device, then reloads; saving is paused meanwhile so the old in-memory state cannot
      overwrite what was just restored. */
-  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt'];
+  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt', 'wt:follows'];
   const BK_PREFIX = ['wt:book:', 'wt:bm:', 'wt:clips:', 'wt:lp:', 'wt:lev:'];
   const BK_IDB = /^(s|f):/;
   const bkWanted = k => BK_KEYS.indexOf(k) >= 0 || BK_PREFIX.some(p => k.indexOf(p) === 0);
