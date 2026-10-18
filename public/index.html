@@ -2339,6 +2339,20 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 :root[data-theme="contrast"] #seg-theme button[aria-pressed="true"] { background: #FFE600; color: #000; }
 .topbar .syncbar { display: none; }
 .topbar .syncbar.pop:not([hidden]) { display: flex; position: absolute; z-index: 6; top: calc(100% + .25rem); right: .6rem; max-width: calc(100% - 1.2rem); gap: .8rem; padding: .4rem .45rem .4rem .9rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow-pop); animation: pop var(--dur) var(--ease); }
+
+.bm-f textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 1.05rem; padding: .65rem .8rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2, var(--surface)); color: inherit; resize: vertical; min-height: 4.5rem; }
+.bm-f h3 .help { font-weight: 400; }
+
+/* Account sign-in and sync */
+.acct-sync { display: grid; gap: .7rem; padding: 1rem; margin-bottom: .8rem; }
+.acct-sync .help { margin: 0; color: var(--muted); font-size: .88rem; }
+.acct-who { display: flex; align-items: center; gap: .75rem; }
+.acct-who small { display: block; color: var(--muted); }
+.acct-av { width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; object-fit: cover; flex: none; }
+.acct-opts { display: grid; gap: .1rem; }
+.acct-opt { display: flex; align-items: center; gap: .6rem; padding: .45rem 0; font-size: .92rem; }
+.acct-opt input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); }
+.acct-err { margin: 0; color: #E4574F; font-size: .85rem; }
 </style>
 </head>
 <body>
@@ -2365,6 +2379,7 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
     <symbol id="i-m-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
     <symbol id="i-m-wave" viewBox="0 0 24 24"><path d="M4 10v4M8 6v12M12 3v18M16 8v8M20 11v2"/></symbol>
     <symbol id="i-m-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.8.6-1.5 1-1.5 2M12 17h.01"/></symbol>
+    <symbol id="i-m-bm" viewBox="0 0 24 24"><path d="M7.2 3.8h9.6a1.2 1.2 0 0 1 1.2 1.2v15.3l-6-4.3-6 4.3V5a1.2 1.2 0 0 1 1.2-1.2z"/></symbol>
     <symbol id="i-m-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
     <symbol id="i-m-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></symbol>
     <symbol id="i-m-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
@@ -2593,7 +2608,8 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 <main id="account" class="view home" hidden></main>
 
 <template id="tpl-account">
-  <div class="tab-head"><h1>Account</h1><p>Wordtrail keeps everything on this device.</p></div>
+  <div class="tab-head"><h1>Account</h1><p>Your library, settings and progress. Sign in to sync them across devices.</p></div>
+  <section id="acct-sync" aria-label="Sign in and sync"></section>
   <section id="ls" class="ls" aria-labelledby="ls-h"></section>
   <div class="acct-card">
     <div class="acct-row"><span>Saved books</span><strong id="acct-favs">0</strong></div>
@@ -2746,6 +2762,7 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
     <label class="bm-f"><h3>Time</h3><input id="bm-time" type="text" inputmode="numeric" autocomplete="off" placeholder="12:30" aria-describedby="bm-help"></label>
     <p class="help" id="bm-help">Type minutes and seconds (12:30) or hours too (1:02:30).</p>
     <button id="bm-now" class="btn bm-alt" type="button">Use where I am now</button>
+    <label class="bm-f"><h3>Note <span class="help">(optional)</span></h3><textarea id="bm-note" rows="3" maxlength="500" autocomplete="off" placeholder="Why this place matters…" aria-label="Bookmark note"></textarea></label>
     <p id="bm-err" class="help" role="alert" hidden></p>
     <button id="bm-save" class="btn slp-go" type="button">Save bookmark</button>
     <button id="bm-del" class="btn bm-alt" type="button" hidden>Remove this bookmark</button>
@@ -4650,6 +4667,7 @@ The sky was heavy with rain, and the air smelled of it as they set out.
       <button id="b-words" class="mrow" aria-label="Words in this book and my saved words"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-dict"/></svg></span><span class="mr-main"><span class="mr-t">Words</span><span class="mr-d">Look up words in this book and review the ones you saved</span></span></button>
       <button id="b-find" class="mrow" type="button" aria-label="Search the text of this book"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-search"/></svg></span><span class="mr-main"><span class="mr-t">Search this book</span><span class="mr-d">Find a word or quote and jump to it</span></span></button>
       <button id="b-trail" class="mrow" type="button" aria-label="Find my place, go back to an earlier position"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-refresh"/></svg></span><span class="mr-main"><span class="mr-t">Find my place</span><span class="mr-d">Go back after a seek, or to where you fell asleep</span></span></button>
+      <button id="b-bm" class="mrow" type="button" aria-label="Bookmark this place and add a note"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="mr-main"><span class="mr-t">Bookmark and note</span><span class="mr-d">Save this place and add a note to it</span></span></button>
       <button id="b-chars" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="mr-main"><span class="mr-t">Characters</span><span class="mr-d" id="b-chars-d">Who is who, with where each one first appears</span></span></button>
       <button id="b-hl" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="mr-main"><span class="mr-t">Highlights and notes</span><span class="mr-d" id="b-hl-d">Saved sentences, your notes, quote cards</span></span></button>
       <button id="b-clips" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Audio clips</span><span class="mr-d" id="b-clips-d">Save short moments, replay them, export as a file</span></span></button>
@@ -5849,9 +5867,10 @@ const Core = makeCore();
       }
       return f0(typeof input === 'string' ? px(input) : input, init);
     }; }
+  let storeHook = null; // set by 295-account-sync.js: called with the key after every saved item
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-    set(k, v) { if (window.__wtRestoring) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+    set(k, v) { if (window.__wtRestoring) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return; /* storage unavailable */ } if (storeHook) storeHook(k); }
   };
   const idb = (() => {
     let dbp = null;
@@ -6634,6 +6653,7 @@ const Core = makeCore();
     S.secs.forEach((sec, i) => sel.append(h('option', { value: String(i) }, 'Track ' + (i + 1) + (sec.title ? ' · ' + sec.title : ''))));
     const r = old || { sec: S.sec, time: Math.floor(nowT()) };
     sel.value = String(Math.min(r.sec, S.secs.length - 1)); $('#bm-time').value = bmShort(r.time);
+    $('#bm-note').value = (old && old.note) || '';
     $('#bm-del').hidden = !old; bmErr(''); bmHelp();
     openSheet('sheet-bm');
     setTimeout(() => { try { $('#bm-time').focus(); $('#bm-time').select(); } catch (e) { /* ignore */ } }, 250);
@@ -6642,9 +6662,10 @@ const Core = makeCore();
     const i = +$('#bm-track').value, t = bmParse($('#bm-time').value), d = bmLen(i);
     if (!isFinite(t)) { bmErr('Please type a time like 12:30.'); return; }
     if (d && t > d) { bmErr('That is past the end of this track (' + bmShort(d) + ').'); return; }
-    const r = { sec: i, time: Math.floor(t) };
+    const r = { sec: i, time: Math.floor(t) }, note = $('#bm-note').value.trim().slice(0, 500);
+    if (note) r.note = note;
     store.set(bmKey(), r); nrBmUI(); closeSheets();
-    toast('Bookmark saved · Track ' + (r.sec + 1) + ' · ' + bmShort(r.time), 3200, ['Go there', () => { if (r.sec === S.sec) seekAudio(r.time); else goTrack(r.sec, r.time, !audio.paused); }]);
+    toast('Bookmark saved · Track ' + (r.sec + 1) + ' · ' + bmShort(r.time) + (r.note ? ' · with note' : ''), 3200, ['Go there', () => { if (r.sec === S.sec) seekAudio(r.time); else goTrack(r.sec, r.time, !audio.paused); }]);
   }
   function nrBookmark() {
     if (!S.book) return;
@@ -6653,11 +6674,11 @@ const Core = makeCore();
     const at = r => 'Track ' + (r.sec + 1) + ' · ' + hms(r.time).replace(/^00:/, '');
     if (!old) {
       const r = { sec: S.sec, time: Math.floor(nowT()) };
-      store.set(bmKey(), r); nrBmUI(); toast('Bookmark saved · ' + at(r), 5000, ['Change', bmOpen]);
+      store.set(bmKey(), r); nrBmUI(); toast('Bookmark saved · ' + at(r), 5000, ['Add note', bmOpen]);
       return;
     }
-    toast('Bookmark: ' + at(old), 6000, ['Go there', () => { if (old.sec === S.sec) seekAudio(old.time); else goTrack(old.sec, old.time, !audio.paused); }]);
-    el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; bmOpen(); } }, 'Change'), h('button', { type: 'button', onclick: () => { el.toast.hidden = true; store.set(bmKey(), null); nrBmUI(); } }, 'Remove'));
+    toast('Bookmark: ' + at(old) + (old.note ? ' — “' + (old.note.length > 80 ? old.note.slice(0, 80).trim() + '…' : old.note) + '”' : ''), 6000, ['Go there', () => { if (old.sec === S.sec) seekAudio(old.time); else goTrack(old.sec, old.time, !audio.paused); }]);
+    el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; bmOpen(); } }, old.note ? 'Edit note' : 'Add note'), h('button', { type: 'button', onclick: () => { el.toast.hidden = true; store.set(bmKey(), null); nrBmUI(); } }, 'Remove'));
   }
   function nrOpen() {
     if (!S.book || NR.on) return;
@@ -6688,6 +6709,7 @@ const Core = makeCore();
     nrEl.bm.addEventListener('pointerdown', () => { BMLP.done = false; clearTimeout(BMLP.t); BMLP.t = setTimeout(() => { BMLP.done = true; buzz('medium'); bmOpen(); }, 550); });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => nrEl.bm.addEventListener(ev, () => clearTimeout(BMLP.t)));
     nrEl.bm.addEventListener('contextmenu', e => e.preventDefault());
+    $('#b-bm').addEventListener('click', () => { closeSheets(); if (!S.book) { toast('Open a book first.'); return; } bmOpen(); });
     $('#bm-save').addEventListener('click', bmSave);
     $('#bm-time').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bmSave(); } });
     $('#bm-time').addEventListener('input', () => bmErr(''));
@@ -7711,6 +7733,7 @@ const Core = makeCore();
   }
   function renderAccount() {
     ensureAccount();
+    renderAcctSync();
     guideBadge();
     $('#acct-favs').textContent = String(getFavs().length);
     $('#acct-recents').textContent = String(P.recents.length);
@@ -12479,10 +12502,10 @@ const Core = makeCore();
       const k = localStorage.key(i); if (!k || k.indexOf('wt:bm:') !== 0) continue;
       const r = store.get(k, null); if (!r) continue;
       const bk = store.get('wt:book:' + k.slice(6), null);
-      out.push([bk && bk.title || k.slice(6), 'Track ' + (r.sec + 1), hms(r.time)]);
+      out.push([bk && bk.title || k.slice(6), 'Track ' + (r.sec + 1), hms(r.time), r.note || '']);
     }
     if (!out.length) { toast('No bookmarks to export yet.'); return; }
-    download('wordtrail-bookmarks.csv', 'book,track,time\n' + out.map(r => r.map(csv).join(',')).join('\n'), 'text/csv');
+    download('wordtrail-bookmarks.csv', 'book,track,time,note\n' + out.map(r => r.map(csv).join(',')).join('\n'), 'text/csv');
   }
   function vocReview(list, help) {
     const all = myWords(), due = all.filter(srsDue);
@@ -18294,6 +18317,241 @@ const Core = makeCore();
     applyTheme();
   }
 
+  /* ---------- Account: sign in with Google and sync across devices ----------
+     Optional. Without signing in nothing changes and the Firebase code is never downloaded.
+     Signed in, the same items the backup file keeps (settings, favourites, words, bookmarks, clips, highlights,
+     positions, stats) are copied to Firestore at users/{uid}/data/{encoded key} as { k, v: the JSON text, t: time }.
+     Downloaded audio, caches, the GitHub token and uploaded book texts stay on the device.
+     wt:acct     = { uid, email, name, photo, cats: {settings, library, marks, progress}, first, last }
+     wt:syncmeta = { key: time it last changed here }   (used to decide which copy is newer: last write wins)
+     Pull (app open, sign in, "Sync now"): newer cloud copies replace local ones, then the page reloads, the same
+     way Restore does, so the in-memory state cannot overwrite them. On the first sync of an account on a device,
+     list items (favourites, words, recent searches, listening history) and daily stats are merged, not replaced.
+     Push: changes are sent 8 seconds after the last change, and when the page is hidden. */
+  const FB_CFG = {
+    apiKey: 'AIzaSyBqIqgear6hpbSLrap4yIABBaqD_ZHnaZg',
+    authDomain: 'wordtrail-a1b2c.firebaseapp.com',
+    projectId: 'wordtrail-a1b2c',
+    storageBucket: 'wordtrail-a1b2c.firebasestorage.app',
+    messagingSenderId: '323294819807',
+    appId: '1:323294819807:web:5a11ede059ce9a05bd406a'
+  };
+  const FB_VER = '10.12.2', AC_KEY = 'wt:acct', AC_META = 'wt:syncmeta', AC_MAX = 900000;
+  const AC_CATS = [
+    ['settings', 'Settings', k => k === 'wt:prefs'],
+    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q'],
+    ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
+    ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
+  ];
+  let acFb = null, acLoading = null, acDb = null, acUser = null, acBusy = false, acTimer = null, acMsg = '', acErr = '';
+  const acDirty = new Set();
+  const acInfo = () => { try { return JSON.parse(localStorage.getItem(AC_KEY) || 'null'); } catch (e) { return null; } };
+  const acSaveInfo = o => { try { if (o) localStorage.setItem(AC_KEY, JSON.stringify(o)); else localStorage.removeItem(AC_KEY); } catch (e) { /* storage unavailable */ } };
+  const acMeta = () => { try { return JSON.parse(localStorage.getItem(AC_META) || '{}') || {}; } catch (e) { return {}; } };
+  const acSaveMeta = m => { try { localStorage.setItem(AC_META, JSON.stringify(m)); } catch (e) { /* storage unavailable */ } };
+  function acWanted(k) {
+    const i = acInfo(); if (!i) return false;
+    return AC_CATS.some(c => i.cats && i.cats[c[0]] === false ? false : c[2](k));
+  }
+  const acLocalKeys = () => { const out = []; try { Object.keys(localStorage).forEach(k => { if (acWanted(k)) out.push(k); }); } catch (e) { /* storage unavailable */ } return out; };
+
+  /* called by store.set for every saved item */
+  function acMark(k) {
+    if (!acWanted(k)) return;
+    const m = acMeta(); m[k] = Date.now(); acSaveMeta(m);
+    acDirty.add(k);
+    clearTimeout(acTimer); acTimer = setTimeout(() => { acPush().catch(() => {}); }, 8000);
+  }
+  storeHook = k => { try { acMark(k); } catch (e) { /* never break saving */ } };
+
+  function acLoad() {
+    if (acFb) return Promise.resolve(acFb);
+    if (acLoading) return acLoading;
+    const one = n => new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/firebase-' + n + '-compat.js';
+      s.onload = res; s.onerror = () => rej(new Error('Could not load the sign-in service. Check your connection.'));
+      document.head.append(s);
+    });
+    acLoading = one('app').then(() => Promise.all([one('auth'), one('firestore')])).then(() => {
+      const fb = window.firebase; fb.initializeApp(FB_CFG);
+      acFb = fb; acDb = fb.firestore();
+      fb.auth().onAuthStateChanged(acAuthChanged);
+      fb.auth().getRedirectResult().catch(e => { acErr = acNice(e); renderAcctSync(); });
+      return fb;
+    }).catch(e => { acLoading = null; throw e; });
+    return acLoading;
+  }
+  function acNice(e) {
+    const c = e && e.code || '';
+    if (c === 'auth/unauthorized-domain') return 'This website address is not allowed yet in Firebase (Authentication > Settings > Authorized domains).';
+    if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return '';
+    if (c === 'auth/network-request-failed') return 'No connection. Try again when you are online.';
+    if (c === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.' || c === 'auth/invalid-api-key') return 'The Firebase API key is not valid.';
+    return (e && e.message) || 'Sign-in failed.';
+  }
+
+  async function acSignIn() {
+    acErr = ''; renderAcctSync();
+    try {
+      const fb = await acLoad();
+      const prov = new fb.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: 'select_account' });
+      try { await fb.auth().signInWithPopup(prov); }
+      catch (e) {
+        if (e && (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment')) { await fb.auth().signInWithRedirect(prov); return; }
+        throw e;
+      }
+    } catch (e) { acErr = acNice(e); renderAcctSync(); }
+  }
+  async function acSignOut() {
+    if (!confirm('Sign out? Your data stays on this device and in your account.')) return;
+    try { if (acFb) await acFb.auth().signOut(); } catch (e) { /* ignore */ }
+    acUser = null; acSaveInfo(null); try { localStorage.removeItem(AC_META); } catch (e) { /* ignore */ }
+    acDirty.clear(); acMsg = ''; renderAcctSync();
+  }
+
+  function acAuthChanged(u) {
+    acUser = u || null;
+    if (!u) { renderAcctSync(); return; }
+    const old = acInfo(), same = old && old.uid === u.uid;
+    acSaveInfo({ uid: u.uid, email: u.email || '', name: u.displayName || '', photo: u.photoURL || '',
+      cats: same && old.cats ? old.cats : { settings: true, library: true, marks: true, progress: true },
+      first: same ? !!old.first : true, last: same ? old.last || 0 : 0 });
+    if (!same) { try { localStorage.removeItem(AC_META); } catch (e) { /* ignore */ } }
+    renderAcctSync();
+    acSync(!same).catch(() => {});
+  }
+
+  const acKeyOf = x => typeof x === 'object' && x ? (x.id !== undefined ? String(x.id) : x.w !== undefined ? String(x.w) : JSON.stringify(x)) : String(x);
+  function acUnion(k, a, b) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
+    let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
+    if (k === 'wt:stats') {
+      if (!A || !B || !A.days || !B.days || A.cleared !== B.cleared) return null;
+      const days = Object.assign({}, B.days);
+      Object.keys(A.days).forEach(d => { const x = A.days[d], y = days[d]; days[d] = y ? { s: Math.max(x.s || 0, y.s || 0), w: Math.max(x.w || 0, y.w || 0) } : x; });
+      const seen = new Set(), done = [];
+      [].concat(A.done || [], B.done || []).forEach(x => { const q = acKeyOf(x); if (!seen.has(q)) { seen.add(q); done.push(x); } });
+      return JSON.stringify(Object.assign({}, B, A, { days, done }));
+    }
+    if (!Array.isArray(A) || !Array.isArray(B)) return null;
+    const map = new Map();
+    [].concat(A, B).forEach(x => { const q = k === 'wt:recent-q' ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
+    let out = [...map.values()];
+    if (k === 'wt:listens') out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
+    const cap = { 'wt:favs': 300, 'wt:words': 2000, 'wt:recent-q': 8, 'wt:listens': 40 }[k];
+    if (cap) out = out.slice(0, cap);
+    return JSON.stringify(out);
+  }
+
+  const acCol = () => acDb.collection('users').doc(acUser.uid).collection('data');
+  async function acPushKeys(keys) {
+    const meta = acMeta(), col = acCol(), list = [...keys];
+    let skipped = 0;
+    for (let i = 0; i < list.length; i += 400) {
+      const batch = acDb.batch(); let n = 0;
+      list.slice(i, i + 400).forEach(k => {
+        const v = localStorage.getItem(k);
+        if (v === null) return;
+        if (v.length > AC_MAX) { skipped++; return; }
+        if (!meta[k]) meta[k] = Date.now();
+        batch.set(col.doc(encodeURIComponent(k)), { k, v, t: meta[k] }); n++;
+      });
+      if (n) await batch.commit();
+    }
+    acSaveMeta(meta);
+    list.forEach(k => acDirty.delete(k));
+    return skipped;
+  }
+  async function acPush() {
+    if (!acUser || !acFb || !acInfo() || !acDirty.size || acBusy) return;
+    try {
+      await acPushKeys(acDirty);
+      const i = acInfo(); if (i) { i.last = Date.now(); acSaveInfo(i); }
+      acMsg = ''; acErr = '';
+    } catch (e) { acErr = navigator.onLine ? 'Could not save to your account. It will retry.' : ''; acMsg = navigator.onLine ? '' : 'Offline. Changes will sync when you are back online.'; }
+    renderAcctSync();
+  }
+
+  async function acSync(manual) {
+    if (!acUser || !acDb || acBusy) return;
+    acBusy = true; acErr = ''; acMsg = 'Syncing…'; renderAcctSync();
+    let reload = false;
+    try {
+      const info = acInfo() || {}, first = !!info.first, meta = acMeta();
+      const remote = {};
+      (await acCol().get()).forEach(d => { const x = d.data(); if (x && typeof x.k === 'string' && typeof x.v === 'string') remote[x.k] = x; });
+      const up = new Set(acDirty), apply = [];
+      Object.keys(remote).forEach(k => {
+        if (!acWanted(k)) return;
+        const r = remote[k], lt = meta[k] || 0, mine = localStorage.getItem(k);
+        const union = mine !== null && (first || k === 'wt:stats') && r.v !== mine ? acUnion(k, mine, r.v) : null;
+        if (union !== null) { if (union !== mine) apply.push([k, union]); if (union !== r.v) up.add(k); meta[k] = Date.now(); }
+        else if (mine === null || r.t > lt) { if (r.v !== mine) apply.push([k, r.v]); meta[k] = r.t; }
+        else if (r.t < lt) up.add(k);
+      });
+      acLocalKeys().forEach(k => { if (!remote[k]) up.add(k); });
+      acSaveMeta(meta);
+      if (apply.length) {
+        window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
+        apply.forEach(([k, v]) => { try { localStorage.setItem(k, v); } catch (e) { /* storage full: skip */ } });
+        reload = true;
+      }
+      let skipped = 0;
+      try { skipped = await acPushKeys(up); } catch (e) { if (!reload) throw e; /* merged items are newer here, so the next sync uploads them */ }
+      info.first = false; info.last = Date.now(); acSaveInfo(info);
+      acMsg = skipped ? 'Synced. ' + skipped + ' item(s) were too large to upload.' : '';
+      if (reload) { toast('Synced from your account. Reloading…', 2500); setTimeout(() => location.reload(), 900); }
+      else if (manual) toast('Synced.', 2000);
+    } catch (e) {
+      window.__wtRestoring = false;
+      acMsg = ''; acErr = navigator.onLine ? 'Sync failed. ' + ((e && e.code === 'permission-denied') ? 'Check the Firestore rules.' : 'Try again in a moment.') : 'Offline. Sync will run when you are back online.';
+    } finally { acBusy = false; renderAcctSync(); }
+  }
+
+  async function acDeleteCloud() {
+    if (!acUser || !confirm('Delete everything saved in your account? Data on this device is kept.')) return;
+    try {
+      const snap = await acCol().get(); let batch = acDb.batch(), n = 0;
+      for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = acDb.batch(); } }
+      await batch.commit();
+      toast('Cloud data deleted.', 2500);
+    } catch (e) { toast('Could not delete the cloud data.', 3500); }
+  }
+
+  function renderAcctSync() {
+    const box = $('#acct-sync'); if (!box) return;
+    box.textContent = '';
+    const info = acInfo();
+    const err = acErr ? h('p', { class: 'acct-err', role: 'alert' }, acErr) : null;
+    if (!info) {
+      box.append(h('div', { class: 'acct-card acct-sync' },
+        h('strong', {}, 'Sync across devices'),
+        h('p', { class: 'help' }, 'Sign in to keep your settings, favourites, bookmarks and progress safe, and on every device. It is optional: the app works the same without it.'),
+        h('button', { class: 'btn', type: 'button', onclick: acSignIn }, 'Continue with Google'), err));
+      return;
+    }
+    const last = info.last ? 'Last synced ' + new Date(info.last).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not synced yet';
+    const toggles = AC_CATS.map(c => {
+      const cb = h('input', { type: 'checkbox', onchange: e => { const i = acInfo(); if (!i) return; i.cats = Object.assign({}, i.cats, { [c[0]]: e.target.checked }); acSaveInfo(i); if (e.target.checked) acSync(false); } });
+      cb.checked = !(info.cats && info.cats[c[0]] === false);
+      return h('label', { class: 'acct-opt' }, cb, h('span', {}, c[1]));
+    });
+    const av = info.photo ? h('img', { class: 'acct-av', src: info.photo, alt: '', referrerpolicy: 'no-referrer' }) : h('span', { class: 'acct-av' }, (info.name || info.email || '?').slice(0, 1).toUpperCase());
+    box.append(h('div', { class: 'acct-card acct-sync' },
+      h('div', { class: 'acct-who' }, av, h('span', {}, h('strong', {}, info.name || 'Signed in'), h('small', {}, info.email))),
+      h('p', { class: 'help' }, acBusy ? 'Syncing…' : (acMsg || last)),
+      h('div', { class: 'acct-opts' }, toggles),
+      h('div', { class: 'row', style: 'justify-content:flex-start;gap:.5rem;flex-wrap:wrap' },
+        h('button', { class: 'btn small', type: 'button', onclick: () => { if (!acUser) acLoad().then(() => acSync(true)).catch(e => { acErr = acNice(e); renderAcctSync(); }); else acSync(true); } }, 'Sync now'),
+        h('button', { class: 'btn small ghost', type: 'button', onclick: acSignOut }, 'Sign out'),
+        h('button', { class: 'btn small ghost', type: 'button', onclick: acDeleteCloud }, 'Delete cloud data')), err));
+  }
+
+  /* start: signed-in users reconnect a few seconds after the app opens; guests never download the sign-in code */
+  setTimeout(() => { if (acInfo()) acLoad().catch(() => { acMsg = 'Offline. Changes will sync when you are back online.'; }); }, 2500);
+  window.addEventListener('online', () => { if (acInfo()) acLoad().then(() => acPush()).catch(() => {}); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && acInfo()) { clearTimeout(acTimer); acPush().catch(() => {}); } });
+  window.addEventListener('pagehide', () => { if (acInfo()) acPush().catch(() => {}); });
   /* ---------- wiring ---------- */
   function init() {
     // Lists cached before cover art was requested have no covers: drop them once so they reload with art.
