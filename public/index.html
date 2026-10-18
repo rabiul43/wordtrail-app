@@ -2385,6 +2385,58 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 .acct-links { justify-content: center; }
 .tab.signed .tab-ic { position: relative; }
 .tab.signed .tab-ic::after { content: ""; position: absolute; top: -1px; right: -3px; width: .55rem; height: .55rem; border-radius: 50%; background: #4FB477; border: 2px solid var(--bg); }
+/* ---------- Reader player sheet (Focus page) ----------
+   A raised sheet with a grip: speed, back 15, big play, forward 15, next track; under it one bar for the whole
+   book (a segment per track, a dot for where you are). Same palette as the rest of the app: nothing here uses a raw colour. */
+.nr-card { background: var(--surface); }
+.nr-panel { border-radius: 0; box-shadow: none; }
+.nr-dock { position: relative; z-index: 2; background: var(--surface-2); border-radius: var(--r-xl) var(--r-xl) 0 0; box-shadow: var(--shadow-up); padding: .6rem 1.35rem max(1.1rem, env(safe-area-inset-bottom)); }
+.nr-grip { display: block; width: 2.5rem; height: 4px; margin: 0 auto .9rem; border-radius: 2px; background: color-mix(in srgb, var(--muted) 55%, var(--surface-2)); }
+
+.nr-ctl { display: flex; align-items: center; justify-content: space-between; margin: 0; padding: 0 .1rem; }
+.nr-spd { min-width: 2.9rem; height: 2.9rem; padding: 0; border: 0; background: transparent; color: var(--ink); font: 700 1.1rem/1 var(--font-ui); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.nr-spd small { font-size: .72em; font-weight: 700; margin-left: .04em; }
+.nr-spd[data-on="true"] { color: var(--accent); }
+.nr-skip { width: 2.9rem; height: 2.9rem; color: var(--ink); }
+.nr-skip .nic { width: 2.05rem; height: 2.05rem; }
+.nr-skip.nr-nxt .nic { width: 1.55rem; height: 1.55rem; }
+.nr-skip:disabled { opacity: .35; }
+.nr-play { width: 4.4rem; height: 4.4rem; }
+.nr-play .nic { width: 1.8rem; height: 1.8rem; }
+
+.nr-wave { position: relative; height: 2.5rem; margin: .45rem .55rem 0; }
+.nr-segs { position: absolute; left: 0; right: 0; top: 50%; height: 5px; margin-top: -2.5px; display: flex; gap: 3px; }
+.nr-segs.dense { gap: 0; }
+.nr-segs > i { position: relative; flex: 1 1 0; min-width: 0; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--muted) 38%, var(--surface-2)); }
+.nr-segs > i > b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); transition: width .25s linear; }
+.nr-dot { position: absolute; top: 50%; left: 0; width: 1.15rem; height: 1.15rem; margin: -.575rem 0 0 -.575rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent), var(--shadow-sm); pointer-events: none; transition: left .25s linear; }
+.nr-wave.drag .nr-dot, .nr-wave.drag .nr-segs > i > b { transition: none; }
+.nr-wave.drag .nr-dot { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 24%, transparent), var(--shadow-sm); }
+
+.nr-meta { display: flex; align-items: center; justify-content: space-between; margin: 0 .1rem; font: 500 .78rem/1 var(--font-ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.nr-mid { display: flex; align-items: center; gap: .4rem; }
+.nr-side { width: 2.4rem; height: 2.4rem; color: var(--muted); }
+.nr-side .nic { width: 1.3rem; height: 1.3rem; }
+.nr-side.on { color: var(--accent); }
+.nr-bp { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; margin: 0 .1rem; opacity: .8; }
+.nr-bp .bp-bar { display: none; }
+@media (prefers-reduced-motion: reduce) { .nr-dot, .nr-segs > i > b { transition: none; } }
+
+/* ---------- Reader top bar: back, title, then star, Aa, tracks, vertical dots ---------- */
+.topbar { gap: 0; }
+.topbar .ib { width: 2.5rem; min-width: 2.5rem; height: 2.75rem; color: var(--ink); }
+.topbar .ib .ic { width: 1.5rem; height: 1.5rem; stroke-width: 1.7; }
+.topbar .ib .ic circle { fill: currentColor; stroke: none; }
+.topbar #btn-back { margin-right: .15rem; }
+.topbar #btn-fav .ic { fill: none; stroke: currentColor; stroke-linejoin: round; }
+.topbar #btn-fav[aria-pressed="true"] { color: var(--accent); }
+.topbar #btn-fav[aria-pressed="true"] .ic { fill: currentColor; }
+.topbar .aa { font: 500 1.3rem/1 var(--font-ui); letter-spacing: -.02em; }
+.topbar .dots-ic { width: 1.4rem; height: 1.4rem; fill: currentColor; }
+
+/* title is plain text now (tracks have their own icon) */
+.topbar .titles { cursor: default; }
+.topbar .titles:active { background: transparent; }
 </style>
 </head>
 <body>
@@ -2708,8 +2760,10 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
     <button id="btn-back" class="ib" aria-label="Back to search"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button>
     <div class="titles"><h1 id="p-title"></h1><p id="p-sub"></p></div>
     <button id="b-timing" class="ib tdot" type="button" aria-expanded="false" aria-controls="syncbar" aria-label="Timing" hidden></button>
-    <button id="btn-player-settings" class="ib" type="button" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><svg class="dots-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
-    <button id="btn-fav" class="ib" type="button" aria-pressed="false" aria-label="Save to My books"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+    <button id="btn-fav" class="ib" type="button" aria-pressed="false" aria-label="Save to My books"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.8l5.9-.8z"/></svg></button>
+    <button id="btn-aa" class="ib aa" type="button" aria-label="Text size and reading settings">Aa</button>
+    <button id="btn-tracks-top" class="ib" type="button" aria-label="Tracks"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.6" cy="7" r=".9"/><circle cx="4.6" cy="12" r=".9"/><circle cx="4.6" cy="17" r=".9"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></button>
+    <button id="btn-player-settings" class="ib" type="button" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><svg class="dots-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     <div id="syncbar" class="syncbar" hidden><span class="sstate" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i><span id="sstate-t"></span></span><div class="syncbar-btns"><button id="b-dl-hint" class="dl-hint" type="button" aria-label="Download this book for offline playback" hidden>⬇ Download</button><button id="b-fix" class="fix" type="button">Adjust timing</button></div></div>
   </header>
 
@@ -2768,19 +2822,28 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
       <div id="nr-slot" class="nr-slot"></div>
     </div>
     <footer id="nr-dock" class="nr-dock">
-      <div id="nr-wave" class="nr-wave">
-        <div class="bars" aria-hidden="true"></div>
-        <input id="nr-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Position in this track">
-      </div>
-      <div class="nr-times"><span id="nr-cur">00:00:00</span><span id="nr-tot">00:00:00</span></div>
-      <div id="nr-bp" class="bookprog nr-bp" aria-hidden="true"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
+      <span class="nr-grip" aria-hidden="true"></span>
       <div class="nr-ctl">
-        <button id="nr-queue" class="nr-side" type="button" aria-label="Tracks"><svg class="nic" aria-hidden="true"><use href="#n-queue"/></svg></button>
-        <button id="nr-rew" class="nr-skip" type="button" aria-label="Back 15 seconds"><svg class="nic f" aria-hidden="true"><use href="#n-rew"/></svg></button>
+        <button id="nr-speed" class="nr-spd" type="button" aria-label="Playback speed">1.0<small>x</small></button>
+        <button id="nr-rew" class="nr-skip" type="button" aria-label="Back 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-back15"/></svg></button>
         <button id="nr-play" class="nr-play" type="button" aria-label="Play"><svg class="nic f" aria-hidden="true"><use href="#n-play"/></svg></button>
-        <button id="nr-ff" class="nr-skip" type="button" aria-label="Forward 15 seconds"><svg class="nic f" aria-hidden="true"><use href="#n-ff"/></svg></button>
-        <button id="nr-sleep" class="nr-side" type="button" aria-label="Sleep timer"><svg class="nic" aria-hidden="true"><use href="#n-moon"/></svg></button>
+        <button id="nr-ff" class="nr-skip" type="button" aria-label="Forward 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
+        <button id="nr-next" class="nr-skip nr-nxt" type="button" aria-label="Next track"><svg class="nic f" aria-hidden="true"><use href="#i-nexttrack"/></svg></button>
       </div>
+      <div id="nr-wave" class="nr-wave">
+        <div id="nr-segs" class="nr-segs" aria-hidden="true"></div>
+        <i id="nr-dot" class="nr-dot" aria-hidden="true"></i>
+        <input id="nr-seek" type="range" min="0" max="10000" step="1" value="0" aria-label="Position in the book">
+      </div>
+      <div class="nr-meta">
+        <span id="nr-cur">00:00:00</span>
+        <span class="nr-mid">
+          <button id="nr-queue" class="nr-side" type="button" aria-label="Tracks"><svg class="nic" aria-hidden="true"><use href="#n-queue"/></svg></button>
+          <button id="nr-sleep" class="nr-side" type="button" aria-label="Sleep timer"><svg class="nic" aria-hidden="true"><use href="#n-moon"/></svg></button>
+        </span>
+        <span id="nr-tot">00:00:00</span>
+      </div>
+      <div id="nr-bp" class="bookprog nr-bp" aria-hidden="true"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
     </footer>
   </div>
 </div>
@@ -2969,6 +3032,25 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
   </div>
 </section>
 
+<section id="sheet-aa" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-aa">
+  <header><h2 id="h-aa">Text</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="sp">
+      <div class="row">
+        <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-texts"/></svg>Text size</h3>
+        <div class="seg"><button id="aa-size-down" aria-label="Smaller text">A-</button><button id="aa-size-up" aria-label="Larger text">A+</button></div>
+      </div>
+      <div class="row">
+        <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-lines"/></svg>Line spacing</h3>
+        <div class="seg"><button id="aa-lh-down" aria-label="Tighter line spacing">&minus;</button><button id="aa-lh-up" aria-label="Looser line spacing">+</button></div>
+      </div>
+      <div class="row">
+        <label for="aa-font" style="flex:1">Reading font</label>
+        <select id="aa-font" class="num" style="width:auto"><option value="">Default (Newsreader)</option><option value="lexend">Lexend (easy to read)</option><option value="atkinson">Atkinson Hyperlegible</option><option value="opendyslexic">OpenDyslexic</option></select>
+      </div>
+    </div>
+  </div>
+</section>
 <script type="text/plain" id="scene-tests">
 ## strength=strong|weak|normal checks how loud the weather is made: heavy rain / driving snow = strong, light drizzle / soft rain / distant thunder = weak.
 ## Scene test fixtures. Format:
@@ -6189,32 +6271,53 @@ const Core = makeCore();
   /* ---------- new reader ----------
      Opened from the book icon in the player. The text container and the "Back to narrator" button are moved
      into it while it is open and put back when it closes, so the highlight, scrolling and tapping work as before. */
-  const NR = { on: false, seeking: false, seed: -1 };
-  const nrEl = { root: $('#nr'), slot: $('#nr-slot'), title: $('#nr-title'), bm: $('#nr-bm'), wave: $('#nr-wave'), seek: $('#nr-seek'), cur: $('#nr-cur'), tot: $('#nr-tot'), play: $('#nr-play'), sleep: $('#nr-sleep'), card: $('#nr-card'), dock: $('#nr-dock') };
+  const NR = { on: false, seeking: false, segKey: '', segN: 0, fills: [], fillEls: [], max: 10000, pos: 0 };
+  const nrEl = { root: $('#nr'), slot: $('#nr-slot'), title: $('#nr-title'), bm: $('#nr-bm'), wave: $('#nr-wave'), segs: $('#nr-segs'), dot: $('#nr-dot'), spd: $('#nr-speed'), next: $('#nr-next'), seek: $('#nr-seek'), cur: $('#nr-cur'), tot: $('#nr-tot'), play: $('#nr-play'), sleep: $('#nr-sleep'), card: $('#nr-card'), dock: $('#nr-dock') };
   const hms = s => { s = Math.max(0, Math.floor(isFinite(s) ? s : 0)); return [Math.floor(s / 3600), Math.floor(s % 3600 / 60), s % 60].map(n => String(n).padStart(2, '0')).join(':'); };
   const nrDur = () => (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : ((S.durs && S.durs[S.sec]) || 0);
-  function nrWave(seed) {
-    if (seed === NR.seed) return;
-    NR.seed = seed;
-    const N = 54, W = 360, H = 56, step = W / N, bw = 3.4;
-    let s = ((seed + 7) * 2654435761) >>> 0 || 1;
-    const rnd = () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
-    let r = '';
+  /* The bar under the controls is the whole book: one segment per track (equal widths), the dot is where you are.
+     Position is kept as "track number + fraction of that track" (0..N), so the bar never needs track lengths. */
+  function nrSegs() {
+    const N = S.secs ? S.secs.length : 0, key = (S.book ? S.book.id : '') + ':' + N;
+    if (key === NR.segKey) return;
+    NR.segKey = key; NR.segN = N; NR.fills = new Array(N).fill(''); NR.fillEls = [];
+    nrEl.segs.textContent = '';
+    const fr = document.createDocumentFragment();
+    for (let k = 0; k < N; k++) { const i = document.createElement('i'), b = document.createElement('b'); i.append(b); fr.append(i); NR.fillEls.push(b); }
+    nrEl.segs.append(fr); nrEl.segs.classList.toggle('dense', N > 40);
+  }
+  function nrPaint(pos) {
+    const N = NR.segN; if (!N) return;
+    nrEl.dot.style.left = (Math.min(N, Math.max(0, pos)) / N * 100) + '%';
     for (let k = 0; k < N; k++) {
-      const env = 0.5 + 0.5 * Math.sin(k * 0.37 + seed) * Math.sin(k * 0.11 + 1.3);
-      const v = Math.max(0.14, Math.min(1, 0.16 + 0.55 * env + 0.35 * rnd()));
-      const hh = Math.max(bw, v * (H - 4));
-      r += '<rect x="' + (k * step + (step - bw) / 2).toFixed(2) + '" y="' + ((H - hh) / 2).toFixed(2) + '" width="' + bw + '" height="' + hh.toFixed(2) + '" rx="' + (bw / 2) + '"/>';
+      const w = (Math.round(Math.min(1, Math.max(0, pos - k)) * 1000) / 10) + '%';
+      if (NR.fills[k] !== w) { NR.fills[k] = w; NR.fillEls[k].style.width = w; }
     }
-    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' + r + '</svg>';
-    nrEl.wave.style.setProperty('--wave', 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")');
+  }
+  /* slider value (0..max) -> which track, how far into it, and that track's length */
+  function nrPosOf(v) {
+    const N = Math.max(1, S.secs.length), pos = Math.min(N, Math.max(0, v / NR.max * N)), i = Math.min(N - 1, Math.floor(pos));
+    const d = i === S.sec ? nrDur() : (+S.durs[i] || 0);
+    let t = (pos - i) * d; if (i !== S.sec && t < 2) t = 0;   // a tap at the very start of another track: start it cleanly (skips the spoken intro)
+    return { pos, i, t, d };
+  }
+  const nrSpd = v => { let s = String(+(+v).toFixed(2)); if (s.indexOf('.') < 0) s += '.0'; return s; };
+  function nrSpeedUI() {
+    nrEl.spd.innerHTML = nrSpd(P.speed) + '<small>x</small>';
+    nrEl.spd.dataset.on = String(P.speed !== 1);
+    nrEl.spd.setAttribute('aria-label', 'Playback speed: ' + spdFmt(P.speed) + '. Open playback settings');
   }
   function nrSeekUI(t, d) {
     if (!NR.on) return;
-    const v = d ? Math.min(1000, Math.max(0, t / d * 1000)) : 0;
-    if (!NR.seeking) nrEl.seek.value = v;
-    nrEl.wave.style.setProperty('--fill', (v / 10) + '%');
+    nrSegs();
+    const N = NR.segN || 1;
+    NR.pos = S.sec + (d ? Math.min(1, Math.max(0, t / d)) : 0);
+    if (NR.seeking) return;   // the finger is on the bar: it shows the finger, not the audio
+    nrEl.seek.value = Math.round(NR.pos / N * NR.max);
+    nrEl.seek.setAttribute('aria-valuetext', 'Track ' + (S.sec + 1) + ' of ' + N + ', ' + hms(t));
+    nrPaint(NR.pos);
     nrEl.cur.textContent = hms(t); nrEl.tot.textContent = hms(d);
+    nrEl.next.disabled = S.sec >= N - 1;
   }
   function nrPlay(playing) {
     nrEl.play.firstElementChild.firstElementChild.setAttribute('href', playing ? '#n-pause' : '#n-play');
@@ -6231,7 +6334,7 @@ const Core = makeCore();
   function nrHead() {
     if (!S.book) return;
     nrEl.title.textContent = S.book.title;
-    nrWave(S.sec); nrBmUI();
+    nrSegs(); nrBmUI();
   }
   /* ---------- audio clips ----------
      A clip is a saved stretch of one track (track, start, end, a name). It plays from the list and stops by itself at the end,
@@ -6717,7 +6820,7 @@ const Core = makeCore();
     NR.on = true;
     nrEl.slot.append(el.reader); nrEl.card.append(el.follow);
     nrEl.root.hidden = false; el.player.inert = true;
-    nrHead(); nrPlay(!audio.paused); nrSleep(S.sleep);
+    nrHead(); nrPlay(!audio.paused); nrSleep(S.sleep); nrSpeedUI();
     nrSeekUI(nowT(), nrDur());
     document.documentElement.style.setProperty('--dock-h', nrEl.dock.offsetHeight + 'px');
     S.follow = true; el.follow.hidden = true;
@@ -6753,11 +6856,24 @@ const Core = makeCore();
     $('#nr-ff').addEventListener('click', () => seekAudio(nowT() + 15));
     $('#nr-queue').addEventListener('click', () => openSheet('sheet-tracks'));
     nrEl.sleep.addEventListener('click', () => { buzz('medium'); setSleep(SLEEPS[(SLEEPS.indexOf(S.sleep) + 1) % SLEEPS.length]); toast(sleepLabel(S.sleep), 1800); });
+    nrEl.spd.addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
+    nrEl.next.addEventListener('click', () => { buzz('tick'); stepTrack(1); });
     nrEl.seek.addEventListener('input', () => {
-      NR.seeking = true; const d = nrDur(), v = +nrEl.seek.value;
-      nrEl.wave.style.setProperty('--fill', (v / 10) + '%'); nrEl.cur.textContent = hms(v / 1000 * d);
+      NR.seeking = true; nrEl.wave.classList.add('drag');
+      const p = nrPosOf(+nrEl.seek.value);
+      nrPaint(p.pos); nrEl.cur.textContent = hms(p.t); nrEl.tot.textContent = hms(p.d);
     });
-    nrEl.seek.addEventListener('change', () => { NR.seeking = false; seekAudio(+nrEl.seek.value / 1000 * nrDur()); });
+    const nrSeekEnd = commit => {
+      if (!NR.seeking) return;
+      NR.seeking = false; nrEl.wave.classList.remove('drag');
+      if (commit) { const p = nrPosOf(+nrEl.seek.value); if (p.i === S.sec) seekAudio(p.t); else goTrack(p.i, p.t, !audio.paused); }
+      else nrSeekUI(nowT(), nrDur());
+    };
+    nrEl.seek.addEventListener('change', () => nrSeekEnd(true));
+    nrEl.seek.addEventListener('blur', () => nrSeekEnd(false));
+    nrEl.seek.addEventListener('keydown', e => {   // arrow keys: 15 seconds, like the buttons (the bar itself is far too fine for a key press)
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); seekAudio(nowT() + (e.key === 'ArrowLeft' ? -15 : 15)); }
+    });
     if (window.ResizeObserver) new ResizeObserver(() => {
       nrEl.root.style.setProperty('--nr-dock-h', nrEl.dock.offsetHeight + 'px');
       if (NR.on) document.documentElement.style.setProperty('--dock-h', nrEl.dock.offsetHeight + 'px');
@@ -17323,6 +17439,7 @@ const Core = makeCore();
     v = spdClamp(v); silOn = false; P.speed = v; audio.defaultPlaybackRate = v; audio.playbackRate = v;
     el.speed.textContent = spdFmt(v); el.speed.dataset.on = String(v !== 1);
     el.speed.setAttribute('aria-label', 'Playback speed: ' + spdFmt(v) + '. Open playback settings'); savePrefs();
+    nrSpeedUI();
     qkPaint();
   }
   /* ---------- lock screen / notification artwork ----------
@@ -18414,11 +18531,36 @@ const Core = makeCore();
     }).catch(e => { acLoading = null; throw e; });
     return acLoading;
   }
+  /* Optional, more reliable sign-in: Google's own sign-in popup returns a token straight to the page, so it does not
+     depend on cross-site storage (which Brave, Safari and newer Chrome block, and which makes the Firebase popup
+     close without signing in). Paste the "Web client ID" from Firebase > Authentication > Sign-in method > Google >
+     Web SDK configuration, and add this site's address under "Authorized JavaScript origins" of that client in
+     Google Cloud > APIs & Services > Credentials. Leave empty to use the Firebase popup. */
+  const GIS_CLIENT_ID = '';
+  function acGisPreload() {
+    if (!GIS_CLIENT_ID || window.google && google.accounts || document.getElementById('gis-js')) return;
+    const s = document.createElement('script'); s.id = 'gis-js'; s.src = 'https://accounts.google.com/gsi/client'; s.async = true; document.head.append(s);
+  }
+  function acGisToken() { // must be called straight from a tap, so the popup is allowed
+    return new Promise((res, rej) => {
+      if (!(window.google && google.accounts && google.accounts.oauth2)) { rej(new Error('Google sign-in is still loading. Tap again in a moment.')); acGisPreload(); return; }
+      try {
+        const tc = google.accounts.oauth2.initTokenClient({
+          client_id: GIS_CLIENT_ID, scope: 'openid email profile',
+          callback: r => r && r.access_token ? res(r.access_token) : rej({ code: 'gis/denied', message: (r && (r.error_description || r.error)) || 'Google did not complete the sign-in.' }),
+          error_callback: e => rej({ code: 'gis/' + ((e && e.type) || 'error'), message: e && e.type === 'popup_failed_to_open' ? 'The sign-in window was blocked. Allow pop-ups for this site and tap again.' : '' })
+        });
+        tc.requestAccessToken({ prompt: 'select_account' });
+      } catch (e) { rej(e); }
+    });
+  }
   function acNice(e) {
     const c = e && e.code || '';
     if (c === 'auth/unauthorized-domain') return 'This website address is not allowed yet in Firebase (Authentication > Settings > Authorized domains).';
     if (c === 'auth/operation-not-supported-in-this-environment') return 'Sign-in needs the app to be opened from its website address (or http://localhost), not from a file on your computer.';
-    if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return '';
+    if (c === 'auth/popup-closed-by-user') return 'The sign-in window closed before it finished. If you did choose your account, your browser may be blocking the connection (Brave shields, or blocked third-party cookies for this site). Allow them, or try another browser.';
+    if (c === 'auth/cancelled-popup-request' || c === 'gis/popup_closed') return '';
+    if (c.indexOf('gis/') === 0) return (e && e.message) || '';
     if (c === 'auth/network-request-failed') return 'No connection. Try again when you are online.';
     if (c === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.' || c === 'auth/invalid-api-key') return 'The Firebase API key is not valid.';
     return (e && e.message) || 'Sign-in failed.';
@@ -18428,6 +18570,13 @@ const Core = makeCore();
     acErr = ''; renderAcctSync();
     if (!/^https?:$/.test(location.protocol)) { acErr = 'Sign-in needs the app to be opened from its website address (or http://localhost), not from a file on your computer.'; renderAcctSync(); return; }
     try {
+      if (GIS_CLIENT_ID) {
+        const tokP = acGisToken(); tokP.catch(() => {}); // starts inside the tap; Firebase loads meanwhile
+        const fb = await acLoad();
+        const tok = await tokP;
+        await fb.auth().signInWithCredential(fb.auth.GoogleAuthProvider.credential(null, tok));
+        return;
+      }
       const fb = await acLoad();
       const prov = new fb.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: 'select_account' });
       try { await fb.auth().signInWithPopup(prov); }
@@ -18562,6 +18711,7 @@ const Core = makeCore();
     const info = acInfo();
     const err = acErr ? h('p', { class: 'acct-err', role: 'alert' }, acErr) : null;
     if (!info) {
+      acGisPreload();
       const gbtn = h('button', { class: 'acct-g', type: 'button', onclick: acSignIn }, h('span', {}), 'Sign in with Google');
       gbtn.firstChild.replaceWith(acSvg(AC_G, 'acct-g-logo'));
       box.append(h('div', { class: 'acct-out' }, gbtn, err));
@@ -18662,10 +18812,17 @@ const Core = makeCore();
     histInit();
     $('#btn-back').addEventListener('click', () => { persist(); renderRecents(); closeSheets(); showView('home'); restoreBack(); document.title = 'Wordtrail'; if (!el.results.hidden) syncHomeRows(true); else syncHomeRows(false); });
     $('#btn-tracks').addEventListener('click', () => openSheet('sheet-tracks'));
+    $('#btn-tracks-top').addEventListener('click', () => { buzz('tick'); openSheet('sheet-tracks'); });
+    $('#btn-aa').addEventListener('click', () => { buzz('tick'); $('#aa-font').value = $('#in-font').value; openSheet('sheet-aa'); });
+    /* the Aa sheet only has the text controls; each one presses the matching Settings control, so the saved values stay in one place */
+    $('#aa-size-down').addEventListener('click', () => $('#size-down').click());
+    $('#aa-size-up').addEventListener('click', () => $('#size-up').click());
+    $('#aa-lh-down').addEventListener('click', () => $('#lh-down').click());
+    $('#aa-lh-up').addEventListener('click', () => $('#lh-up').click());
+    $('#aa-font').addEventListener('change', e => { const f = $('#in-font'); f.value = e.target.value; f.dispatchEvent(new Event('change', { bubbles: true })); });
     $('#b-more').addEventListener('click', () => { if (S.book) VER.dotSeen.add(String(S.book.id)); verChip(); openSheet('sheet-more'); });
     $('#b-cal').addEventListener('click', () => { if (!$('#sheet-more').hidden) closeSheets(); });
     $('#btn-nr').addEventListener('click', () => { if (!$('#sheet-more').hidden) closeSheets(); });
-    { const tt = $('.topbar .titles'); if (tt) { tt.setAttribute('role', 'button'); tt.tabIndex = 0; tt.setAttribute('aria-label', 'Tracks'); tt.addEventListener('click', () => openSheet('sheet-tracks')); tt.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet('sheet-tracks'); } }); } }
     $('#b-ver').addEventListener('click', () => openSheet('sheet-versions'));
     $('#dl-go').addEventListener('click', () => { if (DL.running) dlCancel(); else dlStart(); });
     { const dh = $('#b-dl-hint'); if (dh) dh.addEventListener('click', () => { hideDlHint(); dlStart(); }); }
