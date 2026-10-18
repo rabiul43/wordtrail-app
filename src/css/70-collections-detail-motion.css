@@ -375,6 +375,8 @@ html[data-lite] .w.on, html[data-lite] .nr .w.on { box-shadow: 0 0 0 .1em var(--
 .det-top { display: flex; align-items: center; gap: .4rem; }
 .det-top .ib { margin-left: -.6rem; }
 .det-top span { font-size: var(--label); color: var(--muted); }
+.det-tools { margin-left: auto; display: flex; align-items: center; padding: 0 .15rem; border-radius: var(--r-pill); background: var(--surface-2); }
+.det-top .det-tools .ib { margin-left: 0; width: 2.75rem; height: 2.75rem; }
 .det-hero { --h: 40; position: relative; display: grid; justify-items: center; gap: .6rem; text-align: center; padding: 1.4rem 1.1rem 1.2rem; color: inherit; border: 1px solid color-mix(in srgb, hsl(var(--h) 60% 55%) 30%, var(--line)); background: linear-gradient(160deg, color-mix(in srgb, hsl(var(--h) 65% 55%) 22%, var(--surface)), var(--surface)); border-radius: var(--r-xl); }
 .det-cover { width: min(11rem, 52vw); aspect-ratio: 3 / 4; border-radius: var(--r-ctl); box-shadow: var(--shadow-cover); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 2rem; margin-bottom: .4rem; }
 .det-cover.mc { display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; text-align: left; padding: 1rem .9rem .85rem; }
