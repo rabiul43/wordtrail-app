@@ -1,0 +1,97 @@
+/* Layout: a search home, and a full-height reader with a fixed playback dock. */
+/* =====================================================================
+   DESIGN TOKENS — "Midnight Library". Single source of truth.
+   Dark is the default; Paper (light) and Sepia are overrides below.
+   Component rules must use these variables, never raw colours.
+   ===================================================================== */
+:root {
+  /* surfaces */
+  --bg: #0F1220; --surface: #171B2E; --surface-2: #1F2440; --line: #2A3050;
+  /* text */
+  --ink: #F2EBDD; --muted: #B0B2C8;
+  /* brand + state */
+  --accent: #E0B15A; --accent-ink: #1A1405; --accent-soft: #2B2619; --sun: #E0B15A; --mark: #5A4720;
+  --warn: #E9A23B; --warn-ink: #1A1405; --danger: #FF8F80; --err: #E5604F; --err-ink: #1A0805;
+  /* overlays */
+  --scrim: rgba(5, 7, 16, .62); --glass: rgba(15, 18, 32, .78);
+  /* elevation */
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .45);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, .35); --shadow-pop: 0 8px 30px rgba(0, 0, 0, .5);
+  --shadow-cover: 0 6px 16px rgba(0, 0, 0, .45); --shadow-up: 0 -6px 24px rgba(0, 0, 0, .40);
+  /* generated covers (hue is set per book as --ch) */
+  --cv-a: 34% 30%; --cv-b: 36% 20%; --cv-ink: 55% 86%;
+  /* shape */
+  --r-sm: 8px; --r-ctl: 12px; --r-card: 18px; --r-xl: 24px; --r-pill: 999px;
+  /* space */
+  --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --sec-gap: .65rem;
+  /* type — Fraunces for titles, Inter for interface, Newsreader for book text */
+  --font-display: 'Fraunces', 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-read: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --read-size: 1.24rem;
+  /* scale: 12.5 · 13.8 · 16 · 17 · 19 · 28 px */
+  --label: .78rem; --small: .86rem; --lead: 1.0625rem; --h2: 1.2rem; --h1: 1.75rem;
+  /* motion */
+  --dur-fast: 120ms; --dur: 220ms; --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur-slow: 380ms; --spring: cubic-bezier(.3, 1.4, .5, 1); --stagger: 38ms;
+  --press: .97; --press-lg: .985; --press-sm: .9;
+  color-scheme: dark; --tile-w: 8.75rem; --tile-ratio: 3 / 4; --gold: var(--sun); --hl-wash: color-mix(in srgb, var(--sun) 26%, transparent); --hl-edge: color-mix(in srgb, var(--sun) 70%, transparent); --hl-glow: color-mix(in srgb, var(--sun) 45%, transparent); --gold-ink: #1A1405; --row-gap: 1rem; --sec-space: 1.75rem;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #FAF7F2; --surface: #F1ECE2; --surface-2: #E7E0D2; --line: #E3DBCB;
+    --ink: #1B1A22; --muted: #66625A;
+    --accent: #865D0E; --accent-ink: #FFFFFF; --accent-soft: #F3E5C4; --sun: #E0B15A; --mark: #F6DC94;
+    --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #B03A2A; --err: #C0392B; --err-ink: #FFFFFF;
+    --scrim: rgba(15, 18, 32, .45); --glass: rgba(250, 247, 242, .86);
+    --shadow: 0 1px 2px rgba(26, 22, 40, .07), 0 10px 30px rgba(26, 22, 40, .10);
+    --shadow-sm: 0 2px 10px rgba(26, 22, 40, .12); --shadow-pop: 0 8px 30px rgba(26, 22, 40, .22);
+    --shadow-cover: 0 6px 16px rgba(26, 22, 40, .20); --shadow-up: 0 -6px 24px rgba(26, 22, 40, .10);
+    --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
+  --bg: #FAF7F2; --surface: #F1ECE2; --surface-2: #E7E0D2; --line: #E3DBCB;
+  --ink: #1B1A22; --muted: #66625A;
+  --accent: #865D0E; --accent-ink: #FFFFFF; --accent-soft: #F3E5C4; --sun: #E0B15A; --mark: #F6DC94;
+  --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #B03A2A; --err: #C0392B; --err-ink: #FFFFFF;
+  --scrim: rgba(15, 18, 32, .45); --glass: rgba(250, 247, 242, .86);
+  --shadow: 0 1px 2px rgba(26, 22, 40, .07), 0 10px 30px rgba(26, 22, 40, .10);
+  --shadow-sm: 0 2px 10px rgba(26, 22, 40, .12); --shadow-pop: 0 8px 30px rgba(26, 22, 40, .22);
+  --shadow-cover: 0 6px 16px rgba(26, 22, 40, .20); --shadow-up: 0 -6px 24px rgba(26, 22, 40, .10);
+  color-scheme: light;
+}
+:root[data-theme="sepia"] {
+  --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
+  --bg: #EFE6D0; --surface: #F8F1DE; --surface-2: #E6DBC1; --line: #D7C9A8;
+  --ink: #3A3227; --muted: #4E432D;
+  --accent: #85590F; --accent-ink: #FFFFFF; --accent-soft: #EBDCB5; --sun: #D9A93F; --mark: #F6D27B;
+  --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #A33A2A; --err: #B03A2A; --err-ink: #FFFFFF;
+  --scrim: rgba(40, 30, 12, .45); --glass: rgba(248, 241, 222, .88);
+  --shadow: 0 1px 2px rgba(60, 45, 20, .10), 0 10px 30px rgba(60, 45, 20, .12);
+  --shadow-sm: 0 2px 10px rgba(60, 45, 20, .14); --shadow-pop: 0 8px 30px rgba(60, 45, 20, .24);
+  --shadow-cover: 0 6px 16px rgba(60, 45, 20, .22); --shadow-up: 0 -6px 24px rgba(60, 45, 20, .12);
+  color-scheme: light;
+}
+
+:root[data-theme="contrast"] {
+  --cv-a: 0% 0%; --cv-b: 0% 0%; --cv-ink: 0% 100%;
+  --bg: #000000; --surface: #000000; --surface-2: #1A1A1A; --line: #FFFFFF;
+  --ink: #FFFFFF; --muted: #FFFFFF;
+  --accent: #FFE600; --accent-ink: #000000; --accent-soft: #2B2800; --sun: #FFE600; --mark: #FFE600;
+  --warn: #FFB000; --warn-ink: #000000; --danger: #FF8A80; --err: #FF6B5E; --err-ink: #000000;
+  --scrim: rgba(0, 0, 0, .85); --glass: rgba(0, 0, 0, .95);
+  --shadow: none; --shadow-sm: none; --shadow-pop: 0 0 0 2px #FFFFFF; --shadow-cover: none; --shadow-up: none;
+  color-scheme: dark;
+}
+:root[data-theme="contrast"] :focus-visible { outline: 3px solid #FFE600; outline-offset: 3px; }
+:root[data-theme="contrast"] .btn, :root[data-theme="contrast"] .seg button { border: 2px solid #FFFFFF; }
+:root[data-theme="contrast"] .btn.ghost { background: #000; color: #FFF; }
+:root[data-theme="contrast"] .seg button[aria-pressed="true"] { background: #FFE600; color: #000; border-color: #FFE600; }
+:root[data-theme="contrast"] .field { border: 2px solid #FFFFFF; }
+:root[data-theme="contrast"] .field:focus-within { border-color: #FFE600; }
+:root[data-theme="contrast"] a { color: #FFE600; text-decoration: underline; }
+:root[data-theme="contrast"] .prog .bar { background: #333; outline: 1px solid #FFF; }
+

@@ -1,0 +1,52 @@
+/* ---------- Reader player sheet (Focus page) ----------
+   A raised sheet with a grip: speed, back 15, big play, forward 15, next track; under it one bar for the whole
+   book (a segment per track, a dot for where you are). Same palette as the rest of the app: nothing here uses a raw colour. */
+.nr-card { background: var(--surface); }
+.nr-panel { border-radius: 0; box-shadow: none; }
+.nr-dock { position: relative; z-index: 2; background: var(--surface-2); border-radius: var(--r-xl) var(--r-xl) 0 0; box-shadow: var(--shadow-up); padding: .6rem 1.35rem max(1.1rem, env(safe-area-inset-bottom)); }
+.nr-grip { display: block; width: 2.5rem; height: 4px; margin: 0 auto .9rem; border-radius: 2px; background: color-mix(in srgb, var(--muted) 55%, var(--surface-2)); }
+
+.nr-ctl { display: flex; align-items: center; justify-content: space-between; margin: 0; padding: 0 .1rem; }
+.nr-spd { min-width: 2.9rem; height: 2.9rem; padding: 0; border: 0; background: transparent; color: var(--ink); font: 700 1.1rem/1 var(--font-ui); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.nr-spd small { font-size: .72em; font-weight: 700; margin-left: .04em; }
+.nr-spd[data-on="true"] { color: var(--accent); }
+.nr-skip { width: 2.9rem; height: 2.9rem; color: var(--ink); }
+.nr-skip .nic { width: 2.05rem; height: 2.05rem; }
+.nr-skip.nr-nxt .nic { width: 1.55rem; height: 1.55rem; }
+.nr-skip:disabled { opacity: .35; }
+.nr-play { width: 4.4rem; height: 4.4rem; }
+.nr-play .nic { width: 1.8rem; height: 1.8rem; }
+
+.nr-wave { position: relative; height: 2.5rem; margin: .45rem .55rem 0; }
+.nr-segs { position: absolute; left: 0; right: 0; top: 50%; height: 5px; margin-top: -2.5px; display: flex; gap: 3px; }
+.nr-segs.dense { gap: 0; }
+.nr-segs > i { position: relative; flex: 1 1 0; min-width: 0; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--muted) 38%, var(--surface-2)); }
+.nr-segs > i > b { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); transition: width .25s linear; }
+.nr-dot { position: absolute; top: 50%; left: 0; width: 1.15rem; height: 1.15rem; margin: -.575rem 0 0 -.575rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent), var(--shadow-sm); pointer-events: none; transition: left .25s linear; }
+.nr-wave.drag .nr-dot, .nr-wave.drag .nr-segs > i > b { transition: none; }
+.nr-wave.drag .nr-dot { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 24%, transparent), var(--shadow-sm); }
+
+.nr-meta { display: flex; align-items: center; justify-content: space-between; margin: 0 .1rem; font: 500 .78rem/1 var(--font-ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.nr-mid { display: flex; align-items: center; gap: .4rem; }
+.nr-side { width: 2.4rem; height: 2.4rem; color: var(--muted); }
+.nr-side .nic { width: 1.3rem; height: 1.3rem; }
+.nr-side.on { color: var(--accent); }
+.nr-bp { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; margin: 0 .1rem; opacity: .8; }
+.nr-bp .bp-bar { display: none; }
+@media (prefers-reduced-motion: reduce) { .nr-dot, .nr-segs > i > b { transition: none; } }
+
+/* ---------- Reader top bar: back, title, then star, Aa, tracks, vertical dots ---------- */
+.topbar { gap: 0; }
+.topbar .ib { width: 2.5rem; min-width: 2.5rem; height: 2.75rem; color: var(--ink); }
+.topbar .ib .ic { width: 1.5rem; height: 1.5rem; stroke-width: 1.7; }
+.topbar .ib .ic circle { fill: currentColor; stroke: none; }
+.topbar #btn-back { margin-right: .15rem; }
+.topbar #btn-fav .ic { fill: none; stroke: currentColor; stroke-linejoin: round; }
+.topbar #btn-fav[aria-pressed="true"] { color: var(--accent); }
+.topbar #btn-fav[aria-pressed="true"] .ic { fill: currentColor; }
+.topbar .aa { font: 500 1.3rem/1 var(--font-ui); letter-spacing: -.02em; }
+.topbar .dots-ic { width: 1.4rem; height: 1.4rem; fill: currentColor; }
+
+/* title is plain text now (tracks have their own icon) */
+.topbar .titles { cursor: default; }
+.topbar .titles:active { background: transparent; }

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Audiobooks you can read along with.">
+<meta name="theme-color" content="#0F1220">
+<script>try{var __t=(JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{}).theme,__l=matchMedia('(prefers-color-scheme: light)').matches,__c=({light:'#FAF7F2',sepia:'#EFE6D0',contrast:'#000000',dark:'#0F1220'})[__t]||(__l?'#FAF7F2':'#0F1220');document.querySelector('meta[name="theme-color"]').setAttribute('content',__c);}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wordtrail">
+<link rel="preconnect" href="https://librivox.org" crossorigin>
+<link rel="dns-prefetch" href="https://archive.org">
+<title>Wordtrail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>html.resuming #home, html.resuming #tabbar, html.resuming #mini { visibility: hidden; }</style>
+<style>
+/* Boot skeleton: static placeholders painted before the main script runs; removed by initHomeSections(). */
+.boot-sk { display: grid; gap: 1.1rem; margin-top: 1rem; pointer-events: none; animation: bootsk-out 0s 12s forwards; }
+html.resuming .boot-sk { display: none; }
+.boot-sk .bk-hero { min-height: 11.5rem; border-radius: var(--r-xl); background: var(--surface); animation: shimmer 1.4s ease-in-out infinite; }
+.boot-sk .bk-head { display: grid; gap: .35rem; }
+.boot-sk .bk-head .sk-l { margin: 0; height: 1rem; width: 9rem; } .boot-sk .bk-head .sk-l + .sk-l { height: .7rem; width: 14rem; max-width: 70%; }
+.boot-sk .hrow { overflow: hidden; }
+.boot-sk .card.sk { padding: .85rem 0; }
+.boot-sk .card.sk .cover { background: var(--surface); border-radius: var(--r-sm); }
+@keyframes bootsk-out { to { visibility: hidden; height: 0; margin: 0; overflow: hidden; } }
+</style>
+<noscript><style>.boot-sk { display: none; }</style></noscript>
+<script>try { var __o = JSON.parse(localStorage.getItem('wt:open') || 'null'); if (__o && __o.id && localStorage.getItem('wt:onboarded')) { document.documentElement.classList.add('resuming'); setTimeout(function () { document.documentElement.classList.remove('resuming'); }, 8000); } } catch (e) {}</script>
+<script>
+/* Fonts: with "Faster loading" on, the Google Fonts stylesheet no longer blocks the first paint (text shows in the system font, then swaps). Off = the old blocking <link>. */
+(function(){var on=true;try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}');on=!p||p.fastLoad!==false;}catch(e){}
+var u="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Literata:opsz,wght@7..72,600&family=Outfit:wght@300;400;500;600&display=swap";
+document.write(on?'<link rel="stylesheet" href="'+u+'" media="print" onload="this.media=\'all\'">':'<link rel="stylesheet" href="'+u+'">');})();
+</script>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Literata:opsz,wght@7..72,600&family=Outfit:wght@300;400;500;600&display=swap"></noscript>
+<script>
+/* Diagnostics: error + slow-moment log, kept in memory only (last 50). Starts before the app so early errors are caught. */
+(function(){
+var D=window.__wtDiag={log:[],on:false,po:[],drop:0,lt:typeof PerformanceObserver!=='undefined',t0:Date.now()};
+function add(type,msg){try{var l=D.log,m=String(msg).slice(0,300),x=l[l.length-1];
+if(x&&x.type===type&&x.msg===m){x.n=(x.n||1)+1;x.t=Date.now();return;}
+l.push({t:Date.now(),type:type,msg:m});if(l.length>50){l.shift();D.drop++;}}catch(e){}}
+D.add=add;
+addEventListener('error',function(e){if(!D.on||!e||!e.message)return;
+add('error',e.message+(e.filename?' @'+String(e.filename).replace(/^.*\//,'').slice(0,50)+':'+e.lineno+':'+e.colno:''));});
+addEventListener('unhandledrejection',function(e){if(!D.on)return;var r=e&&e.reason;
+add('promise',(r&&r.message)?r.message:String(r));});
+function obs(opts,fn){try{var po=new PerformanceObserver(function(list){if(!D.on)return;list.getEntries().forEach(fn);});po.observe(opts);D.po.push(po);return true;}catch(e){return false;}}
+function start(){if(D.po.length||!D.lt)return;
+D.lt=obs({entryTypes:['longtask']},function(en){add('longtask',Math.round(en.duration)+' ms, '+(Math.round(en.startTime/100)/10)+' s after load');});
+obs({type:'event',durationThreshold:200},function(en){if(en.name==='click'||en.name==='keydown')add('slow-tap',Math.round(en.duration)+' ms ('+en.name+')');});}
+function stop(){D.po.forEach(function(p){try{p.disconnect();}catch(e){}});D.po=[];}
+D.set=function(v){D.on=!!v;if(D.on)start();else stop();};
+D.clear=function(){D.log=[];D.drop=0;};
+D.text=function(){var n=navigator,h=document.documentElement,c={};D.log.forEach(function(x){c[x.type]=(c[x.type]||0)+(x.n||1);});
+var o=['Wordtrail diagnostics','UA: '+n.userAgent,'memory: '+(n.deviceMemory||'?')+' GB, cores: '+(n.hardwareConcurrency||'?')+', lite graphics: '+(h.hasAttribute('data-lite')?'on':'off'),
+'logging: '+(D.on?'on':'off')+(D.lt?'':' (longtask not supported here)'),
+'counts: '+(Object.keys(c).map(function(k){return k+' '+c[k];}).join(', ')||'none')+(D.drop?' (+'+D.drop+' older dropped)':''),''];
+D.log.forEach(function(x){o.push(new Date(x.t).toTimeString().slice(0,8)+'  '+x.type+'  '+x.msg+(x.n>1?'  (x'+x.n+')':''));});
+if(!D.log.length)o.push('(no entries yet)');return o.join('\n');};
+try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};D.set(p.diag!==false);}catch(e){D.set(true);}
+})();
+</script>
+<script>
+/* Lite graphics: set before first paint (same rule as applyLite() in the main script). */
+(function(){try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};var m=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;var n=navigator;var weak=m||(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4);if(p.calm===true)document.documentElement.setAttribute('data-calm','');if(p.liteForce===true||(p.liteGfx!==false&&weak))document.documentElement.setAttribute('data-lite','');}catch(e){}})();
+</script>

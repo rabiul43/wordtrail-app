@@ -1,0 +1,172 @@
+rules_version = '2';
+
+// Wordtrail account sync (plus public book ratings, see the end of this file). Paste this into Firebase console > Firestore Database > Rules, then Publish.
+// (It is kept here for reference; GitHub Pages only publishes dist/, so this file is not deployed by the build.)
+//
+// Everything lives at users/{uid}/data/{docId}. Only the signed-in owner can touch it. Four kinds of document:
+//   item          id = encodeURIComponent(key)   { k, v, t, u? }                 a saved value (v = JSON text)
+//   large header  id = encodeURIComponent(key)   { k, chunks, len, t, u }        a value too big for one document
+//   piece         id = 'chunk:<key>:<n>'         { ck, i, v }                    one piece of a large value
+//   clock         id = '__clock'                 { t }                           server time, to correct device clocks
+// 'u' is the server's upload time. It is optional on plain items so a device still running an older copy of the
+// app can keep syncing; once every device is updated, change `!('u' in d) ||` to nothing to require it.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validClock() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['t']) && d.t == request.time;
+    }
+
+    function validPiece() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['ck', 'i', 'v'])
+        && d.ck is string && d.ck.size() > 0 && d.ck.size() <= 200 && d.ck.matches('wt:.*')
+        && d.i is int && d.i >= 0 && d.i < 12
+        && d.v is string && d.v.size() <= 300000;
+    }
+
+    function validLargeHeader() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['k', 'chunks', 'len', 't', 'u'])
+        && d.keys().hasAll(['k', 'chunks', 'len', 't', 'u'])
+        && d.k is string && d.k.size() > 0 && d.k.size() <= 200 && d.k.matches('wt:.*')
+        && d.chunks is int && d.chunks >= 1 && d.chunks <= 12
+        && d.len is int && d.len > 0 && d.len <= 3000000
+        && d.t is number
+        && d.u == request.time;
+    }
+
+    function validItem() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['k', 'v', 't', 'u'])
+        && d.keys().hasAll(['k', 'v', 't'])
+        && d.k is string && d.k.size() > 0 && d.k.size() <= 200 && d.k.matches('wt:.*')
+        && d.v is string && d.v.size() <= 900000
+        && d.t is number
+        && (!('u' in d) || d.u == request.time);
+    }
+
+    function validDoc(docId) {
+      return docId == '__clock' ? validClock()
+        : docId.matches('chunk:.*') ? validPiece()
+        : ('chunks' in request.resource.data) ? validLargeHeader()
+        : validItem();
+    }
+
+    match /users/{uid}/data/{docId} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validDoc(docId);
+      allow delete: if isOwner(uid);
+    }
+
+    // ---- Ratings and one-line reviews (public to read, one per signed-in user per book) ----
+    //   ratings/{bookId}              { n, s, c1..c5 }      how many ratings, their sum (average = s / n), and how many of each star
+    //   ratings/{bookId}/votes/{uid}  { r, c, n, t, x? }    r = 1..5 stars, c = review (0..140 characters),
+    //                                                       n = first name shown with it, t = server time,
+    //                                                       x = how many people reported the review (the app hides it at 3)
+    //   ratings/{bookId}/votes/{uid}/reports/{reporterUid}  { k, t }   k = spam | offensive | spoiler | other
+    // The totals document can only change in the SAME batch as the user's own vote, and only by exactly what that
+    // vote changed (new vote: +1 and +r, one more of its star; changed vote: the star counters move from the old star to the new; removed vote: -1 and -old r). So nobody can
+    // push the average around without a real vote, and nobody can rate twice (the vote id is the user's uid).
+    function votePath(bookId, uid) { return /databases/$(database)/documents/ratings/$(bookId)/votes/$(uid); }
+    function totalsPath(bookId) { return /databases/$(database)/documents/ratings/$(bookId); }
+
+    // one star level: its counter must move by exactly what the vote moved (+1 for the new stars, -1 for the old)
+    function starOk(k, ra, rb, before, after) {
+      let was = before == null ? 0 : before['c' + string(k)];
+      return after['c' + string(k)] == was + (ra == k ? 1 : 0) - (rb == k ? 1 : 0);
+    }
+
+    function totalsMatch(bookId, uid) {
+      let v = votePath(bookId, uid);
+      let t = totalsPath(bookId);
+      let nb = exists(v) ? 1 : 0;
+      let na = existsAfter(v) ? 1 : 0;
+      let rb = exists(v) ? get(v).data.r : 0;
+      let ra = existsAfter(v) ? getAfter(v).data.r : 0;
+      let n0 = exists(t) ? get(t).data.n : 0;
+      let s0 = exists(t) ? get(t).data.s : 0;
+      let before = exists(t) ? get(t).data : null;
+      let after = getAfter(t).data;
+      return existsAfter(t)
+        && after.n == n0 + na - nb
+        && after.s == s0 + ra - rb
+        && starOk(1, ra, rb, before, after) && starOk(2, ra, rb, before, after) && starOk(3, ra, rb, before, after)
+        && starOk(4, ra, rb, before, after) && starOk(5, ra, rb, before, after);
+    }
+
+    function validTotals() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['n', 's', 'c1', 'c2', 'c3', 'c4', 'c5']) && d.keys().hasAll(['n', 's', 'c1', 'c2', 'c3', 'c4', 'c5'])
+        && d.c1 is int && d.c2 is int && d.c3 is int && d.c4 is int && d.c5 is int
+        && d.c1 >= 0 && d.c2 >= 0 && d.c3 >= 0 && d.c4 >= 0 && d.c5 >= 0
+        && d.n == d.c1 + d.c2 + d.c3 + d.c4 + d.c5
+        && d.s == d.c1 + 2 * d.c2 + 3 * d.c3 + 4 * d.c4 + 5 * d.c5;
+    }
+
+    function validVote() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['r', 'c', 'n', 't']) && d.keys().hasAll(['r', 'c', 'n', 't'])
+        && d.r is int && d.r >= 1 && d.r <= 5
+        && d.c is string && d.c.size() <= 140
+        && d.n is string && d.n.size() <= 40
+        && d.t == request.time;
+    }
+
+    function validReport() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['k', 't']) && d.keys().hasAll(['k', 't'])
+        && d.k in ['spam', 'offensive', 'spoiler', 'other']
+        && d.t == request.time;
+    }
+
+    // Someone else's report raised the report counter x of a review by exactly one, and nothing else changed
+    function reportBump(bookId, uid) {
+      let d = request.resource.data;
+      let o = resource.data;
+      let mine = /databases/$(database)/documents/ratings/$(bookId)/votes/$(uid)/reports/$(request.auth.uid);
+      return request.auth != null && request.auth.uid != uid
+        && d.diff(o).affectedKeys().hasOnly(['x'])
+        && d.x is int && d.x == o.get('x', 0) + 1
+        && !exists(mine) && existsAfter(mine);
+    }
+
+    match /ratings/{bookId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && bookId.matches('[A-Za-z0-9_-]{1,40}')
+        && validTotals() && totalsMatch(bookId, request.auth.uid);
+      allow delete: if false;
+
+      match /votes/{uid} {
+        allow read: if true;
+        allow create: if isOwner(uid) && bookId.matches('[A-Za-z0-9_-]{1,40}') && validVote() && totalsMatch(bookId, uid);
+        // the owner rewrites the whole vote (which also clears its report counter x: an edited review starts fresh);
+        // anyone else can only add exactly one to x, and only together with their own report (below)
+        allow update: if (isOwner(uid) && bookId.matches('[A-Za-z0-9_-]{1,40}') && validVote() && totalsMatch(bookId, uid))
+          || reportBump(bookId, uid);
+        allow delete: if isOwner(uid) && totalsMatch(bookId, uid);
+
+        // One report per signed-in user per review (the report id is the reporter's uid). Nobody can read reports from
+        // the app; you read and clear them in the Firebase console. Reports cannot be changed or taken back.
+        match /reports/{me} {
+          allow create: if request.auth != null && request.auth.uid == me && me != uid
+            && bookId.matches('[A-Za-z0-9_-]{1,40}') && validReport()
+            && exists(votePath(bookId, uid))
+            && getAfter(votePath(bookId, uid)).data.get('x', 0) == get(votePath(bookId, uid)).data.get('x', 0) + 1;
+          allow read, update, delete: if false;
+        }
+      }
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

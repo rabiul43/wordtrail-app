@@ -1,0 +1,94 @@
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<audio id="au" preload="metadata"></audio>
+
+<!-- ===================== First-run onboarding overlay ===================== -->
+<div id="ob-overlay" hidden role="dialog" aria-modal="true" aria-label="Welcome to Wordtrail">
+  <button class="ob-skip-top" id="ob-skip-top" type="button">Skip ✕</button>
+  <div class="ob-card">
+
+    <!-- Logo -->
+    <div class="ob-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <span>Wordtrail</span>
+    </div>
+
+    <!-- Progress dots -->
+    <div class="ob-dots" aria-hidden="true">
+      <span class="ob-dot on" id="ob-dot-0"></span>
+      <span class="ob-dot" id="ob-dot-1"></span>
+    </div>
+
+    <!-- Step 1: reading level -->
+    <div class="ob-step" id="ob-step-0">
+      <p class="ob-h">What's your English reading level?</p>
+      <p class="ob-sub">We'll use this to personalise the books we show you. You can change it any time.</p>
+
+      <div class="ob-levels" role="group" aria-label="Reading level">
+        <button class="ob-lvl" id="ob-pick-0" type="button" aria-pressed="false">
+          <span class="ob-lvl-ic">🌱</span>
+          <span class="ob-lvl-body">
+            <span class="ob-lvl-t">Easy — A2 to B1</span>
+            <span class="ob-lvl-d">Shorter sentences, everyday words</span>
+          </span>
+        </button>
+        <button class="ob-lvl" id="ob-pick-1" type="button" aria-pressed="false">
+          <span class="ob-lvl-ic">📚</span>
+          <span class="ob-lvl-body">
+            <span class="ob-lvl-t">Medium — B2</span>
+            <span class="ob-lvl-d">Comfortable with longer fiction</span>
+          </span>
+        </button>
+        <button class="ob-lvl" id="ob-pick-2" type="button" aria-pressed="false">
+          <span class="ob-lvl-ic">🎓</span>
+          <span class="ob-lvl-body">
+            <span class="ob-lvl-t">Hard — C1 to C2</span>
+            <span class="ob-lvl-d">Classics and literary prose</span>
+          </span>
+        </button>
+        <button class="ob-placement" id="ob-pick-pl" type="button" aria-pressed="false">
+          <span class="ob-placement-ic">⚡</span>
+          <span class="ob-lvl-body ob-placement-body">
+            <span class="ob-lvl-t">Take the 2-minute placement test</span>
+            <span class="ob-lvl-d">6 quick questions, easy to hard — we'll set the level for you</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Placement quiz (hidden until chosen) -->
+      <div class="ob-quiz" id="ob-quiz" hidden>
+        <div class="ob-q-bar"><i id="ob-q-prog" style="width:0%"></i></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="ob-q-n" id="ob-q-num">Question 1 of 5</span>
+          <span class="ob-q-n" id="ob-q-score"></span>
+        </div>
+        <p class="ob-q-hd" id="ob-q-hd"></p>
+        <div class="ob-q-opts" id="ob-q-opts" role="group" aria-label="Answer options"></div>
+      </div>
+
+      <div class="ob-actions">
+        <button class="ob-btn" id="ob-next-0" type="button" disabled>Continue</button>
+        <button class="ob-skip" id="ob-skip-0" type="button">Skip — show me everything</button>
+      </div>
+    </div>
+
+    <!-- Step 2: translation language -->
+    <div class="ob-step" id="ob-step-1" hidden>
+      <p class="ob-h">What's your native language?</p>
+      <p class="ob-sub">Long-press any sentence in the reader to translate it instantly.</p>
+
+      <div class="ob-langs" id="ob-lang-grid" role="group" aria-label="Translation language">
+        <!-- filled by JS -->
+      </div>
+      <select class="ob-lang-sel" id="ob-lang-sel" aria-label="Other language"></select>
+
+      <div class="ob-actions">
+        <button class="ob-btn" id="ob-done" type="button">Start reading</button>
+        <button class="ob-skip" id="ob-skip-1" type="button">Skip</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- ===================================================================== -->

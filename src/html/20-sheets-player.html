@@ -1,0 +1,206 @@
+<section id="sheet-bm" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-bm">
+  <header><h2 id="h-bm">Bookmark at a position</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <label class="bm-f"><h3>Track</h3><select id="bm-track" aria-label="Track"></select></label>
+    <label class="bm-f"><h3>Time</h3><input id="bm-time" type="text" inputmode="numeric" autocomplete="off" placeholder="12:30" aria-describedby="bm-help"></label>
+    <p class="help" id="bm-help">Type minutes and seconds (12:30) or hours too (1:02:30).</p>
+    <button id="bm-now" class="btn bm-alt" type="button">Use where I am now</button>
+    <label class="bm-f"><h3>Note <span class="help">(optional)</span></h3><textarea id="bm-note" rows="3" maxlength="500" autocomplete="off" placeholder="Why this place matters…" aria-label="Bookmark note"></textarea></label>
+    <p id="bm-err" class="help" role="alert" hidden></p>
+    <button id="bm-save" class="btn slp-go" type="button">Save bookmark</button>
+    <button id="bm-del" class="btn bm-alt" type="button" hidden>Remove this bookmark</button>
+  </div>
+</section>
+<section id="sheet-tracks" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-tracks">
+  <header><h2 id="h-tracks">Tracks</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="trk-nav">
+      <button id="b-prevtrack" class="btn small ghost" type="button" aria-label="Previous track (or restart this one)"><svg class="ic" aria-hidden="true"><use href="#i-prevtrack"/></svg>Previous</button>
+      <button id="b-nexttrack" class="btn small ghost" type="button" aria-label="Next track">Next<svg class="ic" aria-hidden="true"><use href="#i-nexttrack"/></svg></button>
+    </div>
+    <div id="dl-bar" class="dlbar">
+      <div><strong id="dl-t">Listen offline</strong><small id="dl-s"></small></div>
+      <div id="dl-m" class="bar-progress" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100" hidden><i></i></div>
+      <div class="acts"><button id="dl-go" class="btn small" type="button">Download book</button><button id="dl-rm" class="btn small ghost" type="button" hidden>Remove download</button></div>
+    </div>
+    <div id="trk-sum" class="trksum" hidden><div class="ts-top"><strong class="ts-pct"></strong><span class="ts-left"></span></div><div class="bar-progress ts-bar"><i></i></div><small class="ts-fin"></small></div>
+    <div id="track-list" class="tracks"></div>
+  </div>
+</section>
+
+<section id="sheet-text" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-text">
+  <header><h2 id="h-text">Text and timing</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="text-body"></div>
+</section>
+
+<section id="sheet-find" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-find">
+  <header><h2 id="h-find">Search inside books</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="fd-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><label class="sr-only" for="fd-q">Word or quote</label><input id="fd-q" type="search" placeholder="A word, or &quot;an exact quote&quot;" autocomplete="off" enterkeyhint="search"><button id="fd-clear" class="btn-clear" type="button" aria-label="Clear" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <div class="fd-opts"><label class="sr-only" for="fd-author">Author</label><select id="fd-author"></select></div>
+    <p class="fd-note" id="fd-note" role="status" aria-live="polite"></p>
+    <div id="fd-out"></div>
+  </div>
+</section>
+
+<section id="sheet-quiz" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-quiz">
+  <header><h2 id="h-quiz">Quick quiz</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="qz-body"></div>
+</section>
+
+<section id="sheet-shadow" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-shadow">
+  <header><h2 id="h-shadow">Shadow reading</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="sh-body"></div>
+</section>
+
+<section id="sheet-words" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-words">
+  <header><h2 id="h-words">Words</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="seg" id="seg-words"><button type="button" data-v="book" aria-pressed="true">This book</button><button type="button" data-v="review" aria-pressed="false">Review <span id="vw-due"></span></button><button type="button" data-v="mine" aria-pressed="false">My words <span id="vw-n"></span></button></div>
+    <p class="help" id="vw-help"></p>
+    <div id="vw-tools" class="row" style="gap:.5rem;justify-content:flex-start;margin-bottom:.5rem" hidden><button id="vw-exp" class="btn" type="button">Export words (CSV)</button><button id="vw-expbm" class="btn" type="button">Export bookmarks</button></div>
+    <div id="vw-list" class="vlist"></div>
+  </div>
+</section>
+
+<section id="sheet-versions" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-versions">
+  <header><h2 id="h-versions">Choose a reader</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="ver-body"></div>
+  <div class="vp-foot" id="ver-foot" hidden><button class="vp-go" id="ver-go" type="button"></button><p id="ver-foot-p"></p></div>
+</section>
+
+<section id="sheet-howto" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-howto">
+  <header><h2 id="h-howto">How to use Wordtrail</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div>
+      <h3 class="ht-sec" style="margin-top:0">While you read</h3>
+      <ul class="ht-list">
+        <li class="has-anim"><span class="gi anim a-tap" aria-hidden="true"><i></i><i class="hit"></i><i></i><u class="fg"></u></span><div><b>Tap a sentence</b><span>Jump the audio to that sentence.</span></div></li>
+        <li class="has-anim"><span class="gi anim a-dbl" aria-hidden="true"><i></i><i class="hit"></i><i></i><u class="fg"></u></span><div><b>Double-tap a sentence while it plays</b><span>Tells the app "this is what I hear now". It lines up the highlight again if it has drifted.</span></div></li>
+        <li><span class="gi" aria-hidden="true">&#9757;</span><div><b>Press and hold a sentence</b><span>Translate it.</span></div></li>
+        <li class="has-anim"><span class="gi anim a-swipe" aria-hidden="true"><i></i><i class="hit"></i><i></i><s class="pn"></s><u class="fg"></u></span><div><b>Swipe up on the text</b><span>Hide the player controls to leave a slim bar. Swipe down, or tap the bar or its handle, to show them again.</span></div></li>
+        <li><span class="gi" aria-hidden="true">&#8635;</span><div><b>Back to narrator</b><span>After you scroll away, this button brings the text back to the sentence being read.</span></div></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="ht-sec">Around the app</h3>
+      <ul class="ht-list">
+        <li><span class="gi" aria-hidden="true">&#9825;</span><div><b>Heart a book</b><span>Saves it to My books.</span></div></li>
+        <li><span class="gi" aria-hidden="true">&#9776;</span><div><b>More</b><span>In the player: tracks, who reads the book, next up, text and settings.</span></div></li>
+        <li><span class="gi" aria-hidden="true">&#8984;</span><div><b>Keyboard</b><span>Press <kbd>?</kbd> to see the shortcuts.</span></div></li>
+      </ul>
+    </div>
+    <button id="ht-reset" class="mrow" type="button"><span class="mr-main"><span class="mr-t">Show the gesture hint again</span><span class="mr-d">Brings back the small card in the reader</span></span></button>
+  </div>
+</section>
+
+<section id="sheet-report" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-report">
+  <header><h2 id="h-report">Report this review</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="rp-body"></div>
+</section>
+
+<section id="sheet-guide" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-guide">
+  <header><h2 id="h-guide">Feature guide</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <p class="help" style="margin:0">Every part of Wordtrail, from the first screen to the settings. Tap a section to open it.</p>
+    <input id="guide-q" class="guide-q" type="search" placeholder="Find a feature, e.g. sleep timer" aria-label="Find a feature" autocomplete="off">
+    <div id="guide-list" class="guide-list"></div>
+    <p id="guide-none" class="help" hidden>Nothing matches. Try another word.</p>
+  </div>
+</section>
+
+<section id="sheet-keys" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-keys">
+  <header><h2 id="h-keys">Keyboard shortcuts</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <dl class="keys" style="display:grid;grid-template-columns:auto 1fr;gap:.55rem 1rem;margin:0">
+      <dt><kbd>Space</kbd></dt><dd style="margin:0">Play or pause</dd>
+      <dt><kbd>&larr;</kbd> <kbd>&rarr;</kbd></dt><dd style="margin:0">Previous or next sentence</dd>
+      <dt><kbd>Shift</kbd> + <kbd>&larr;</kbd> <kbd>&rarr;</kbd></dt><dd style="margin:0">Back or forward 15 seconds</dd>
+      <dt><kbd>N</kbd> / <kbd>P</kbd></dt><dd style="margin:0">Next or previous track</dd>
+      <dt><kbd>Esc</kbd></dt><dd style="margin:0">Close a panel</dd>
+      <dt><kbd>?</kbd></dt><dd style="margin:0">Show this list</dd>
+    </dl>
+    <p class="help" style="margin-top:.8rem">Shortcuts work while a book is open and you are not typing in a box.</p>
+  </div>
+</section>
+
+<section id="sheet-speed" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-speed">
+  <header><h2 id="h-speed">Playback</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="spd-read"><button id="sp-minus" class="ib" type="button" aria-label="Slower by 0.05">&minus;</button><output id="sp-val" for="sp-range" aria-live="polite">1x</output><button id="sp-plus" class="ib" type="button" aria-label="Faster by 0.05">+</button></div>
+    <input id="sp-range" class="spd-range" type="range" min="0.5" max="3" step="0.05" value="1" aria-label="Playback speed">
+    <div id="sp-presets" class="spd-pre" role="group" aria-label="Speed presets"></div>
+    <div class="row" style="margin-top:1rem"><label for="sp-sil" style="flex:1">Skip silence<small class="spd-s">Speeds through pauses, so the story moves along</small></label><input id="sp-sil" type="checkbox"></div>
+    <div class="row" style="margin-top:.8rem"><label for="sp-voice" style="flex:1">Voice boost<small class="spd-s">Keeps the narrator clear and evenly loud</small></label><input id="sp-voice" type="checkbox"></div>
+    <div class="row" style="margin-top:.8rem"><label for="sp-lev" style="flex:1">Even out volume<small class="spd-s">Matches the loudness of every track, for books where the narrator's level changes</small></label><input id="sp-lev" type="checkbox"></div>
+    <div class="row" style="margin-top:.8rem"><label for="sp-mono" style="flex:1">Mono sound<small class="spd-s">Plays the same sound in both ears. Helps with hearing loss in one ear and with old stereo recordings</small></label><input id="sp-mono" type="checkbox"></div>
+    <div class="spd-bal" style="margin-top:.8rem">
+      <div class="row"><label for="sp-bal" style="flex:1">Left / right balance<small class="spd-s">Move the sound toward the ear you hear with. All of it plays on that side</small></label><output id="sp-bal-v" for="sp-bal" aria-live="polite">Centre</output></div>
+      <input id="sp-bal" class="spd-range" type="range" min="-100" max="100" step="5" value="0" aria-label="Left and right balance">
+      <div id="sp-bal-pre" class="spd-pre" role="group" aria-label="Balance presets"><button class="chip" type="button" data-b="-1" aria-pressed="false">Left ear only</button><button class="chip" type="button" data-b="0" aria-pressed="true">Centre</button><button class="chip" type="button" data-b="1" aria-pressed="false">Right ear only</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="sheet-hl" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-hl">
+  <header><h2 id="h-hl">Highlights and notes</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body"><p id="hl-empty" class="help" hidden>Nothing yet. Press and hold a sentence, then tap Highlight.</p><div id="hl-list" class="hl-list"></div></div>
+</section>
+
+<section id="sheet-clips" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-clips">
+  <header><h2 id="h-clips">Audio clips</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <p id="cl-empty" class="help" hidden>No clips yet. Tap New clip, then drag the handles to choose the part you want.</p>
+    <div id="cl-list" class="hl-list"></div>
+  </div>
+  <div class="cl-foot"><button id="cl-new" class="btn" type="button">New clip</button></div>
+</section>
+
+<section id="sheet-clipedit" class="sheet ced" hidden role="dialog" aria-modal="true" aria-label="Audio clip">
+  <header>
+    <button id="ced-x" class="ib" type="button" aria-label="Cancel"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <input id="ced-name" class="ced-name" type="text" maxlength="80" aria-label="Clip name">
+    <button id="ced-save" class="btn small" type="button">Save</button>
+  </header>
+  <div class="body ced-body">
+    <div><div id="ced-len" class="ced-len"></div><div id="ced-range" class="ced-range"></div></div>
+    <div id="ced-tl"></div>
+    <div class="ced-tools">
+      <button id="ced-zo" class="btn small ghost" type="button" aria-label="Zoom out">&minus;</button>
+      <button id="ced-ss" class="btn small ghost" type="button">Start here</button>
+      <button id="ced-se" class="btn small ghost" type="button">End here</button>
+      <button id="ced-zi" class="btn small ghost" type="button" aria-label="Zoom in">+</button>
+    </div>
+    <button id="ced-play" class="ced-play" type="button" aria-label="Play"></button>
+    <p id="ced-hint" class="ced-hint">Drag the ends to trim. Drag the timeline to slide along the track. Tap it to place the playhead.</p>
+  </div>
+</section>
+
+<section id="sheet-trail" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-trail">
+  <header><h2 id="h-trail">Find my place</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <p class="help">Places you may want to go back to: where you were before a big jump, when you set the sleep timer, and the last time you touched the screen before a long stretch of listening.</p>
+    <p id="tr-empty" class="help" hidden>Nothing saved for this book yet. Places appear here after a big jump or a long stretch of listening.</p>
+    <div id="tr-list" class="hl-list"></div>
+  </div>
+</section>
+
+<section id="sheet-aa" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-aa">
+  <header><h2 id="h-aa">Text</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="sp">
+      <div class="row">
+        <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-texts"/></svg>Text size</h3>
+        <div class="seg"><button id="aa-size-down" aria-label="Smaller text">A-</button><button id="aa-size-up" aria-label="Larger text">A+</button></div>
+      </div>
+      <div class="row">
+        <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-lines"/></svg>Line spacing</h3>
+        <div class="seg"><button id="aa-lh-down" aria-label="Tighter line spacing">&minus;</button><button id="aa-lh-up" aria-label="Looser line spacing">+</button></div>
+      </div>
+      <div class="row">
+        <label for="aa-font" style="flex:1">Reading font</label>
+        <select id="aa-font" class="num" style="width:auto"><option value="">Default (Newsreader)</option><option value="lexend">Lexend (easy to read)</option><option value="atkinson">Atkinson Hyperlegible</option><option value="opendyslexic">OpenDyslexic</option></select>
+      </div>
+    </div>
+  </div>
+</section>

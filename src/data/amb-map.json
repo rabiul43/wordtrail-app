@@ -1,0 +1,819 @@
+{
+ "v": 1,
+ "scenes": [
+  {
+   "k": "storm",
+   "n": "Stormy night",
+   "L": {
+    "rain": 40,
+    "wind": 45,
+    "thunder": 45,
+    "fire": 25,
+    "creaks": 15
+   }
+  },
+  {
+   "k": "dread",
+   "n": "Creeping dread",
+   "L": {
+    "wind": 35,
+    "drone": 50,
+    "rain": 15,
+    "thunder": 12,
+    "heartbeat": 18,
+    "creaks": 25,
+    "drips": 15
+   }
+  },
+  {
+   "k": "fog",
+   "n": "Foggy evening",
+   "L": {
+    "rain": 50,
+    "fire": 30,
+    "wind": 10,
+    "clock": 20,
+    "bell": 12
+   }
+  },
+  {
+   "k": "sea",
+   "n": "On the sea",
+   "L": {
+    "waves": 60,
+    "wind": 35,
+    "creaks": 12
+   }
+  },
+  {
+   "k": "ship",
+   "n": "Starship hum",
+   "L": {
+    "engine": 50,
+    "drone": 40
+   }
+  },
+  {
+   "k": "hearth",
+   "n": "By the hearth",
+   "L": {
+    "fire": 55,
+    "cafe": 15,
+    "wind": 10,
+    "clock": 15
+   }
+  },
+  {
+   "k": "enchant",
+   "n": "Enchanted night",
+   "L": {
+    "wind": 25,
+    "fire": 30,
+    "drone": 12,
+    "night": 40
+   }
+  },
+  {
+   "k": "trail",
+   "n": "Forest morning",
+   "L": {
+    "birds": 40,
+    "river": 30,
+    "wind": 20
+   }
+  },
+  {
+   "k": "parlour",
+   "n": "Cozy parlour",
+   "L": {
+    "cafe": 30,
+    "rain": 20,
+    "fire": 15,
+    "clock": 15
+   }
+  },
+  {
+   "k": "gentle",
+   "n": "Gentle rain",
+   "L": {
+    "rain": 30,
+    "birds": 15
+   }
+  },
+  {
+   "k": "quiet",
+   "n": "Quiet study",
+   "L": {
+    "brown": 30,
+    "rain": 15,
+    "clock": 10
+   }
+  },
+  {
+   "k": "night",
+   "n": "Summer night",
+   "L": {
+    "night": 55,
+    "river": 15,
+    "wind": 8
+   }
+  },
+  {
+   "k": "sleep",
+   "n": "Sleepy rain",
+   "L": {
+    "rain": 45,
+    "brown": 25
+   }
+  },
+  {
+   "k": "graveyard",
+   "n": "Graveyard",
+   "L": {
+    "wind": 30,
+    "night": 30,
+    "drone": 12,
+    "bell": 6
+   }
+  },
+  {
+   "k": "attic",
+   "n": "Attic",
+   "L": {
+    "creaks": 26,
+    "wind": 22,
+    "drone": 10,
+    "brown": 8
+   }
+  },
+  {
+   "k": "cellar",
+   "n": "Cellar or dungeon",
+   "L": {
+    "drips": 40,
+    "drone": 24,
+    "creaks": 12,
+    "wind": 8
+   }
+  },
+  {
+   "k": "haunted",
+   "n": "Haunted house",
+   "L": {
+    "creaks": 30,
+    "drone": 30,
+    "wind": 24,
+    "heartbeat": 8,
+    "clock": 8
+   }
+  },
+  {
+   "k": "swamp",
+   "n": "Swamp or marsh",
+   "L": {
+    "night": 40,
+    "river": 20,
+    "birds": 10,
+    "wind": 8
+   }
+  },
+  {
+   "k": "moor",
+   "n": "Moor or heath",
+   "L": {
+    "wind": 48,
+    "birds": 8,
+    "brown": 8
+   }
+  },
+  {
+   "k": "lighthouse",
+   "n": "Lighthouse or cliff",
+   "L": {
+    "waves": 40,
+    "wind": 38,
+    "birds": 12,
+    "bell": 4
+   }
+  },
+  {
+   "k": "lab",
+   "n": "Laboratory",
+   "L": {
+    "drone": 34,
+    "clock": 10,
+    "drips": 10,
+    "fire": 6
+   }
+  },
+  {
+   "k": "asylum",
+   "n": "Asylum or hospital",
+   "L": {
+    "drone": 30,
+    "drips": 14,
+    "clock": 14,
+    "creaks": 8,
+    "wind": 6
+   }
+  },
+  {
+   "k": "farm",
+   "n": "Farm",
+   "L": {
+    "birds": 35,
+    "wind": 15,
+    "creaks": 10,
+    "river": 8,
+    "brown": 6,
+    "steps": 6
+   }
+  },
+  {
+   "k": "school",
+   "n": "School",
+   "L": {
+    "cafe": 35,
+    "clock": 22,
+    "bell": 10,
+    "wind": 5
+   }
+  },
+  {
+   "k": "orchard",
+   "n": "Orchard",
+   "L": {
+    "birds": 42,
+    "wind": 22,
+    "river": 10,
+    "night": 6
+   }
+  },
+  {
+   "k": "market",
+   "n": "Market",
+   "L": {
+    "cafe": 14,
+    "wind": 8,
+    "bell": 8,
+    "birds": 10,
+    "crowd": 42,
+    "steps": 6
+   }
+  },
+  {
+   "k": "cottage",
+   "n": "Cottage",
+   "L": {
+    "fire": 38,
+    "clock": 16,
+    "birds": 14,
+    "wind": 12,
+    "creaks": 6
+   }
+  },
+  {
+   "k": "foggystreet",
+   "n": "Foggy street",
+   "L": {
+    "wind": 14,
+    "drips": 16,
+    "bell": 8,
+    "clock": 8,
+    "drone": 10,
+    "night": 12,
+    "steps": 12,
+    "hooves": 8
+   }
+  },
+  {
+   "k": "court",
+   "n": "Police or courtroom",
+   "L": {
+    "drone": 18,
+    "clock": 24,
+    "cafe": 14,
+    "creaks": 8,
+    "bell": 4,
+    "steps": 8
+   }
+  },
+  {
+   "k": "hotel",
+   "n": "Hotel",
+   "L": {
+    "drone": 16,
+    "cafe": 22,
+    "clock": 14,
+    "creaks": 8,
+    "bell": 8,
+    "steps": 10
+   }
+  },
+  {
+   "k": "library",
+   "n": "Library",
+   "L": {
+    "clock": 24,
+    "brown": 14,
+    "creaks": 8,
+    "rain": 10,
+    "wind": 5
+   }
+  },
+  {
+   "k": "alley",
+   "n": "Dark alley",
+   "L": {
+    "drips": 28,
+    "wind": 18,
+    "night": 22,
+    "drone": 14,
+    "steps": 14
+   }
+  },
+  {
+   "k": "docks",
+   "n": "Docks or harbour",
+   "L": {
+    "waves": 38,
+    "wind": 24,
+    "creaks": 16,
+    "bell": 8,
+    "birds": 10,
+    "crowd": 12
+   }
+  },
+  {
+   "k": "manor",
+   "n": "Country manor",
+   "L": {
+    "fire": 28,
+    "clock": 20,
+    "wind": 14,
+    "creaks": 10,
+    "rain": 12,
+    "birds": 8
+   }
+  },
+  {
+   "k": "station",
+   "n": "Space station",
+   "L": {
+    "drone": 38,
+    "engine": 22,
+    "clock": 10,
+    "heartbeat": 4
+   }
+  },
+  {
+   "k": "alien",
+   "n": "Alien planet",
+   "L": {
+    "wind": 40,
+    "drone": 24,
+    "night": 12,
+    "drips": 8,
+    "brown": 10
+   }
+  },
+  {
+   "k": "neon",
+   "n": "Neon city",
+   "L": {
+    "rain": 30,
+    "cafe": 12,
+    "drone": 20,
+    "engine": 12,
+    "bell": 4,
+    "crowd": 14
+   }
+  },
+  {
+   "k": "bridge",
+   "n": "Command bridge",
+   "L": {
+    "engine": 30,
+    "drone": 28,
+    "clock": 14,
+    "bell": 8
+   }
+  },
+  {
+   "k": "derelict",
+   "n": "Derelict ship",
+   "L": {
+    "drone": 34,
+    "drips": 22,
+    "creaks": 18,
+    "wind": 10,
+    "heartbeat": 10
+   }
+  },
+  {
+   "k": "observatory",
+   "n": "Observatory",
+   "L": {
+    "brown": 18,
+    "night": 24,
+    "clock": 12,
+    "wind": 10,
+    "drone": 8
+   }
+  },
+  {
+   "k": "camp",
+   "n": "Army camp",
+   "L": {
+    "fire": 34,
+    "cafe": 16,
+    "wind": 14,
+    "night": 18,
+    "creaks": 6,
+    "steps": 8,
+    "clang": 6,
+    "cannon": 8
+   }
+  },
+  {
+   "k": "carriage",
+   "n": "Carriage and road",
+   "L": {
+    "creaks": 24,
+    "wind": 16,
+    "birds": 10,
+    "drone": 6,
+    "hooves": 30
+   }
+  },
+  {
+   "k": "saloon",
+   "n": "Saloon",
+   "L": {
+    "cafe": 36,
+    "creaks": 14,
+    "fire": 10,
+    "wind": 6,
+    "bell": 4,
+    "steps": 8,
+    "crowd": 14
+   }
+  },
+  {
+   "k": "prairie",
+   "n": "Prairie",
+   "L": {
+    "wind": 45,
+    "birds": 22,
+    "brown": 8,
+    "river": 6,
+    "hooves": 8
+   }
+  },
+  {
+   "k": "castle",
+   "n": "Castle hall",
+   "L": {
+    "fire": 34,
+    "drone": 14,
+    "wind": 18,
+    "creaks": 10,
+    "cafe": 10,
+    "bell": 6,
+    "clang": 8
+   }
+  },
+  {
+   "k": "tavern",
+   "n": "Old tavern",
+   "L": {
+    "cafe": 45,
+    "fire": 30,
+    "creaks": 10,
+    "wind": 8,
+    "clock": 6
+   }
+  },
+  {
+   "k": "trench",
+   "n": "Trench",
+   "L": {
+    "thunder": 8,
+    "rain": 28,
+    "wind": 20,
+    "drone": 20,
+    "drips": 14,
+    "heartbeat": 10,
+    "cannon": 26
+   }
+  },
+  {
+   "k": "campfire",
+   "n": "Campfire under stars",
+   "L": {
+    "fire": 45,
+    "night": 38,
+    "wind": 10,
+    "river": 6
+   }
+  },
+  {
+   "k": "ghosttown",
+   "n": "Ghost town",
+   "L": {
+    "wind": 42,
+    "creaks": 28,
+    "drone": 8,
+    "brown": 8,
+    "bell": 4
+   }
+  },
+  {
+   "k": "palace",
+   "n": "Palace",
+   "L": {
+    "cafe": 22,
+    "drone": 14,
+    "clock": 12,
+    "bell": 8,
+    "wind": 8,
+    "birds": 8
+   }
+  },
+  {
+   "k": "temple",
+   "n": "Temple",
+   "L": {
+    "drone": 30,
+    "bell": 16,
+    "fire": 14,
+    "wind": 14,
+    "drips": 8
+   }
+  },
+  {
+   "k": "tower",
+   "n": "Magic tower",
+   "L": {
+    "wind": 38,
+    "drone": 24,
+    "fire": 16,
+    "creaks": 14,
+    "night": 10,
+    "bell": 4
+   }
+  },
+  {
+   "k": "lair",
+   "n": "Dragon's lair",
+   "L": {
+    "drone": 34,
+    "fire": 24,
+    "drips": 22,
+    "heartbeat": 14,
+    "wind": 10,
+    "creaks": 6
+   }
+  },
+  {
+   "k": "glade",
+   "n": "Elven glade",
+   "L": {
+    "birds": 30,
+    "river": 28,
+    "wind": 14,
+    "night": 8,
+    "drone": 6
+   }
+  },
+  {
+   "k": "underworld",
+   "n": "Underworld",
+   "L": {
+    "drone": 40,
+    "drips": 22,
+    "wind": 22,
+    "heartbeat": 10,
+    "river": 10,
+    "bell": 4
+   }
+  },
+  {
+   "k": "mine",
+   "n": "Dwarven mine",
+   "L": {
+    "drips": 34,
+    "drone": 24,
+    "creaks": 12,
+    "wind": 10,
+    "fire": 10
+   }
+  },
+  {
+   "k": "oracle",
+   "n": "Sacred spring",
+   "L": {
+    "river": 38,
+    "birds": 16,
+    "wind": 12,
+    "bell": 6,
+    "drone": 8
+   }
+  },
+  {
+   "k": "rails",
+   "n": "Train journey",
+   "L": {
+    "train": 46,
+    "wind": 12,
+    "creaks": 8
+   }
+  }
+ ],
+ "rules": [
+  [
+   "storm",
+   "gothic|frankenstein|dracula|wuthering|usher|jekyll"
+  ],
+  [
+   "dread",
+   "horror|supernatural|ghost|vampire|haunt|macabre|weird"
+  ],
+  [
+   "court",
+   "court|legal|lawyer|trial|police|prison|judge|inspector"
+  ],
+  [
+   "hotel",
+   "\\bhotel|\\binn\\b|boarding house|guest house"
+  ],
+  [
+   "library",
+   "librar|archive|\\bscholar|bookshop"
+  ],
+  [
+   "alley",
+   "\\balley|underworld|\\bnoir|gangster|hard-?boiled"
+  ],
+  [
+   "docks",
+   "\\bdock|harbou?r|\\bport\\b|wharf|waterfront"
+  ],
+  [
+   "manor",
+   "\\bmanor|country house|\\bestate|mansion|stately"
+  ],
+  [
+   "rails",
+   "\\btrains?\\b|railway|railroad|locomotive|orient express"
+  ],
+  [
+   "fog",
+   "detective|mystery|crime|sherlock|holmes|poirot"
+  ],
+  [
+   "sea",
+   "nautical|marine|\\bsea\\b|ocean|pirate|sailor|voyage|moby|\\bship\\b"
+  ],
+  [
+   "station",
+   "space station|orbital|\\borbit|satellite|\\bcolony"
+  ],
+  [
+   "alien",
+   "alien|extraterrestrial|martian|\\bmars\\b|first contact"
+  ],
+  [
+   "neon",
+   "cyberpunk|dystopi|android|\\bcyber|neon"
+  ],
+  [
+   "bridge",
+   "starship|spaceship|starfleet|\\bfleet|\\bcaptain|space opera"
+  ],
+  [
+   "derelict",
+   "derelict|wreck|abandoned|castaway"
+  ],
+  [
+   "observatory",
+   "astronom|telescope|observatory|\\bstars\\b|cosmos"
+  ],
+  [
+   "lab",
+   "laborator|scientist|experiment|mad science|alchem"
+  ],
+  [
+   "ship",
+   "science fiction|sci-?fi|\\bspace\\b|martian|time machine|robot|planet|worlds"
+  ],
+  [
+   "trench",
+   "trench|\\bwwi\\b|western front|great war"
+  ],
+  [
+   "camp",
+   "army camp|\\bsoldier|regiment|\\barmy\\b|civil war|military camp"
+  ],
+  [
+   "castle",
+   "castle|medieval|\\bknight|\\bking arthur|chivalr|feudal"
+  ],
+  [
+   "tavern",
+   "tavern|\\bpub\\b|\\bale\\b"
+  ],
+  [
+   "saloon",
+   "saloon|cowboy|gunslinger|\\bwestern"
+  ],
+  [
+   "ghosttown",
+   "ghost town|frontier|\\bgold rush"
+  ],
+  [
+   "prairie",
+   "prairie|homestead|pioneer|\\bplains\\b|little house"
+  ],
+  [
+   "carriage",
+   "carriage|stagecoach|coachman|highwayman"
+  ],
+  [
+   "lair",
+   "dragon|\\bhoard|\\bwyrm"
+  ],
+  [
+   "underworld",
+   "underworld|\\bhades|\\binferno|netherworld|\\bhell\\b"
+  ],
+  [
+   "mine",
+   "\\bdwarf|\\bdwarves|\\bmines?\\b|\\bcavern"
+  ],
+  [
+   "glade",
+   "\\belf\\b|\\belves|\\belven|\\bfae\\b|faerie|\\bglade"
+  ],
+  [
+   "tower",
+   "wizard|sorcer|\\bwitch|\\bspell|necromanc|\\bmagician"
+  ],
+  [
+   "temple",
+   "temple|monaster|\\bpriest|pilgrim|\\bshrine|\\bmonk"
+  ],
+  [
+   "palace",
+   "palace|emperor|empress|sultan|\\broyal court|arabian nights|\\bpharaoh"
+  ],
+  [
+   "oracle",
+   "oracle|\\bnymph|\\bgreek myth|\\bolympus"
+  ],
+  [
+   "hearth",
+   "histor|biograph|civil war|world war|napoleon|military|ancient|medieval|roman empire|memoir"
+  ],
+  [
+   "enchant",
+   "fantasy|fantastic|fairy|myth|legend|magic|saga"
+  ],
+  [
+   "trail",
+   "travel|adventure|western|explor|expedition"
+  ],
+  [
+   "farm",
+   "\\bfarm|barn|pastoral|agricultur|livestock|husbandry"
+  ],
+  [
+   "school",
+   "\\bschool|classroom|student|boarding|teacher|pupil"
+  ],
+  [
+   "orchard",
+   "orchard|\\bapple|harvest"
+  ],
+  [
+   "market",
+   "\\bmarket|bazaar|merchant|\\bshop"
+  ],
+  [
+   "cottage",
+   "cottage|village|countryside|\\brural"
+  ],
+  [
+   "parlour",
+   "romance|literary|classic|drama|domestic|social|manners|satire"
+  ],
+  [
+   "gentle",
+   "child|juvenile|fable|nursery|humou?r|comed"
+  ],
+  [
+   "quiet",
+   "poetry|philosoph|religio|essay|self-?help|spiritual"
+  ]
+ ]
+}

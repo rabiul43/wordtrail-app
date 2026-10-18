@@ -1,0 +1,416 @@
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-prevtrack" viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12L18 6v12z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-nexttrack" viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM14.5 12L6 18V6z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-back15" viewBox="0 0 24 24"><path d="M12 5a8 8 0 1 1-8 8"/><path d="M12 2l-3 3 3 3"/><text x="12" y="16.4" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">15</text></symbol>
+    <symbol id="i-fwd15" viewBox="0 0 24 24"><path d="M12 5a8 8 0 1 0 8 8"/><path d="M12 2l3 3-3 3"/><text x="12" y="16.4" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">15</text></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5L20 20"/></symbol>
+    <symbol id="i-m-headphones" viewBox="0 0 24 24"><path d="M3 14v-2a9 9 0 0118 0v2"/><path d="M21 19a2 2 0 01-2 2h-1v-6h3zM3 19a2 2 0 002 2h1v-6H3z"/></symbol>
+    <symbol id="i-m-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></symbol>
+    <symbol id="i-m-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+    <symbol id="i-m-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-m-dict" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5v14z"/><path d="M8 7h7M8 11h5M6.5 17a2.5 2.5 0 000 4H20v-4"/></symbol>
+    <symbol id="i-m-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+    <symbol id="i-m-wave" viewBox="0 0 24 24"><path d="M4 10v4M8 6v12M12 3v18M16 8v8M20 11v2"/></symbol>
+    <symbol id="i-m-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.8.6-1.5 1-1.5 2M12 17h.01"/></symbol>
+    <symbol id="i-m-bm" viewBox="0 0 24 24"><path d="M7.2 3.8h9.6a1.2 1.2 0 0 1 1.2 1.2v15.3l-6-4.3-6 4.3V5a1.2 1.2 0 0 1 1.2-1.2z"/></symbol>
+    <symbol id="i-m-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-m-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></symbol>
+    <symbol id="i-m-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+    <symbol id="i-m-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></symbol>
+    <symbol id="i-m-texts" viewBox="0 0 24 24"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></symbol>
+    <symbol id="i-m-lines" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11M5 5v4M3 7l2-2 2 2M5 15v4M3 17l2 2 2-2"/></symbol>
+    <symbol id="i-m-font" viewBox="0 0 24 24"><path d="M5 20L12 4l7 16M8 14h8"/></symbol>
+    <symbol id="i-m-focus" viewBox="0 0 24 24"><path d="M3 6h18M3 18h18" opacity=".45"/><path d="M3 12h18" stroke-width="3"/></symbol>
+    <symbol id="i-m-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></symbol>
+    <symbol id="i-m-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></symbol>
+    <symbol id="i-m-kbd" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></symbol>
+    <symbol id="i-m-phone" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M3 9v6M21 9v6"/></symbol>
+    <symbol id="i-m-sliders" viewBox="0 0 24 24"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-m-chart" viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></symbol>
+    <symbol id="i-m-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5"/></symbol>
+    <symbol id="i-m-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-m-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9M10 13h4"/></symbol>
+    <symbol id="i-m-zap" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></symbol>
+    <symbol id="i-m-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+    <symbol id="i-m-book" viewBox="0 0 24 24"><path d="M12 5a2 2 0 00-2-2H3v16h7a2 2 0 012 2zM12 5a2 2 0 012-2h7v16h-7a2 2 0 00-2 2"/></symbol>
+    <symbol id="i-m-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></symbol>
+    <symbol id="i-m-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6.5 6.5 0 013.5 6"/></symbol>
+    <symbol id="i-m-rain" viewBox="0 0 24 24"><path d="M20 16.5A4.5 4.5 0 0017.5 8h-1A6 6 0 104 14.5"/><path d="M8 19v2M12 19v2M16 19v2"/></symbol>
+    <symbol id="i-m-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-go" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="n-open" viewBox="0 0 24 24"><path d="M12 6.6C10.2 5.2 7.8 4.6 4 4.6v13.5c3.8 0 6.2.6 8 2 1.8-1.4 4.2-2 8-2V4.6c-3.8 0-6.2.6-8 2zM12 6.6V20"/></symbol>
+    <symbol id="n-back" viewBox="0 0 24 24"><path d="M20 12H4.6M10.6 6l-6 6 6 6"/></symbol>
+    <symbol id="n-bm" viewBox="0 0 24 24"><path d="M7.2 3.8h9.6a1.2 1.2 0 0 1 1.2 1.2v15.3l-6-4.3-6 4.3V5a1.2 1.2 0 0 1 1.2-1.2z"/></symbol>
+    <symbol id="n-queue" viewBox="0 0 24 24"><path d="M4 6.5h13M4 11h13M4 15.5h6.5"/><circle cx="16.3" cy="18.2" r="1.9"/><path d="M18.2 18.2v-6.6l3.3-1"/></symbol>
+    <symbol id="n-rew" viewBox="0 0 24 24"><path d="M11.4 7.4v9.2c0 .8-.9 1.2-1.5.8L3.6 12.8a1 1 0 0 1 0-1.6l6.3-4.6c.6-.4 1.5 0 1.5.8zM20.8 7.4v9.2c0 .8-.9 1.2-1.5.8l-6.3-4.6a1 1 0 0 1 0-1.6l6.3-4.6c.6-.4 1.5 0 1.5.8z"/></symbol>
+    <symbol id="n-ff" viewBox="0 0 24 24"><path d="M12.6 7.4v9.2c0 .8.9 1.2 1.5.8l6.3-4.6a1 1 0 0 0 0-1.6l-6.3-4.6c-.6-.4-1.5 0-1.5.8zM3.2 7.4v9.2c0 .8.9 1.2 1.5.8L11 13.8a1 1 0 0 0 0-1.6L4.7 7.6c-.6-.4-1.5 0-1.5.8z"/></symbol>
+    <symbol id="n-play" viewBox="0 0 24 24"><path d="M8.6 5.4c0-1.1 1.2-1.7 2.1-1.1l8.2 5.6c.8.5.8 1.7 0 2.2l-8.2 5.6c-.9.6-2.1 0-2.1-1.1z"/></symbol>
+    <symbol id="n-pause" viewBox="0 0 24 24"><rect x="5.6" y="4.6" width="4.8" height="14.8" rx="1.8"/><rect x="13.6" y="4.6" width="4.8" height="14.8" rx="1.8"/></symbol>
+    <symbol id="n-moon" viewBox="0 0 24 24"><path d="M20.2 14.4A8.2 8.2 0 0 1 9.6 3.8a8.2 8.2 0 1 0 10.6 10.6z"/></symbol>
+  </defs>
+</svg>
+
+<main id="home" class="view home">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" rx="1.5" fill="currentColor" opacity=".3"/><rect x="2" y="10" width="14" height="4.4" rx="2.2" fill="currentColor"/><rect x="3" y="16" width="16" height="3" rx="1.5" fill="currentColor" opacity=".3"/></svg>
+    <h1>Wordtrail</h1>
+  </div>
+
+  <div id="searchbar" class="searchbar">
+  <form id="search-form" role="search">
+    <div class="field">
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <label class="sr-only" for="q">Search LibriVox audiobooks</label>
+      <input id="q" type="search" placeholder="Search a title or author" autocomplete="off" enterkeyhint="search">
+      <button id="btn-fpanel" class="btn-fpanel" type="button" aria-label="Filters" aria-expanded="false" aria-controls="fpanel"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><span id="fpanel-n" class="flt-n" hidden></span></button>
+      <button id="btn-clear-q" class="btn-clear" type="button" aria-label="Clear search" hidden>
+        <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+      <button class="sr-only" type="submit" tabindex="-1">Search</button>
+    </div>
+    <div id="rq" class="rq" hidden></div>
+  </form>
+  <div id="sfilt" class="sfilt" role="group" aria-label="Search filters">
+    <div class="sfilt-row">
+      <button type="button" class="fchip" data-scope="all" aria-pressed="true">All</button>
+      <button type="button" class="fchip" data-scope="title" aria-pressed="false">Title</button>
+      <button type="button" class="fchip" data-scope="author" aria-pressed="false">Author</button>
+      <button type="button" class="fchip" data-scope="genre" aria-pressed="false">Genre</button>
+      <span class="fsep" aria-hidden="true"></span>
+      <button type="button" class="fchip star" id="f-ready" aria-pressed="false" title="Books with sentence timing ready, so the text follows the narrator">&#9733; Synced books</button>
+    </div>
+    <div id="sfilt-count" class="sfilt-count" hidden></div>
+  </div>
+  </div>
+  <div id="fchips" class="fchips" role="group" aria-label="Active filters" hidden></div>
+  <div id="fpanel" class="fpanel" hidden>
+    <div class="fp-g"><button type="button" class="btn small ghost fp-inside" id="f-find" title="Find a word or quote in the texts saved on this device">&#128269; Search inside books</button></div>
+    <div class="fp-g"><h3>Genres</h3>
+    <div id="genre-chips" class="genre-row" role="group" aria-label="Genres"></div>
+    </div>
+    <details id="filters" class="filters">
+      <summary>Filters <span id="flt-n" class="flt-n" hidden></span></summary>
+      <div class="flt-body">
+        <div class="flt-g"><h3>Sort by</h3><div id="flt-sort" class="flt-chips"></div></div>
+        <div class="flt-g flt-rate"><h3>Minimum rating</h3><div id="flt-rate" class="flt-chips"></div><p class="help">Books with fewer than 5 ratings are left out of Top rated and the rating filter.</p></div>
+        <div class="flt-g"><h3>Level</h3><div id="flt-lvl" class="flt-chips"></div><p class="help">Pick one or more. Estimated from the book's text; CEFR and age are rough guides.</p></div>
+        <div class="flt-g"><h3>Synced books</h3><div class="flt-chips"><button id="flt-ready" type="button" aria-pressed="false" title="Books with sentence timing ready, so the text follows the narrator">★ Synced books</button></div></div>
+        <div class="flt-g"><h3>Length</h3><div id="flt-len" class="flt-chips"></div></div>
+        <div class="flt-g"><h3>Mood</h3><div id="flt-mood" class="flt-chips"></div></div>
+        <div class="flt-g"><h3>Language</h3><select id="flt-lang" class="num" aria-label="Language"></select></div>
+        <div class="flt-g"><h3>Narrator</h3><select id="flt-nar" class="num" aria-label="Narrator"></select><p class="help" id="flt-nar-help"></p></div>
+        <button id="flt-clear" class="btn small ghost" type="button">Clear filters</button>
+      </div>
+    </details>
+    <div class="fp-foot"><button id="fp-clear" class="btn small ghost" type="button">Clear all</button><button id="fp-done" class="btn small" type="button">Done</button></div>
+  </div>
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+  <div id="prog" class="prog" hidden aria-hidden="true"><div class="bar"><i></i></div><span id="prog-t"></span></div>
+
+  <div id="home-state" hidden></div>
+
+  <div id="boot-sk" class="boot-sk" aria-hidden="true">
+    <div class="bk-hero"></div>
+    <div class="bk-head"><div class="sk-l"></div><div class="sk-l"></div></div>
+    <div class="hrow"><div class="tile sk"><div class="tile-cover"></div><div class="sk-l sk-k"></div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div></div><div class="tile sk"><div class="tile-cover"></div><div class="sk-l sk-k"></div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div></div><div class="tile sk"><div class="tile-cover"></div><div class="sk-l sk-k"></div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div></div><div class="tile sk"><div class="tile-cover"></div><div class="sk-l sk-k"></div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div></div><div class="tile sk"><div class="tile-cover"></div><div class="sk-l sk-k"></div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div></div></div>
+    <div class="list"><div class="card sk"><div class="cover"></div><div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div><div class="sk-l sk-chip"></div></div></div><div class="card sk"><div class="cover"></div><div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div><div class="sk-l sk-chip"></div></div></div><div class="card sk"><div class="cover"></div><div><div class="sk-l w90"></div><div class="sk-l w60"></div><div class="sk-l w40"></div><div class="sk-l sk-chip"></div></div></div></div>
+  </div>
+
+  <!-- Continue listening: hero card, first thing under the search bar -->
+  <section id="recents" aria-label="Continue listening" hidden>
+    <div id="recent-list" class="list"></div>
+  </section>
+
+  <!-- Time-of-day card: a review in the morning, a short story at bedtime (filled by loadTod) -->
+  <section id="sec-tod" class="home-section" aria-label="For this time of day" hidden></section>
+
+  <!-- Book of the day: hero card (filled from curation.json) -->
+  <section id="sec-botd" class="home-section" aria-label="Book of the day" hidden>
+    <div id="botd-card"></div>
+  </section>
+
+  <!-- Genres: one compact scrolling row under the search bar -->
+  <section id="sec-genre" class="home-section" hidden>
+    <div id="filter-results" class="genre-results" hidden>
+      <p id="filter-count" class="genre-count" aria-live="polite"></p>
+      <div id="filter-list" class="list" aria-label="Filtered audiobooks"></div>
+      <button id="filter-more" class="genre-more" type="button" hidden>Show more</button>
+    </div>
+    <div id="genre-results" class="genre-results" hidden>
+      <p id="genre-count" class="genre-count" aria-live="polite" hidden></p>
+      <p id="genre-note" class="genre-note" hidden></p>
+      <div id="genre-list" class="list" aria-label="Genre audiobooks"></div>
+      <button id="genre-more" class="genre-more" type="button" hidden>Show more</button>
+    </div>
+  </section>
+
+  <!-- Search results (existing) -->
+  <section id="results" hidden>
+    <h2>Audiobooks</h2>
+    <div id="rbar" class="rbar" hidden>
+      <span id="rcount" class="rcount" role="status" aria-live="polite"></span>
+      <label class="rsort"><span class="sr-only">Sort results</span><span class="rsort-l" aria-hidden="true">Sort</span>
+        <select id="rsort">
+          <option value="best">Best match</option>
+          <option value="az">A–Z</option>
+          <option value="short">Shortest</option>
+          <option value="rated" class="rt-only">Top rated</option>
+        </select>
+      </label>
+    </div>
+    <div id="result-list" class="list"></div>
+  </section>
+
+  
+  
+
+  <section id="sec-picks" class="home-section" hidden></section>
+
+  <section id="sec-newweek" class="home-section" hidden>
+    <div class="home-section-head"><div><h2>New this week</h2><p class="mood-sub">Fresh arrivals, just added to the library</p></div></div>
+    <div id="newweek-row" class="hrow" aria-label="New this week"></div>
+  </section>
+  <section id="sec-collections" class="home-section" hidden></section>
+
+  
+
+  
+
+  
+
+  
+
+</main>
+
+<main id="seeall" class="view home" hidden>
+  <div class="seeall-head">
+    <button id="seeall-back" class="ib" type="button" aria-label="Back to library"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button>
+    <div><h1 id="seeall-title"></h1><p id="seeall-sub"></p></div>
+  </div>
+  <div id="seeall-grid" class="grid3"></div>
+  <p id="seeall-err" class="genre-err" hidden></p>
+</main>
+
+<main id="detail" class="view home" hidden aria-label="Book details"></main>
+
+<main id="collections" class="view home" hidden>
+  <div id="col-head" class="tab-head"><h1>Collections</h1><p id="col-sub">Curated shelves, rebuilt daily.</p></div>
+  <div id="col-body"></div>
+  <div id="col-extra" hidden>
+  <section id="sec-trending" class="home-section" hidden>
+    <div class="home-section-head"><div><h2>Trending</h2><p class="mood-sub">Most listened to this week</p></div></div>
+    <div id="trending-row" class="hrow" aria-label="Trending audiobooks"></div>
+  </section>
+  <section id="sec-featured" class="home-section" hidden>
+    <div class="home-section-head">
+      <div><h2>Featured</h2><p class="mood-sub">Hand-picked classics</p></div>
+      <span id="featured-err" class="sec-err" hidden></span>
+    </div>
+    <div id="featured-row" class="hrow" aria-label="Featured audiobooks"></div>
+  </section>
+  <section id="sec-recent" class="home-section" hidden>
+    <div class="home-section-head">
+      <div><h2>Recently added</h2><p class="mood-sub">New in the last 90 days</p></div>
+      <span id="recent-err" class="sec-err" hidden></span>
+    </div>
+    <div id="recent-row" class="hrow" aria-label="Recently added audiobooks"></div>
+  </section>
+  </div>
+</main>
+
+<main id="shelf" class="view home" hidden>
+  <div class="tab-head"><h1>My books</h1><p id="shelf-sub"></p></div>
+  <div id="shelf-seg" class="shelf-seg" role="group" aria-label="My books view">
+    <button type="button" class="chip" data-m="saved" aria-pressed="true">Saved</button>
+    <button type="button" class="chip" data-m="ra" aria-pressed="false">Synced books</button>
+  </div>
+  <div id="shelf-saved">
+    <div id="shelf-list" class="list"></div>
+    <div id="shelf-empty" class="tab-empty" hidden>
+      <span class="tab-empty-heart" aria-hidden="true">♥</span>
+      <h2>Nothing saved yet</h2>
+      <p>Tap the heart on any book and it will wait for you here.</p>
+      <button id="shelf-browse" class="resume-btn" type="button">Browse the library</button>
+    </div>
+  </div>
+  <div id="shelf-ra" hidden>
+    <span id="synced-count" class="synced-count"></span>
+    <div id="synced-filters" class="synced-filters" role="group" aria-label="Filter synced books"></div>
+    <div id="synced-list" class="synced-list"></div>
+  </div>
+</main>
+
+<main id="account" class="view home" hidden></main>
+
+<template id="tpl-account">
+  <div class="tab-head"><h1>Account</h1><p>Your library, settings and progress. Sign in to sync them across devices.</p></div>
+  <section id="acct-sync" aria-label="Sign in and sync"></section>
+  <section id="acct-rt" class="acct-rt" aria-label="Your ratings" hidden></section>
+  <section id="ls" class="ls" aria-labelledby="ls-h"></section>
+  <div class="acct-card">
+    <div class="acct-row"><span>Saved books</span><strong id="acct-favs">0</strong></div>
+    <div class="acct-row"><span>Recently listened</span><strong id="acct-recents">0</strong></div>
+  </div>
+  <button id="acct-settings" class="acct-link" type="button">
+    <svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>
+    <span>Settings<small>Theme, text size, speed and sync</small></span>
+    <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
+  </button>
+  <button id="acct-guide" class="acct-link" type="button">
+    <svg class="ic" aria-hidden="true"><use href="#i-list"/></svg>
+    <span>Feature guide<small>Everything the app can do, and how to use it</small></span>
+    <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
+  </button>
+  <button id="acct-howto" class="acct-link" type="button">
+    <svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>
+    <span>How to use<small>Double-tap, press and hold, swipe</small></span>
+    <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
+  </button>
+  <button id="acct-keys" class="acct-link" type="button">
+    <svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>
+    <span>Keyboard shortcuts<small>Space, arrows, N and P. Press ? anywhere</small></span>
+    <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
+  </button>
+  <section id="acct-history" class="acct-history" hidden>
+    <h2>History</h2>
+    <div id="acct-history-list" class="list"></div>
+  </section>
+  <section class="about" aria-labelledby="about-h">
+    <h2 id="about-h">About</h2>
+    <p>Audio comes from LibriVox and the text from Project Gutenberg, both public domain. LibriVox does not publish sentence times, so Wordtrail estimates them in your browser. If the highlight drifts, double-tap the sentence you are hearing. You can also turn on Sync and tap it. Either way, the sentences around it are re-timed too.</p>
+  </section>
+</template>
+
+<div id="mini" class="mini" hidden role="region" aria-label="Now playing">
+  <button id="mini-open" class="mini-open" type="button" aria-label="Open the player">
+    <span id="mini-cover" class="mini-cover" aria-hidden="true"></span>
+    <span class="mini-txt"><strong id="mini-t"></strong><small id="mini-a"></small></span>
+  </button>
+  <button id="mini-scene" class="mini-scene" type="button" hidden aria-label="Sound scene — tap to open mixer"></button>
+  <button id="mini-play" class="mini-play" type="button" aria-label="Play"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
+  <button id="mini-close" class="mini-close" type="button" aria-label="Close player"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+  <span class="mini-bar" aria-hidden="true"><i id="mini-prog"></i></span>
+</div>
+
+<nav id="tabbar" class="tabbar" aria-label="Main">
+  <button class="tab" type="button" data-tab="library" aria-current="page">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.4 5.4 8.2 5 5 5v12c3.2 0 5.4.4 7 1.5 1.6-1.1 3.8-1.5 7-1.5V5c-3.2 0-5.4.4-7 1.5z"/><path d="M12 6.5v12"/></svg></span><span>Library</span>
+  </button>
+  <button class="tab" type="button" data-tab="collections">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h4v14H3zM9 5h4v14H9zM15.2 6.4l3.8-1 3 12.6-3.8 1z"/></svg></span><span>Collections</span>
+  </button>
+  <button class="tab" type="button" data-tab="shelf">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></span><span>My books</span>
+  </button>
+  <button class="tab" type="button" data-tab="account">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.2 18.2c1.3-2 3.3-3 5.8-3s4.5 1 5.8 3"/></svg></span><span>Account</span>
+  </button>
+</nav>
+
+<section id="player" class="view player" hidden>
+  <header class="topbar">
+    <button id="btn-back" class="ib" aria-label="Back to search"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button>
+    <div class="titles"><h1 id="p-title"></h1><p id="p-sub"></p></div>
+    <button id="b-timing" class="ib tdot" type="button" aria-expanded="false" aria-controls="syncbar" aria-label="Timing" hidden></button>
+    <button id="btn-fav" class="ib" type="button" aria-pressed="false" aria-label="Save to My books"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.8l5.9-.8z"/></svg></button>
+    <button id="btn-aa" class="ib aa" type="button" aria-label="Text size and reading settings">Aa</button>
+    <button id="btn-tracks-top" class="ib" type="button" aria-label="Tracks"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.6" cy="7" r=".9"/><circle cx="4.6" cy="12" r=".9"/><circle cx="4.6" cy="17" r=".9"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></button>
+    <button id="btn-player-settings" class="ib" type="button" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><svg class="dots-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+    <div id="syncbar" class="syncbar" hidden><span class="sstate" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i><span id="sstate-t"></span></span><div class="syncbar-btns"><button id="b-dl-hint" class="dl-hint" type="button" aria-label="Download this book for offline playback" hidden>⬇ Download</button><button id="b-fix" class="fix" type="button">Adjust timing</button></div></div>
+  </header>
+
+
+  <div id="reader" class="reader" tabindex="0" aria-label="Book text">
+    <div id="pcover" class="pcover" aria-hidden="true"></div>
+    <div class="pcover-ctl"><button id="b-speed" class="chip" aria-label="Playback speed">1x</button><button id="b-sleep" class="chip" aria-label="Sleep timer">Sleep</button></div>
+    <div id="ptitle" class="ptitle" aria-hidden="true"><strong></strong><span></span></div>
+    <div id="calbar" class="calbar" hidden>Tap the sentence you are hearing right now to line it up.</div>
+    <div id="page" class="page"></div>
+  </div>
+  <button id="follow" class="pill" hidden>Back to narrator</button>
+  <div id="gesture-hint" class="gh" role="region" aria-label="Reading gestures" hidden>
+    <h3>Three handy gestures</h3>
+    <ul>
+      <li><span class="gi" aria-hidden="true"><b style="display:inline;font-size:.85rem">2&times;</b></span><div><b>Double-tap a sentence</b><span>If the highlight is off, double-tap the sentence you hear right now.</span></div></li>
+      <li class="has-anim"><span class="gi anim a-hold" aria-hidden="true"><i></i><i class="hit"></i><i></i><s class="pp"></s><u class="fg"></u></span><div><b>Press and hold a sentence</b><span>Translate it.</span></div></li>
+      <li><span class="gi" aria-hidden="true">&#8693;</span><div><b>Swipe up while reading</b><span>Hide the player controls. Swipe down or tap the bar to bring them back.</span></div></li>
+    </ul>
+    <div class="gh-act"><button type="button" id="gh-more">How to use</button><button type="button" id="gh-ok" class="gh-ok">Got it</button></div>
+  </div>
+  <div id="ro-bar" class="ro-bar"><button id="ro-play" type="button">Play</button><button id="ro-exit" type="button">Exit text only</button></div>
+
+  <footer id="dock" class="dock">
+    <button id="dock-grip" class="dock-grip" type="button" aria-label="Hide player controls" aria-expanded="true"></button>
+    <canvas id="viz" class="viz" aria-hidden="true"></canvas>
+    <button id="b-skipintro" class="skipintro" type="button" hidden>Skip intro</button>
+    <div class="seek">
+      <span id="t-cur">0:00</span>
+      <input id="seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Position in this track">
+      <span id="t-left">-0:00</span>
+    </div>
+    <div id="book-prog" class="bookprog" role="progressbar" aria-label="Book progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
+    <div class="ctl">
+      <button id="b-prevsent" class="ib" aria-label="Previous sentence" title="Previous sentence"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+      <button id="b-back15" class="ib" aria-label="Back 15 seconds" title="Back 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-back15"/></svg></button>
+      <button id="b-play" class="play" aria-label="Play"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
+      <button id="b-fwd15" class="ib" aria-label="Forward 15 seconds" title="Forward 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
+      <button id="b-nextsent" class="ib" aria-label="Next sentence" title="Next sentence"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+    </div>
+    <div class="dchips">
+      <button id="b-read" class="chip" aria-pressed="false" aria-label="Text only: hide the player and just read">Text only</button>
+      <button id="b-more" class="chip" aria-label="More: tracks, reader, next up, words">More</button>
+    </div>
+  </footer>
+</section>
+
+<div id="nr" class="nr" hidden role="dialog" aria-modal="true" aria-label="Focus page">
+  <div class="nr-card" id="nr-card">
+    <div class="nr-panel">
+      <header class="nr-top">
+        <button id="nr-back" class="nr-ib" type="button" aria-label="Back"><svg class="nic" aria-hidden="true"><use href="#n-back"/></svg></button>
+        <h1 id="nr-title"></h1>
+        <button id="nr-bm" class="nr-ib nr-bm" type="button" aria-pressed="false" aria-label="Bookmark"><svg class="nic" aria-hidden="true"><use href="#n-bm"/></svg></button>
+      </header>
+      <div id="nr-slot" class="nr-slot"></div>
+    </div>
+    <footer id="nr-dock" class="nr-dock">
+      <span class="nr-grip" aria-hidden="true"></span>
+      <div class="nr-ctl">
+        <button id="nr-speed" class="nr-spd" type="button" aria-label="Playback speed">1.0<small>x</small></button>
+        <button id="nr-rew" class="nr-skip" type="button" aria-label="Back 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-back15"/></svg></button>
+        <button id="nr-play" class="nr-play" type="button" aria-label="Play"><svg class="nic f" aria-hidden="true"><use href="#n-play"/></svg></button>
+        <button id="nr-ff" class="nr-skip" type="button" aria-label="Forward 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
+        <button id="nr-next" class="nr-skip nr-nxt" type="button" aria-label="Next track"><svg class="nic f" aria-hidden="true"><use href="#i-nexttrack"/></svg></button>
+      </div>
+      <div id="nr-wave" class="nr-wave">
+        <div id="nr-segs" class="nr-segs" aria-hidden="true"></div>
+        <i id="nr-dot" class="nr-dot" aria-hidden="true"></i>
+        <input id="nr-seek" type="range" min="0" max="10000" step="1" value="0" aria-label="Position in the book">
+      </div>
+      <div class="nr-meta">
+        <span id="nr-cur">00:00:00</span>
+        <span class="nr-mid">
+          <button id="nr-queue" class="nr-side" type="button" aria-label="Tracks"><svg class="nic" aria-hidden="true"><use href="#n-queue"/></svg></button>
+          <button id="nr-sleep" class="nr-side" type="button" aria-label="Sleep timer"><svg class="nic" aria-hidden="true"><use href="#n-moon"/></svg></button>
+        </span>
+        <span id="nr-tot">00:00:00</span>
+      </div>
+      <div id="nr-bp" class="bookprog nr-bp" aria-hidden="true"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
+    </footer>
+  </div>
+</div>
+
+<div id="backdrop" class="backdrop" hidden></div>
+
