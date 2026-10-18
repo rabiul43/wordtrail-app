@@ -65,3 +65,14 @@
 .rc-row { display: flex; gap: .6rem; margin-top: .6rem; }
 .rc-alt { flex: 1; min-height: 48px; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface-2); color: var(--ink); font: 500 .95rem var(--font-ui); cursor: pointer; }
 .rc-go:active, .rc-alt:active { transform: scale(var(--press)); }
+
+/* bookmark chip under a book on My books > Saved (060-position-bookmarks.js) */
+.bm-row { margin: -.4rem 0 .85rem 5.5rem; }
+.bm-row[hidden] { display: none; }
+.bm-chip { display: inline-flex; align-items: stretch; height: 1.65rem; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: var(--r-pill); background: var(--accent-soft); }
+.bm-chip button { position: relative; display: inline-flex; align-items: center; gap: .3rem; border: 0; background: transparent; font: 650 .72rem var(--font-ui); cursor: pointer; }
+.bm-chip button::after { content: ""; position: absolute; inset: -.6rem 0; }   /* 44px tap height, chip stays small */
+.bm-go { padding: 0 .55rem 0 .6rem; color: var(--accent); border-radius: var(--r-pill) 0 0 var(--r-pill); }
+.bm-go svg { width: .8rem; height: .8rem; fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.bm-x { width: 2.1rem; justify-content: center; color: var(--danger); border-left: 1px solid color-mix(in srgb, var(--accent) 35%, transparent) !important; border-radius: 0 var(--r-pill) var(--r-pill) 0; }
+.bm-chip button:active { transform: scale(var(--press-sm)); }

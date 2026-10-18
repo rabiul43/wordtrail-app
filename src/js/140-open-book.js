@@ -192,7 +192,7 @@
     const bk = S.book, md = S.model;
     S.tPending = true;
     afterPaint(() => { if (S.book !== bk || S.model !== md) return; try { applyTimings(); } finally { S.tPending = false; }
-      const cp = S.plan[S.sec]; if (!cp || !cp.ids.length) renderSection(S.sec); rcReturn(); });
+      const cp = S.plan[S.sec]; if (!cp || !cp.ids.length) renderSection(S.sec); if (!bmGoPending()) rcReturn(); });
   }
   function trkLoading(i) { return !!(S.timingWait || S.tPending || S.bgTrack === i); }
   /* What the wait is for, in plain words, so a reader can tell a normal wait from a failure. */

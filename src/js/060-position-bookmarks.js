@@ -118,7 +118,41 @@
       return;
     }
     toast('Bookmark: ' + at(old) + (old.note ? ' — “' + (old.note.length > 80 ? old.note.slice(0, 80).trim() + '…' : old.note) + '”' : ''), 6000, ['Go there', () => { if (old.sec === S.sec) seekAudio(old.time); else goTrack(old.sec, old.time, !audio.paused); }]);
-    el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; bmOpen(); } }, old.note ? 'Edit note' : 'Add note'), h('button', { type: 'button', onclick: () => { el.toast.hidden = true; store.set(bmKey(), null); nrBmUI(); } }, 'Remove'));
+    el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; bmOpen(); } }, old.note ? 'Edit note' : 'Add note'), h('button', { type: 'button', onclick: () => { el.toast.hidden = true; if (S.book) bmRemoveAny(S.book, old, null); } }, 'Remove'));
+  }
+  /* ---- My books > Saved: a bookmark chip under each book that has one. Tap the time to go there, tap x to remove (with Undo). ---- */
+  const BMG = { id: '', sec: 0, time: 0 };
+  const bmAt = r => 'Track ' + (r.sec + 1) + ' \u00b7 ' + hms(r.time).replace(/^00:/, '');
+  function bmRemoveAny(b, r, after) {
+    store.set('wt:bm:' + b.id, null);
+    if (S.book && String(S.book.id) === String(b.id)) nrBmUI();
+    if (after) after();
+    toast('Bookmark removed', 6000, ['Undo', () => { store.set('wt:bm:' + b.id, r); if (S.book && String(S.book.id) === String(b.id)) nrBmUI(); if (after) after(); }]);
+  }
+  function bmGoSaved(b, r) {
+    pendingBack = { tab: 'shelf', see: false }; showTab('library');
+    if (S.book && String(S.book.id) === String(b.id)) { trGo(r); return; }
+    BMG.id = String(b.id); BMG.sec = r.sec; BMG.time = r.time;
+    resumeRecent(b);
+  }
+  /* called from applyText once the book is open: jumps to the bookmark chosen on the Saved list (the old place stays in the trail) */
+  function bmGoPending() {
+    if (!BMG.id || !S.book || String(S.book.id) !== BMG.id) return false;
+    const e = { sec: Math.min(BMG.sec, S.secs.length - 1), time: BMG.time }; BMG.id = '';
+    trGo(e); return true;
+  }
+  function bmChipRow(b) {
+    const row = h('div', { class: 'bm-row' });
+    const paint = () => {
+      const r = store.get('wt:bm:' + b.id, null); row.textContent = ''; row.hidden = !r;
+      if (!r) return;
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', 'M6 3h12v18l-6-4.5L6 21z'); svg.append(p);
+      row.append(h('span', { class: 'bm-chip' },
+        h('button', { type: 'button', class: 'bm-go', title: r.note || '', 'aria-label': 'Go to bookmark, ' + bmAt(r), onclick: () => bmGoSaved(b, r) }, svg, bmAt(r)),
+        h('button', { type: 'button', class: 'bm-x', 'aria-label': 'Remove bookmark, ' + bmAt(r), onclick: () => bmRemoveAny(b, r, paint) }, '\u2715')));
+    };
+    paint(); return row;
   }
   function nrOpen() {
     if (!S.book || NR.on) return;

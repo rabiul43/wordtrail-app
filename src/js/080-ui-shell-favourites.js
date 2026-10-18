@@ -221,6 +221,7 @@
     $('#shelf-empty').hidden = favs.length > 0;
     $('#shelf-sub').textContent = favs.length ? plural(favs.length, 'book') + ' saved' : '';
     const cards = favs.map(f => bookCard(f, () => { pendingBack = { tab: 'shelf', see: false }; showTab('library'); resumeRecent(f); }));
+    cards.forEach((c, i) => { if (favs[i] && favs[i].id) c.append(bmChipRow(favs[i])); });
     list.append(...cards);
     checkReady(cards);
   }
