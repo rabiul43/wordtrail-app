@@ -341,6 +341,7 @@
     $('#in-resume').addEventListener('change', e => { P.resumeCount = parseInt(e.target.value, 10) || 3; savePrefs(); renderRecents(); });
     $('#in-drift').addEventListener('change', e => { P.driftFix = e.target.checked; savePrefs(); drift.pend = null; drift.off.clear(); });
     $('#in-smart').addEventListener('change', e => { P.smartSync = e.target.checked; savePrefs(); });
+    $('#in-recap').addEventListener('change', e => { P.recap = e.target.checked; savePrefs(); });
     $('#in-fast').addEventListener('change', e => { P.fastCheck = e.target.checked; savePrefs(); });
     $('#in-auto').addEventListener('change', e => { P.autoStart = e.target.checked; savePrefs(); S.autoTried.clear(); enqueueAlign(S.sec, true); });
     $('#in-bg').addEventListener('change', e => { P.bgAlign = e.target.value; savePrefs(); S.autoTried.clear(); enqueueAlign(S.sec, true); });

@@ -27,6 +27,7 @@
   let listing = false;
   async function openBook(b, opts) {   // opts.play: start the narration as soon as the book opens (the Listen button)
     const autoplay = !!(opts && opts.play === true);
+    RC.prev = ((P.recents || []).find(r => String(r.id) === String(b.id)) || {}).ts || 0;   // last listened, read before persist() stamps it
     if (listing && !b.secs.length) return;
     if (DET.book && String(DET.book.id) !== String(b.id)) { DET.book = null; DET.author = null; DET.rv = false; DET.stack = []; $('#detail').textContent = ''; }
     else if (DET.book) DET.stale = true;
@@ -191,7 +192,7 @@
     const bk = S.book, md = S.model;
     S.tPending = true;
     afterPaint(() => { if (S.book !== bk || S.model !== md) return; try { applyTimings(); } finally { S.tPending = false; }
-      const cp = S.plan[S.sec]; if (!cp || !cp.ids.length) renderSection(S.sec); });
+      const cp = S.plan[S.sec]; if (!cp || !cp.ids.length) renderSection(S.sec); rcReturn(); });
   }
   function trkLoading(i) { return !!(S.timingWait || S.tPending || S.bgTrack === i); }
   /* What the wait is for, in plain words, so a reader can tell a normal wait from a failure. */
@@ -294,7 +295,8 @@
   /* ---------- free chapter summaries: picks the most representative sentences (no AI, runs on the phone) ---------- */
   const SUM_N = 3; // sentences per summary
   const SUM_STOP = new Set('the and but for with from that this these those they them their there then than have has had was were are been being will would could should said not you your his her its our who whom what when where which while into over under also very just upon about after before again some such only more most other any all can may might shall'.split(' '));
-  function summarize(list, n) {
+  function summarize(list, n) { return sumPick(list, n).join(' '); }
+  function sumPick(list, n) {
     const keep = w => w.length > 2 && !SUM_STOP.has(w);
     const toks = s => (s.toLowerCase().match(/[a-z']+/g) || []).filter(keep);
     const freq = new Map(), rows = list.map(s => toks(s));
@@ -308,7 +310,7 @@
       if (i === 0) sc *= 1.15;
       return { i, sc };
     }).filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, n).sort((a, b) => a.i - b.i);
-    return scored.map(x => list[x.i]).join(' ');
+    return scored.map(x => list[x.i]);
   }
   function chapSummary(ci) {
     const m = S.model, c = m && m.chapters[ci];

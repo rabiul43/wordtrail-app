@@ -319,6 +319,7 @@
   function setCurrent(id, scroll) {
     $$('.s.now', el.page).forEach(n => n.classList.remove('now', 'est'));
     if (S.wSp && (S.wId !== id || !wordTimesAny(id))) unwrapWords();
+    rcWatch(S.curId, id);
     S.curId = id;
     ambStory(id);
     updateSyncUI();

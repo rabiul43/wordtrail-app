@@ -50,3 +50,18 @@
 /* title is plain text now (tracks have their own icon) */
 .topbar .titles { cursor: default; }
 .topbar .titles:active { background: transparent; }
+
+/* chapter recap sheet (145-chapter-recap.js) */
+.rc { display: flex; flex-direction: column; gap: var(--s-3); }
+.rc-meta { display: flex; flex-direction: column; gap: .15rem; font: var(--small) var(--font-ui); color: var(--accent); }
+.rc-meta b { font: 600 1.15rem/1.3 var(--font-display); color: var(--ink); }
+.rc-title { font: 600 1.5rem/1.25 var(--font-display); color: var(--ink); }
+.rc-k { font: var(--small) var(--font-ui); color: var(--muted); }
+.rc-list { margin: 0; padding: 0; list-style: none; counter-reset: rc; display: flex; flex-direction: column; gap: .75rem; }
+.rc-list li { counter-increment: rc; display: flex; gap: .75rem; font: 1.05rem/1.55 var(--font-read); color: var(--ink); }
+.rc-list li::before { content: counter(rc); flex: none; width: .9rem; font: 600 .95rem/1.65 var(--font-display); color: var(--accent); }
+.rc-note { margin: 0; font: var(--label) var(--font-ui); color: var(--muted); }
+.rc-go { margin-top: var(--s-3); min-height: 52px; width: 100%; border: 0; border-radius: var(--r-ctl); background: var(--accent); color: var(--accent-ink); font: 600 1rem var(--font-ui); cursor: pointer; }
+.rc-row { display: flex; gap: .6rem; margin-top: .6rem; }
+.rc-alt { flex: 1; min-height: 48px; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface-2); color: var(--ink); font: 500 .95rem var(--font-ui); cursor: pointer; }
+.rc-go:active, .rc-alt:active { transform: scale(var(--press)); }

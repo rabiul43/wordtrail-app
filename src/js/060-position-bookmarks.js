@@ -42,6 +42,7 @@
   }
   /* one tap back to the last place you touched the screen, offered on the first touch after a long gap */
   function trWelcome(lt) {
+    if (Date.now() - RC.backAt < 60000) return;   // the "Previously" sheet just opened
     const at = { sec: lt.sec, time: lt.time };
     toast('Welcome back. You were at ' + trLabel(at.sec, at.time) + ' when you last touched the screen.', 12000, ['Go back', () => trGo(at)]);
   }
