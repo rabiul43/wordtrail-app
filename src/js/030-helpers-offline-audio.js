@@ -155,6 +155,21 @@
   const dlKey = (id, i) => String(id) + ':' + i;
   const isLocal = (id, i, url) => { const m = dlMeta.get(String(id)), t = m && m.tracks[i]; return !!t && (!url || t.u === url); };
   const dlSaved = id => { const m = dlMeta.get(String(id)); return m ? Object.keys(m.tracks).length : 0; };
+  /* Offline mode (navigator.onLine === false; screen code in 280). A book counts as available when at least one of its tracks is saved here. */
+  const OFF = { on: false, ready: false };
+  const offHave = id => !!id && dlSaved(id) > 0;
+  const offBooks = () => { let n = 0; for (const m of dlMeta.values()) if (Object.keys(m.tracks || {}).length) n++; return n; };
+  function offDim(node) {   // a tile or card whose book is not on this device is dimmed (and announced as unavailable) while offline
+    if (!node || !node._wtId) return;
+    const dim = OFF.on && !offHave(node._wtId);
+    node.classList.toggle('off-dim', dim);
+    if (dim) node.setAttribute('aria-disabled', 'true'); else node.removeAttribute('aria-disabled');
+  }
+  function offBlock(b) {   // true (with a message) when this book cannot be played now: offline and nothing of it is saved
+    if (!OFF.on || !b || !b.id || offHave(b.id)) return false;
+    toast("You're offline and this book is not downloaded.", 4000);
+    return true;
+  }
   function dlLocalFor(url) { for (const m of dlMeta.values()) for (const i in m.tracks) if (m.tracks[i].u === url) return [m.id, +i]; return null; }
   /* The saved Blob of a track file, or null when it is not on this device. Used to read audio without the network. */
   async function dlBlob(url) { const f = dlLocalFor(url); if (!f) return null; try { return await adb.blob(f[0], f[1]); } catch (e) { return null; } }

@@ -157,7 +157,7 @@
   function nrOpen() {
     if (!S.book || NR.on) return;
     NR.on = true;
-    nrEl.slot.append(el.reader); nrEl.card.append(el.follow);
+    nrEl.slot.append(el.reader); nrEl.card.append(el.follow); nrEl.card.append($('#hlp'));
     nrEl.root.hidden = false; el.player.inert = true;
     nrHead(); nrPlay(!audio.paused); nrSleep(S.sleep); nrSpeedUI();
     nrSeekUI(nowT(), nrDur());
@@ -169,7 +169,7 @@
   function nrClose() {
     if (!NR.on) return;
     NR.on = false;
-    el.player.insertBefore(el.reader, el.dock); el.player.insertBefore(el.follow, el.dock);
+    el.player.insertBefore(el.reader, el.dock); el.player.insertBefore(el.follow, el.dock); el.player.insertBefore($('#hlp'), el.dock);
     nrEl.root.hidden = true; el.player.inert = false;
     document.documentElement.style.setProperty('--dock-h', el.dock.offsetHeight + 'px');
     requestAnimationFrame(() => { const sp = S.spans.get(S.curId); if (sp) ensureVisible(sp, true); });
@@ -192,8 +192,8 @@
     $('#bm-now').addEventListener('click', () => { $('#bm-track').value = String(S.sec); $('#bm-time').value = bmShort(nowT()); bmErr(''); bmHelp(); });
     $('#bm-del').addEventListener('click', () => { store.set(bmKey(), null); nrBmUI(); closeSheets(); toast('Bookmark removed', 1800); });
     nrEl.play.addEventListener('click', togglePlay);
-    $('#nr-rew').addEventListener('click', () => seekAudio(nowT() - 15));
-    $('#nr-ff').addEventListener('click', () => seekAudio(nowT() + 15));
+    $('#nr-rew').addEventListener('click', () => userSeek(nowT() - 15));
+    $('#nr-ff').addEventListener('click', () => userSeek(nowT() + 15));
     $('#nr-queue').addEventListener('click', () => openSheet('sheet-tracks'));
     nrEl.sleep.addEventListener('click', () => { buzz('medium'); setSleep(SLEEPS[(SLEEPS.indexOf(S.sleep) + 1) % SLEEPS.length]); toast(sleepLabel(S.sleep), 1800); });
     nrEl.spd.addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
@@ -210,13 +210,13 @@
     const nrSeekEnd = commit => {
       if (!NR.seeking) return;
       NR.seeking = false; nrEl.wave.classList.remove('drag');
-      if (commit) { const p = nrPosOf(+nrEl.seek.value); if (p.i === S.sec) seekAudio(p.t); else goTrack(p.i, p.t, !audio.paused); }
+      if (commit) { const p = nrPosOf(+nrEl.seek.value); if (p.i === S.sec) userSeek(p.t); else goTrack(p.i, p.t, !audio.paused); }
       else nrSeekUI(nowT(), nrDur());
     };
     nrEl.seek.addEventListener('change', () => nrSeekEnd(true));
     nrEl.seek.addEventListener('blur', () => nrSeekEnd(false));
     nrEl.seek.addEventListener('keydown', e => {   // arrow keys: 15 seconds, like the buttons (the bar itself is far too fine for a key press)
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); seekAudio(nowT() + (e.key === 'ArrowLeft' ? -15 : 15)); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); userSeek(nowT() + (e.key === 'ArrowLeft' ? -15 : 15)); }
     });
     if (window.ResizeObserver) new ResizeObserver(() => {
       nrEl.root.style.setProperty('--nr-dock-h', nrEl.dock.offsetHeight + 'px');

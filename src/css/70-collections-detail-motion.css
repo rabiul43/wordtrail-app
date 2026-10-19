@@ -468,6 +468,24 @@ button, [role="button"], .tile, .card, .synced-row { -webkit-tap-highlight-color
 .gh .gh-act { display: flex; gap: .5rem; justify-content: flex-end; margin-top: .6rem; }
 .gh .gh-act button { border: 0; border-radius: var(--r-ctl); padding: .45rem .8rem; font: inherit; font-size: .85rem; font-weight: 700; background: transparent; color: var(--muted); min-height: 2.2rem; }
 .gh .gh-act button.gh-ok { background: var(--accent); color: var(--accent-ink); }
+/* ---------- "Highlight off?" prompt: a small card above the dock (Classic player and Focus page) ---------- */
+.hlp { position: absolute; z-index: 4; left: 0; right: 0; margin: 0 auto; bottom: calc(var(--dock-h, 11rem) + 3.6rem); width: min(calc(100% - 1.6rem), 26rem); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .1rem .6rem; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-pop); padding: .35rem .4rem .35rem .9rem; }
+.hlp[hidden] { display: none; }
+.nr .hlp { bottom: calc(var(--nr-dock-h, 12rem) + 3.6rem); }
+.hlp-t { flex: 1 1 12rem; font-size: .9rem; font-weight: 600; line-height: 1.35; padding: .3rem 0; }
+.hlp-act { display: flex; gap: .2rem; margin-left: auto; }
+.hlp button { min-height: 44px; min-width: 44px; border: 0; border-radius: var(--r-ctl); padding: .45rem .8rem; background: transparent; color: var(--muted); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
+.hlp button.hlp-x { background: var(--accent); color: var(--accent-ink); }
+@media (prefers-reduced-motion: no-preference) { .hlp:not([hidden]) { animation: pop var(--dur) var(--ease); } }
+
+/* ---------- Offline mode: thin banner, dimmed books that are not on this device ---------- */
+.offbar { position: sticky; top: 0; z-index: 30; box-sizing: border-box; min-height: calc(1.75rem + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) .75rem 0; display: flex; align-items: center; justify-content: center; background: var(--ink); color: var(--bg); font: 600 .78rem/1.2 var(--font-ui); text-align: center; }
+.offbar[hidden] { display: none; }
+html[data-off] .home { padding-top: .9rem; }
+html[data-off] .topbar { padding-top: .5rem; }
+html[data-off] .player { height: calc(100dvh - var(--offbar-h, 0px)); }
+.tile.off-dim, .card.off-dim { opacity: .45; cursor: not-allowed; }
+.tile.off-dim .tile-cover, .card.off-dim .cover { filter: grayscale(.7); }
 .ht-list { gap: .9rem; }
 .ht-list li { font-size: .95rem; grid-template-columns: 2rem 1fr; }
 .ht-sec { margin: 1rem 0 .5rem; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }

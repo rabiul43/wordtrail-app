@@ -701,6 +701,7 @@
     tick(true); updateSeekUI(nowT());
   }
   function stepSentence(dir) {
+    hlpSeek();
     const p = S.plan[S.sec];
     if (!p || !p.ids.length) { seekAudio(nowT() + dir * 15); return; }
     const k = Core.locate(p.starts, nowT() + P.nudge);

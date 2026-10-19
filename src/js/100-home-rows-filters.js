@@ -302,6 +302,7 @@
   /* Tiles stay quiet: the only badge that earns a place is "Available offline". */
   function paintTileBadge(tile) {
     if (!tile._wtTileDl) return;
+    offDim(tile);
     const d = dlBadgeText(tile._wtId);
     tile._wtTileDl.textContent = d; tile._wtTileDl.classList.toggle('full', /^✓/.test(d));
     tile._wtTileDl.hidden = !d;

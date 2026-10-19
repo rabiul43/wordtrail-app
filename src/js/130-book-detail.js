@@ -582,6 +582,7 @@
   }
   async function resumeRecent(r) {
     if (OP.active && OP.home) return;
+    if (offBlock(r)) return;
     startOpen(r.title, true);
     try {
       let b = await idb.get('b:' + r.id);

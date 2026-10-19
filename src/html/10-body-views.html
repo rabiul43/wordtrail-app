@@ -114,6 +114,8 @@
   </defs>
 </svg>
 
+<div id="offbar" class="offbar" role="status" aria-live="polite" hidden></div>
+
 <main id="home" class="view home">
   <div class="brand">
     <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" rx="1.5" fill="currentColor" opacity=".3"/><rect x="2" y="10" width="14" height="4.4" rx="2.2" fill="currentColor"/><rect x="3" y="16" width="16" height="3" rx="1.5" fill="currentColor" opacity=".3"/></svg>
@@ -375,6 +377,10 @@
     <div id="page" class="page"></div>
   </div>
   <button id="follow" class="pill" hidden>Back to narrator</button>
+  <div id="hlp" class="hlp" role="region" aria-label="Highlight help" hidden>
+    <span id="hlp-t" class="hlp-t" role="status"></span>
+    <div class="hlp-act"><button id="hlp-never" type="button">Don't show again</button><button id="hlp-x" class="hlp-x" type="button">Dismiss</button></div>
+  </div>
   <div id="gesture-hint" class="gh" role="region" aria-label="Reading gestures" hidden>
     <h3>Three handy gestures</h3>
     <ul>

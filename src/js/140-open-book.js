@@ -26,6 +26,7 @@
   }
   let listing = false;
   async function openBook(b, opts) {   // opts.play: start the narration as soon as the book opens (the Listen button)
+    if (offBlock(b)) return;
     const autoplay = !!(opts && opts.play === true);
     RC.prev = ((P.recents || []).find(r => String(r.id) === String(b.id)) || {}).ts || 0;   // last listened, read before persist() stamps it
     if (listing && !b.secs.length) return;

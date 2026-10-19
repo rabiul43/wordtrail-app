@@ -191,7 +191,58 @@
       }
     } finally { AP.busy = false; }
   }
+  /* ---------- offline mode: banner, downloaded books first, the rest dimmed ----------
+     Runs while navigator.onLine is false. #offbar says how many books are on this device (OFF/offHave/offBooks, 030). Every tile and
+     card is dimmed and blocked when its book is not saved (offDim in 030; the capture-phase click below). In every row and list of
+     Library and My books the saved books move first; each keeps its first-seen place (_wtOi) so going online puts the order back. */
+  let offMo = null, offTimer = 0;
+  function offOrder(force) {
+    if (!OFF.on && !force) return;
+    const items = $$('#home .tile, #home .card-wrap, #home .card, #shelf .card-wrap, #shelf .card').filter(n => n._wtId && !(n.classList.contains('card') && n.parentElement && n.parentElement.classList.contains('card-wrap')));
+    const groups = new Map();
+    for (const n of items) { const p = n.parentElement; if (!p) continue; if (!groups.has(p)) groups.set(p, []); groups.get(p).push(n); }
+    groups.forEach((list, parent) => {
+      if (list.length < 2) return;
+      for (const n of list) if (n._wtOi == null) n._wtOi = (parent._wtOiN = (parent._wtOiN || 0) + 1);
+      const rank = n => (OFF.on && !offHave(n._wtId) ? 1 : 0);
+      const sorted = list.slice().sort((a, b) => rank(a) - rank(b) || a._wtOi - b._wtOi);
+      if (sorted.every((n, i) => n === list[i])) return;
+      const kids = [...parent.children]; let k = 0;
+      parent.append(...kids.map(c => (list.includes(c) ? sorted[k++] : c)));   // books change places, anything else (the Show more tile) stays where it was
+    });
+  }
+  function offRefresh() {
+    const bar = $('#offbar'); if (!bar) return;
+    bar.hidden = !OFF.on;
+    if (OFF.on) { const t = OFF.ready ? "You're offline \u2014 " + plural(offBooks(), 'book') + ' available' : "You're offline"; if (bar.textContent !== t) bar.textContent = t; }
+    document.documentElement.style.setProperty('--offbar-h', OFF.on ? bar.offsetHeight + 'px' : '0px');
+    offOrder();
+  }
+  function offSet() {
+    const on = navigator.onLine === false;
+    if (on === OFF.on) { offRefresh(); return; }
+    OFF.on = on;
+    document.documentElement.toggleAttribute('data-off', on);
+    paintCards();   // dims or restores every tile and card, then offRefresh (banner, order)
+    if (!on) offOrder(true);   // back online: the original order returns
+    if (!window.MutationObserver) return;
+    if (!offMo) offMo = new MutationObserver(() => { clearTimeout(offTimer); offTimer = setTimeout(offOrder, 150); });   // rows and lists drawn while offline get ordered too
+    offMo.disconnect();
+    if (on) ['#home', '#shelf'].forEach(s => { const n = $(s); if (n) offMo.observe(n, { childList: true, subtree: true }); });
+  }
+  function offInit() {
+    window.addEventListener('offline', offSet); window.addEventListener('online', offSet);
+    document.addEventListener('click', e => {   // capture phase: runs before the tile's own handler
+      if (!OFF.on || !e.target.closest) return;
+      const n = e.target.closest('.tile.off-dim, .card.off-dim'); if (!n) return;
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      toast("You're offline and this book is not downloaded.", 3500);
+    }, true);
+    Promise.resolve(dlReady).then(() => { OFF.ready = true; offRefresh(); });
+    offSet();   // the page may open while offline
+  }
   function initAutoPrefetch() {
+    offInit();
     audio.addEventListener('playing', () => autoPrefetch(false));
     window.addEventListener('online', () => { autoPrefetch(true); setTimeout(() => dlResumePending(false), 1500); });
     setTimeout(() => dlResumePending(false), 2500);   // a download cut short last time carries on

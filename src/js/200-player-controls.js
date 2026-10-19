@@ -23,6 +23,7 @@
     const pl = S.model && S.plan[S.sec], hasText = !!(pl && pl.ids.length);
     let info = S.curId >= 0 ? syncInfo(S.sec, S.curId) : null;
     if (!info && hasText) { const d = trackDone(S.sec); info = { sure: d, audio: d }; }   // no sentence playing yet: show the state of the track itself
+    hlpWatch(info);
     el.syncbar.hidden = !info;
     { const td = $('#b-timing'); if (td) td.hidden = !info; }
     const sp = S.spans.get(S.curId);
@@ -58,7 +59,74 @@
     el.cal.setAttribute('aria-pressed', String(S.calibrate));
     el.calbar.hidden = !S.calibrate;
     el.reader.classList.toggle('calibrating', S.calibrate);
+    if (!S.calibrate && HLP.cal) { HLP.cal = false; const b = $('#hlp'); if (b) b.hidden = true; }   // tap-sync was ended (Done, or the sync button): the help prompt goes with it
   }
+
+  /* ---------- "Highlight off?" prompt ----------
+     A small card above the dock that offers the tap-sync mode (#calbar, S.calibrate). It appears when the highlight is only an
+     estimate for LOW_MS of playing, or when you pause and seek HLP_SEEKS times within HLP_SEEK_WIN (and the highlight is not
+     already confirmed by the audio). At most once per track (wt:hlp:seen). While it is up, tap-sync is on: one tap on the
+     sentence you hear re-times the highlight and ends the mode. Dismiss ends it too; "Don't show again" sets P.hlpOff
+     (Settings > Timing > Advanced timing turns it back on). */
+  const HLP_LOW_MS = 30000, HLP_SEEKS = 3, HLP_SEEK_WIN = 150000, HLP_PAUSE_GAP = 20000, HLP_SEEN_MAX = 80;
+  const HLP = { key: '', low: 0, seeks: [], pausedAt: 0, cal: false };
+  const hlpKey = () => (S.book ? S.book.id + ':' + S.sec : '');
+  const hlpSeen = () => { const a = store.get('wt:hlp:seen', []); return Array.isArray(a) ? a : []; };
+  function hlpHide() {
+    const b = $('#hlp'); if (b) b.hidden = true;
+    const armed = HLP.cal; HLP.cal = false;
+    if (armed && S.calibrate) { S.calibrate = false; syncCalUI(); }
+  }
+  function hlpTrackCheck() {   // a new book or track starts from zero, and the prompt does not follow you there
+    const k = hlpKey(); if (k === HLP.key) return;
+    HLP.key = k; HLP.low = 0; HLP.seeks = []; hlpHide();
+  }
+  function hlpCanShow() {
+    if (P.hlpOff === true || !S.book || !S.model || el.player.hidden || document.hidden) return false;
+    if (S.calibrate || S.aligning || S.refining || job.running) return false;
+    const p = S.plan[S.sec], k = hlpKey(), g = $('#gesture-hint');
+    if (!p || !p.ids.length || !k || hlpSeen().includes(k)) return false;
+    return !(g && !g.hidden);   // one card at a time: the gesture hint goes first
+  }
+  function hlpShow() {
+    const b = $('#hlp'); if (!b || !hlpCanShow()) return;
+    store.set('wt:hlp:seen', hlpSeen().concat(hlpKey()).slice(-HLP_SEEN_MAX));   // counted when it is shown: never twice for one track
+    HLP.low = 0; HLP.seeks = [];
+    S.calibrate = true; HLP.cal = true; syncCalUI();
+    $('#hlp-t').textContent = 'Highlight off? Tap the sentence you hear.';
+    b.hidden = false;
+  }
+  /* Called from updateSyncUI (every sentence change): the highlight has been an estimate for a while. */
+  function hlpWatch(info) {
+    hlpTrackCheck();
+    if (!info || audio.paused || S.curId < 0 || S.sentSec[S.curId] !== S.sec) { HLP.low = 0; return; }
+    const busy = !info.sure && (S.aligning || S.bgTrack === S.sec);   // the app is already improving it
+    if (info.sure || busy || S.calibrate) { HLP.low = 0; return; }
+    const now = Date.now();
+    if (!HLP.low) HLP.low = now; else if (now - HLP.low >= HLP_LOW_MS) hlpShow();
+  }
+  /* Called when you move by hand (seek bar, back/forward 15, previous/next sentence, tap a sentence, keys). */
+  function hlpSeek() {
+    if (!S.book || S.loadingAudio || S.pendingSeek) return;
+    hlpTrackCheck();
+    const now = Date.now();
+    if (!audio.paused && now - HLP.pausedAt > HLP_PAUSE_GAP) return;   // only seeks made while paused, or just after a pause
+    HLP.seeks = HLP.seeks.filter(t => now - t < HLP_SEEK_WIN); HLP.seeks.push(now);
+    if (HLP.seeks.length < HLP_SEEKS) return;
+    const info = S.curId >= 0 ? syncInfo(S.sec, S.curId) : null;
+    if (info && info.sure && info.audio) { HLP.seeks = []; return; }   // the narrator's own pauses confirm it: you are just navigating
+    hlpShow();
+  }
+  function userSeek(t) { hlpSeek(); seekAudio(t); }
+  function hlpTapped() { if (HLP.cal) hlpHide(); }   // the one tap it asked for: tap-sync ends
+  audio.addEventListener('pause', () => { if (!audio.ended && !audio.seeking && !S.loadingAudio) HLP.pausedAt = Date.now(); });
+  document.addEventListener('click', e => {
+    if (e.target.closest('#hlp-x')) hlpHide();
+    else if (e.target.closest('#hlp-never')) { P.hlpOff = true; savePrefs(); hlpHide(); const c = $('#in-hlp'); if (c) c.checked = false; toast('Okay. You can turn this back on in Settings > Timing.', 4500); }
+  });
+  document.addEventListener('change', e => { if (e.target && e.target.id === 'in-hlp') { P.hlpOff = !e.target.checked; savePrefs(); if (P.hlpOff) hlpHide(); } });
+  { const b = $('#hlp'); if (b) b.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); hlpHide(); } }); }
+  guideDoc('timing', 'Highlight off? prompt', "If the highlight is only a guess for a while, or you keep pausing and jumping, a small card asks you to tap the sentence you hear. Dismiss it, or choose Don't show again (turn it back on in Settings > Advanced timing).");
 
   guideDoc('player', 'Speed', "Open Quick controls (the three-dot button) and choose 0.5x to 3x. Fine-tune sets exact steps.");
   guideDoc('player', 'Sleep timer', "In Quick controls pick 15, 30, 45 or 60 minutes, or End of track. The sound fades out and the audio stops by itself.");

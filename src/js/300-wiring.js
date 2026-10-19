@@ -85,8 +85,8 @@
     $('#b-nextsent').addEventListener('click', () => { buzz('light'); stepSentence(1); });
     $('#b-prevtrack').addEventListener('click', () => { buzz('light'); stepTrack(-1); });
     $('#b-nexttrack').addEventListener('click', () => { buzz('light'); stepTrack(1); });
-    $('#b-back15').addEventListener('click', () => { buzz('tick'); seekAudio(nowT() - 15); });
-    $('#b-fwd15').addEventListener('click', () => { buzz('tick'); seekAudio(nowT() + 15); });
+    $('#b-back15').addEventListener('click', () => { buzz('tick'); userSeek(nowT() - 15); });
+    $('#b-fwd15').addEventListener('click', () => { buzz('tick'); userSeek(nowT() + 15); });
     el.sleep.addEventListener('click', () => { buzz('medium'); setSleep(SLEEPS[(SLEEPS.indexOf(S.sleep) + 1) % SLEEPS.length]); });
     el.fix.addEventListener('click', fixSync);
     { const td = $('#b-timing');
@@ -129,7 +129,7 @@
     });
 
     el.seek.addEventListener('input', () => { S.seeking = true; const v = +el.seek.value; el.cur.textContent = fmt(v); el.left.textContent = '-' + fmt(Math.max(0, (audio.duration || S.durs[S.sec] || 0) - v)); el.seek.style.setProperty('--fill', (v / (+el.seek.max || 1) * 100) + '%'); });
-    el.seek.addEventListener('change', () => { S.seeking = false; seekAudio(+el.seek.value); });
+    el.seek.addEventListener('change', () => { S.seeking = false; userSeek(+el.seek.value); });
 
     /* Long-press a sentence to translate it. The tap that follows the press is swallowed (trPressAt). */
     {
@@ -178,12 +178,12 @@
         return;
       }
       if (window.getSelection().toString()) return;
-      if (S.calibrate) { syncTap(id); return; }
+      if (S.calibrate) { syncTap(id); hlpTapped(); return; }
       const go = () => {
         const q = S.plan[S.sec];
         if (!q || S.sentSec[id] !== S.sec) return;
         buzz('light');
-        seekAudio(sentTime(q, S.sentPos[id]));
+        userSeek(sentTime(q, S.sentPos[id]));
         if (audio.paused) audio.play().catch(onPlayFail);
       };
       clearTimeout(seekTimer);
@@ -384,8 +384,8 @@
       if (e.target.closest('input, textarea, select')) return;
       const k = e.key;
       if (k === ' ' && e.target.tagName !== 'BUTTON') { e.preventDefault(); togglePlay(); }
-      else if (k === 'ArrowLeft') { e.preventDefault(); e.shiftKey ? seekAudio(nowT() - 15) : stepSentence(-1); }
-      else if (k === 'ArrowRight') { e.preventDefault(); e.shiftKey ? seekAudio(nowT() + 15) : stepSentence(1); }
+      else if (k === 'ArrowLeft') { e.preventDefault(); e.shiftKey ? userSeek(nowT() - 15) : stepSentence(-1); }
+      else if (k === 'ArrowRight') { e.preventDefault(); e.shiftKey ? userSeek(nowT() + 15) : stepSentence(1); }
       else if (k === 'n' || k === 'N') stepTrack(1);
       else if (k === 'p' || k === 'P') stepTrack(-1);
     });

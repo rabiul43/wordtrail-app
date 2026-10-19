@@ -19,6 +19,7 @@
     return have >= m.n ? '✓ Available offline' : 'Offline ' + have + '/' + m.n;
   }
   function paintBadge(card) {
+    offDim(card);
     const t = badgeText(card._wtId);
     card._wtBadge.textContent = t; card._wtBadge.hidden = !t; card._wtBadge.dataset.s = t === 'Not synced' ? 'no' : '';
     if (card._wtDl) { const d = dlBadgeText(card._wtId); card._wtDl.textContent = d; card._wtDl.hidden = !d; card._wtDl.classList.toggle('full', /^✓/.test(d)); }
@@ -31,7 +32,7 @@
     if (card._wtRate) { const rl = rtLineText(card._wtId); card._wtRate.textContent = rl; card._wtRate.hidden = !rl; }
     if (card._wtChip) card._wtChip.hidden = !Array.from(card._wtChip.children).some(c => !c.hidden && c.textContent);
   }
-  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); }
+  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); offRefresh(); }
   async function checkReady(cards) {
     let ids = null;
     try { ids = await loadHFSyncedIds(); } catch (e) { return; }
