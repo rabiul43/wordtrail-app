@@ -9,7 +9,8 @@
 .ib:hover { background: var(--surface-2); }
 .ib[disabled] { opacity: .35; }
 
-.reader { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; scroll-behavior: auto; outline: 0; position: relative; }
+.reader { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; scroll-behavior: auto; position: relative; }
+.reader:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: -3px; }
 .page { max-width: 40rem; margin: 0 auto; padding: 1.4rem 1.25rem 3rem; font: 400 var(--read-size)/var(--read-lh, 1.78) var(--font-text, var(--font-read)); scroll-margin-top: 1rem; }
 .page details.sum { margin: -.8rem 0 1.4rem; font: .92rem/1.55 var(--font-ui); color: var(--muted); }
 .page details.sum summary { cursor: pointer; font-weight: 650; color: var(--accent); }

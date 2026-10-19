@@ -697,6 +697,6 @@
     const wr = $('#row-wordest'); if (wr) wr.style.opacity = P.wordHl === false ? '.5' : '';
     const wp = $('#wordhl-help'); if (wp) wp.textContent = P.wordHl === false ? 'Off: only the whole sentence is highlighted.' : 'On: the word being spoken is highlighted.';
     if (ACC.cur) paintAccent(); // the theme changed: recompute the book colour for it
-    $$('#seg-theme button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === P.theme)));
+    $$('#seg-theme button, #aa-themes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === P.theme)));
   }
 

@@ -1,4 +1,5 @@
   /* ---------- wiring ---------- */
+  const SIZE_MIN = 0.9, SIZE_MAX = 1.9; // reader text size limits (rem): used by A- / A+ and pinch-to-zoom
   function init() {
     // Lists cached before cover art was requested have no covers: drop them once so they reload with art.
     try {
@@ -270,13 +271,49 @@
     }, { passive: true });
     el.follow.addEventListener('click', () => { S.follow = true; el.follow.hidden = true; const sp = S.spans.get(S.curId); if (sp) ensureVisible(sp); });
 
-    $$('#seg-theme button').forEach(b => b.addEventListener('click', () => { P.theme = b.dataset.v; applyTheme(); savePrefs(); }));
+    /* Pinch the reader with two fingers to change the text size. Same limits as A- / A+; saved when the fingers lift.
+       The sentence under the fingers stays where it is on screen while the text reflows. */
+    { let p0 = 0, s0 = 1, anchor = null, aTop = 0, raf = 0, want = 0, active = false, lastEnd = 0;
+      const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      const apply = () => {
+        raf = 0; if (!active) return;
+        const v = Math.round(Math.max(SIZE_MIN, Math.min(SIZE_MAX, want)) * 100) / 100;
+        if (v === P.size) return;
+        P.size = v; document.documentElement.style.setProperty('--read-size', v.toFixed(2) + 'rem');
+        if (anchor && anchor.isConnected) el.reader.scrollTop += anchor.getBoundingClientRect().top - el.reader.getBoundingClientRect().top - aTop;
+      };
+      el.reader.addEventListener('touchstart', e => {
+        if (e.touches.length !== 2) return;
+        active = true; p0 = dist(e.touches); s0 = P.size; want = s0;
+        const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2, my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const hit = document.elementFromPoint(mx, my); anchor = hit && hit.closest ? hit.closest('.s, p') : null;
+        aTop = anchor ? anchor.getBoundingClientRect().top - el.reader.getBoundingClientRect().top : 0;
+        S.follow = false;
+      }, { passive: true });
+      el.reader.addEventListener('touchmove', e => {
+        if (!active || e.touches.length !== 2 || !p0) return;
+        e.preventDefault();
+        want = s0 * dist(e.touches) / p0;
+        if (!raf) raf = requestAnimationFrame(apply);
+      }, { passive: false });
+      const end = e => {
+        if (!active || (e.touches && e.touches.length >= 2)) return;
+        active = false; if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        lastEnd = performance.now(); anchor = null;
+        applyTheme(); savePrefs();
+      };
+      el.reader.addEventListener('touchend', end, { passive: true });
+      el.reader.addEventListener('touchcancel', end, { passive: true });
+      el.reader.addEventListener('gesturestart', e => e.preventDefault()); // iOS Safari: no page zoom
+      el.reader.addEventListener('click', e => { if (performance.now() - lastEnd < 400) { e.stopPropagation(); e.preventDefault(); } }, true);
+    }
+    $$('#seg-theme button, #aa-themes button').forEach(b => b.addEventListener('click', () => { P.theme = b.dataset.v; applyTheme(); savePrefs(); }));
     $$('#seg-cover button').forEach(b => b.addEventListener('click', () => {
       P.coverStyle = b.dataset.v; savePrefs(); covSegSync(); coverRefresh();
       if (P.bookColors !== false && S.book && !el.player.hidden) bookAccent(S.book);
       toast('Cover style: ' + ({ modern: 'Modern', auto: 'Auto', se: 'Standard Ebooks', original: 'Original' }[covStyle()]));
     }));
-    $('#size-up').addEventListener('click', () => { P.size = Math.min(1.9, P.size + 0.08); applyTheme(); savePrefs(); });
+    $('#size-up').addEventListener('click', () => { P.size = Math.min(SIZE_MAX, P.size + 0.08); applyTheme(); savePrefs(); });
     $$('#seg-hl button').forEach(b => b.addEventListener('click', () => { P.hlStyle = b.dataset.v; applyTheme(); savePrefs(); }));
     $('#in-lf').addEventListener('change', e => { P.lineFocus = e.target.checked; applyTheme(); savePrefs(); });
     $$('#seg-lf button').forEach(b => b.addEventListener('click', () => { P.lfScope = b.dataset.v; applyTheme(); savePrefs(); }));
@@ -304,7 +341,7 @@
     $('#lh-up').addEventListener('click', () => { P.lh = Math.min(2.6, +((P.lh || 1.78) + 0.1).toFixed(2)); applyTheme(); savePrefs(); });
     $('#lh-down').addEventListener('click', () => { P.lh = Math.max(1.3, +((P.lh || 1.78) - 0.1).toFixed(2)); applyTheme(); savePrefs(); });
     $('#in-font').addEventListener('change', e => { P.rfont = e.target.value; applyTheme(); savePrefs(); });
-    $('#size-down').addEventListener('click', () => { P.size = Math.max(0.9, P.size - 0.08); applyTheme(); savePrefs(); });
+    $('#size-down').addEventListener('click', () => { P.size = Math.max(SIZE_MIN, P.size - 0.08); applyTheme(); savePrefs(); });
     const num = (id, apply) => $(id).addEventListener('change', e => { const v = parseFloat(e.target.value); if (isFinite(v)) apply(v); });
     $('#in-lead').addEventListener('change', e => {
       const v = parseFloat(e.target.value);

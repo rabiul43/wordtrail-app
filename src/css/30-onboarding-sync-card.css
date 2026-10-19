@@ -32,7 +32,8 @@
 }
 .ob-lvl:hover { border-color: var(--accent); background: var(--accent-soft); }
 .ob-lvl[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.ob-lvl-ic { font-size: 1.5rem; flex: none; width: 2.2rem; text-align: center; }
+.ob-lvl-ic { flex: none; width: 2.2rem; display: grid; place-items: center; color: var(--accent); }
+.ob-lvl-ic svg { width: 1.6rem; height: 1.6rem; display: block; }
 .ob-lvl-body { flex: 1; min-width: 0; }
 .ob-lvl-t { font-weight: 650; font-size: .98rem; }
 .ob-lvl-d { color: var(--muted); font-size: .82rem; margin-top: .1rem; }
@@ -44,7 +45,8 @@
 }
 .ob-placement:hover { border-color: var(--accent); }
 .ob-placement[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.ob-placement-ic { font-size: 1.4rem; flex: none; }
+.ob-placement-ic { flex: none; display: grid; place-items: center; color: var(--accent); }
+.ob-placement-ic svg { width: 1.5rem; height: 1.5rem; display: block; }
 .ob-placement-body .ob-lvl-t { font-weight: 600; }
 .ob-langs { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
 .ob-lang {
