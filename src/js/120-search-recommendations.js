@@ -462,8 +462,9 @@
     loadTod();
     let src = [];
     try {
-      const [m, bc, gs, tr] = await Promise.all([moodSources(), becauseSources(), genreSource().catch(() => null), trendingSource().catch(() => null)]);
+      const [m, bc, gs, tr, fo] = await Promise.all([moodSources(), becauseSources(), genreSource().catch(() => null), trendingSource().catch(() => null), folSource().catch(() => null)]);
       src = [gs, bc[0], m[0], tr, m[1], bc[1]].filter(Boolean);
+      if (fo) { if (fo.first) src.unshift(fo); else src.push(fo); }   // followed authors with new books come first
     } catch (e) { /* offline: hide */ }
     HSK.done.picks = true;
     sec.textContent = '';

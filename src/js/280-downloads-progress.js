@@ -109,7 +109,8 @@
     const todo = (only || b.secs.map((_, i) => i)).filter(i => !isLocal(b.id, i, b.secs[i].url));
     if (!todo.length) { if (!only) dqClear(); return; }
     if (!only) dqSet(b);
-    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* optional */ }
+    dlPersist();   // after the user's tap: ask the browser to keep the saved audio; the answer is shown in Settings > Storage
+    dmUsedPct().then(pct => { if (pct != null && pct > 90 && !DL.warned) { DL.warned = true; toast('Storage is almost full (' + Math.round(pct) + '% used). The download may not fit.', 6000); } });
     const ctl = new AbortController(), q = todo.slice();
     Object.assign(DL, { id: String(b.id), book: b, ctl, running: true, cancelling: false, quota: false, st: {} });
     todo.forEach(i => { DL.st[i] = { state: 'wait', got: 0, total: 0, size: 0 }; });
@@ -174,7 +175,7 @@
     if (!todo.length) return;
     AP.busy = true;
     try {
-      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* optional */ }
+      dlPersist();
       for (const j of todo) {
         if (!S.book || String(S.book.id) !== String(b.id) || S.sec + n < j || !apNetOk() || DL.running) break;   // moved on, or left Wi-Fi
         const sec = b.secs[j], t = { got: 0, total: 0 };

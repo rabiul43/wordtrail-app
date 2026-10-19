@@ -222,6 +222,9 @@ kbd { font: 600 .78rem var(--font-ui); border: 1px solid var(--line); border-bot
 .dm-space{font-size:.82rem;color:var(--muted);margin:.2rem 0 .5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .dm-sp-bar{display:inline-block;width:5rem;height:5px;border-radius:3px;background:var(--surface-2);vertical-align:middle;overflow:hidden;flex:none}
 .dm-sp-bar b{display:block;height:100%;background:var(--accent);border-radius:3px}
+.dm-note{font-size:.82rem;color:var(--muted);margin:0 0 .5rem}
+.dm-note-ok{color:var(--accent);font-weight:600}
+.dm-warn{font-size:.85rem;font-weight:600;color:var(--danger);margin:0 0 .5rem}
 .dm-acts{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem}
 /* .synccard .btn makes every button full width; keep the Remove button compact so the book title and size stay visible */
 .synccard .dm-row .btn{width:auto;flex:none;margin-top:0;padding:.4rem .75rem;font-size:.88rem}

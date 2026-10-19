@@ -213,6 +213,32 @@
     }
     return true;
   }
+  /* Storage protection: ask the browser not to evict the offline audio. Called from a user tap (first download). The answer is
+     remembered on this device ('wt:persist' = { ok, ts }); it is not synced. Returns true / false / null (not supported). */
+  const dmPersistGet = () => { const v = store.get('wt:persist', null); return v && typeof v.ok === 'boolean' ? v.ok : null; };
+  async function dlPersist() {
+    try {
+      const sg = navigator.storage; if (!sg || !sg.persist) return null;
+      let ok = sg.persisted ? await sg.persisted() : false;
+      if (!ok) ok = await sg.persist();
+      ok = !!ok;
+      if (dmPersistGet() !== ok) store.set('wt:persist', { ok, ts: Date.now() });
+      dmNote();
+      return ok;
+    } catch (e) { return null; /* optional */ }
+  }
+  /* The short note under the space bar: protected or may be removed. Stays hidden until the browser has given an answer. */
+  function dmNote() {
+    const n = $('#dm-note'); if (!n) return;
+    const ok = dmPersistGet();
+    n.hidden = ok === null;
+    n.classList.toggle('dm-note-ok', ok === true);
+    n.textContent = ok === true ? 'Protected from automatic clean-up' : ok === false ? 'May be removed if the phone runs low on space' : '';
+  }
+  /* Percent of the browser's storage allowance that is used (null if unknown). */
+  async function dmUsedPct() {
+    try { const e = navigator.storage && navigator.storage.estimate ? await navigator.storage.estimate() : null; return e && e.quota ? (e.usage || 0) / e.quota * 100 : null; } catch (e) { return null; }
+  }
   async function dmRender() {
     const sum = $('#dm-sum'), list = $('#dm-list'), fin = $('#dm-fin'); if (!sum) return;
     await dlReady;
@@ -223,7 +249,9 @@
     const all = $('#dm-all'); if (all) { all.disabled = !rows.length; all.textContent = rows.length ? 'Delete all downloads (' + dmMB(total) + ')' : 'Delete all downloads'; }
     sum.textContent = rows.length ? 'Downloaded audio uses ' + dmMB(total) + ' across ' + plural(rows.length, 'book') + '.' : 'No books are downloaded on this device.';
     const spEl = $('#dm-space'); if (spEl) spEl.textContent = '';
-    try { if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { if (!e || !e.quota) return; const used = e.usage || 0, quota = e.quota, free = Math.max(0, quota - used), pct = Math.min(100, Math.round(used / quota * 100)); if ($('#dm-sum') === sum && spEl) { spEl.innerHTML = '<b>' + dmMB(used) + '</b> used · <b>' + dmMB(free) + '</b> free <span class="dm-sp-bar" aria-hidden="true"><b style="width:' + pct + '%"></b></span>'; } }).catch(() => {}); } catch (e) { /* optional */ }
+    dmNote();
+    if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(ok => { if (ok && dmPersistGet() !== true) { store.set('wt:persist', { ok: true, ts: Date.now() }); } dmNote(); }).catch(() => {});
+    try { if (navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => { if (!e || !e.quota) return; const used = e.usage || 0, quota = e.quota, free = Math.max(0, quota - used), pct = Math.min(100, Math.round(used / quota * 100)); if ($('#dm-sum') === sum && spEl) { const wn = $('#dm-warn'); if (wn) { wn.hidden = pct <= 90; wn.textContent = pct > 90 ? 'Storage is almost full (' + pct + '% used). Downloads may fail. Remove finished books to free space.' : ''; } spEl.innerHTML = '<b>' + dmMB(used) + '</b> used · <b>' + dmMB(free) + '</b> free <span class="dm-sp-bar" aria-hidden="true"><b style="width:' + pct + '%"></b></span>'; } }).catch(() => {}); } catch (e) { /* optional */ }
     list.textContent = '';
     if (!rows.length) list.append(h('p', { class: 'dm-empty' }, 'Open a book and tap Download book to listen offline.'));
     rows.forEach(r => {

@@ -635,3 +635,17 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .sh-hit { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r-sm); }   /* no animation, so nothing to switch off for reduced motion */
 .sh-back { color: var(--accent); }
 .sh-back + h2 { flex: 1; }
+
+/* Follow an author, Wikipedia bio, "New" tag on followed authors' books */
+.det-desc.clamp.wp { -webkit-line-clamp: 3; }   /* Wikipedia text: three lines, then Read more */
+.wp-sec { margin: 1rem 0 0; }
+.wp-src { margin: .4rem 0 0; color: var(--muted); font-size: var(--label); }
+.wp-src a { color: var(--muted); text-decoration: underline; }
+.fol-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 2.75rem; padding: 0 1.4rem; margin-top: .3rem; border-radius: var(--r-pill); border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font: 600 .95rem var(--font-ui); cursor: pointer; }
+.fol-btn.on { background: transparent; color: var(--accent); }
+.fol-btn:active { transform: scale(var(--press)); }
+.fol-btn:focus-visible, .fol-un:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fol-av { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font: 600 .9rem var(--font-ui); }
+.fol-new { flex: none; background: var(--accent); color: var(--accent-ink); font: 600 var(--label) var(--font-ui); padding: .15rem .55rem; border-radius: var(--r-pill); }
+.fol-un { flex: none; min-height: 2.75rem; padding: 0 .85rem; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: var(--r-pill); font: 600 var(--small) var(--font-ui); cursor: pointer; }
+.tile-new { position: absolute; top: .4rem; right: .4rem; z-index: 1; background: var(--accent); color: var(--accent-ink); font: 700 .72rem/1.2 var(--font-ui); padding: .12rem .55rem; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); }
