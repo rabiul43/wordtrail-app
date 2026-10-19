@@ -164,14 +164,15 @@
   const HOME_IDS = ['recents', 'sec-botd', 'sec-tod', 'sec-picks', 'sec-newweek', 'sec-collections'];   // the sections on the Library tab itself (Featured and Recently added live in Collections)
   const HS = { start: Date.now(), obs: null, timer: 0 };
   function homeStatus() {
-    let loading = false;
+    let loading = false, skipped = false;
     for (const id of HOME_IDS) {
       const sec = document.getElementById(id); if (!sec || sec.hidden) continue;
+      if (sec.classList.contains('hh-off') || sec.classList.contains('hh-cap')) { skipped = true; continue; }   // switched off in Settings > Customise home
       if (sec.querySelector('.tile:not(.sk), .botd-hero, .col-card, .card:not(.sk), .state')) return 'content';
       if (sec.querySelector('.sk')) loading = true;
     }
     if (loading && navigator.onLine !== false && Date.now() - HS.start < 45000) return 'loading';
-    return 'empty';
+    return skipped ? 'content' : 'empty';   // everything switched off on purpose is not an error
   }
   function homeStateCheck() {
     const st = $('#home-state'); if (!st) return;

@@ -613,3 +613,11 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .acct-help { display: flex; flex-direction: column; gap: var(--sec-gap); }
 .acct-help h2 { margin: 0 0 .1rem .25rem; font: 600 var(--h2)/1.2 var(--font-display); letter-spacing: -.01em; color: var(--ink); text-transform: none; }
 @media not all and (hover: hover) and (pointer: fine) { #acct-keys { display: none; } }
+/* Customise home (Settings > Reading): sections switched off, or beyond one card and three rows, are not shown. */
+.hh-off, .hh-cap { display: none !important; }
+.hc-list { display: grid; gap: .1rem; }
+.hc-row { min-height: 2.75rem; padding: .2rem 0; flex-wrap: nowrap; }
+.hc-row > label { display: grid; gap: .1rem; flex: 1; min-height: 2.75rem; align-content: center; }
+.hc-n { color: var(--ink); font-size: var(--lead); }
+.hc-s { color: var(--muted); font-size: var(--label); }
+.hc-row input { flex: none; width: 1.5rem; height: 1.5rem; accent-color: var(--accent); }

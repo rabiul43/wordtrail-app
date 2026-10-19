@@ -198,6 +198,7 @@
   }
   function fillSettings() {
     covSegSync();
+    homeCustPaint();
     dmRender();
     devStartup();
     $('#in-mdays').value = MAINT().days; $('#in-mlive').checked = !!MAINT().live;

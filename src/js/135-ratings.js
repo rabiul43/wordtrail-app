@@ -10,8 +10,29 @@
      Reading needs no sign-in and no Firebase code: it uses Firestore's REST address, so a guest never downloads the
      sign-in service. Rating needs an account; the Firebase code (from 295-account-sync.js) loads only then.
      Calm mode hides the whole section (no scores). */
-  guideDoc('home', 'Ratings and reviews', "Sign in, then give a book 1 to 5 stars and, if you like, a one-line review (up to 140 characters). You can change or remove your rating at any time. A book's page shows the average rating and the latest reviews; only your first name is shown. Tap the three dots on a review to report it (spam, offensive, spoils the story, something else; reports are anonymous), or to edit or delete your own. Reviews with several reports are hidden until they are checked. See all reviews opens a page with every review, which you can sort by newest, highest or lowest stars. Your ratings and the books you finished but have not rated are listed on the Account tab, where Edit takes you to the book's page. Calm mode hides ratings.", '2026-10-18');
+  guideDoc('home', 'Ratings and reviews', "Sign in, then give a book 1 to 5 stars and, if you like, a one-line review (up to 140 characters). You can change or remove your rating at any time. A book's page shows the average rating and the latest reviews; only your first name is shown. Tap the three dots on a review to report it (spam, offensive, spoils the story, something else; reports are anonymous), or to edit or delete your own. Reviews with several reports are hidden until they are checked. See all reviews opens a page with every review, which you can sort by newest, highest or lowest stars. Your ratings and the books you finished but have not rated are listed on the Account tab, where Edit takes you to the book's page. You can rate a book once you have listened to about a tenth of it (or finished it), and there is a daily limit on ratings and reports to keep reviews honest. Calm mode hides ratings.", '2026-10-19');
   const RT_MAX = 140, RT_HIDE = 3, RT_TTL = 5 * 60e3, RT_CACHE = new Map();
+  /* ---- limits against abuse (this device) ----
+     A new rating needs some listening first: the book is finished, or at least RT_MIN_PCT of it was heard. This reads
+     what the app already keeps (wt:listens and recents, the finished list, and the open book), so nothing new is
+     tracked. A day also has a cap on saved ratings (RT_DAY_RATE; removing one never counts) and on reports (RT_DAY_REPORT),
+     counted in wt:rtlim, which stays on this device and starts again each day. Editing a rating you already made is
+     never blocked by the listening rule. These checks slow down careless or scripted use from the app; only the
+     Firestore rules can enforce a limit for real. */
+  const RT_MIN_PCT = 0.1, RT_DAY_RATE = 20, RT_DAY_REPORT = 10;
+  const RT_NEED = 'Listen to a little more of this book (about ' + Math.round(RT_MIN_PCT * 100) + '%) before rating it.';
+  const RT_RCAP = 'You have saved a lot of ratings today. Please try again tomorrow.', RT_PCAP = 'You have sent a lot of reports today. Please try again tomorrow.';
+  function rtListened(b) {
+    const id = String(b.id);
+    if ((ST.done || []).some(x => x && String(x.id) === id)) return true;
+    let pct = 0;
+    try { if (S.book && String(S.book.id) === id) pct = bookPct(); } catch (e) { /* the open book has no position yet */ }
+    const rec = listenedList().find(r => String(r.id) === id);
+    return Math.max(pct, rec ? +rec.pct || 0 : 0) >= RT_MIN_PCT;
+  }
+  const rtLim = () => { const d = dayKey(), o = store.get('wt:rtlim', null); return o && typeof o === 'object' && o.d === d ? o : { d, r: 0, p: 0 }; };
+  const rtLeft = k => (k === 'p' ? RT_DAY_REPORT : RT_DAY_RATE) - (+rtLim()[k] || 0) > 0;
+  const rtCount = k => { const o = rtLim(); o[k] = (+o[k] || 0) + 1; store.set('wt:rtlim', o); };
   const rtBase = () => 'https://firestore.googleapis.com/v1/projects/' + FB_CFG.projectId + '/databases/(default)/documents';
   const rtId = b => encodeURIComponent(String(b.id));
   const rtNum = f => f && (f.integerValue !== undefined ? +f.integerValue : f.doubleValue !== undefined ? +f.doubleValue : 0) || 0;
@@ -82,6 +103,10 @@
     const first = String((acInfo() || {}).name || u.displayName || '').trim().split(/\s+/)[0].slice(0, 40);
     for (let tries = 0; ; tries++) {
       const prev = await ref.v.get(), had = prev.exists, was = had ? +prev.data().r || 0 : 0, batch = acDb.batch();
+      if (r !== 0) {
+        if (!had && !rtListened(b)) throw new Error(RT_NEED);
+        if (!rtLeft('r')) throw new Error(RT_RCAP);
+      }
       if (r === 0) {
         if (!had) return;
         batch.delete(ref.v); batch.set(ref.t, Object.assign({ n: inc(-1), s: inc(-was) }, starMoves(0, was, inc)), { merge: true });
@@ -92,6 +117,7 @@
       try {
         await Promise.race([batch.commit(), new Promise((_, no) => setTimeout(() => no(new Error('This is taking too long. Check your connection and try again.')), 15000))]);
         RT_CACHE.delete(String(b.id)); RT_CACHE.delete(rtId(b));
+        if (r !== 0) rtCount('r');
         try { myRtSet(b, r, c); } catch (e) { /* the list is only a convenience */ }
         return;
       } catch (e) {
@@ -110,6 +136,7 @@
   async function rtReport(b, uid, k) {
     const u = await rtUser(); if (!u) throw new Error('Sign in to report a review.');
     if (u.uid === uid) throw new Error('This is your own review.');
+    if (!rtLeft('p')) throw new Error(RT_PCAP);
     const vref = rtRefs(b, uid).v, batch = acDb.batch();
     batch.set(vref.collection('reports').doc(u.uid), { k, t: acFb.firestore.FieldValue.serverTimestamp() });
     batch.update(vref, { x: acFb.firestore.FieldValue.increment(1) });
@@ -119,7 +146,7 @@
       if (e && e.code === 'permission-denied') { rtMarkReported(b, uid); throw new Error('You have already reported this review.'); }
       throw e;
     }
-    rtMarkReported(b, uid);
+    rtMarkReported(b, uid); rtCount('p');
   }
   function rtMarkReported(b, uid) { const o = store.get('wt:rtrep', {}) || {}; o[rtRepKey(b, uid)] = 1; store.set('wt:rtrep', o); }
   const RT_WHY = [['spam', 'Spam or advertising'], ['offensive', 'Offensive or abusive'], ['spoiler', 'Spoils the story'], ['other', 'Something else']];
@@ -164,6 +191,7 @@
   }
   function rtReportTap(b, x, done) {
     if (!acInfo()) { toast('Sign in to report a review.', 4000, ['Sign in', () => { acSignIn().catch(() => {}); }]); return; }
+    if (!rtLeft('p')) { toast(RT_PCAP, 4500); return; }
     reportSheet(b, x, done);
   }
   const rtStars = (r, cls) => h('span', { class: 'rt-stars' + (cls ? ' ' + cls : ''), role: 'img', 'aria-label': r + ' out of 5 stars' }, '★'.repeat(r), h('span', { 'aria-hidden': 'true' }, '★'.repeat(5 - r)));
@@ -226,6 +254,7 @@
         return;
       }
       if (own === null) { mine.append(h('p', { class: 'rt-note' }, 'Checking your rating…')); return; }
+      if (!own.r && !rtListened(b)) { mine.append(h('p', { class: 'rt-note rt-wait' }, 'Listen to a little of this book (about ' + Math.round(RT_MIN_PCT * 100) + '%) and you can rate it here.')); return; }
       const group = h('div', { class: 'rt-pick', role: 'radiogroup', 'aria-label': 'Your rating' });
       const btns = [1, 2, 3, 4, 5].map(i => h('button', { class: 'rt-star' + (i <= draftR ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': String(i === draftR), 'aria-label': i + (i === 1 ? ' star' : ' stars'), disabled: busy,
         onclick: () => { draftR = i; paintMine(); } }, '★'));
@@ -255,7 +284,7 @@
   function ratePrompt(b, show) {
     if (!acInfo() || P.calm === true) return null;
     const skip = store.get('wt:rtskip', {}) || {};
-    if (skip[String(b.id)]) return null;
+    if (skip[String(b.id)] || !rtListened(b)) return null;
     const box = h('div', { class: 'rt-prompt', hidden: true });
     let draftR = 0, draftC = '', busy = false;
     const paint = () => {

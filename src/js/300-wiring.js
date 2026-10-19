@@ -326,6 +326,7 @@
     $('#in-autodel').addEventListener('change', e => { P.autoDel = e.target.checked; savePrefs(); toast(P.autoDel ? 'Finished books will be removed from this device.' : 'Finished downloads are kept.', 2500); });
     $('#in-sharestats').addEventListener('change', e => { P.shareStats = e.target.checked; savePrefs(); });
     $('#in-lockseek').addEventListener('change', e => { P.lockSeek = e.target.checked; savePrefs(); initMediaSession(); });
+    homeCustInit();   // Customise home: apply the saved switches to the Library tab (100-home-rows-filters.js)
     $('#in-calm').addEventListener('change', e => { P.calm = e.target.checked; applyTheme(); savePrefs(); toast(P.calm ? 'Calm mode is on.' : 'Calm mode is off.', 2000); try { renderStats(); } catch (x) {} });
     $('#in-haptics').addEventListener('change', e => { P.haptics = e.target.checked; savePrefs(); if (P.haptics) buzz('medium'); });
     $('#in-shake').addEventListener('change', e => {

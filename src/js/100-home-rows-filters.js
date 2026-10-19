@@ -1151,4 +1151,55 @@
     finally { HSK.done.cur = true; skSweep('sec-newweek'); skSweep('sec-collections'); }
   }
 
+  /* ---------- Customise home (Settings > Reading) ----------
+     Home shows Continue listening first, then ONE hero card, then at most HC_ROWS rows. The hero is the time-of-day
+     card when it has something to say, otherwise Book of the day (never both). Rows are Picked for you, New this
+     week and Collections, in page order. Each part has a switch in Settings; the ones switched off are kept in
+     P.homeOff (a list of keys), saved with the other prefs, so a new row is on until someone turns it off.
+     The loaders above and in 120 keep deciding by themselves when a section has content (they set `hidden`);
+     this code only adds classes on top: .hh-off (switched off) and .hh-cap (one card / three rows already shown),
+     both display:none in 70-collections-detail-motion.css. A MutationObserver re-checks whenever a section's
+     `hidden` changes, so the order in which the loaders finish does not matter. */
+  const HC_ROWS = 3;
+  const HC_ITEMS = [
+    ['recents', 'recents', 'Continue listening', 'Your books in progress'],
+    ['tod', 'sec-tod', 'Time-of-day card', 'Morning review or bedtime story'],
+    ['botd', 'sec-botd', 'Book of the day', 'Shown when there is no time-of-day card'],
+    ['picks', 'sec-picks', 'Picked for you', 'Suggestions from your listening'],
+    ['newweek', 'sec-newweek', 'New this week', 'Fresh arrivals in the library'],
+    ['collections', 'sec-collections', 'Collections', 'Curated shelves']
+  ];
+  const hcOff = () => new Set(Array.isArray(P.homeOff) ? P.homeOff : []);
+  function homeApply() {
+    const off = hcOff(), g = id => document.getElementById(id), live = id => { const e = g(id); return !!e && !e.hidden; };
+    HC_ITEMS.forEach(([k, id]) => { const e = g(id); if (e) e.classList.toggle('hh-off', off.has(k)); });
+    const botd = g('sec-botd'); if (botd) botd.classList.toggle('hh-cap', !off.has('tod') && live('sec-tod'));   // one hero card
+    let rows = 0;
+    ['sec-picks', 'sec-newweek', 'sec-collections'].forEach(id => {
+      const e = g(id); if (!e) return;
+      const on = live(id) && !e.classList.contains('hh-off');
+      e.classList.toggle('hh-cap', on && ++rows > HC_ROWS);   // at most three rows
+    });
+  }
+  function homeCustInit() {
+    homeApply();
+    try { const mo = new MutationObserver(homeApply); HC_ITEMS.forEach(([, id]) => { const e = document.getElementById(id); if (e) mo.observe(e, { attributes: true, attributeFilter: ['hidden'] }); }); } catch (e) { /* the classes still apply on every change of the switches */ }
+  }
+  /* the switches in Settings > Reading; called every time Settings opens (fillSettings in 290) */
+  function homeCustPaint() {
+    const box = $('#hc-list'); if (!box) return;
+    const off = hcOff();
+    box.textContent = '';
+    HC_ITEMS.forEach(([k, , name, note]) => {
+      const id = 'hc-' + k, cb = h('input', { id, type: 'checkbox', 'aria-describedby': id + '-d' });
+      cb.checked = !off.has(k);
+      cb.addEventListener('change', () => {
+        const now = hcOff(); if (cb.checked) now.delete(k); else now.add(k);
+        P.homeOff = [...now]; savePrefs(); homeApply();
+      });
+      box.append(h('div', { class: 'row hc-row' }, h('label', { for: id }, h('span', { class: 'hc-n' }, name), h('small', { id: id + '-d', class: 'hc-s' }, note)), cb));
+    });
+  }
+  guideDoc('home', 'Customise home', "Settings > Reading > Customise home has a switch for each part of the Library tab. Continue listening always comes first, then one card (the time-of-day card when it has something for you, otherwise Book of the day), then up to three rows: Picked for you, New this week and Collections. Turn a part off and it disappears from Home; the next one moves up.", '2026-10-19');
+
   guideDoc('collections', 'Browse shelves', "Collections are curated shelves such as Trending and New this week, rebuilt daily. Tap See all for a whole shelf, then sort it, hide books you have heard, or tap Surprise me.");
