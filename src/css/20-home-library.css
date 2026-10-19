@@ -100,7 +100,6 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
 
 /* Genre chip row */
 .genre-row::-webkit-scrollbar { display: none; }
-.filters > summary::-webkit-details-marker { display: none; }
 .flt-n { background: var(--accent); color: var(--accent-ink); border-radius: 999px; font-size: .72rem; padding: .05rem .5rem; }
 .flt-g select { width: 100%; }
 .flt-chips { display: flex; flex-wrap: wrap; gap: .4rem; }

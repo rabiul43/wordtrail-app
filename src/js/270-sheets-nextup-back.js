@@ -220,13 +220,12 @@
   var HIST = null;
   /* Layers that live inside other code: the first-run onboarding fills these in (see initOnboarding). */
   var OB = { layers: () => 0, back() {} };
-  /* The filter panel and the search results both belong to the Library home, so they only count while that tab is showing. */
-  const fpanelOn = () => { const p = $('#fpanel'); return curTab === 'library' && !!p && !p.hidden; };
+  /* The search results belong to the Library home, so they only count while that tab is showing. (The Filters sheet is a .sheet and counts as one.) */
   const searchOn = () => curTab === 'library' && !!el.results && !el.results.hidden;
   function histLayers() {
     return OB.layers() + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
       ((DET.book || DET.author) ? 1 + (DET.stack || []).length : 0) + (seeOpen ? 1 : 0) +
-      ((curTab === 'collections' && COL.open) ? 1 : 0) + (fpanelOn() ? 1 : 0) + (searchOn() ? 1 : 0) + (curTab !== 'library' ? 1 : 0);
+      ((curTab === 'collections' && COL.open) ? 1 : 0) + (searchOn() ? 1 : 0) + (curTab !== 'library' ? 1 : 0);
   }
   function histBack() {
     try {
@@ -237,7 +236,6 @@
       else if (DET.book || DET.author) closeDetail();
       else if (seeOpen) closeSeeAll();
       else if (curTab === 'collections' && COL.open) { COL.open = null; renderCollections(); window.scrollTo(0, 0); }
-      else if (fpanelOn()) fpanelSet(false);
       else if (searchOn()) clearSearch(false);
       else if (curTab !== 'library') showTab('library');
     } catch (e) { /* leave the screen as it is */ }

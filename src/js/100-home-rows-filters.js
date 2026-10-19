@@ -646,7 +646,7 @@
   function lfPaint() {
     $$('#sfilt .fchip[data-lvl]').forEach(b => b.setAttribute('aria-pressed', String(LF.lvl.has(+b.dataset.lvl))));
     $$('#flt-lvl button').forEach(b => b.setAttribute('aria-pressed', String(LF.lvl.has(+b.dataset.v))));
-    ['#f-ready', '#flt-ready'].forEach(q => { const r = $(q); if (r) r.setAttribute('aria-pressed', String(LF.ready)); });
+    { const r = $('#flt-ready'); if (r) r.setAttribute('aria-checked', String(LF.ready)); }
   }
   async function lfToggle(kind, v, from) {
     if (kind === 'lvl') { if (LF.lvl.has(v)) LF.lvl.delete(v); else LF.lvl.add(v); } else LF.ready = !LF.ready;
@@ -693,8 +693,7 @@
   }
   function fltActiveCount() { return (FLT.len ? 1 : 0) + (LF.lvl.size ? 1 : 0) + (LF.ready ? 1 : 0) + (FLT.mood ? 1 : 0) + (FLT.lang ? 1 : 0) + (FLT.nar ? 1 : 0) + (fltRate() ? 1 : 0) + (fltSort() ? 1 : 0); }
   async function applyFilters(more) {
-    const n = fltActiveCount(), badge = $('#flt-n'), res = $('#filter-results'), g = genreEls();
-    badge.hidden = !n; badge.textContent = String(n);
+    const n = fltActiveCount(), res = $('#filter-results'), g = genreEls();
     { const dn = $('#fp-done'); if (dn && !n) dn.textContent = 'Done'; }
     if (!n) { res.hidden = true; $('#filter-list').textContent = ''; if (g.wrap && activeGenre) g.wrap.hidden = false; return; }
     if (g.wrap) g.wrap.hidden = true; // the filtered list stands in for the genre list while filters are on
@@ -754,12 +753,21 @@
     ns.value = FLT.nar;
     $('#flt-nar-help').textContent = names.length ? 'Narrators of the books you have opened.' : 'Narrators appear here once you have opened a few books. The catalog does not list narrators.';
   }
-  /* ---------- Filter panel: opens under the search bar ---------- */
+  /* ---------- Filters: one bottom sheet (#fpanel) ----------
+     Sort, Minimum rating, Level, Length, Mood, Genre, Language, Narrator and Read-along ready live here. The scope chips under the
+     search bar (All, Title, Author, Genre) only choose what the search looks in. The sheet is a normal .sheet, so the backdrop,
+     Back button and Close work like every other sheet. "Show N books" is updated by applyFilters as filters change. */
   function fpanelSet(open) {
-    const p = $('#fpanel'), b = $('#btn-fpanel'), f = $('#filters');
+    const p = $('#fpanel'), b = $('#btn-fpanel');
     if (!p || !b) return;
-    p.hidden = !open; b.setAttribute('aria-expanded', String(open));
-    if (f && f.open !== open) f.open = open;
+    if (open) { fltFillSelects(); applyFilters(); openSheet('fpanel'); }
+    else if (!p.hidden) { p.hidden = true; if (!$$('.sheet').some(x => !x.hidden)) el.backdrop.hidden = true; histSoon(); }
+  }
+  function fltClearAll() {
+    if (activeGenre) clearGenre();
+    FLT.len = FLT.mood = FLT.lang = FLT.nar = FLT.rate = FLT.sort = ''; LF.lvl.clear(); LF.ready = false; lfPaint(); fltSegPaint();
+    $$('#flt-len button, #flt-mood button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    $('#flt-lang').value = ''; $('#flt-nar').value = ''; applyFilters();
   }
   function fpanelChips() {
     const host = $('#fchips'); if (!host) return;
@@ -767,7 +775,7 @@
     const g = activeGenre ? GENRES.find(x => x.lv === activeGenre) : null;
     if (g) items.push([g.label, () => clearGenre()]);
     FLT_LVL.forEach(([k, label, tier]) => { if (LF.lvl.has(tier)) items.push([label.split(' \u00b7 ')[0], () => lfToggle('lvl', tier, 'lib')]); });
-    if (LF.ready) items.push(['\u2605 Synced books', () => lfToggle('ready', 0, 'lib')]);
+    if (LF.ready) items.push(['Read-along ready', () => lfToggle('ready', 0, 'lib')]);
     if (FLT.len) { const x = FLT_LEN.find(y => y[0] === FLT.len); if (x) items.push([x[1], () => { FLT.len = ''; $$('#flt-len button').forEach(b => b.setAttribute('aria-pressed', 'false')); applyFilters(); }]); }
     if (FLT.mood) { const x = FLT_MOODS.find(y => y.k === FLT.mood); if (x) items.push([x.label, () => { FLT.mood = ''; $$('#flt-mood button').forEach(b => b.setAttribute('aria-pressed', 'false')); applyFilters(); }]); }
     if (fltSort()) { const x = FLT_SORTS.find(y => y[0] === fltSort()); if (x) items.push(['Sort: ' + x[1], () => { FLT.sort = ''; fltSegPaint(); applyFilters(); }]); }
@@ -778,7 +786,7 @@
     if (host._sig === sig) return;
     host._sig = sig; host.textContent = '';
     items.forEach(([label, off]) => host.append(h('button', { type: 'button', 'aria-label': 'Remove filter ' + label, onclick: () => { off(); setTimeout(fpanelBadge, 0); setTimeout(fpanelBadge, 350); } }, label, h('span', { class: 'x', 'aria-hidden': 'true' }, '\u2715'))));
-    if (items.length > 1) host.append(h('button', { type: 'button', class: 'clear', onclick: () => { if (activeGenre) clearGenre(); $('#flt-clear').click(); setTimeout(fpanelBadge, 0); setTimeout(fpanelBadge, 350); } }, 'Clear all'));
+    if (items.length > 1) host.append(h('button', { type: 'button', class: 'clear', onclick: () => { fltClearAll(); setTimeout(fpanelBadge, 0); setTimeout(fpanelBadge, 350); } }, 'Clear all'));
     host.hidden = !items.length;
   }
   function fpanelBadge() {
@@ -795,10 +803,12 @@
     b.addEventListener('click', () => fpanelSet(p.hidden));
     $('#fp-done').addEventListener('click', () => fpanelSet(false));
     { const ff = $('#f-find'); if (ff) ff.addEventListener('click', () => fpanelSet(false)); }
-    $('#fp-clear').addEventListener('click', () => { if (activeGenre) clearGenre(); $('#flt-clear').click(); setTimeout(fpanelBadge, 0); });
-    $('#genre-chips').addEventListener('click', () => { setTimeout(fpanelBadge, 350); }); $('#genre-chips').addEventListener('click', () => setTimeout(() => { fpanelBadge(); fpanelSet(false); window.scrollTo({ top: 0, behavior: motionOk() }); }, 0));
+    $('#fp-clear').addEventListener('click', () => { fltClearAll(); setTimeout(fpanelBadge, 0); });
+    $('#genre-chips').addEventListener('click', () => { setTimeout(fpanelBadge, 350); }); 
     p.addEventListener('change', () => setTimeout(fpanelBadge, 0));
-    new MutationObserver(fpanelBadge).observe(p, { attributes: true, attributeFilter: ['aria-pressed'], subtree: true });
+    new MutationObserver(fpanelBadge).observe(p, { attributes: true, attributeFilter: ['aria-pressed', 'aria-checked'], subtree: true });
+    /* keep the Filters button in step with the sheet however it was closed (Close, backdrop, Back, Done) and hand focus back to it */
+    new MutationObserver(() => { const o = !p.hidden; b.setAttribute('aria-expanded', String(o)); if (!o && b._open && !$$('.sheet').some(x => !x.hidden)) { try { b.focus({ preventScroll: true }); } catch (e) { /* ignore */ } } b._open = o; }).observe(p, { attributes: true, attributeFilter: ['hidden'] });
     el.q.addEventListener('input', () => { if (el.q.value && !p.hidden) fpanelSet(false); });
     fpanelBadge();
   }
@@ -814,12 +824,6 @@
     $('#flt-lang').addEventListener('change', e => { FLT.lang = e.target.value; applyFilters(); });
     $('#flt-nar').addEventListener('change', e => { FLT.nar = e.target.value; applyFilters(); });
     $('#filter-more').addEventListener('click', () => applyFilters(true));
-    $('#flt-clear').addEventListener('click', () => {
-      FLT.len = FLT.mood = FLT.lang = FLT.nar = FLT.rate = FLT.sort = ''; LF.lvl.clear(); LF.ready = false; lfPaint(); fltSegPaint();
-      $$('#flt-len button, #flt-mood button').forEach(x => x.setAttribute('aria-pressed', 'false'));
-      $('#flt-lang').value = ''; $('#flt-nar').value = ''; applyFilters();
-    });
-    $('#filters').addEventListener('toggle', e => { if (e.target.open) { fltFillSelects(); applyFilters(); } }); // filters set from the search chips show up here too
   }
   function buildGenreChips() {
     const container = $('#genre-chips');

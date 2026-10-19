@@ -101,6 +101,23 @@
   </div>
 </section>
 
+<section id="fpanel" class="sheet fpanel" hidden role="dialog" aria-modal="true" aria-labelledby="h-fpanel">
+  <header><h2 id="h-fpanel">Filters</h2><button class="ib" data-close aria-label="Close filters"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <button type="button" class="btn small ghost fp-inside" id="f-find" title="Find a word or quote in the texts saved on this device">&#128269; Search inside books</button>
+    <div class="flt-g"><h3>Sort</h3><div id="flt-sort" class="flt-chips"></div></div>
+    <div class="flt-g flt-rate"><h3>Minimum rating</h3><div id="flt-rate" class="flt-chips"></div><p class="help">Books with fewer than 5 ratings are left out of Top rated and the rating filter.</p></div>
+    <div class="flt-g"><h3>Level</h3><div id="flt-lvl" class="flt-chips"></div><p class="help">Pick one or more. Estimated from the book's text; CEFR and age are rough guides.</p></div>
+    <div class="flt-g"><h3>Length</h3><div id="flt-len" class="flt-chips"></div></div>
+    <div class="flt-g"><h3>Mood</h3><div id="flt-mood" class="flt-chips"></div></div>
+    <div class="flt-g"><h3>Genre</h3><div id="genre-chips" class="genre-row" role="group" aria-label="Genres"></div></div>
+    <div class="flt-g"><h3>Language</h3><select id="flt-lang" class="num" aria-label="Language"></select></div>
+    <div class="flt-g"><h3>Narrator</h3><select id="flt-nar" class="num" aria-label="Narrator"></select><p class="help" id="flt-nar-help"></p></div>
+    <div class="flt-g"><h3>Read-along ready</h3><button id="flt-ready" class="fp-switch" type="button" role="switch" aria-checked="false" title="Books with sentence timing ready, so the text follows the narrator"><span><b>Read-along ready only</b><small>Text follows the narrator</small></span><i class="fp-tg" aria-hidden="true"></i></button></div>
+  </div>
+  <footer class="fp-foot"><button id="fp-clear" class="btn ghost" type="button">Clear all</button><button id="fp-done" class="btn" type="button">Done</button></footer>
+</section>
+
 <section id="sheet-more" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-more">
   <header><h2 id="h-more">More</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body">

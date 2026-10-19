@@ -24,11 +24,8 @@ body.genre-on #sec-tod, body:has(#filter-results:not([hidden])) #sec-tod { displ
 #recents:not([hidden]) ~ #sec-botd { display: none; }
 /* scope / level chips only matter while searching */
 .searchbar:not(:focus-within):not(:has(#q:not(:placeholder-shown))):not(:has(.sfilt .fchip[aria-pressed="true"]:not([data-scope="all"]))) .sfilt { display: none; }
-/* Filters button sits at the end of the genre row */
 #sec-genre > * { grid-column: 1 / -1; }
 #sec-genre > .genre-row { grid-column: 1; grid-row: 1; margin-right: 0; }
-#sec-genre > .filters { grid-column: 2; grid-row: 1; margin: 0; }
-#sec-genre > .filters[open] { grid-column: 1 / -1; grid-row: 2; margin-top: .6rem; }
 /* ---------- Collections tab ---------- */
 #collections { display: grid; gap: .9rem; align-content: start; padding-bottom: calc(7.5rem + env(safe-area-inset-bottom)); gap: var(--row-gap); }
 #collections[hidden] { display: none; }
@@ -137,18 +134,7 @@ body.has-mini #collections { padding-bottom: calc(11rem + env(safe-area-inset-bo
 .btn-fpanel[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
 .btn-fpanel .flt-n { position: absolute; top: -.1rem; right: -.1rem; min-width: 1.05rem; height: 1.05rem; padding: 0 .25rem; font-size: .65rem; line-height: 1.05rem; text-align: center; }
 .btn-fpanel .flt-n[hidden] { display: none; }
-.fpanel { margin: .5rem 0 .9rem; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); display: grid; gap: 1rem; }
-.fpanel[hidden] { display: none; }
-.fpanel .fp-g h3 { margin: 0 0 .5rem; font-size: var(--small); font-weight: 600; color: var(--muted); }
-.fpanel .genre-row { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; gap: .45rem; scroll-snap-type: none; }
-.fpanel .filters { margin: 0; }
-.fpanel .filters > summary { display: none; }
-.fpanel .flt-body { margin: 0; padding: 0; background: none; border: 0; }
-.fpanel #flt-clear { display: none; }
-.fpanel .fp-foot { display: flex; gap: .5rem; }
-.fpanel .fp-inside { width: 100%; justify-content: center; min-height: 2.6rem; }
-.fpanel .fp-foot .btn:last-child { flex: 1; }
-/* v27 active filter chips under the search bar */
+
 .fchips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0 .2rem; }
 .fchips[hidden] { display: none; }
 .fchips button { display: inline-flex; align-items: center; gap: .35rem; min-height: 2rem; padding: 0 .65rem 0 .8rem; border: 1px solid var(--accent); border-radius: var(--r-pill); background: var(--accent-soft); color: var(--accent); font-size: .8rem; font-weight: 600; white-space: nowrap; }

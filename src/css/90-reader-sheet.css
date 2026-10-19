@@ -116,3 +116,25 @@
 .nr-dock .nr-ctl { margin-top: .5rem; }
 .nr-dock .uc { margin-top: .25rem; }
 .nr-back { width: 2.75rem; height: 2.75rem; }
+
+/* ---------- Filters: one bottom sheet (#fpanel) with a pinned footer: Clear all + Show N books ---------- */
+#fpanel .body { gap: 1.15rem; }
+#fpanel .flt-g h3 { margin: 0 0 .55rem; }
+#fpanel .flt-chips { gap: .5rem; }
+#fpanel .flt-chips button { min-height: 2.75rem; padding: 0 1rem; font-size: .88rem; }
+#fpanel .genre-row { display: flex; flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; gap: .5rem; scroll-snap-type: none; }
+#fpanel .genre-chip { min-height: 2.75rem; }
+#fpanel select { width: 100%; min-height: 2.75rem; }
+#fpanel .fp-inside { justify-content: center; min-height: 2.75rem; }
+.fp-switch { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; min-height: 3.5rem; padding: .5rem .9rem; border: 1.5px solid var(--line); border-radius: var(--r-ctl, 12px); background: var(--surface-2); color: var(--ink); text-align: left; cursor: pointer; }
+.fp-switch b { display: block; font: 600 .95rem/1.2 var(--font-ui); }
+.fp-switch small { display: block; margin-top: .15rem; color: var(--muted); font: 400 .8rem/1.35 var(--font-ui); }
+.fp-switch[aria-checked="true"] { border-color: var(--accent); }
+.fp-tg { flex: none; position: relative; width: 2.75rem; height: 1.6rem; border-radius: 999px; background: var(--line); transition: background-color var(--dur-fast); }
+.fp-tg::after { content: ""; position: absolute; top: .2rem; left: .2rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: var(--ink); transition: transform var(--dur-fast) var(--ease); }
+.fp-switch[aria-checked="true"] .fp-tg { background: var(--accent); }
+.fp-switch[aria-checked="true"] .fp-tg::after { transform: translateX(1.15rem); background: var(--accent-ink); }
+#fpanel .fp-foot { flex: none; display: flex; align-items: center; gap: .75rem; padding: .8rem 1.2rem max(1rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface); }
+#fpanel .fp-foot .btn { min-height: 2.75rem; }
+#fpanel .fp-foot .btn:last-child { flex: 1; }
+@media (prefers-reduced-motion: reduce) { .fp-tg, .fp-tg::after { transition: none; } }

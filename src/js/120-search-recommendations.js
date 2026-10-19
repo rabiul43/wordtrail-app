@@ -79,8 +79,8 @@
     el.results.classList.remove('loading'); el.results.hidden = false;
   }
   guideDoc('home', 'Search', "Type in the search bar. Choose All, Title, Author or Genre to narrow it. Recent searches are kept for quick reuse, and the x button clears the box.");
-  guideDoc('home', 'Synced books', "The star chip shows only books that have exact sentence timing ready, so the text follows the narrator closely.");
-  /* ------ search filters: scope (all / title / author / genre) and read-along ready ------ */
+  guideDoc('home', 'Read-along ready', "Filters > Read-along ready shows only books that have exact sentence timing ready, so the text follows the narrator closely.");
+  /* ------ search scope: All / Title / Author / Genre. Level and Read-along ready are set in the Filters sheet (100) and still narrow search results ------ */
   const RS = { all: [], scope: 'all', sort: 'best' };
   const SCOPE_HINT = { all: 'Search a title or author', title: 'Search by title', author: 'Search by author', genre: 'Search a genre, such as mystery' };
   function rsFilter(list) {
@@ -136,7 +136,6 @@
     $$('#sfilt .fchip[data-lvl]').forEach(b => b.addEventListener('click', () => lfToggle('lvl', +b.dataset.lvl, 'search')));
     const so = $('#rsort');
     if (so) so.addEventListener('change', () => { RS.sort = so.value; if (RS.all.length) showBooks(RS.all); if (so.value === 'rated') rtSumLoad().then(() => { if (RS.sort === 'rated' && RS.all.length) showBooks(RS.all); }); });
-    $('#f-ready').addEventListener('click', () => lfToggle('ready', 0, 'search'));
   }
   function cacheResults(key, books) {
     store.set(key, { t: Date.now(), books });
@@ -337,7 +336,7 @@
   function openMoodFilter(k) {
     FLT.mood = k;
     $$('#flt-mood button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === k)));
-    fpanelSet(true); const f = $('#filters'); if (f) { f.open = true; f.scrollIntoView({ block: 'start', behavior: motionOk() }); }
+    fpanelSet(true); const m = $('#flt-mood'); if (m) m.scrollIntoView({ block: 'center', behavior: motionOk() });
     applyFilters();
   }
   function moodTick() {

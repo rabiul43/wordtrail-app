@@ -89,34 +89,11 @@
       <button type="button" class="fchip" data-scope="title" aria-pressed="false">Title</button>
       <button type="button" class="fchip" data-scope="author" aria-pressed="false">Author</button>
       <button type="button" class="fchip" data-scope="genre" aria-pressed="false">Genre</button>
-      <span class="fsep" aria-hidden="true"></span>
-      <button type="button" class="fchip star" id="f-ready" aria-pressed="false" title="Books with sentence timing ready, so the text follows the narrator">&#9733; Synced books</button>
     </div>
     <div id="sfilt-count" class="sfilt-count" hidden></div>
   </div>
   </div>
   <div id="fchips" class="fchips" role="group" aria-label="Active filters" hidden></div>
-  <div id="fpanel" class="fpanel" hidden>
-    <div class="fp-g"><button type="button" class="btn small ghost fp-inside" id="f-find" title="Find a word or quote in the texts saved on this device">&#128269; Search inside books</button></div>
-    <div class="fp-g"><h3>Genres</h3>
-    <div id="genre-chips" class="genre-row" role="group" aria-label="Genres"></div>
-    </div>
-    <details id="filters" class="filters">
-      <summary>Filters <span id="flt-n" class="flt-n" hidden></span></summary>
-      <div class="flt-body">
-        <div class="flt-g"><h3>Sort by</h3><div id="flt-sort" class="flt-chips"></div></div>
-        <div class="flt-g flt-rate"><h3>Minimum rating</h3><div id="flt-rate" class="flt-chips"></div><p class="help">Books with fewer than 5 ratings are left out of Top rated and the rating filter.</p></div>
-        <div class="flt-g"><h3>Level</h3><div id="flt-lvl" class="flt-chips"></div><p class="help">Pick one or more. Estimated from the book's text; CEFR and age are rough guides.</p></div>
-        <div class="flt-g"><h3>Synced books</h3><div class="flt-chips"><button id="flt-ready" type="button" aria-pressed="false" title="Books with sentence timing ready, so the text follows the narrator">★ Synced books</button></div></div>
-        <div class="flt-g"><h3>Length</h3><div id="flt-len" class="flt-chips"></div></div>
-        <div class="flt-g"><h3>Mood</h3><div id="flt-mood" class="flt-chips"></div></div>
-        <div class="flt-g"><h3>Language</h3><select id="flt-lang" class="num" aria-label="Language"></select></div>
-        <div class="flt-g"><h3>Narrator</h3><select id="flt-nar" class="num" aria-label="Narrator"></select><p class="help" id="flt-nar-help"></p></div>
-        <button id="flt-clear" class="btn small ghost" type="button">Clear filters</button>
-      </div>
-    </details>
-    <div class="fp-foot"><button id="fp-clear" class="btn small ghost" type="button">Clear all</button><button id="fp-done" class="btn small" type="button">Done</button></div>
-  </div>
   <div id="status" class="status" role="status" aria-live="polite"></div>
   <div id="prog" class="prog" hidden aria-hidden="true"><div class="bar"><i></i></div><span id="prog-t"></span></div>
 
