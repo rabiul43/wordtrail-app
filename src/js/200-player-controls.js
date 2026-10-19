@@ -35,7 +35,7 @@
     el.sstate.textContent = info.sure ? (info.audio ? 'Timing: Precise' : 'Timing: Precise \u00b7 set by you')
       : busy ? 'Timing: Preparing\u2026'
       : 'Timing: Estimated';
-    { const td = $('#b-timing'); if (td) { td.dataset.state = el.syncbar.dataset.state; td.setAttribute('aria-label', el.sstate.textContent); td.title = el.sstate.textContent; } }
+    { const td = $('#b-timing'); if (td) { td.dataset.state = el.syncbar.dataset.state; td.setAttribute('aria-label', el.sstate.textContent); td.title = el.sstate.textContent; const tl = $('#b-timing-l'); if (tl) tl.textContent = el.sstate.textContent; } }
     if (S.calibrate) el.syncbar.classList.add('pop');   // tap-sync is on: keep the Done button in reach
     el.sstate.title = info.sure ? 'The highlight follows the narrator closely.' : busy ? 'Improving the timing for this track.' : 'The highlight is a good guess. Tap Adjust timing to tighten it.';
     el.fix.textContent = S.calibrate ? 'Done' : S.aligning ? 'Working\u2026' : 'Adjust timing';
@@ -96,6 +96,7 @@
     });
     const more = $('#b-more'), dot = P.speed !== 1 || !!S.sleep || !!(more && more.classList.contains('has-dot'));
     ['#btn-player-settings'].forEach(id => { const b = $(id); if (b) b.classList.toggle('has-dot', dot); });
+    { const mb = $('#btn-topmore'), td = $('#b-timing'); if (mb) mb.classList.toggle('has-dot', dot || !!(td && !td.hidden && td.dataset.state && td.dataset.state !== 'precise')); }   // the \u22ef menu hides these two, so it shows their dot
   }
   function setSleep(v) {
     if (v !== 0 && S.book) trAdd({ sec: S.sec, time: nowT(), why: 'sleep' });

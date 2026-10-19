@@ -97,6 +97,32 @@
         td.addEventListener('click', e => { e.stopPropagation(); if (el.syncbar.classList.contains('pop')) close(); else open(); });
         document.addEventListener('click', e => { if (!S.calibrate && !e.target.closest('#syncbar, #b-timing')) close(); });
       } }
+    /* Player top bar: the \u22ef button opens a small menu (Timing, Text and reading, Tracks, Settings). The four buttons keep their ids and handlers. */
+    { const mb = $('#btn-topmore'), mn = $('#tb-menu');
+      if (mb && mn) {
+        const items = () => $$('.mi', mn).filter(b => !b.hidden), isOpen = () => !mn.hidden;
+        const close = back => { if (mn.hidden) return; mn.hidden = true; mb.setAttribute('aria-expanded', 'false'); if (back) mb.focus(); };
+        const open = at => { mn.hidden = false; mb.setAttribute('aria-expanded', 'true'); buzz('tick'); const it = items(); if (at != null && it.length) it[at < 0 ? it.length - 1 : 0].focus(); };
+        mb.addEventListener('click', e => { e.stopPropagation(); if (isOpen()) close(); else open(e.detail === 0 ? 0 : null); });
+        mb.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const at = e.key === 'ArrowDown' ? 0 : -1; if (!isOpen()) open(at); else { const it = items(); if (it.length) it[at < 0 ? it.length - 1 : 0].focus(); } }
+          else if (e.key === 'Escape' && isOpen()) { e.preventDefault(); e.stopPropagation(); close(); }
+        });
+        mn.addEventListener('click', () => close(true), true);   // capture: the menu closes first, then the chosen button's own handler runs
+        mn.addEventListener('keydown', e => {
+          const it = items(), i = it.indexOf(document.activeElement), k = e.key;
+          const go = n => { e.preventDefault(); e.stopPropagation(); if (it.length) it[(n + it.length) % it.length].focus(); };
+          if (k === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+          else if (k === 'ArrowDown') go(i + 1);
+          else if (k === 'ArrowUp') go(i < 0 ? -1 : i - 1);
+          else if (k === 'Home') go(0);
+          else if (k === 'End') go(-1);
+          else if (k === 'ArrowLeft' || k === 'ArrowRight') e.stopPropagation();
+          else if (k === 'Tab') close(true);
+        });
+        document.addEventListener('click', e => { if (isOpen() && !e.target.closest('#tb-menu, #btn-topmore')) close(); });
+        if (window.MutationObserver) new MutationObserver(() => { if (el.player.hidden) close(); }).observe(el.player, { attributes: true, attributeFilter: ['hidden'] });
+      } }
     el.cal.addEventListener('click', () => {
       S.calibrate = !S.calibrate; syncCalUI();
       if (S.calibrate && !(S.plan[S.sec] && S.plan[S.sec].ids.length)) { S.calibrate = false; syncCalUI(); toast('This track has no text to sync.'); }

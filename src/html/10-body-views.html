@@ -324,11 +324,14 @@
   <header class="topbar">
     <button id="btn-back" class="ib" aria-label="Back to search"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button>
     <div class="titles"><h1 id="p-title"></h1><p id="p-sub"></p></div>
-    <button id="b-timing" class="ib tdot" type="button" aria-expanded="false" aria-controls="syncbar" aria-label="Timing" hidden></button>
     <button id="btn-fav" class="ib" type="button" aria-pressed="false" aria-label="Save to My books"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.8l5.9-.8z"/></svg></button>
-    <button id="btn-aa" class="ib aa" type="button" aria-label="Text size and reading settings">Aa</button>
-    <button id="btn-tracks-top" class="ib" type="button" aria-label="Tracks"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.6" cy="7" r=".9"/><circle cx="4.6" cy="12" r=".9"/><circle cx="4.6" cy="17" r=".9"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></button>
-    <button id="btn-player-settings" class="ib" type="button" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><svg class="dots-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+    <button id="btn-topmore" class="ib" type="button" aria-label="More: timing, text, tracks, settings" aria-haspopup="true" aria-expanded="false" aria-controls="tb-menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    <div id="tb-menu" class="tb-menu" role="menu" aria-label="Player options" hidden>
+      <button id="b-timing" class="mi" type="button" role="menuitem" aria-expanded="false" aria-controls="syncbar" aria-label="Timing" hidden><i class="mi-ic mi-dot" aria-hidden="true"></i><span id="b-timing-l" class="mi-l">Timing</span></button>
+      <button id="btn-aa" class="mi" type="button" role="menuitem" aria-label="Text and reading settings"><span class="mi-ic mi-aa" aria-hidden="true">Aa</span><span class="mi-l">Text and reading</span></button>
+      <button id="btn-tracks-top" class="mi" type="button" role="menuitem" aria-label="Tracks"><span class="mi-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="4.6" cy="7" r=".9"/><circle cx="4.6" cy="12" r=".9"/><circle cx="4.6" cy="17" r=".9"/><path d="M9 7h11M9 12h11M9 17h11"/></svg></span><span class="mi-l">Tracks</span></button>
+      <button id="btn-player-settings" class="mi" type="button" role="menuitem" aria-label="Settings"><span class="mi-ic" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg></span><span class="mi-l">Settings</span></button>
+    </div>
     <div id="syncbar" class="syncbar" hidden><span class="sstate" role="status" aria-live="polite"><i class="dot" aria-hidden="true"></i><span id="sstate-t"></span></span><div class="syncbar-btns"><button id="b-dl-hint" class="dl-hint" type="button" aria-label="Download this book for offline playback" hidden>⬇ Download</button><button id="b-fix" class="fix" type="button">Adjust timing</button></div></div>
   </header>
 
