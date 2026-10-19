@@ -49,8 +49,8 @@ Reports are kept in Firestore at `ratings/{bookId}/votes/{reviewerUid}/reports/{
 
 The build puts `manifest.json`, `sw.js` and `icons/` next to `index.html`, so the app can be installed (Android/desktop
 Chrome and Edge: the install button in the address bar; iPhone/iPad: Share > Add to Home Screen) and opens without a
-connection. `sw.js` only does two things: it keeps the app page (network first, so updates still arrive on the next open;
-the saved copy is used when offline or when the network takes more than 4 seconds) and it keeps the Google Fonts files.
+connection. `sw.js` only does two things: it keeps the app page (opened from the saved copy at once for a fast start; the newest page is fetched in the
+background and a "New version ready - Reload" message appears when it differs; only the very first visit waits for the network) and it keeps the Google Fonts files.
 Audio, books, sign-in and sync are not touched by it. To change the icons, replace the PNGs in `src/pwa/icons/`.
 When you change `sw.js` itself, the browser installs the new one on the next visit by itself. If you ever need every
 device to drop its saved page, change `SHELL = 'wt-shell-v1'` to `v2` in `sw.js`.

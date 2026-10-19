@@ -22,6 +22,17 @@
     if (document.readyState === 'complete') pwaRegister(); else window.addEventListener('load', pwaRegister, { once: true });
   }
 
+  /* Fast start: the saved page opens at once and the newest one is fetched in the background (sw.js). When a newer
+     page has been saved, sw.js sends 'wt-update' and this offers a reload (once per visit). A reload keeps the open book. */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    let told = false;
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (told || !e.data || e.data.type !== 'wt-update') return;
+      told = true;
+      try { toast('A new version is ready.', 15000, ['Reload', () => location.reload()]); } catch (x) { /* cosmetic only */ }
+    });
+  }
+
   /* Splash screen covers: keeps 24 real covers (title, author, image address) from the catalogue for the next launch, renewed every 3 days.
      Read by the splash script in 10-body-views.html. Kept in localStorage directly, so it is not synced to the account. */
   function splashRemember() {

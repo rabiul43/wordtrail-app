@@ -35,7 +35,7 @@ html.resuming .boot-sk { display: none; }
 /* Splash: tilted wall of real covers while the installed app opens (built by the script in 10-body-views.html, removed by wtSplashDone) */
 #wt-splash { position: fixed; inset: 0; z-index: 9999; background: #0F1220; color: #F2EBDD; overflow: hidden; isolation: isolate; transition: opacity .35s ease; }
 #wt-splash.out { opacity: 0; pointer-events: none; }
-#wt-splash .sp-wall { position: absolute; left: 50%; top: -10%; width: 150%; height: 82%; transform: translateX(-50%) rotate(-14deg); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+#wt-splash .sp-wall { position: absolute; left: 50%; top: -10%; width: 150%; height: 122%; transform: translateX(-50%) rotate(-14deg); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 #wt-splash .sp-col { overflow: hidden; }
 #wt-splash .sp-track { display: grid; gap: 12px; animation: sp-drift 34s linear infinite; }
 #wt-splash .sp-col:nth-child(even) .sp-track { animation-direction: reverse; animation-duration: 40s; }
@@ -47,7 +47,7 @@ html.resuming .boot-sk { display: none; }
 #wt-splash .sp-cv img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; z-index: 2; background: var(--c1); }
 #wt-splash .sp-cv img.ok { opacity: 1; }
 #wt-splash .sp-top { position: absolute; inset: 0 0 auto 0; height: 14%; background: linear-gradient(180deg, #0F1220, rgba(15,18,32,0)); z-index: 2; }
-#wt-splash .sp-fade { position: absolute; inset: auto 0 0 0; height: 56%; background: linear-gradient(180deg, rgba(15,18,32,0), rgba(15,18,32,.9) 46%, #0F1220 72%); z-index: 2; }
+#wt-splash .sp-fade { position: absolute; inset: auto 0 0 0; height: 16%; background: linear-gradient(180deg, rgba(15,18,32,0), rgba(15,18,32,.75)); z-index: 2; }
 #wt-splash .sp-copy { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: grid; justify-items: center; gap: 8px; text-align: center; padding: 0 24px calc(34px + env(safe-area-inset-bottom, 0px)); }
 #wt-splash .sp-logo { display: flex; align-items: center; gap: 9px; font: 500 1.9rem 'Newsreader', Georgia, serif; }
 #wt-splash .sp-logo svg { width: 32px; height: 32px; }
