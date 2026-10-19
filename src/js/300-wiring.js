@@ -593,8 +593,34 @@
     /* --- Build language grid --- */
     let pickedLang = null;
 
+    /* --- The app in the person's own language (only for languages that have a `suggest` entry, e.g. Bengali) ---
+       1) Top of the card: if the browser prefers such a language, ask once, in that language, so a person who cannot read English can answer.
+       2) Step 2: after they pick it as their native language, one tap to use the app in it too.
+       Either choice is saved as the app language (P.uiLang), the same setting as Settings > Reading > Language. */
+    (function appLangOffer() {
+      const c = i18nSuggest(); if (!c) return;
+      const w = I18N_SUG[c], box = document.createElement('div'), q = document.createElement('p'), row = document.createElement('div');
+      box.className = 'ob-ui'; box.lang = c; q.textContent = w.q; row.className = 'ob-ui-btns';
+      const yes = document.createElement('button'), no = document.createElement('button');
+      yes.type = no.type = 'button'; yes.className = 'yes'; yes.textContent = w.yes; no.textContent = w.no || 'English';
+      yes.addEventListener('click', () => { setUiLang(c); box.remove(); });
+      no.addEventListener('click', () => { setUiLang('en'); box.remove(); });   // "en" is saved too, so we do not ask again
+      row.append(yes, no); box.append(q, row);
+      const card = ov.querySelector('.ob-card'); if (card) card.prepend(box);
+    })();
+    const alsoBtn = document.createElement('button');
+    alsoBtn.type = 'button'; alsoBtn.className = 'ob-lang ob-also'; alsoBtn.hidden = true;
+    langSel.after(alsoBtn);
+    function alsoUpdate() {
+      const c = String(pickedLang || '').toLowerCase().split('-')[0];
+      if (I18N_SUG[c] && P.uiLang !== c) {
+        alsoBtn.hidden = false; alsoBtn.lang = c; alsoBtn.textContent = I18N_SUG[c].also;
+        alsoBtn.onclick = () => { setUiLang(c); alsoBtn.hidden = true; };
+      } else alsoBtn.hidden = true;
+    }
+
     function pickLang(code) {
-      pickedLang = code;
+      pickedLang = code; alsoUpdate();
       Array.from(langGrid.querySelectorAll('.ob-lang')).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === code)));
       langSel.value = '';
     }
@@ -617,7 +643,7 @@
     });
     langSel.addEventListener('change', () => {
       if (!langSel.value) return;
-      pickedLang = langSel.value;
+      pickedLang = langSel.value; alsoUpdate();
       Array.from(langGrid.querySelectorAll('.ob-lang')).forEach(b => b.setAttribute('aria-pressed', 'false'));
     });
 

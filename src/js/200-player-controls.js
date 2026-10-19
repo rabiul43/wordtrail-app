@@ -344,63 +344,61 @@
      controls stay left-to-right). The main screens, menus and Settings headings are translated; anything not in the
      dictionary below stays in English. To add a language or more words, add them to I18N and I18N_LANGS. */
   /* The words live in src/i18n/<code>.json (one file per language; build.py joins them into the #i18n-data block).
-     Each file: { name, dir, order, dict: { "English text": "translation" }, rx: [ [regex, replacement] ] }.
+     Each file: { name, dir, order, dict: { "English text": "translation" }, rx: [ [regex, replacement] ], suggest: { q, yes, no, also },
+     units: [ [regex, replacement] ], keep: regex, digits: { map, label, hint } }.
+     `units` turns numbers with units ("5h 10m", "45 min ago", "12 books") into the language, inside any text, and is applied to every
+     match of each pattern in order. Text that has no exact key and still has English words after that is left alone, so English sentences
+     are never half translated. `keep` lists Latin text that may stay (MB, GB, level codes). `digits` adds a Settings switch for native digits.
+     `suggest` is optional: the first-run offer ("Use the app in <language>?"), worded in that language. Without it the language is never offered by itself.
      dict keys are the exact English text. rx is for text with numbers or names built in code ($1 = first match); it is
      tried only when there is no exact key. To add a language: add src/i18n/xx.json (and `python build.py`). Missing words stay English.
      Run `python tools/i18n_check.py xx` to list what a language still lacks. */
-  const I18N = {}, I18N_RX = {}, I18N_LANGS = [['en', 'English', 'ltr']];
+  const I18N = {}, I18N_RX = {}, I18N_SUG = {}, I18N_UNITS = {}, I18N_KEEP = {}, I18N_DIG = {}, I18N_LANGS = [['en', 'English', 'ltr']];
   try {
     const D = JSON.parse(document.getElementById('i18n-data').textContent);
     Object.keys(D).sort((x, y) => D[x].order - D[y].order).forEach(c => {
       I18N[c] = D[c].dict || {}; I18N_RX[c] = (D[c].rx || []).map(r => [new RegExp(r[0]), r[1]]);
       I18N_LANGS.push([c, D[c].name, D[c].dir || 'ltr']);
+      I18N_UNITS[c] = (D[c].units || []).map(r => [new RegExp(r[0], 'g'), r[1]]);
+      I18N_KEEP[c] = new RegExp(D[c].keep || '(?!)', 'g');
+      if (D[c].digits) I18N_DIG[c] = D[c].digits;   // { map: "০১২…", label, hint }
+      if (D[c].suggest) I18N_SUG[c] = D[c].suggest;   // { q, yes, no, also }: the first-run offer, worded in that language
     });
   } catch (e) { /* no translations: the app stays in English */ }
-  const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results';
+  const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results, #ob-q-hd, #ob-q-opts';   // book text and the placement-test questions are English on purpose
   const I18N_REC = new WeakMap();   // text node -> { o: original text, tr: text we put there }
   let i18nObs = null;
-  function i18nTr(src, dict) {   // src -> translated text (or src itself when there is nothing for it)
+  const I18N_NODIGIT = '.tile-t, .tile-a, .gc-t, .card .t, .rm-t, .mini-txt strong, .track .tt, .col-tile strong, .vp-name, h1';   // book titles keep their own digits
+  const I18N_CLOCK = /^-?\d{1,2}:\d{2}(?::\d{2})?$/;   // player times (0:00) keep Western digits
+  function i18nTr(src, dict, noDig) {   // src -> translated text (or src itself when there is nothing for it)
     const key = src.trim();
     if (!key || !dict) return src;
-    if (dict[key]) return src.replace(key, dict[key]);
-    const rx = I18N_RX[P.uiLang || 'en'];
-    if (rx) for (const [re, to] of rx) if (re.test(key)) return src.replace(key, key.replace(re, to));
-    return src;
+    const lang = P.uiLang || 'en', has = Object.prototype.hasOwnProperty;
+    let out = has.call(dict, key) ? dict[key] : null;
+    if (out === null) { const rx = I18N_RX[lang]; if (rx) for (const [re, to] of rx) if (re.test(key)) { out = key.replace(re, to); break; } }
+    const un = I18N_UNITS[lang], base = out === null ? key : out;
+    if (un && un.length && /\d|\bago\b|\bleft\b/.test(base)) {
+      let t = base; for (const [re, to] of un) t = t.replace(re, to);
+      if (t !== base && (out !== null || !/[A-Za-z]/.test(t.replace(I18N_KEEP[lang], '')))) out = t;
+    }
+    const dg = I18N_DIG[lang];
+    if (dg && P.uiDigits && !noDig) {
+      const b = out === null ? key : out;
+      if (/\d/.test(b) && !I18N_CLOCK.test(b) && !/[A-Za-z]/.test(b.replace(I18N_KEEP[lang], ''))) {   // only text that is fully in the language or only numbers: English sentences and titles keep their digits
+        const d = b.replace(/([A-Za-z]?)(\d+)/g, (m, pre, n) => pre ? m : n.replace(/\d/g, c => dg.map[c]));   // A2, B1 and the like keep their digits
+        if (d !== b) out = d;
+      }
+    }
+    return out === null ? src : src.replace(key, () => out);
   }
   function i18nNode(n, dict) {
     if (!n.parentElement || n.parentElement.closest(I18N_SKIP)) return;
     const rec = I18N_REC.get(n);
     const src = rec && n.nodeValue === rec.tr ? rec.o : n.nodeValue;   // still our text: go back to the original. Changed by the app: it is new
     if (!src.trim()) return;
-    const out = i18nTr(src, dict);
+    const out = i18nTr(src, dict, !!n.parentElement.closest(I18N_NODIGIT));
     if (n.nodeValue !== out) n.nodeValue = out;
     if (out !== src) I18N_REC.set(n, { o: src, tr: out }); else I18N_REC.delete(n);
-  }
-  /* placeholder, aria-label and title are attributes, not text nodes, so they get their own pass (same rules, same restore) */
-  const I18N_ATTRS = ['placeholder', 'aria-label', 'title'], I18N_AREC = new WeakMap();   // element -> { attr: { o, tr } }
-  function i18nAttr(e, dict) {
-    if (e.closest && e.closest(I18N_SKIP)) return;
-    for (const a of I18N_ATTRS) {
-      if (!e.hasAttribute(a)) continue;
-      const cur = e.getAttribute(a), recs = I18N_AREC.get(e) || {}, rec = recs[a];
-      const src = rec && cur === rec.tr ? rec.o : cur, out = i18nTr(src, dict);
-      if (cur !== out) e.setAttribute(a, out);
-      if (out !== src) { recs[a] = { o: src, tr: out }; I18N_AREC.set(e, recs); } else if (rec) { delete recs[a]; }
-    }
-  }
-  function i18nAttrWalk(root, dict) {
-    if (root.nodeType !== 1) return;
-    i18nAttr(root, dict);
-    root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e => i18nAttr(e, dict));
-  }
-  /* Bengali font: loaded only the first time Bengali is chosen (the service worker then keeps it for offline use).
-     The CSS that puts it in the font stack and loosens line height is at the end of 90-reader-sheet.css (:root:lang(bn)). */
-  function i18nFont(lang) {
-    if (lang !== 'bn' || document.getElementById('wt-bn-font')) return;
-    const l = document.createElement('link');
-    l.id = 'wt-bn-font'; l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap';
-    document.head.appendChild(l);
   }
   function i18nWalk(root, dict) {
     if (root.nodeType === 3) { i18nNode(root, dict); return; }
@@ -425,10 +423,39 @@
       i18nObs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: I18N_ATTRS });
     }
   }
+  /* One place to change the app language: saves it, keeps the Settings list in step, and re-translates the page. */
+  function setUiLang(code) {
+    P.uiLang = code; savePrefs();
+    const s = $('#in-uilang'); if (s) s.value = code;
+    i18nApply(); i18nDigitsRow();
+  }
+  /* Settings > Reading > Language: a "native digits" switch under the language list, only for a language that has `digits` (Bengali). */
+  function i18nDigitsRow() {
+    const sel = $('#in-uilang'); if (!sel) return;
+    const lang = P.uiLang || 'en', dg = I18N_DIG[lang]; let row = $('#row-uidigits');
+    if (!dg) { if (row) row.hidden = true; return; }
+    if (!row) {
+      row = h('div', { class: 'row', id: 'row-uidigits' },
+        h('label', { for: 'in-uidigits' }, h('h3', { style: 'margin:0' }, ''), h('small', { style: 'color:var(--muted)' }, '')),
+        h('input', { id: 'in-uidigits', type: 'checkbox', onchange: e => { P.uiDigits = e.target.checked; savePrefs(); i18nApply(); } }));
+      const host = sel.closest('.row'); if (host) host.after(row); else return;
+    }
+    row.hidden = false; row.lang = lang;
+    $('h3', row).textContent = dg.label; $('small', row).textContent = dg.hint; $('#in-uidigits').checked = !!P.uiDigits;
+  }
+  /* First run only (no app language chosen yet): a language the browser prefers that has a `suggest` entry, or null.
+     Looks at the whole preference list, because many people have English first and their own language second. */
+  function i18nSuggest() {
+    if (P.uiLang) return null;
+    const list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+    for (const l of list) { const c = String(l).toLowerCase().split('-')[0]; if (I18N_SUG[c]) return c; }
+    return null;
+  }
   function i18nInit() {
     const sel = $('#in-uilang'); if (!sel) return;
     sel.textContent = ''; I18N_LANGS.forEach(l => sel.append(h('option', { value: l[0] }, l[1])));
     sel.value = P.uiLang || 'en';
-    sel.addEventListener('change', e => { P.uiLang = e.target.value; savePrefs(); i18nApply(); });
+    i18nDigitsRow();
+    sel.addEventListener('change', e => setUiLang(e.target.value));
     i18nApply();
   }

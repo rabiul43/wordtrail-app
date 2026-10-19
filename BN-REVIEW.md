@@ -23,6 +23,29 @@ The list below is ordered by how unsure the wording is. Each row: English | curr
 | Romance (genre) | প্রেমের গল্প | Fine for a genre shelf? |
 | Children (shelf) | শিশুদের বই | Or শিশুতোষ? |
 
+## 1b. First-run language offer (new)
+
+| English meaning | Current | Question |
+|---|---|---|
+| Use this app in Bengali? | এই অ্যাপ বাংলায় ব্যবহার করবেন? | Natural for a first screen? |
+| Yes, in Bengali | হ্যাঁ, বাংলায় | |
+| Also show the app in Bengali (step 2 button) | অ্যাপও বাংলায় দেখান | Clear that it changes the whole app, not only translations? |
+| Other language… | অন্য ভাষা… | |
+
+The "no" button deliberately stays in English ("Continue in English") so a person who wants English can find it.
+
+## 1c. Durations, counts and digits (new)
+
+| English | Current | Question |
+|---|---|---|
+| h / min / s | ঘণ্টা / মিনিট / সেকেন্ড | Fine to spell out in full on small tiles ("4 ঘণ্টা 15 মিনিট" is longer than "4h 15m")? Short forms (ঘ., মি.) possible |
+| ago / left | আগে / বাকি | "45 মিনিট আগে", "2 ঘণ্টা 5 মিনিট বাকি" |
+| under 1 min left | 1 মিনিটেরও কম বাকি | |
+| N books / tracks / sentences … | Nটি বই, Nটি ট্র্যাক, Nটি বাক্য | "টি" for every noun, "জন" for authors. Correct for all of them? |
+| 1.2K / 1.2M | 1.2 হাজার / 1.2 মিলিয়ন | Or লাখ / কোটি for Bangladesh? |
+| Speed 1.25x | 1.25× | |
+| Settings: native digits | বাংলা অঙ্ক (০১২৩) — "সংখ্যা বাংলা অঙ্কে দেখান। প্লেয়ারের সময় (0:00) আগের মতোই থাকে।" | Wording of the switch |
+
 ## 2. Tone and register (formal আপনি is used everywhere; check it feels right)
 
 | English | Current |

@@ -209,3 +209,12 @@ button.ss-trk[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offs
 .ss-pick strong { font-size: .9rem; }
 .ss-pick span { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
 
+
+/* First-run offer to use the app in the browser's language (shown above the logo), and the one-tap "also in <language>" button in step 2 */
+.ob-ui { display: flex; flex-direction: column; gap: .6rem; padding: .75rem .9rem; border: 1.5px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.ob-ui p { margin: 0; font-weight: 600; font-size: .95rem; line-height: 1.5; }
+.ob-ui-btns { display: flex; gap: .5rem; }
+.ob-ui-btns button { flex: 1; min-height: 2.75rem; padding: .5rem .8rem; border: 1.5px solid var(--line); border-radius: 10px; background: transparent; color: var(--ink); font: 600 .9rem/1.4 var(--font-ui); cursor: pointer; }
+.ob-ui-btns button.yes { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ob-also { grid-column: 1 / -1; width: 100%; margin-top: .25rem; }
+.ob-also[hidden] { display: none; }
