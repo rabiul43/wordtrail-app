@@ -10,6 +10,15 @@
     var sa = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true || /[?&]splash(=|&|$)/.test(location.search);
     if (!sa || r.classList.contains('resuming')) return;
     var L = []; try { L = JSON.parse(localStorage.getItem('wt:splash') || '[]') || []; } catch (e) { L = []; }
+    /* books you already have on this device come first (they have real covers saved from earlier visits), then the saved catalogue list */
+    try {
+      var mine = [], seen = {}, add = function (r) { if (r && r.cover && /^https?:/.test(r.cover) && r.title && !seen[r.cover]) { seen[r.cover] = 1; mine.push({ t: String(r.title).slice(0, 60), a: String(r.authors || '').split(',')[0].slice(0, 40), c: r.cover }); } };
+      var rd = function (k) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
+      add(JSON.parse(localStorage.getItem('wt:open') || 'null')); rd('wt:favs').forEach(add); rd('wt:listens').forEach(add);
+      try { ((JSON.parse(localStorage.getItem('wt:prefs') || '{}') || {}).recents || []).forEach(add); } catch (e) { /* none */ }
+      L.forEach(function (x) { if (x && x.c && !seen[x.c]) { seen[x.c] = 1; mine.push(x); } });
+      L = mine.slice(0, 40);
+    } catch (e) { /* use the saved list only */ }
     var PAL = [['#E8E1CF', '#2B3A2E', '#7FA67A'], ['#1E2A44', '#E6D9B8', '#C0392B'], ['#5A1420', '#F1E6D2', '#1A0A0E'], ['#0F4C5C', '#F3EBDD', '#E0B15A'], ['#7A3E8E', '#FFF3D6', '#F2B8D0'], ['#E0B15A', '#1A1405', '#8A5E10'], ['#2F3E5C', '#F1E6D2', '#B04B5A'], ['#C65D3B', '#FFF1DE', '#7A2E18'], ['#3C4A3A', '#EDE6D3', '#8FA38C'], ['#101A3A', '#F4E9C6', '#4F7CAC']];
     var F = [['Pride and Prejudice', 'Austen'], ['Frankenstein', 'Shelley'], ['Dracula', 'Stoker'], ['Moby-Dick', 'Melville'], ['Alice in Wonderland', 'Carroll'], ['Sherlock Holmes', 'Doyle'], ['Jane Eyre', 'Bront\u00eb'], ['Great Expectations', 'Dickens'], ['Wuthering Heights', 'Bront\u00eb'], ['The Time Machine', 'Wells']].map(function (x) { return { t: x[0], a: x[1] }; });
     var items = L.length >= 8 ? L : F, n = items.length;
