@@ -138,3 +138,21 @@
 #fpanel .fp-foot .btn { min-height: 2.75rem; }
 #fpanel .fp-foot .btn:last-child { flex: 1; }
 @media (prefers-reduced-motion: reduce) { .fp-tg, .fp-tg::after { transition: none; } }
+
+/* ---------- Bengali (app language bn) ----------
+   The script is loaded lazily by i18nFont() in 200-player-controls.js. Inter / Fraunces / Newsreader have no Bengali glyphs,
+   so Noto Sans Bengali goes right after the Latin font: English text keeps its font, Bengali falls through to it.
+   Bengali has tall upper marks and deep lower marks (ূ, ু, ্য, র‍্য), so the tight line heights used for English
+   (1.1 to 1.35) clip them, most of all in the clamped or one-line ellipsis boxes. */
+:root:lang(bn) {
+  --font-display: 'Fraunces', 'Newsreader', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', 'Noto Sans Bengali', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-read: 'Newsreader', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
+}
+:root:lang(bn) body { line-height: 1.6; }
+:root:lang(bn) :is(.card .t, .tile .tile-t, .tile .tile-a, .tile .tile-r, .tile .tile-dur, .rm-t, .mini-txt strong, .track .tt,
+  .col-tile strong, #collections .tile .tile-t, .tile-cover .gc-t, .det-cover.mc .gc-t, .vp-name, .vp-meta, .vp-delta, .mr-d,
+  .hlp-t, .gh li, .ht-list li, .ob-lvl-t, .ob-lvl-d, .ob-sub, .ob-q-hd) { line-height: 1.55; }
+:root:lang(bn) :is(.ss-stat b, .ss-trk b, .ss-trk em, .slp-big, .dm-big) { line-height: 1.4; }
+/* one-line boxes that cut off overflow: a little room below for the deep marks */
+:root:lang(bn) :is(.tile .tile-a, .tile .tile-r, .rm-t, .mini-txt strong) { padding-bottom: .12em; }

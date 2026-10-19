@@ -343,22 +343,64 @@
      Settings > Reading > Language. Arabic and Urdu switch the whole page to right-to-left (the book text and the player
      controls stay left-to-right). The main screens, menus and Settings headings are translated; anything not in the
      dictionary below stays in English. To add a language or more words, add them to I18N and I18N_LANGS. */
-  const I18N_LANGS = [['en', 'English', 'ltr'], ['ar', 'العربية', 'rtl'], ['ur', 'اردو', 'rtl'], ['es', 'Español', 'ltr'], ['fr', 'Français', 'ltr']];
-  const I18N = {"ar": {"Library": "المكتبة", "Collections": "المجموعات", "Shelf": "الرف", "Account": "الحساب", "More": "المزيد", "Settings": "الإعدادات", "Tracks": "المقاطع", "Next up": "التالي", "Text and timing": "النص والتوقيت", "Words": "الكلمات", "Cinematic sound": "صوت سينمائي", "Characters": "الشخصيات", "Highlights and notes": "التمييزات والملاحظات", "Shadow reading": "القراءة بالمحاكاة", "Quick quiz": "اختبار سريع", "Focus page": "وضع التركيز", "How to use": "طريقة الاستخدام", "Playback": "التشغيل", "Reading": "القراءة", "Audio": "الصوت", "Timing": "التوقيت", "Storage": "التخزين", "Theme": "المظهر", "Text size": "حجم النص", "Line spacing": "تباعد الأسطر", "Reading font": "خط القراءة", "Line focus": "تركيز السطر", "Auto": "تلقائي", "Light": "فاتح", "Dark": "داكن", "Sepia": "سيبيا", "Language": "اللغة", "Skip intro": "تخطي المقدمة", "Offline storage": "التخزين دون اتصال", "Smart rewind": "إرجاع ذكي", "Download ahead": "التنزيل المسبق"}, "ur": {"Library": "لائبریری", "Collections": "مجموعے", "Shelf": "شیلف", "Account": "اکاؤنٹ", "More": "مزید", "Settings": "ترتیبات", "Tracks": "ٹریکس", "Next up": "اگلا", "Text and timing": "متن اور وقت", "Words": "الفاظ", "Cinematic sound": "سنیمائی آواز", "Characters": "کردار", "Highlights and notes": "نمایاں حصے اور نوٹس", "Shadow reading": "شیڈو ریڈنگ", "Quick quiz": "فوری کوئز", "Focus page": "فوکس صفحہ", "How to use": "استعمال کا طریقہ", "Playback": "پلے بیک", "Reading": "مطالعہ", "Audio": "آڈیو", "Timing": "وقت بندی", "Storage": "اسٹوریج", "Theme": "تھیم", "Text size": "متن کا سائز", "Line spacing": "سطروں کا فاصلہ", "Reading font": "مطالعے کا فونٹ", "Line focus": "سطر پر توجہ", "Auto": "خودکار", "Light": "روشن", "Dark": "گہرا", "Sepia": "سیپیا", "Language": "زبان", "Skip intro": "تعارف چھوڑیں", "Offline storage": "آف لائن اسٹوریج", "Smart rewind": "سمارٹ ریوائنڈ", "Download ahead": "پیشگی ڈاؤن لوڈ"}, "es": {"Library": "Biblioteca", "Collections": "Colecciones", "Shelf": "Estantería", "Account": "Cuenta", "More": "Más", "Settings": "Ajustes", "Tracks": "Pistas", "Next up": "A continuación", "Text and timing": "Texto y sincronía", "Words": "Palabras", "Cinematic sound": "Sonido cinematográfico", "Characters": "Personajes", "Highlights and notes": "Subrayados y notas", "Shadow reading": "Lectura en sombra", "Quick quiz": "Cuestionario rápido", "Focus page": "Página de enfoque", "How to use": "Cómo usar", "Playback": "Reproducción", "Reading": "Lectura", "Audio": "Audio", "Timing": "Sincronía", "Storage": "Almacenamiento", "Theme": "Tema", "Text size": "Tamaño del texto", "Line spacing": "Interlineado", "Reading font": "Fuente de lectura", "Line focus": "Enfoque de línea", "Auto": "Auto", "Light": "Claro", "Dark": "Oscuro", "Sepia": "Sepia", "Language": "Idioma", "Skip intro": "Saltar introducción", "Offline storage": "Almacenamiento sin conexión", "Smart rewind": "Retroceso inteligente", "Download ahead": "Descarga anticipada"}, "fr": {"Library": "Bibliothèque", "Collections": "Collections", "Shelf": "Étagère", "Account": "Compte", "More": "Plus", "Settings": "Réglages", "Tracks": "Pistes", "Next up": "À suivre", "Text and timing": "Texte et synchro", "Words": "Mots", "Cinematic sound": "Ambiance cinéma", "Characters": "Personnages", "Highlights and notes": "Surlignages et notes", "Shadow reading": "Lecture en écho", "Quick quiz": "Quiz rapide", "Focus page": "Page de concentration", "How to use": "Mode d'emploi", "Playback": "Lecture audio", "Reading": "Lecture", "Audio": "Audio", "Timing": "Synchro", "Storage": "Stockage", "Theme": "Thème", "Text size": "Taille du texte", "Line spacing": "Interligne", "Reading font": "Police de lecture", "Line focus": "Focus de ligne", "Auto": "Auto", "Light": "Clair", "Dark": "Sombre", "Sepia": "Sépia", "Language": "Langue", "Skip intro": "Passer l'intro", "Offline storage": "Stockage hors ligne", "Smart rewind": "Retour intelligent", "Download ahead": "Téléchargement anticipé"}};
-  Object.assign(I18N, {"tr": {"Library": "Kütüphane", "Collections": "Koleksiyonlar", "Shelf": "Raf", "Account": "Hesap", "More": "Daha fazla", "Settings": "Ayarlar", "Tracks": "Parçalar", "Next up": "Sıradaki", "Text and timing": "Metin ve zamanlama", "Words": "Kelimeler", "Cinematic sound": "Sinematik ses", "Characters": "Karakterler", "Highlights and notes": "Vurgular ve notlar", "Shadow reading": "Gölge okuma", "Quick quiz": "Hızlı sınav", "Focus page": "Odak sayfası", "How to use": "Nasıl kullanılır", "Playback": "Oynatma", "Reading": "Okuma", "Audio": "Ses", "Timing": "Zamanlama", "Storage": "Depolama", "Theme": "Tema", "Text size": "Metin boyutu", "Line spacing": "Satır aralığı", "Reading font": "Okuma yazı tipi", "Line focus": "Satır odağı", "Auto": "Otomatik", "Light": "Açık", "Dark": "Koyu", "Sepia": "Sepya", "Language": "Dil", "Skip intro": "Girişi atla", "Offline storage": "Çevrimdışı depolama", "Smart rewind": "Akıllı geri sarma", "Download ahead": "Önceden indirme"}, "bn": {"Library": "লাইব্রেরি", "Collections": "সংগ্রহ", "Shelf": "তাক", "Account": "অ্যাকাউন্ট", "More": "আরও", "Settings": "সেটিংস", "Tracks": "ট্র্যাক", "Next up": "এরপর", "Text and timing": "লেখা ও সময়", "Words": "শব্দ", "Cinematic sound": "সিনেমাটিক শব্দ", "Characters": "চরিত্র", "Highlights and notes": "হাইলাইট ও নোট", "Shadow reading": "শ্যাডো রিডিং", "Quick quiz": "দ্রুত কুইজ", "Focus page": "ফোকাস পাতা", "How to use": "কীভাবে ব্যবহার করবেন", "Playback": "প্লেব্যাক", "Reading": "পড়া", "Audio": "অডিও", "Timing": "সময় নির্ধারণ", "Storage": "স্টোরেজ", "Theme": "থিম", "Text size": "লেখার আকার", "Line spacing": "লাইনের ব্যবধান", "Reading font": "পড়ার ফন্ট", "Line focus": "লাইন ফোকাস", "Auto": "স্বয়ংক্রিয়", "Light": "হালকা", "Dark": "গাঢ়", "Sepia": "সেপিয়া", "Language": "ভাষা", "Skip intro": "ভূমিকা এড়িয়ে যান", "Offline storage": "অফলাইন স্টোরেজ", "Smart rewind": "স্মার্ট রিওয়াইন্ড", "Download ahead": "আগাম ডাউনলোড"}, "de": {"Library": "Bibliothek", "Collections": "Sammlungen", "Shelf": "Regal", "Account": "Konto", "More": "Mehr", "Settings": "Einstellungen", "Tracks": "Titel", "Next up": "Als Nächstes", "Text and timing": "Text und Timing", "Words": "Wörter", "Cinematic sound": "Kino-Sound", "Characters": "Figuren", "Highlights and notes": "Markierungen und Notizen", "Shadow reading": "Shadow-Reading", "Quick quiz": "Kurzquiz", "Focus page": "Fokusseite", "How to use": "Anleitung", "Playback": "Wiedergabe", "Reading": "Lesen", "Audio": "Audio", "Timing": "Timing", "Storage": "Speicher", "Theme": "Design", "Text size": "Textgröße", "Line spacing": "Zeilenabstand", "Reading font": "Leseschrift", "Line focus": "Zeilenfokus", "Auto": "Auto", "Light": "Hell", "Dark": "Dunkel", "Sepia": "Sepia", "Language": "Sprache", "Skip intro": "Intro überspringen", "Offline storage": "Offline-Speicher", "Smart rewind": "Intelligentes Zurückspulen", "Download ahead": "Vorab laden"}, "th": {"Library": "ห้องสมุด", "Collections": "คอลเลกชัน", "Shelf": "ชั้นหนังสือ", "Account": "บัญชี", "More": "เพิ่มเติม", "Settings": "การตั้งค่า", "Tracks": "แทร็ก", "Next up": "ถัดไป", "Text and timing": "ข้อความและเวลา", "Words": "คำศัพท์", "Cinematic sound": "เสียงแบบภาพยนตร์", "Characters": "ตัวละคร", "Highlights and notes": "ไฮไลต์และบันทึก", "Shadow reading": "การอ่านตามเสียง", "Quick quiz": "แบบทดสอบด่วน", "Focus page": "หน้าโฟกัส", "How to use": "วิธีใช้", "Playback": "การเล่น", "Reading": "การอ่าน", "Audio": "เสียง", "Timing": "จังหวะเวลา", "Storage": "พื้นที่จัดเก็บ", "Theme": "ธีม", "Text size": "ขนาดตัวอักษร", "Line spacing": "ระยะห่างบรรทัด", "Reading font": "ฟอนต์สำหรับอ่าน", "Line focus": "โฟกัสบรรทัด", "Auto": "อัตโนมัติ", "Light": "สว่าง", "Dark": "มืด", "Sepia": "ซีเปีย", "Language": "ภาษา", "Skip intro": "ข้ามช่วงเปิด", "Offline storage": "พื้นที่จัดเก็บออฟไลน์", "Smart rewind": "ย้อนกลับอัจฉริยะ", "Download ahead": "ดาวน์โหลดล่วงหน้า"}, "zh": {"Library": "图书馆", "Collections": "合集", "Shelf": "书架", "Account": "账户", "More": "更多", "Settings": "设置", "Tracks": "音轨", "Next up": "接下来", "Text and timing": "文本与同步", "Words": "单词", "Cinematic sound": "电影感音效", "Characters": "人物", "Highlights and notes": "标注与笔记", "Shadow reading": "跟读", "Quick quiz": "快速测验", "Focus page": "专注页面", "How to use": "使用方法", "Playback": "播放", "Reading": "阅读", "Audio": "音频", "Timing": "同步", "Storage": "存储", "Theme": "主题", "Text size": "文字大小", "Line spacing": "行距", "Reading font": "阅读字体", "Line focus": "行聚焦", "Auto": "自动", "Light": "浅色", "Dark": "深色", "Sepia": "护眼棕", "Language": "语言", "Skip intro": "跳过片头", "Offline storage": "离线存储", "Smart rewind": "智能回退", "Download ahead": "提前下载"}});
-  I18N_LANGS.push(['tr', 'Türkçe', 'ltr'], ['bn', 'বাংলা', 'ltr'], ['de', 'Deutsch', 'ltr'], ['th', 'ไทย', 'ltr'], ['zh', '中文', 'ltr']);
+  /* The words live in src/i18n/<code>.json (one file per language; build.py joins them into the #i18n-data block).
+     Each file: { name, dir, order, dict: { "English text": "translation" }, rx: [ [regex, replacement] ] }.
+     dict keys are the exact English text. rx is for text with numbers or names built in code ($1 = first match); it is
+     tried only when there is no exact key. To add a language: add src/i18n/xx.json (and `python build.py`). Missing words stay English.
+     Run `python tools/i18n_check.py xx` to list what a language still lacks. */
+  const I18N = {}, I18N_RX = {}, I18N_LANGS = [['en', 'English', 'ltr']];
+  try {
+    const D = JSON.parse(document.getElementById('i18n-data').textContent);
+    Object.keys(D).sort((x, y) => D[x].order - D[y].order).forEach(c => {
+      I18N[c] = D[c].dict || {}; I18N_RX[c] = (D[c].rx || []).map(r => [new RegExp(r[0]), r[1]]);
+      I18N_LANGS.push([c, D[c].name, D[c].dir || 'ltr']);
+    });
+  } catch (e) { /* no translations: the app stays in English */ }
   const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results';
   const I18N_REC = new WeakMap();   // text node -> { o: original text, tr: text we put there }
   let i18nObs = null;
+  function i18nTr(src, dict) {   // src -> translated text (or src itself when there is nothing for it)
+    const key = src.trim();
+    if (!key || !dict) return src;
+    if (dict[key]) return src.replace(key, dict[key]);
+    const rx = I18N_RX[P.uiLang || 'en'];
+    if (rx) for (const [re, to] of rx) if (re.test(key)) return src.replace(key, key.replace(re, to));
+    return src;
+  }
   function i18nNode(n, dict) {
     if (!n.parentElement || n.parentElement.closest(I18N_SKIP)) return;
     const rec = I18N_REC.get(n);
     const src = rec && n.nodeValue === rec.tr ? rec.o : n.nodeValue;   // still our text: go back to the original. Changed by the app: it is new
-    const key = src.trim();
-    if (!key) return;
-    const out = dict && dict[key] ? src.replace(key, dict[key]) : src;
+    if (!src.trim()) return;
+    const out = i18nTr(src, dict);
     if (n.nodeValue !== out) n.nodeValue = out;
     if (out !== src) I18N_REC.set(n, { o: src, tr: out }); else I18N_REC.delete(n);
+  }
+  /* placeholder, aria-label and title are attributes, not text nodes, so they get their own pass (same rules, same restore) */
+  const I18N_ATTRS = ['placeholder', 'aria-label', 'title'], I18N_AREC = new WeakMap();   // element -> { attr: { o, tr } }
+  function i18nAttr(e, dict) {
+    if (e.closest && e.closest(I18N_SKIP)) return;
+    for (const a of I18N_ATTRS) {
+      if (!e.hasAttribute(a)) continue;
+      const cur = e.getAttribute(a), recs = I18N_AREC.get(e) || {}, rec = recs[a];
+      const src = rec && cur === rec.tr ? rec.o : cur, out = i18nTr(src, dict);
+      if (cur !== out) e.setAttribute(a, out);
+      if (out !== src) { recs[a] = { o: src, tr: out }; I18N_AREC.set(e, recs); } else if (rec) { delete recs[a]; }
+    }
+  }
+  function i18nAttrWalk(root, dict) {
+    if (root.nodeType !== 1) return;
+    i18nAttr(root, dict);
+    root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e => i18nAttr(e, dict));
+  }
+  /* Bengali font: loaded only the first time Bengali is chosen (the service worker then keeps it for offline use).
+     The CSS that puts it in the font stack and loosens line height is at the end of 90-reader-sheet.css (:root:lang(bn)). */
+  function i18nFont(lang) {
+    if (lang !== 'bn' || document.getElementById('wt-bn-font')) return;
+    const l = document.createElement('link');
+    l.id = 'wt-bn-font'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap';
+    document.head.appendChild(l);
   }
   function i18nWalk(root, dict) {
     if (root.nodeType === 3) { i18nNode(root, dict); return; }
@@ -369,16 +411,18 @@
   function i18nApply() {
     const lang = P.uiLang || 'en', meta = I18N_LANGS.find(x => x[0] === lang) || I18N_LANGS[0], dict = I18N[meta[0]] || null;
     document.documentElement.lang = meta[0]; document.documentElement.dir = meta[2];
-    i18nWalk(document.body, dict);
+    i18nFont(meta[0]);
+    i18nWalk(document.body, dict); i18nAttrWalk(document.body, dict);
     if (i18nObs) { i18nObs.disconnect(); i18nObs = null; }
     if (dict) {
       i18nObs = new MutationObserver(ms => {
         for (const m of ms) {
           if (m.type === 'characterData') i18nWalk(m.target, dict);
-          else m.addedNodes.forEach(n => { if (n.nodeType === 3 || n.nodeType === 1) i18nWalk(n, dict); });
+          else if (m.type === 'attributes') i18nAttr(m.target, dict);
+          else m.addedNodes.forEach(n => { if (n.nodeType === 3 || n.nodeType === 1) { i18nWalk(n, dict); i18nAttrWalk(n, dict); } });
         }
       });
-      i18nObs.observe(document.body, { childList: true, subtree: true, characterData: true });
+      i18nObs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: I18N_ATTRS });
     }
   }
   function i18nInit() {

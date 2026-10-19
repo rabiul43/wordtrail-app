@@ -43,7 +43,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 466 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 654 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
-| `200-player-controls.js` | 313 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout |
+| `200-player-controls.js` | 313 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
 | `210-sound-mixer.js` | 680 | background sound mixer, real recordings |
 | `220-story-sounds.js` | 406 | story sounds |
 | `230-scene-detection.js` | 835 | scene detection |

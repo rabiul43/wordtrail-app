@@ -12,7 +12,7 @@ The order below is the order of the final file. It matters: CSS is a layered cas
 and the script is one closure, so a piece may only use names declared above it.
 To add a piece: create the file in src/ and add one line here, at the right place.
 """
-import hashlib, os, shutil, sys
+import hashlib, json, os, shutil, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,6 +40,9 @@ PARTS = [
     ('lit', '<script type="application/json" id="amb-map">\n'),
     ('file', 'src/data/amb-map.json'),
     ('lit', '</script>\n'),
+    ('lit', '<script type="application/json" id="i18n-data">\n'),
+    ('i18n', 'src/i18n'),
+    ('lit', '\n</script>\n'),
     ('file', 'src/html/30-sheets-settings.html'),
     ('lit', '<script>\n'),
     ('file', 'src/js/005-settings-tabs.js'),
@@ -98,6 +101,14 @@ def build(include_dev=False):
                 out.append(value.encode("utf-8"))
         elif kind == "lit":
             out.append(value.encode("utf-8"))
+        elif kind == "i18n":
+            # one JSON file per language in src/i18n/ -> one JSON object {code: {...}} (the code is the file name)
+            langs = {}
+            for name in sorted(os.listdir(os.path.join(ROOT, value))):
+                if name.endswith(".json"):
+                    with open(os.path.join(ROOT, value, name), "r", encoding="utf-8") as f:
+                        langs[name[:-5]] = json.load(f)
+            out.append(json.dumps(langs, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/").encode("utf-8"))
         else:
             if value in DEV_PARTS and not include_dev:
                 continue
