@@ -282,7 +282,7 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
 .ptr.ready .ptr-dot { border-color: var(--accent-soft); border-top-color: var(--accent); }
 .ptr.spin .ptr-dot { animation: ptrspin .8s linear infinite; }
 @keyframes ptrspin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .ptr { transition: none; } .ptr.spin .ptr-dot { animation: none; border-top-color: var(--accent); } }
+@media (prefers-reduced-motion: reduce) { .ptr { transition: none; } .ptr.spin .ptr-dot { animation: none; border-color: var(--accent-soft); border-top-color: var(--accent); border-right-color: var(--accent); } }
 
 /* ---------- Phase 11: press states, empty/error states, recent searches ---------- */
 .tile, .card, .genre-chip, .tab, .tile-more, .acct-link, .heart { transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }

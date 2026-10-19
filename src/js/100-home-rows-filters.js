@@ -353,7 +353,7 @@
   guideDoc('home', 'Refresh Home', "Pull down at the top of the Library tab to refresh the shelves.");
   /* ------ pull to refresh (Library tab, at the top of the page) ------ */
   const PTR_TRIGGER = 70;
-  let ptrBusy = false;
+  let ptrBusy = false, ptrNote = 0;
   function markStale(key) { const c = store.get(key, null); if (c && Array.isArray(c.books)) store.set(key, Object.assign({}, c, { t: 0 })); }
   async function refreshHome() {
     if (ptrBusy) return;
@@ -393,9 +393,17 @@
       if (y0 == null) return;
       const go = dy >= PTR_TRIGGER; y0 = null;
       if (!go) { paint(0); return; }
+      /* The spinner is the visual cue; the status line (a polite live region) is the spoken one. A search message already
+         showing there is left alone. */
+      const free = !el.status.textContent;
+      if (free) setStatus('Refreshing\u2026');
       paint(PTR_TRIGGER, true);
       await refreshHome();
       paint(0);
+      if (free && el.status.textContent === 'Refreshing\u2026') {
+        setStatus('Updated just now');
+        clearTimeout(ptrNote); ptrNote = setTimeout(() => { if (el.status.textContent === 'Updated just now') setStatus(''); }, 3000);
+      }
     }, { passive: true });
     document.addEventListener('touchcancel', () => { y0 = null; paint(0); }, { passive: true });
   }
