@@ -215,7 +215,7 @@
     setStatus('');
     progress(false);
     syncHomeRows(false);
-    if (focus) el.q.focus(); else el.q.blur();
+    if (focus) { el.q.focus(); showRQ(); } else el.q.blur(); // showRQ: focus() does nothing if the box already had focus
   }
   /* ------ Clear button wiring ------ */
   function initClearButton() {

@@ -84,13 +84,21 @@
   /* ------ search scope: All / Title / Author / Genre. Level and Read-along ready are set in the Filters sheet (100) and still narrow search results ------ */
   const RS = { all: [], scope: 'all', sort: 'best' };
   const SCOPE_HINT = { all: 'Search a title or author', title: 'Search by title', author: 'Search by author', genre: 'Search a genre, such as mystery' };
+  /* Does the normalised text contain this word? Exact part-of-word first; if not, a lightweight edit-distance check
+     against each word (1 edit for words of 4+ letters, 2 from 8), so Title / Author scope also forgives small typos. */
+  function rsHas(hay, t) {
+    if (hay.includes(t)) return true;
+    if (t.length < 4) return false;
+    const k = t.length >= 8 ? 2 : 1;
+    return hay.split(' ').some(w => Math.abs(w.length - t.length) <= k && sxDist(t, w, k) <= k);
+  }
   function rsFilter(list) {
     const q = el.q.value.trim();
     let out = list;
     if (RS.scope === 'genre' && q) out = (typeof catQuery === 'function' && catQuery({ genre: q, limit: 60 })) || [];
     else if ((RS.scope === 'title' || RS.scope === 'author') && q) {
       const toks = sxNorm(q).split(' ').filter(t => t && !SX_STOP.has(t));
-      if (toks.length) out = out.filter(b => { const hay = sxNorm(RS.scope === 'title' ? b.title : b.authors); return toks.every(t => hay.includes(t)) || toks.some(t => hay.includes(t)) && toks.length > 2; });
+      if (toks.length) out = out.filter(b => { const hay = sxNorm(RS.scope === 'title' ? b.title : b.authors); return toks.every(t => rsHas(hay, t)) || toks.some(t => rsHas(hay, t)) && toks.length > 2; });
     }
     if (lfActive()) out = out.filter(lfMatch);
     return out;

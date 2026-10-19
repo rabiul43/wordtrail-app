@@ -1008,11 +1008,18 @@
         h('button', { type: 'button', class: 'rchip-go', onclick: () => go(q) }, mk(clockPath), h('span', {}, q)),
         h('button', { type: 'button', class: 'rchip-x', 'aria-label': 'Remove ' + q + ' from recent searches', onclick: () => { store.set(RQ_KEY, getRQ().filter(x => x !== q)); showRQ(); } }, mk('M6 6l12 12M18 6L6 18'))))));
     }
-    const pop = POP.list.length >= 3 ? POP.list.slice(0, 6) : null;
-    box.append(h('div', { class: 'rq-head' }, h('span', {}, pop ? 'Popular right now' : 'Try one')));
-    if (pop) box.append(h('div', { class: 'rq-pop' }, ...pop.map((b, n) => h('button', { type: 'button', class: 'pop-row', onclick: () => { hideRQ(); el.q.blur(); openDetail(b); } },
-      h('span', { class: 'pop-n' }, String(n + 1)), coverNode(b), h('span', { class: 'pop-txt' }, h('span', { class: 'pop-t' }, b.title), h('span', { class: 'pop-a' }, b.authors || ''))))));
-    else box.append(h('div', { class: 'rq-ideas' }, ...IDEAS.slice(0, 6).map(t => h('button', { type: 'button', class: 'chip', onclick: () => go(t) }, t))));
+    const seen = new Set(list.map(x => x.toLowerCase()));
+    const ideas = IDEAS.filter(t => !seen.has(t.toLowerCase())).slice(0, 4);
+    if (ideas.length) {
+      box.append(h('div', { class: 'rq-head' }, h('span', {}, 'Try searching')));
+      box.append(h('div', { class: 'rq-ideas' }, ...ideas.map(t => h('button', { type: 'button', class: 'chip', onclick: () => go(t) }, t))));
+    }
+    const pop = POP.list.length >= 3 ? POP.list.slice(0, 5) : null;
+    if (pop) {
+      box.append(h('div', { class: 'rq-head' }, h('span', {}, 'Popular right now')));
+      box.append(h('div', { class: 'rq-pop' }, ...pop.map((b, n) => h('button', { type: 'button', class: 'pop-row', onclick: () => { hideRQ(); el.q.blur(); openDetail(b); } },
+        h('span', { class: 'pop-n' }, String(n + 1)), coverNode(b), h('span', { class: 'pop-txt' }, h('span', { class: 'pop-t' }, b.title), h('span', { class: 'pop-a' }, b.authors || ''))))));
+    }
     box.hidden = false;
   }
   function initRecentSearches() {
