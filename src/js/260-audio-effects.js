@@ -313,13 +313,16 @@
       try {
         if (!S.book || S.book.id !== id || S.sec !== sec) return;   // moved on while the art was being made
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: S.secs[sec].title, artist: [b.title, author].filter(Boolean).join(' \u00B7 '), album: b.title, artwork: art
+          title: (S.secs[sec] && S.secs[sec].title) || b.title || '', artist: [b.title, author].filter(Boolean).join(' \u00B7 '), album: b.title, artwork: art
         });
       } catch (e) { /* unsupported */ }
     };
-    const mk = u => [{ src: u, sizes: '512x512', type: 'image/jpeg' }];
+    /* The system picks the size that fits its card (96 = small notification, 192 = lock screen, 512 = large / Android tint),
+       so every image is listed at all three sizes; the built image is 512x512 and is scaled down by the system. */
+    const SZ = ['96x96', '192x192', '512x512'];
+    const mk = u => SZ.map(sizes => ({ src: u, sizes, type: 'image/jpeg' }));
     const have = MSART.get(String(id));
-    apply(have ? mk(have) : (b.cover ? [{ src: b.cover, sizes: '128x128' }] : []));
+    apply(have ? mk(have) : (b.cover ? SZ.map(sizes => ({ src: b.cover, sizes })) : []));
     if (have === undefined) msArt(b).then(u => { if (u) apply(mk(u)); });
   }
   /* ---------- "Skip intro" button: for tracks that have no automatic skip time (see cuts.json) ----------
