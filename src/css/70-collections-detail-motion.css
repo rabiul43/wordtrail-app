@@ -608,3 +608,8 @@ i.sv { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); } 
 .cb-rate { font-size: var(--label); color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 :root[data-calm] .tile-rate, :root[data-calm] .cb-rate { display: none; }   /* Calm mode: no scores or popularity numbers */
 html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* Account > Help: Feature guide, How to use and Keyboard shortcuts sit under one heading. Keyboard shortcuts needs a
+   keyboard, so it is hidden unless the main pointer is a mouse or trackpad (the shortcuts sheet and the ? key still work). */
+.acct-help { display: flex; flex-direction: column; gap: var(--sec-gap); }
+.acct-help h2 { margin: 0 0 .1rem .25rem; font: 600 var(--h2)/1.2 var(--font-display); letter-spacing: -.01em; color: var(--ink); text-transform: none; }
+@media not all and (hover: hover) and (pointer: fine) { #acct-keys { display: none; } }
