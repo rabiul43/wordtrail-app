@@ -105,7 +105,7 @@
         const d = await r.json();
         if (d && Array.isArray(d.b) && d.b.length) { d.fetched = Date.now(); idb.set('catalog', d); CAT.books = catInflate(d); }
       } catch (e) { /* keep older catalog if any; otherwise lvGet falls back to the live API */ }
-    })();
+    })().then(() => { try { splashRemember(); } catch (e) { /* splash list is optional */ } });
     return CAT.p;
   }
   /* Answers the same kinds of query lvGet sends to LibriVox. Returns null when it cannot (then the live API is used). */

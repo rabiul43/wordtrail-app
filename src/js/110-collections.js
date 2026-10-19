@@ -141,6 +141,7 @@
 
   function initHomeSections() {
     const bootSk = document.getElementById('boot-sk'); if (bootSk) bootSk.remove();
+    try { if (window.wtSplashDone) window.wtSplashDone(); } catch (e) { /* splash is optional */ }
     homeSkeletons();
     // Inject "See all" buttons into section headers now that JS is running
     const featHead = $('#sec-featured .home-section-head');

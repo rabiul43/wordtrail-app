@@ -21,3 +21,17 @@
     const pwaRegister = () => navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(e => { try { if (window.__wtDiag) window.__wtDiag.add('sw', (e && e.message) || e); } catch (x) { /* ignore */ } });
     if (document.readyState === 'complete') pwaRegister(); else window.addEventListener('load', pwaRegister, { once: true });
   }
+
+  /* Splash screen covers: keeps 24 real covers (title, author, image address) from the catalogue for the next launch, renewed every 3 days.
+     Read by the splash script in 10-body-views.html. Kept in localStorage directly, so it is not synced to the account. */
+  function splashRemember() {
+    try {
+      const old = parseInt(localStorage.getItem('wt:splash-t') || '0', 10) || 0;
+      if (Date.now() - old < 3 * 864e5 && localStorage.getItem('wt:splash')) return;
+      const eng = (CAT.books || []).filter(b => b.ia && b.cover && (!b.lang || /^english$/i.test(b.lang)));
+      if (eng.length < 8) return;
+      const pick = [];
+      for (let i = 0; i < 24 && eng.length; i++) { const b = eng.splice(Math.floor(Math.random() * eng.length), 1)[0]; pick.push({ t: String(b.title || '').slice(0, 60), a: String(b.authors || '').split(',')[0].slice(0, 40), c: b.cover }); }
+      localStorage.setItem('wt:splash', JSON.stringify(pick)); localStorage.setItem('wt:splash-t', String(Date.now()));
+    } catch (e) { /* storage unavailable */ }
+  }

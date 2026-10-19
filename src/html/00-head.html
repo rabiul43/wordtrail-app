@@ -31,6 +31,40 @@ html.resuming .boot-sk { display: none; }
 .boot-sk .card.sk .cover { background: var(--surface); border-radius: var(--r-sm); }
 @keyframes bootsk-out { to { visibility: hidden; height: 0; margin: 0; overflow: hidden; } }
 </style>
+<style>
+/* Splash: tilted wall of real covers while the installed app opens (built by the script in 10-body-views.html, removed by wtSplashDone) */
+#wt-splash { position: fixed; inset: 0; z-index: 9999; background: #0F1220; color: #F2EBDD; overflow: hidden; isolation: isolate; transition: opacity .35s ease; }
+#wt-splash.out { opacity: 0; pointer-events: none; }
+#wt-splash .sp-wall { position: absolute; left: 50%; top: -10%; width: 150%; height: 82%; transform: translateX(-50%) rotate(-14deg); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+#wt-splash .sp-col { overflow: hidden; }
+#wt-splash .sp-track { display: grid; gap: 12px; animation: sp-drift 34s linear infinite; }
+#wt-splash .sp-col:nth-child(even) .sp-track { animation-direction: reverse; animation-duration: 40s; }
+@keyframes sp-drift { to { transform: translateY(-50%); } }
+#wt-splash .sp-cv { position: relative; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: var(--c1); color: var(--c2); display: flex; flex-direction: column; justify-content: space-between; padding: 10px 9px; box-shadow: 0 8px 18px rgba(0,0,0,.45); }
+#wt-splash .sp-cv b { font: 600 .9rem/1.12 'Newsreader', Georgia, serif; position: relative; z-index: 1; }
+#wt-splash .sp-cv small { font: 400 .5rem/1.2 'Inter', system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; opacity: .85; position: relative; z-index: 1; }
+#wt-splash .sp-cv::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 75% 30%, var(--c3) 0 22%, transparent 23%); opacity: .9; }
+#wt-splash .sp-cv img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; z-index: 2; background: var(--c1); }
+#wt-splash .sp-cv img.ok { opacity: 1; }
+#wt-splash .sp-top { position: absolute; inset: 0 0 auto 0; height: 14%; background: linear-gradient(180deg, #0F1220, rgba(15,18,32,0)); z-index: 2; }
+#wt-splash .sp-fade { position: absolute; inset: auto 0 0 0; height: 56%; background: linear-gradient(180deg, rgba(15,18,32,0), rgba(15,18,32,.9) 46%, #0F1220 72%); z-index: 2; }
+#wt-splash .sp-copy { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: grid; justify-items: center; gap: 8px; text-align: center; padding: 0 24px calc(34px + env(safe-area-inset-bottom, 0px)); }
+#wt-splash .sp-logo { display: flex; align-items: center; gap: 9px; font: 500 1.9rem 'Newsreader', Georgia, serif; }
+#wt-splash .sp-logo svg { width: 32px; height: 32px; }
+#wt-splash .sp-logo rect { fill: #E0B15A; }
+#wt-splash .sp-line { font: 400 1.15rem/1.3 'Newsreader', Georgia, serif; max-width: 20ch; }
+#wt-splash .sp-go { margin-top: 10px; width: 64px; height: 52px; border-radius: 16px; border: 1px solid #2A3050; background: linear-gradient(180deg, #232846, #191D33); color: #E0B15A; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
+#wt-splash .sp-go svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#wt-splash .sp-go:focus-visible { outline: 2px solid #E0B15A; outline-offset: 3px; }
+#wt-splash .sp-logo, #wt-splash .sp-line, #wt-splash .sp-go { opacity: 0; transform: translateY(8px); animation: sp-up .7s ease-out forwards; }
+#wt-splash .sp-logo { animation-delay: .15s; } #wt-splash .sp-line { animation-delay: .4s; } #wt-splash .sp-go { animation-delay: .65s; }
+@keyframes sp-up { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #wt-splash { transition: none; }
+  #wt-splash .sp-track, #wt-splash .sp-logo, #wt-splash .sp-line, #wt-splash .sp-go { animation: none; }
+  #wt-splash .sp-logo, #wt-splash .sp-line, #wt-splash .sp-go { opacity: 1; transform: none; }
+}
+</style>
 <noscript><style>.boot-sk { display: none; }</style></noscript>
 <script>try { var __o = JSON.parse(localStorage.getItem('wt:open') || 'null'); if (__o && __o.id && localStorage.getItem('wt:onboarded')) { document.documentElement.classList.add('resuming'); setTimeout(function () { document.documentElement.classList.remove('resuming'); }, 8000); } } catch (e) {}</script>
 <script>
