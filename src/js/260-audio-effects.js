@@ -132,7 +132,7 @@
     $$('#seg-enh button').forEach(b => b.addEventListener('click', () => { silSync(); spdPaint(); }));
     el.speed.addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
     $('#b-hl').addEventListener('click', () => { closeSheets(); hlOpen(); });
-    $('#qk-set').addEventListener('click', () => openSheet('sheet-settings'));
+    $('#qk-set').addEventListener('click', () => openSettingsHome());
     $('#qk-t-speed').addEventListener('click', () => { buzz('tick'); qkOpt('speed'); });
     $('#qk-t-sleep').addEventListener('click', () => { buzz('tick'); qkOpt('sleep'); });
     /* Turning the sound on also lets the app read the scene from where the reader is now, so no scene has to be picked by hand */

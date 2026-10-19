@@ -32,5 +32,6 @@
     dn.hidden=!q||any;
   }
   dq.addEventListener('input',filt);
+  window.wtDevOn=function(){ return !dev.hidden; };
   window.wtSettingsTab=function(name,force){ if(name==='dev'&&force) unlock(true); show(name); };
 })();

@@ -196,6 +196,124 @@
       c ? h('p', { class: 'help', text: (c.live ? 'Removed ' : 'Would remove ') + c.dirs.length + ' stale folders and ' + c.runs + ' old failed runs (older than ' + c.days + ' days).' }) : null));
     box.hidden = false;
   }
+  /* ---------- Settings home ----------
+     One front door for settings: a search box, then Basics and Advanced. Every row opens an EXISTING sheet as a
+     sub-page (Playback speed, Quick controls for the sleep timer, Cinematic sound, Pre-sync) or the tabbed Settings
+     sheet (now "All settings") scrolled to the right setting; nothing was rewritten. While a sub-page was opened from
+     here (SMH.from), its header gets a Back button (smBackSync, called by openSheet in 270), and Back, Escape and
+     swipe-back return here (sheetBack) instead of closing everything. Search covers these rows, every label and
+     heading in the tabbed Settings, and the book tools of the More menu (marked "Book tool"; they need an open book).
+     Developer and Diagnostics rows appear only after Developer is unlocked (7 taps on this title, as before). */
+  var SMH = { from: false, q: '', idx: null, taps: 0, t: 0 };
+  const smTheme = () => ({ auto: 'Auto', light: 'Light', dark: 'Dark', sepia: 'Sepia', contrast: 'High contrast' }[P.theme] || 'Auto');
+  const smNorm = s => String(s || '').replace(/\s+/g, ' ').trim();
+  const smDev = () => !!(window.wtDevOn && window.wtDevOn());
+  function smMark(node) {   // scroll to a setting, outline it for a moment (no animation) and focus its control
+    if (!node) return;
+    setTimeout(() => {
+      node.scrollIntoView({ block: 'center' }); node.classList.add('sh-hit'); setTimeout(() => node.classList.remove('sh-hit'), 2400);
+      const f = node.matches('label[for]') ? document.getElementById(node.getAttribute('for')) : node.querySelector('input, select, button');
+      if (f && !f.closest('[hidden]')) { try { f.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
+    }, 60);
+  }
+  const smH3 = (tab, text) => { const h3 = $$('#sheet-settings .sp[data-sp="' + tab + '"] h3').find(x => smNorm(x.textContent).toLowerCase().startsWith(text.toLowerCase())); return h3 ? (h3.closest('.row') || h3.parentElement) : null; };
+  function smOpenTab(tab, find) {
+    SMH.from = true; openSheet('sheet-settings'); window.wtSettingsTab(tab);
+    smMark(typeof find === 'function' ? find() : null);
+  }
+  /* [section, key, icon, name, description, value, search words, action, 'dev' when it needs Developer unlocked] */
+  const smRows = () => [
+    ['basics', 'theme', 'i-m-contrast', 'Theme', 'Auto, Light, Dark, Sepia, High contrast', smTheme(), 'dark light sepia contrast colour color night', () => smOpenTab('reading', () => smH3('reading', 'Theme'))],
+    ['basics', 'text', 'i-m-texts', 'Text', 'Size, line spacing, reading font', '', 'font size line spacing dyslexia lexend atkinson opendyslexic bigger larger', () => smOpenTab('reading', () => smH3('reading', 'Text size'))],
+    ['basics', 'speed', 'i-m-zap', 'Speed', 'Playback speed and finer steps', +(+P.speed).toFixed(2) + 'x', 'faster slower pace skip silence voice boost mono balance volume', () => { SMH.from = true; spdPaint(); openSheet('sheet-speed'); }],
+    ['basics', 'sleep', 'i-m-clock', 'Sleep timer', 'Stop after a set time or at the end of a track', !S.sleep ? 'Off' : S.sleep === 'chapter' ? 'End of track' : S.sleep + ' min', 'bedtime timer stop night', () => {
+      if (!S.book) { toast('Open a book to set a sleep timer.', 3500); return; }
+      SMH.from = true; qkOpt('sleep'); qkPaint(); openSheet('sheet-quick'); }],
+    ['basics', 'all', 'i-m-sliders', 'All basic settings', 'Language, Calm mode, Customise home, audio, storage', '', 'language calm home audio storage reading everything', () => smOpenTab('reading')],
+    ['advanced', 'timing', 'i-m-target', 'Precise timing', 'Read-along from speech recognition', '', 'sync highlight alignment drift timing', () => smOpenTab('sync', () => smH3('sync', 'Precise read-along'))],
+    ['advanced', 'presync', 'i-m-refresh', 'Pre-sync books', 'Prepare timing ahead of time', '', 'github precompute sync batch', () => { SMH.from = true; $('#btn-presync').click(); }],
+    ['advanced', 'amb', 'i-m-wave', 'Cinematic sound', 'Background sounds, story sounds and presets', '', 'ambient rain fire background music effects scene sound', () => { SMH.from = true; ambOpen(); }],
+    ['advanced', 'dev', 'i-m-code', 'Developer', 'Scene tests, sync and performance, clean-up', '', 'debug developer tools', () => smOpenTab('dev'), 'dev'],
+    ['advanced', 'diag', 'i-m-info', 'Diagnostics', 'Log errors and slow moments', '', 'log errors debug report', () => smOpenTab('dev', () => { const c = document.getElementById('in-diag'); return c && (c.closest('.row') || c); }), 'dev']
+  ];
+  const smRow = (name, desc, icon, val, pill, go) => h('button', { class: 'mrow sh-row', type: 'button', onclick: () => go() },
+    h('span', { class: 'mr-i', 'aria-hidden': 'true' }, svgIcon('#' + icon)),
+    h('span', { class: 'mr-main' }, h('span', { class: 'mr-t' }, name), h('span', { class: 'mr-d' }, desc)),
+    val ? h('span', { class: 'sh-val' }, val) : null, pill ? h('span', { class: 'sh-pill' }, pill) : null);
+  function smHomePaint() {
+    const box = $('#sh-home'); box.textContent = '';
+    [['basics', 'Basics'], ['advanced', 'Advanced']].forEach(([sec, title]) => {
+      const rows = smRows().filter(r => r[0] === sec && (r[8] !== 'dev' || smDev()));
+      box.append(h('section', { class: 'sh-sec', 'aria-label': title }, h('h3', {}, title), h('div', { class: 'more-list' }, rows.map(r => smRow(r[3], r[4], r[2], r[5], '', r[7])))));
+    });
+  }
+  /* everything that can be found: the rows above, each label and heading in the tabbed Settings, and the book tools */
+  function smIndex() {
+    const out = [], seen = new Set(), dev = smDev();
+    smRows().filter(r => r[8] !== 'dev' || dev).forEach(r => { seen.add(r[3].toLowerCase()); out.push({ name: r[3], desc: (r[0] === 'basics' ? 'Basics' : 'Advanced') + ' \u00b7 ' + r[4], hay: (r[3] + ' ' + r[4] + ' ' + r[6]).toLowerCase(), icon: r[2], go: r[7] }); });
+    const tabs = {}; $$('#sp-tabs button').forEach(b => { tabs[b.dataset.sp] = smNorm(b.textContent); });
+    $$('#sheet-settings .sp').forEach(p => {
+      const tab = p.dataset.sp; if (tab === 'dev' && !dev) return;
+      const items = [];
+      $$('label', p).forEach(l => {
+        const h3 = $('h3', l), sm = $('small', l);
+        const name = h3 ? smNorm(h3.textContent) : smNorm([...l.childNodes].filter(n => !(n.nodeType === 1 && n.tagName === 'SMALL')).map(n => n.textContent).join(''));
+        items.push([l, name, sm ? smNorm(sm.textContent) : '']);
+      });
+      $$('h3', p).forEach(x => { if (!x.closest('label')) items.push([x, smNorm(x.textContent), '']); });
+      items.forEach(([n, name, d]) => {
+        name = name.slice(0, 90); const key = name.toLowerCase(); if (!name || seen.has(key)) return; seen.add(key);
+        const blk = n.closest('.row') || n.parentElement;
+        out.push({ name, desc: 'All settings \u203a ' + tabs[tab] + (d ? ' \u00b7 ' + d.slice(0, 80) : ''), hay: (name + ' ' + d + ' ' + tabs[tab]).toLowerCase(), icon: 'i-m-sliders', go: () => smOpenTab(tab, () => blk) });
+      });
+    });
+    const more = { 'b-hl': 'quote card share picture', 'b-next': 'next up more like this recommend', 'b-chars': 'characters people names', 'b-clips': 'audio clips record' };
+    const tool = (name, desc, hay, icon, go) => { if (seen.has(name.toLowerCase())) return; seen.add(name.toLowerCase()); out.push({ name, desc: 'Book tool \u00b7 ' + (S.book ? desc : 'open a book to use it'), hay: (name + ' ' + desc + ' ' + hay).toLowerCase(), icon, pill: 'Book tool', go }); };
+    tool('Quick controls', 'Speed, sleep timer and sound for this book', 'speed sleep sound player', 'i-m-sliders', () => { if (!S.book) { toast('Open a book first.', 3000); return; } qkOpt(''); qkPaint(); openSheet('sheet-quick'); });
+    $$('#more-list .mrow').forEach(b => {
+      const t = $('.mr-t', b), d = $('.mr-d', b); if (!t || b.hidden || b.id === 'btn-howto') return;
+      tool(smNorm(t.textContent), smNorm(d && d.textContent) || 'in the More menu', more[b.id] || '', 'i-m-layers', () => { if (!S.book) { toast('Open a book first.', 3000); return; } closeSheets(); b.click(); });
+    });
+    return out;
+  }
+  function smSearch(q) {
+    const res = $('#sh-res'), home = $('#sh-home'), cnt = $('#sh-count'); q = smNorm(q).toLowerCase();
+    $('#sh-clear').hidden = !q;
+    if (!q) { res.hidden = true; res.textContent = ''; home.hidden = false; cnt.hidden = true; return; }
+    if (!SMH.idx) SMH.idx = smIndex();
+    const toks = q.split(' '), hits = SMH.idx.filter(x => toks.every(t => x.hay.includes(t)))
+      .map(x => [x.name.toLowerCase().includes(toks[0]) ? 0 : 1, x]).sort((a, b) => a[0] - b[0]).slice(0, 30).map(x => x[1]);
+    home.hidden = true; res.hidden = false; res.textContent = '';
+    hits.forEach(x => res.append(smRow(x.name, x.desc, x.icon, '', x.pill, x.go)));
+    cnt.hidden = false; cnt.textContent = hits.length ? hits.length + (hits.length === 1 ? ' result' : ' results') : 'No settings match \u201c' + q + '\u201d. Clear the search to see everything.';
+  }
+  function smHomeOpen() {   // called by openSheet('sheet-sethome')
+    SMH.idx = null; $('#sh-q').value = SMH.q; smHomePaint(); smSearch(SMH.q);
+  }
+  function openSettingsHome() { SMH.from = false; SMH.q = ''; openSheet('sheet-sethome'); }
+  function smBack() {
+    if (AMB.preview) { AMB.preview = false; ambSync(); }
+    SMH.from = false; openSheet('sheet-sethome');
+  }
+  const sheetBack = () => { if (SMH.from) smBack(); else closeSheets(); };
+  /* a Back button in the header of a sub-page that was opened from Settings home */
+  function smBackSync(id) {
+    $$('.sh-back').forEach(b => b.remove());
+    if (!SMH.from || id === 'sheet-sethome') return;
+    const hd = $('#' + id + ' header'); if (!hd) return;
+    hd.prepend(h('button', { class: 'ib sh-back', type: 'button', 'aria-label': 'Back to Settings', onclick: smBack }, svgIcon('#i-back')));
+  }
+  function smWire() {
+    const q = $('#sh-q'), clr = $('#sh-clear');
+    q.addEventListener('input', () => { SMH.q = q.value; smSearch(q.value); });
+    q.addEventListener('keydown', e => { if (e.key === 'Escape' && q.value) { e.preventDefault(); e.stopPropagation(); q.value = ''; SMH.q = ''; smSearch(''); } });
+    clr.addEventListener('click', () => { q.value = ''; SMH.q = ''; smSearch(''); q.focus(); });
+    $('#h-sethome').addEventListener('click', () => {   // 7 quick taps unlock Developer, like the "All settings" title
+      const now = Date.now(); SMH.taps = now - SMH.t > 2000 ? 1 : SMH.taps + 1; SMH.t = now;
+      if (SMH.taps >= 7) { SMH.taps = 0; window.wtSettingsTab('dev', true); SMH.idx = null; smHomePaint(); smSearch(SMH.q); toast('Developer settings unlocked.', 2500); }
+    });
+  }
+  guideDoc('account', 'Settings home', "Account > Settings opens one page with a search box and two sections. Basics: theme, text, speed and the sleep timer. Advanced: precise timing, pre-sync, cinematic sound, and Developer and Diagnostics once Developer is unlocked. Each row opens the full panel, with a Back button to return. Search finds any setting, and the book tools in the More menu.", '2026-10-19');
   function fillSettings() {
     covSegSync();
     homeCustPaint();

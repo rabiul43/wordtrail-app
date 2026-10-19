@@ -621,3 +621,17 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .hc-n { color: var(--ink); font-size: var(--lead); }
 .hc-s { color: var(--muted); font-size: var(--label); }
 .hc-row input { flex: none; width: 1.5rem; height: 1.5rem; accent-color: var(--accent); }
+/* Settings home: search, Basics and Advanced rows (the rows reuse .mrow), and the Back button on sub-pages. */
+.sh-search { display: flex; align-items: center; gap: .6rem; min-height: 2.75rem; padding: 0 .3rem 0 .9rem; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface); margin-bottom: .9rem; }
+.sh-search:focus-within { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
+.sh-search > .ic { color: var(--muted); }
+.sheet .sh-search input[type="search"] { flex: 1; min-width: 0; min-height: 2.75rem; padding: 0; border: 0; border-radius: 0; outline: 0; box-shadow: none; background: transparent; color: var(--ink); font: inherit; width: auto; }
+.sh-search input::-webkit-search-cancel-button, .sh-search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
+.sh-sec + .sh-sec { margin-top: 1.2rem; }
+.sh-sec h3 { margin: 0 0 .5rem .25rem; }
+#sh-count { margin: 0 .25rem .6rem; }
+.sh-val, .sh-pill { flex: none; color: var(--muted); font-size: var(--label); font-weight: 400; white-space: nowrap; }
+.sh-pill { border: 1px solid var(--line); border-radius: var(--r-pill); padding: .15rem .6rem; }
+.sh-hit { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r-sm); }   /* no animation, so nothing to switch off for reduced motion */
+.sh-back { color: var(--accent); }
+.sh-back + h2 { flex: 1; }

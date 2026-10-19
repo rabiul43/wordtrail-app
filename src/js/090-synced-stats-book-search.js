@@ -194,7 +194,7 @@
     const t = document.getElementById('tpl-account'), m = $('#account');
     if (!t || !m) return;
     m.append(t.content.cloneNode(true)); t.remove(); acctReady = true;
-    $('#acct-settings').addEventListener('click', () => openSheet('sheet-settings'));
+    $('#acct-settings').addEventListener('click', () => openSettingsHome());
     $('#acct-guide').addEventListener('click', () => { initGuide(); openSheet('sheet-guide'); });
     $('#acct-howto').addEventListener('click', () => openSheet('sheet-howto'));
     $('#acct-keys').addEventListener('click', () => openSheet('sheet-keys'));

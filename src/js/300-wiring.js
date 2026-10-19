@@ -37,7 +37,7 @@
     audio.addEventListener('play', () => { S._miniOff = null; });
     const ssMore = document.querySelector('#sync-status .ss-more');
     if (ssMore) ssMore.addEventListener('toggle', () => { if (ssMore.open && S.book) measureFits(S.book); });
-    $('#btn-player-settings').addEventListener('click', () => { if (P.quickCtl !== false) { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); } else openSheet('sheet-settings'); });
+    $('#btn-player-settings').addEventListener('click', () => { if (P.quickCtl !== false) { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); } else openSettingsHome(); });
     $('#btn-fav').addEventListener('click', () => { if (S.book) toggleFav({ id: S.book.id, title: S.book.title, authors: S.book.authors, cover: S.book.cover, ia: S.book.ia, total: S.book.total, n: S.book.n, lang: S.book.lang }); });
     window.addEventListener('resize', setTabH);
     $('#b-health').addEventListener('click', loadHealth);
@@ -326,6 +326,7 @@
     $('#in-autodel').addEventListener('change', e => { P.autoDel = e.target.checked; savePrefs(); toast(P.autoDel ? 'Finished books will be removed from this device.' : 'Finished downloads are kept.', 2500); });
     $('#in-sharestats').addEventListener('change', e => { P.shareStats = e.target.checked; savePrefs(); });
     $('#in-lockseek').addEventListener('change', e => { P.lockSeek = e.target.checked; savePrefs(); initMediaSession(); });
+    smWire();   // Settings home: search and Developer unlock (290)
     homeCustInit();   // Customise home: apply the saved switches to the Library tab (100-home-rows-filters.js)
     $('#in-calm').addEventListener('change', e => { P.calm = e.target.checked; applyTheme(); savePrefs(); toast(P.calm ? 'Calm mode is on.' : 'Calm mode is off.', 2000); try { renderStats(); } catch (x) {} });
     $('#in-haptics').addEventListener('change', e => { P.haptics = e.target.checked; savePrefs(); if (P.haptics) buzz('medium'); });
@@ -376,7 +377,7 @@
     num('#in-nudge', v => { P.nudge = Math.max(-2, Math.min(2, v)); savePrefs(); tick(true); });
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && sheetOpen()) { closeSheets(); return; }
+      if (e.key === 'Escape' && sheetOpen()) { sheetBack(); return; }
       if (e.key === 'Escape' && NR.on) { nrClose(); return; }
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.target.closest('input, textarea, select')) { e.preventDefault(); openSheet('sheet-keys'); return; }
       if (el.player.hidden || sheetOpen() || e.ctrlKey || e.metaKey || e.altKey) return;

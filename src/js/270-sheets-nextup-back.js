@@ -203,13 +203,15 @@
     if (id === 'sheet-tracks') renderTracks();
     if (id === 'sheet-text') renderTextSheet();
     if (id === 'sheet-settings') fillSettings();
+    if (id === 'sheet-sethome') smHomeOpen();
     if (id === 'sheet-versions') renderVersions();
     $('#' + id).hidden = false; el.backdrop.hidden = false;
+    smBackSync(id);   // Back button when opened from Settings home (290)
     const cur = $('[aria-current="true"]', $('#' + id));
     if (cur) cur.scrollIntoView({ block: 'center' });
     histSoon();
   }
-  function closeSheets() { if (AMB.preview) { AMB.preview = false; ambSync(); } shCleanup(); try { clEdCleanup(); } catch (e) { /* clips not ready yet */ } $$('.sheet').forEach(s => { s.hidden = true; }); el.backdrop.hidden = true; histSoon(); }
+  function closeSheets() { SMH.from = false; if (AMB.preview) { AMB.preview = false; ambSync(); } shCleanup(); try { clEdCleanup(); } catch (e) { /* clips not ready yet */ } $$('.sheet').forEach(s => { s.hidden = true; }); el.backdrop.hidden = true; histSoon(); }
 
   guideDoc('home', 'Back button and swipe-back', "Back closes the top layer first (a panel, the player, a book page, an open collection) instead of leaving the app.");
   /* ---------- Back button / swipe-back ----------
@@ -230,7 +232,7 @@
   function histBack() {
     try {
       if (OB.layers()) OB.back();
-      else if ($$('.sheet').some(s => !s.hidden)) closeSheets();
+      else if ($$('.sheet').some(s => !s.hidden)) sheetBack();   // from a Settings sub-page, back goes to Settings home
       else if (NR.on) nrClose();
       else if (!el.player.hidden) $('#btn-back').click();
       else if (DET.book || DET.author) closeDetail();
