@@ -400,6 +400,32 @@
     if (n.nodeValue !== out) n.nodeValue = out;
     if (out !== src) I18N_REC.set(n, { o: src, tr: out }); else I18N_REC.delete(n);
   }
+  /* placeholder, aria-label and title are attributes, not text nodes, so they get their own pass (same rules, same restore) */
+  const I18N_ATTRS = ['placeholder', 'aria-label', 'title'], I18N_AREC = new WeakMap();   // element -> { attr: { o, tr } }
+  function i18nAttr(e, dict) {
+    if (e.closest && e.closest(I18N_SKIP)) return;
+    for (const a of I18N_ATTRS) {
+      if (!e.hasAttribute(a)) continue;
+      const cur = e.getAttribute(a), recs = I18N_AREC.get(e) || {}, rec = recs[a];
+      const src = rec && cur === rec.tr ? rec.o : cur, out = i18nTr(src, dict);
+      if (cur !== out) e.setAttribute(a, out);
+      if (out !== src) { recs[a] = { o: src, tr: out }; I18N_AREC.set(e, recs); } else if (rec) { delete recs[a]; }
+    }
+  }
+  function i18nAttrWalk(root, dict) {
+    if (root.nodeType !== 1) return;
+    i18nAttr(root, dict);
+    root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e => i18nAttr(e, dict));
+  }
+  /* Bengali font: loaded only the first time Bengali is chosen (the service worker then keeps it for offline use).
+     The CSS that puts it in the font stack and loosens line height is at the end of 90-reader-sheet.css (:root:lang(bn)). */
+  function i18nFont(lang) {
+    if (lang !== 'bn' || document.getElementById('wt-bn-font')) return;
+    const l = document.createElement('link');
+    l.id = 'wt-bn-font'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap';
+    document.head.appendChild(l);
+  }
   function i18nWalk(root, dict) {
     if (root.nodeType === 3) { i18nNode(root, dict); return; }
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = [];
