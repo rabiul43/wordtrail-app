@@ -475,6 +475,7 @@
       $$('button', chips).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === x.key)));
       line.textContent = x.line; row.setAttribute('aria-label', x.line);
       fillRow(row, x.books, x.more || null, 12);
+      newWeekPaint();   // the chip changed which books Picked for you shows: New this week repaints without them
       if (x.fresh) $$('.tile', row).forEach(t => { const c = t.querySelector('.tile-cover'); if (c && x.fresh.has(String(t._wtId))) c.append(h('span', { class: 'tile-new' }, 'New')); });
     };
     src.forEach(x => { const b = h('button', { class: 'fchip', type: 'button', 'aria-pressed': 'false', onclick: () => draw(x) }, x.label); b.dataset.k = x.key; chips.append(b); });

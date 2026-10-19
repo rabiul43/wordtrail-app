@@ -431,6 +431,38 @@
     }
   }
 
+  /* ------ one book, one row per screen ------
+     Rows on the same screen are filled by separate loaders that finish in any order, so each screen keeps the FULL list
+     every loader received (RW) and repaints its rows top to bottom, skipping any book a higher row already shows.
+     Painting is repeatable: when a higher row arrives late, the lower rows simply paint again without it.
+     Collections > #col-extra: Trending, then Featured, then Recently added.
+     Library: Picked for you (whatever chip is chosen) above New this week. */
+  const RW = { trending: null, featured: null, recent: null, nw: null };
+  const bookKey = b => String(b && b.id);
+  function colExtraPaint() {
+    const seen = new Set();
+    [['trending', '#trending-row', '#sec-trending', 20, 3, null],
+     ['featured', '#featured-row', '#sec-featured', HOME_LIMIT, 1, () => openSeeAll(SEE_FEATURED)],
+     ['recent', '#recent-row', '#sec-recent', HOME_LIMIT, 1, () => openSeeAll(SEE_RECENT)]].forEach(([k, rowSel, secSel, limit, min, more]) => {
+      if (!RW[k]) return;   // not loaded yet (or it failed and shows its own error card): leave the row alone
+      const row = $(rowSel), sec = $(secSel);
+      const books = RW[k].filter(b => !seen.has(bookKey(b))).slice(0, limit);
+      if (books.length < min) { row.textContent = ''; sec.hidden = true; return; }   // nothing new left for this row: hide it rather than show a repeat
+      books.forEach(b => seen.add(bookKey(b)));
+      fillRow(row, books, more, limit);
+      sec.hidden = false;
+    });
+  }
+  /* New this week, minus the books "Picked for you" (and a visible Book of the day) already show on Library */
+  function newWeekPaint() {
+    if (!RW.nw) return;
+    const nrow = $('#newweek-row'), nsec = $('#sec-newweek');
+    const seen = new Set($$('.tile', $('#sec-picks')).map(t => t._wtId).filter(Boolean).map(String));
+    const bo = $('#sec-botd .botd-hero'); if (bo && !$('#sec-botd').hidden && RW.botd) seen.add(String(RW.botd));
+    const books = RW.nw.filter(b => !seen.has(bookKey(b))).slice(0, 20);
+    if (books.length >= 3) { fillRow(nrow, books, null, 20); nsec.hidden = false; } else { nrow.textContent = ''; nsec.hidden = true; }
+  }
+
   /* ------ Featured section ------ */
   async function loadFeatured() {
     const row = $('#featured-row'), sec = $('#sec-featured'), errEl = $('#featured-err');
@@ -455,8 +487,8 @@
           .map(r => r.value[0]);
       },
       (books) => {
-        fillRow(row, books, () => openSeeAll(SEE_FEATURED), HOME_LIMIT);
-        sec.hidden = false;
+        RW.featured = books;
+        colExtraPaint();   // skips books Trending already shows
       },
       () => {
         row.textContent = '';
@@ -484,8 +516,8 @@
       TTL_RECENT,
       () => lvGet({ since: sinceTs, limit: 20 }, { light: true }),
       (books) => {
-        fillRow(row, books, () => openSeeAll(SEE_RECENT), HOME_LIMIT);
-        sec.hidden = false;
+        RW.recent = books;
+        colExtraPaint();   // skips books Trending and Featured already show
       },
       () => {
         row.textContent = '';
@@ -1049,12 +1081,13 @@
             h('span', { class: 'botd-a' }, b.authors || ''),
             blurb ? h('span', { class: 'botd-b' }, blurb) : null,
             h('span', { class: 'botd-go' }, svgIcon('#i-play'), 'Listen'))));
-        bsec.hidden = false;
-      } else bsec.hidden = true;
+        bsec.hidden = false; RW.botd = b.id;
+      } else { bsec.hidden = true; RW.botd = null; }
+      newWeekPaint();
       const books = (d.trending || []).map(i => map.get(String(i))).filter(b => b && okLang(b)).slice(0, 20).map(pub);
       POP.list = books.slice(0, 8);
-      const row = $('#trending-row'), tsec = $('#sec-trending');
-      if (books.length >= 3) { fillRow(row, books, null, 20); tsec.hidden = false; } else tsec.hidden = true;
+      RW.trending = books.length >= 3 ? books : [];   // fewer than three is not a row (colExtraPaint hides it)
+      colExtraPaint();   // Trending is the top row, so Featured and Recently added repaint without its books
     } catch (e) { /* the rows stay hidden */ }
     finally { HSK.done.daily = true; skSweep('sec-botd'); }
   }
@@ -1134,8 +1167,7 @@
   async function loadCuration() {
     try {
       const d = await curBuild(20); if (!d) return;
-      const nrow = $('#newweek-row'), nsec = $('#sec-newweek');
-      if (d.nw.length >= 3) { fillRow(nrow, d.nw, null, 20); nsec.hidden = false; } else nsec.hidden = true;
+      RW.nw = d.nw; newWeekPaint();   // New this week skips books already in Picked for you
       // Home keeps one compact card that opens the Collections tab.
       const wrap = $('#sec-collections'); wrap.textContent = '';
       const shelves = colShelves(d);
