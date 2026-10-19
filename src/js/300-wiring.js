@@ -484,7 +484,6 @@
     const lvBtns  = [0, 1, 2].map(i => $('ob-pick-' + i));
     const plBtn   = $('ob-pick-pl');
     const next0   = $('ob-next-0');
-    const skip0   = $('ob-skip-0');
     const step0   = $('ob-step-0');
     const step1   = $('ob-step-1');
     const quiz    = $('ob-quiz');
@@ -496,7 +495,6 @@
     const langGrid = $('ob-lang-grid');
     const langSel  = $('ob-lang-sel');
     const obDone  = $('ob-done');
-    const skip1   = $('ob-skip-1');
     const dots    = [$('ob-dot-0'), $('ob-dot-1')];
 
     /* --- Language lists --- */
@@ -589,7 +587,6 @@
     };
 
     next0.addEventListener('click', goStep1);
-    skip0.addEventListener('click', () => { chosenLvl = null; goStep1(); });
 
     /* --- Build language grid --- */
     let pickedLang = null;
@@ -653,8 +650,8 @@
     }
 
     obDone.addEventListener('click', finish);
-    skip1.addEventListener('click', finish);
-    $('ob-skip-top').addEventListener('click', finish);
+    /* "Skip for now" (bottom of the card, every step): no level picked yet -> Medium; a level already picked or won in the quiz is kept. Then onboarding is marked done by finish(). */
+    $('ob-skip-now').addEventListener('click', () => { if (chosenLvl === null) chosenLvl = 1; finish(); });
 
     /* --- Show the overlay --- */
     /* Restore level pref if user somehow has one (e.g. from backup) and is seeing onboarding again */

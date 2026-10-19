@@ -3,7 +3,6 @@
 
 <!-- ===================== First-run onboarding overlay ===================== -->
 <div id="ob-overlay" hidden role="dialog" aria-modal="true" aria-label="Welcome to Wordtrail">
-  <button class="ob-skip-top" id="ob-skip-top" type="button">Skip ✕</button>
   <div class="ob-card">
 
     <!-- Logo -->
@@ -69,7 +68,6 @@
 
       <div class="ob-actions">
         <button class="ob-btn" id="ob-next-0" type="button" disabled>Continue</button>
-        <button class="ob-skip" id="ob-skip-0" type="button">Skip — show me everything</button>
       </div>
     </div>
 
@@ -85,9 +83,11 @@
 
       <div class="ob-actions">
         <button class="ob-btn" id="ob-done" type="button">Start reading</button>
-        <button class="ob-skip" id="ob-skip-1" type="button">Skip</button>
       </div>
     </div>
+
+    <!-- Skip for now: always visible at the bottom of the card, on every step -->
+    <button class="ob-skip-now" id="ob-skip-now" type="button">Skip for now</button>
 
   </div>
 </div>
