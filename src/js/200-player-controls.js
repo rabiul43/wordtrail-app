@@ -101,7 +101,7 @@
   function setSleep(v) {
     if (v !== 0 && S.book) trAdd({ sec: S.sec, time: nowT(), why: 'sleep' });
     clearTimeout(S.sleepTimer); cancelFade(); S.sleep = v;
-    el.sleep.textContent = v === 0 ? 'Sleep' : v === 'chapter' ? 'Track end' : v + ' min';
+    el.sleep.querySelector('.ub-l').textContent = sleepShort(v);
     el.sleep.dataset.on = String(v !== 0);
     el.sleep.setAttribute('aria-label', sleepLabel(v));
     nrSleep(v);

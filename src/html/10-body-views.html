@@ -338,7 +338,6 @@
 
   <div id="reader" class="reader" tabindex="0" aria-label="Book text">
     <div id="pcover" class="pcover" aria-hidden="true"></div>
-    <div class="pcover-ctl"><button id="b-speed" class="chip" aria-label="Playback speed">1x</button><button id="b-sleep" class="chip" aria-label="Sleep timer">Sleep</button></div>
     <div id="ptitle" class="ptitle" aria-hidden="true"><strong></strong><span></span></div>
     <div id="calbar" class="calbar" hidden>Tap the sentence you are hearing right now to line it up.</div>
     <div id="page" class="page"></div>
@@ -372,6 +371,7 @@
       <button id="b-fwd15" class="ib" aria-label="Forward 15 seconds" title="Forward 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
       <button id="b-nextsent" class="ib" aria-label="Next sentence" title="Next sentence"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
     </div>
+    <div class="uc" role="group" aria-label="Playback tools"><button id="b-speed" class="ub" type="button" aria-label="Playback speed"><b class="ub-sp">1.0×</b><span class="ub-l">Speed</span></button><button id="b-sleep" class="ub" type="button" aria-label="Sleep timer"><svg class="uic" aria-hidden="true"><use href="#n-moon"/></svg><span class="ub-l">Sleep</span></button><button id="b-tracks-dock" class="ub" type="button" aria-label="Tracks"><svg class="uic" aria-hidden="true"><use href="#n-queue"/></svg><span class="ub-l">Tracks</span></button><button id="b-bm-dock" class="ub" type="button" aria-label="Bookmark" aria-pressed="false"><svg class="uic" aria-hidden="true"><use href="#n-bm"/></svg><span class="ub-l">Bookmark</span></button><button id="b-nexttrack" class="ub" type="button" aria-label="Next track"><svg class="uic" aria-hidden="true"><use href="#i-nexttrack"/></svg><span class="ub-l">Next track</span></button></div>
     <div class="dchips">
       <button id="b-read" class="chip" aria-pressed="false" aria-label="Text only: hide the player and just read">Text only</button>
       <button id="b-more" class="chip" aria-label="More: tracks, reader, next up, words">More</button>
@@ -383,34 +383,27 @@
   <div class="nr-card" id="nr-card">
     <div class="nr-panel">
       <header class="nr-top">
-        <button id="nr-back" class="nr-ib" type="button" aria-label="Back"><svg class="nic" aria-hidden="true"><use href="#n-back"/></svg></button>
+        <button id="nr-back" class="nr-ib nr-back" type="button" aria-label="Back to the Classic player"><svg class="nic" aria-hidden="true"><use href="#n-back"/></svg></button>
         <h1 id="nr-title"></h1>
-        <button id="nr-bm" class="nr-ib nr-bm" type="button" aria-pressed="false" aria-label="Bookmark"><svg class="nic" aria-hidden="true"><use href="#n-bm"/></svg></button>
       </header>
       <div id="nr-slot" class="nr-slot"></div>
     </div>
     <footer id="nr-dock" class="nr-dock">
       <span class="nr-grip" aria-hidden="true"></span>
-      <div class="nr-ctl">
-        <button id="nr-speed" class="nr-spd" type="button" aria-label="Playback speed">1.0<small>x</small></button>
-        <button id="nr-rew" class="nr-skip" type="button" aria-label="Back 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-back15"/></svg></button>
-        <button id="nr-play" class="nr-play" type="button" aria-label="Play"><svg class="nic f" aria-hidden="true"><use href="#n-play"/></svg></button>
-        <button id="nr-ff" class="nr-skip" type="button" aria-label="Forward 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
-        <button id="nr-next" class="nr-skip nr-nxt" type="button" aria-label="Next track"><svg class="nic f" aria-hidden="true"><use href="#i-nexttrack"/></svg></button>
-      </div>
       <div id="nr-wave" class="nr-wave">
         <div id="nr-segs" class="nr-segs" aria-hidden="true"></div>
         <i id="nr-dot" class="nr-dot" aria-hidden="true"></i>
         <input id="nr-seek" type="range" min="0" max="10000" step="1" value="0" aria-label="Position in the book">
       </div>
-      <div class="nr-meta">
-        <span id="nr-cur">00:00:00</span>
-        <span class="nr-mid">
-          <button id="nr-queue" class="nr-side" type="button" aria-label="Tracks"><svg class="nic" aria-hidden="true"><use href="#n-queue"/></svg></button>
-          <button id="nr-sleep" class="nr-side" type="button" aria-label="Sleep timer"><svg class="nic" aria-hidden="true"><use href="#n-moon"/></svg></button>
-        </span>
-        <span id="nr-tot">00:00:00</span>
+      <div class="nr-meta"><span id="nr-cur">00:00:00</span><span id="nr-tot">00:00:00</span></div>
+      <div class="nr-ctl">
+        <button id="nr-prevs" class="nr-skip" type="button" aria-label="Previous sentence"><svg class="nic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button id="nr-rew" class="nr-skip" type="button" aria-label="Back 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-back15"/></svg></button>
+        <button id="nr-play" class="nr-play" type="button" aria-label="Play"><svg class="nic f" aria-hidden="true"><use href="#n-play"/></svg></button>
+        <button id="nr-ff" class="nr-skip" type="button" aria-label="Forward 15 seconds"><svg class="nic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
+        <button id="nr-nexts" class="nr-skip" type="button" aria-label="Next sentence"><svg class="nic" aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
+      <div class="uc" role="group" aria-label="Playback tools"><button id="nr-speed" class="ub" type="button" aria-label="Playback speed"><b class="ub-sp">1.0×</b><span class="ub-l">Speed</span></button><button id="nr-sleep" class="ub" type="button" aria-label="Sleep timer"><svg class="uic" aria-hidden="true"><use href="#n-moon"/></svg><span class="ub-l">Sleep</span></button><button id="nr-queue" class="ub" type="button" aria-label="Tracks"><svg class="uic" aria-hidden="true"><use href="#n-queue"/></svg><span class="ub-l">Tracks</span></button><button id="nr-bm" class="ub" type="button" aria-label="Bookmark" aria-pressed="false"><svg class="uic" aria-hidden="true"><use href="#n-bm"/></svg><span class="ub-l">Bookmark</span></button><button id="nr-next" class="ub" type="button" aria-label="Next track"><svg class="uic" aria-hidden="true"><use href="#i-nexttrack"/></svg><span class="ub-l">Next track</span></button></div>
       <div id="nr-bp" class="bookprog nr-bp" aria-hidden="true"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
     </footer>
   </div>

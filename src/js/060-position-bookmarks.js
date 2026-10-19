@@ -176,13 +176,14 @@
     histSoon();
   }
   function nrInit() {
+    const bmBtns = [nrEl.bm, $('#b-bm-dock')];   // the same Bookmark button in the Focus page and the Classic player: tap saves, press and hold opens the position panel
     $('#btn-nr').addEventListener('click', nrOpen);
     $('#nr-back').addEventListener('click', nrClose);
-    nrEl.bm.addEventListener('click', nrBookmark);
+    bmBtns.forEach(b => { b.addEventListener('click', nrBookmark); });
     clWire(); trWire();
-    nrEl.bm.addEventListener('pointerdown', () => { BMLP.done = false; clearTimeout(BMLP.t); BMLP.t = setTimeout(() => { BMLP.done = true; buzz('medium'); bmOpen(); }, 550); });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => nrEl.bm.addEventListener(ev, () => clearTimeout(BMLP.t)));
-    nrEl.bm.addEventListener('contextmenu', e => e.preventDefault());
+    bmBtns.forEach(b => { b.addEventListener('pointerdown', () => { BMLP.done = false; clearTimeout(BMLP.t); BMLP.t = setTimeout(() => { BMLP.done = true; buzz('medium'); bmOpen(); }, 550); }); });
+    bmBtns.forEach(b => { ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => clearTimeout(BMLP.t))); });
+    bmBtns.forEach(b => { b.addEventListener('contextmenu', e => e.preventDefault()); });
     $('#b-bm').addEventListener('click', () => { closeSheets(); if (!S.book) { toast('Open a book first.'); return; } bmOpen(); });
     $('#bm-save').addEventListener('click', bmSave);
     $('#bm-time').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bmSave(); } });
@@ -197,6 +198,10 @@
     nrEl.sleep.addEventListener('click', () => { buzz('medium'); setSleep(SLEEPS[(SLEEPS.indexOf(S.sleep) + 1) % SLEEPS.length]); toast(sleepLabel(S.sleep), 1800); });
     nrEl.spd.addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
     nrEl.next.addEventListener('click', () => { buzz('tick'); stepTrack(1); });
+    $('#nr-prevs').addEventListener('click', () => { buzz('light'); stepSentence(-1); });
+    $('#nr-nexts').addEventListener('click', () => { buzz('light'); stepSentence(1); });
+    $('#b-tracks-dock').addEventListener('click', () => { buzz('tick'); openSheet('sheet-tracks'); });
+    $('#b-nexttrack').addEventListener('click', () => { buzz('tick'); stepTrack(1); });
     nrEl.seek.addEventListener('input', () => {
       NR.seeking = true; nrEl.wave.classList.add('drag');
       const p = nrPosOf(+nrEl.seek.value);

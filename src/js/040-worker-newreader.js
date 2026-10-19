@@ -111,11 +111,14 @@
   }
   const nrSpd = v => { let s = String(+(+v).toFixed(2)); if (s.indexOf('.') < 0) s += '.0'; return s; };
   function nrSpeedUI() {
-    nrEl.spd.innerHTML = nrSpd(P.speed) + '<small>x</small>';
+    nrEl.spd.querySelector('.ub-sp').textContent = nrSpd(P.speed) + '×';
     nrEl.spd.dataset.on = String(P.speed !== 1);
     nrEl.spd.setAttribute('aria-label', 'Playback speed: ' + spdFmt(P.speed) + '. Open playback settings');
   }
+  /* Next track is disabled on the last track, in both players. */
+  function nextTrkSync() { const n = $('#b-nexttrack'), N = S.secs ? S.secs.length : 0; if (n) n.disabled = !N || S.sec >= N - 1; }
   function nrSeekUI(t, d) {
+    nextTrkSync();
     if (!NR.on) return;
     nrSegs();
     const N = NR.segN || 1;
@@ -131,13 +134,13 @@
     nrEl.play.firstElementChild.firstElementChild.setAttribute('href', playing ? '#n-pause' : '#n-play');
     nrEl.play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
   }
-  function nrSleep(v) { nrEl.sleep.classList.toggle('on', v !== 0); nrEl.sleep.setAttribute('aria-label', sleepLabel(v)); }
+  const sleepShort = v => v === 0 ? 'Sleep' : v === 'chapter' ? 'Track end' : v + ' min';
+  function nrSleep(v) { nrEl.sleep.classList.toggle('on', v !== 0); nrEl.sleep.dataset.on = String(v !== 0); nrEl.sleep.querySelector('.ub-l').textContent = sleepShort(v); nrEl.sleep.setAttribute('aria-label', sleepLabel(v)); }
   const sleepLabel = v => v === 0 ? 'Sleep timer off' : v === 'chapter' ? 'Sleep timer: end of track' : 'Sleep timer: ' + v + ' min';
   const bmKey = () => 'wt:bm:' + (S.book ? S.book.id : '');
   function nrBmUI() {
     const b = S.book ? store.get(bmKey(), null) : null;
-    nrEl.bm.setAttribute('aria-pressed', String(!!b));
-    nrEl.bm.setAttribute('aria-label', b ? 'Bookmarked' : 'Bookmark');
+    [nrEl.bm, $('#b-bm-dock')].forEach(x => { if (!x) return; x.setAttribute('aria-pressed', String(!!b)); x.setAttribute('aria-label', b ? 'Bookmarked' : 'Bookmark'); });
   }
   function nrHead() {
     if (!S.book) return;

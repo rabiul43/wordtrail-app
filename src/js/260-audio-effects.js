@@ -250,7 +250,7 @@
   }
   function setSpeed(v) {
     v = spdClamp(v); silOn = false; P.speed = v; audio.defaultPlaybackRate = v; audio.playbackRate = v;
-    el.speed.textContent = spdFmt(v); el.speed.dataset.on = String(v !== 1);
+    el.speed.querySelector('.ub-sp').textContent = nrSpd(v) + '×'; el.speed.dataset.on = String(v !== 1);
     el.speed.setAttribute('aria-label', 'Playback speed: ' + spdFmt(v) + '. Open playback settings'); savePrefs();
     nrSpeedUI();
     qkPaint();

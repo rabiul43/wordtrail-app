@@ -99,3 +99,20 @@
 .tb-menu #btn-player-settings .ic { display: block; }   /* quick mode hides this icon on the old round button; in the menu it is the row icon */
 .tb-menu #btn-player-settings.has-dot::after { top: 50%; right: .8rem; transform: translateY(-50%); }
 @media (prefers-reduced-motion: reduce) { .tb-menu, #b-timing[data-state="preparing"] .mi-dot::before { animation: none; } }
+
+/* ---------- One set of playback tools in both players: Speed, Sleep, Tracks, Bookmark, Next track (same icons, labels and order in the Classic player and the Focus page) ---------- */
+.uc { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); justify-items: center; margin: .45rem 0 0; }
+.ub { width: 100%; max-width: 4.8rem; min-width: 2.75rem; min-height: 3.4rem; padding: .25rem 0; border: 0; border-radius: var(--r-ctl, 12px); background: transparent; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .22rem; font: 500 .72rem/1.1 var(--font-ui); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ub:active { background: var(--surface-2); }
+.ub:disabled { opacity: .4; cursor: default; }
+.ub .uic { width: 1.5rem; height: 1.5rem; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ub .ub-sp { display: grid; place-items: center; min-width: 2.9rem; height: 1.5rem; padding: 0 .55rem; border: 1.5px solid var(--line); border-radius: 999px; font: 650 .82rem/1 var(--font-ui); font-variant-numeric: tabular-nums; }
+.ub .ub-l { max-width: 100%; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ub[data-on="true"], .ub.on, .ub[aria-pressed="true"] { color: var(--accent); }
+.ub[data-on="true"] .ub-l, .ub.on .ub-l, .ub[aria-pressed="true"] .ub-l { color: var(--accent); }
+.ub[data-on="true"] .ub-sp { border-color: var(--accent); }
+.ub[aria-pressed="true"] .uic { fill: currentColor; }
+.dock.slim .uc, [data-quick] .dock .uc { display: none; }
+.nr-dock .nr-ctl { margin-top: .5rem; }
+.nr-dock .uc { margin-top: .25rem; }
+.nr-back { width: 2.75rem; height: 2.75rem; }
