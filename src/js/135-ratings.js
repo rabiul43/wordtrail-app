@@ -1,6 +1,7 @@
   /* ---------- Ratings and one-line reviews ----------
      One rating per signed-in user per book: 1-5 stars and an optional review of up to 140 characters. The book's
-     page shows the average, how many ratings it is made from, and the latest reviews.
+     page shows the average, how many ratings it is made from, the star breakdown and one top review (All reviews opens the
+     full list).
      Stored in Firestore (rules: firebase/firestore.rules):
        ratings/{bookId}              { n: how many ratings, s: sum of the stars, c1..c5: how many of each star }   average = s / n
        ratings/{bookId}/votes/{uid}  { r: 1-5, c: review, n: first name, t: server time, x?: how many people reported it }
@@ -10,8 +11,9 @@
      Reading needs no sign-in and no Firebase code: it uses Firestore's REST address, so a guest never downloads the
      sign-in service. Rating needs an account; the Firebase code (from 295-account-sync.js) loads only then.
      Calm mode hides the whole section (no scores). */
-  guideDoc('home', 'Ratings and reviews', "Sign in, then give a book 1 to 5 stars and, if you like, a one-line review (up to 140 characters). You can change or remove your rating at any time. A book's page shows the average rating and the latest reviews; only your first name is shown. Tap the three dots on a review to report it (spam, offensive, spoils the story, something else; reports are anonymous), or to edit or delete your own. Reviews with several reports are hidden until they are checked. See all reviews opens a page with every review, which you can sort by newest, highest or lowest stars. Your ratings and the books you finished but have not rated are listed on the Account tab, where Edit takes you to the book's page. You can rate a book once you have listened to about a tenth of it (or finished it), and there is a daily limit on ratings and reports to keep reviews honest. Calm mode hides ratings.", '2026-10-19');
+  guideDoc('home', 'Ratings and reviews', "Sign in, then give a book 1 to 5 stars and, if you like, a one-line review (up to 140 characters). You can change or remove your rating at any time. A book's page shows the average rating, how the stars are spread and one top review; only your first name is shown. Tap the three dots on a review to report it (spam, offensive, spoils the story, something else; reports are anonymous), or to edit or delete your own. Reviews with several reports are hidden until they are checked. All reviews opens a page with every review, which you can sort by newest, highest or lowest stars. Your ratings and the books you finished but have not rated are listed on the Account tab, where Edit takes you to the book's page. You can rate a book once you have listened to about a tenth of it (or finished it), and there is a daily limit on ratings and reports to keep reviews honest. Calm mode hides ratings.", '2026-10-19');
   const RT_MAX = 140, RT_HIDE = 3, RT_TTL = 5 * 60e3, RT_CACHE = new Map();
+  const rtLen = n => n + ' / ' + RT_MAX;   // the live counter under a review box, e.g. "41 / 140"
   /* ---- limits against abuse (this device) ----
      A new rating needs some listening first: the book is finished, or at least RT_MIN_PCT of it was heard. This reads
      what the app already keeps (wt:listens and recents, the finished list, and the open book), so nothing new is
@@ -200,7 +202,8 @@
   function ratingsSection(b) {
     const avg = h('p', { class: 'rt-avg', 'aria-live': 'polite' }, 'Loading ratings…');
     const mine = h('div', { class: 'rt-mine' }), list = h('ul', { class: 'rt-list', hidden: true });
-    const seeAll = h('button', { class: 'btn ghost small rt-all', type: 'button', hidden: true, onclick: () => openReviews(b) }, 'See all reviews');
+    const seeAll = h('button', { class: 'btn ghost small rt-all', type: 'button', hidden: true, onclick: () => openReviews(b) }, 'All reviews', h('span', { class: 'rt-arrow', 'aria-hidden': 'true' }, '\u2192'));
+    const cap = h('p', { class: 'rt-cap', hidden: true }, 'Top review');
     const live = () => DET.book === b;
     let own = null, draftR = 0, draftC = '', busy = false;
     const paintAvg = d => {
@@ -214,24 +217,20 @@
         sum ? h('span', { class: 'rt-bars', role: 'group', 'aria-label': 'Ratings by star' }, [5, 4, 3, 2, 1].map(k => h('span', { class: 'rt-bar', 'aria-label': d.dist[k - 1] + ' people gave ' + k + (k === 1 ? ' star' : ' stars') },
           h('span', { 'aria-hidden': 'true' }, k + ' \u2605'), h('i', { 'aria-hidden': 'true' }, h('b', { style: 'width:' + Math.round(d.dist[k - 1] / top * 100) + '%' })), h('span', { 'aria-hidden': 'true' }, fmtCount(d.dist[k - 1]))))) : null);
     };
+    /* ONE top review: the highest stars among the latest reviews that others wrote (the list is newest first, so the
+       newest wins a tie). Your own review is changed in the box below, so it is not picked here. */
     const paintList = d => {
       if (!live()) return;
       rtCloseMenu(); list.textContent = '';
       const me = (acInfo() || {}).uid;
-      const rows = (d ? d.reviews : []).filter(x => x.uid === me || (x.x < RT_HIDE && !rtReported(b, x.uid))).slice(0, 5);
-      rows.forEach(x => {
-        const mineRow = x.uid === me, held = mineRow && x.x >= RT_HIDE;
-        const more = h('button', { class: 'rt-more', type: 'button', 'aria-label': mineRow ? 'Your review: options' : 'Review options', 'aria-haspopup': 'menu', 'aria-expanded': 'false' }, '⋯');
-        const li = h('li', { class: 'rt-item' },
-          h('div', { class: 'rt-item-h' }, rtStars(x.r), h('span', {}, mineRow ? 'You' : (x.n || 'A listener')), more),
-          h('p', {}, x.c), held ? h('p', { class: 'rt-note' }, 'Hidden from others while it is checked.') : null);
-        rtMenuBtn(li, more, () => mineRow ? [
-          ['Edit', () => { const t = $('.rt-text', mine); if (t) { t.scrollIntoView({ block: 'center' }); t.focus(); } }],
-          ['Delete review', () => { if (own && confirm('Delete your review? Your stars stay. You can remove them too with Remove.')) run(own.r, '', 'Review deleted'); }, 'bad']
-        ] : [['Report', () => rtReportTap(b, x, () => paintList(d))]]);
+      const top = (d ? d.reviews : []).filter(x => x.uid !== me && x.x < RT_HIDE && !rtReported(b, x.uid)).reduce((a, x) => !a || x.r > a.r ? x : a, null);
+      if (top) {
+        const more = h('button', { class: 'rt-more', type: 'button', 'aria-label': 'Review options', 'aria-haspopup': 'menu', 'aria-expanded': 'false' }, '\u22ef');
+        const li = h('li', { class: 'rt-item' }, h('div', { class: 'rt-item-h' }, rtStars(top.r), h('span', {}, top.n || 'A listener'), more), h('p', {}, top.c));
+        rtMenuBtn(li, more, () => [['Report', () => rtReportTap(b, top, () => paintList(d))]]);   // a reported review drops out and the next best one takes its place
         list.append(li);
-      });
-      list.hidden = !rows.length; seeAll.hidden = !(d && d.reviews.length);
+      }
+      cap.hidden = list.hidden = !top; seeAll.hidden = !(d && d.reviews.length);
     };
     const reload = fresh => rtLoad(b, fresh).then(d => { paintAvg(d); paintList(d); });
     const run = async (r, c, done) => {
@@ -261,8 +260,8 @@
       group.append(...btns);
       const box = h('textarea', { class: 'rt-text', rows: '2', maxlength: String(RT_MAX), placeholder: 'One-line review (optional)', 'aria-label': 'Your one-line review', disabled: busy });
       box.value = draftC;
-      const left = h('span', { class: 'rt-left' }, (RT_MAX - draftC.length) + ' left');
-      box.addEventListener('input', () => { draftC = box.value.replace(/\s*\n+\s*/g, ' ').slice(0, RT_MAX); if (box.value !== draftC) box.value = draftC; left.textContent = (RT_MAX - draftC.length) + ' left'; save.disabled = !dirty(); });
+      const left = h('span', { class: 'rt-left' }, rtLen(draftC.length));
+      box.addEventListener('input', () => { draftC = box.value.replace(/\s*\n+\s*/g, ' ').slice(0, RT_MAX); if (box.value !== draftC) box.value = draftC; left.textContent = rtLen(draftC.length); save.disabled = !dirty(); });
       const dirty = () => !busy && draftR >= 1 && (!own.r || draftR !== own.r || draftC.trim() !== own.c);
       const save = h('button', { class: 'btn small', type: 'button', disabled: !dirty(), onclick: () => run(draftR, draftC.trim(), own.r ? 'Rating updated' : 'Thanks for rating') }, own.r ? 'Update' : 'Save rating');
       const clear = own.r ? h('button', { class: 'btn ghost small', type: 'button', disabled: busy, onclick: () => run(0, '', 'Rating removed') }, 'Remove') : null;
@@ -276,7 +275,7 @@
     };
     reload(false); init();
     return h('section', { class: 'det-rate', 'aria-label': 'Ratings and reviews' },
-      h('div', { class: 'home-section-head' }, h('h2', {}, 'Ratings')), avg, mine, list, seeAll);
+      h('div', { class: 'home-section-head' }, h('h2', {}, 'Ratings and reviews')), avg, cap, list, seeAll, mine);
   }
   /* "How was it?" box on the Finish card (150-player-reader.js), shown to signed-in users who have not rated the
      book. "Not now" is remembered for that book on this device (wt:rtskip), so it is never asked twice.
@@ -293,8 +292,8 @@
       [1, 2, 3, 4, 5].forEach(i => group.append(h('button', { class: 'rt-star' + (i <= draftR ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': String(i === draftR), 'aria-label': i + (i === 1 ? ' star' : ' stars'), disabled: busy, onclick: () => { draftR = i; paint(); } }, '\u2605')));
       const ta = h('textarea', { class: 'rt-text', rows: '2', maxlength: String(RT_MAX), placeholder: 'One-line review (optional)', 'aria-label': 'Your one-line review', disabled: busy });
       ta.value = draftC;
-      const left = h('span', { class: 'rt-left' }, (RT_MAX - draftC.length) + ' left');
-      ta.addEventListener('input', () => { draftC = ta.value.replace(/\s*\n+\s*/g, ' ').slice(0, RT_MAX); if (ta.value !== draftC) ta.value = draftC; left.textContent = (RT_MAX - draftC.length) + ' left'; });
+      const left = h('span', { class: 'rt-left' }, rtLen(draftC.length));
+      ta.addEventListener('input', () => { draftC = ta.value.replace(/\s*\n+\s*/g, ' ').slice(0, RT_MAX); if (ta.value !== draftC) ta.value = draftC; left.textContent = rtLen(draftC.length); });
       const save = h('button', { class: 'btn small', type: 'button', disabled: busy || draftR < 1, onclick: async () => {
         busy = true; paint();
         try { await rtSave(b, draftR, draftC.trim()); box.textContent = ''; box.append(h('p', { class: 'rt-note', role: 'status' }, 'Thanks for rating.')); return; }
