@@ -31,6 +31,7 @@ test.describe('opening a book (network mocked)', () => {
     await page.locator('#btn-back').click();
     await expect(page.locator('#player')).toBeHidden();
     await expect(page.locator('#detail')).toContainText(BOOK.title);
-    await expect(page.getByRole('button', { name: 'Read and listen' })).toBeVisible();
+    // the main button reads "Resume" once any of the book has played, so accept either label
+    await expect(page.getByRole('button', { name: /Read and listen|Resume/ })).toBeVisible();
   });
 });

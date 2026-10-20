@@ -101,7 +101,8 @@
       const p = h('p', { class: 'det-desc clamp' }, info.d);
       const more = h('button', { class: 'sec-more', type: 'button', 'aria-expanded': 'false', onclick: () => { const open = !p.classList.toggle('clamp'); more.textContent = open ? 'Show less' : 'Read more'; more.setAttribute('aria-expanded', String(open)); } }, 'Read more');
       about.textContent = '';
-      about.append(h('div', { class: 'home-section-head' }, h('h2', {}, 'About this book')), p, info.d.length > 260 ? more : null);
+      about.append(h('div', { class: 'home-section-head' }, h('h2', {}, 'About this book')), p);
+      if (info.d.length > 260) about.append(more);   // only add the button for long text (a null here would print the word "null")
       about.hidden = false;
     };
     paint(); paintGenres();
