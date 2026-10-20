@@ -59,10 +59,19 @@ PARTS = [
     ('file', 'src/js/080-ui-shell-favourites.js'),
     ('file', 'src/js/090-synced-stats-book-search.js'),
     ('file', 'src/js/095-weekly-report.js'),
-    ('file', 'src/js/100-home-rows-filters.js'),
+    ('file', 'src/js/100-home-covers.js'),
+    ('file', 'src/js/101-home-tiles.js'),
+    ('file', 'src/js/102-home-sections.js'),
+    ('file', 'src/js/103-browse-filters.js'),
+    ('file', 'src/js/104-see-all-suggestions.js'),
+    ('file', 'src/js/105-home-loaders.js'),
     ('file', 'src/js/110-collections.js'),
     ('file', 'src/js/120-search-recommendations.js'),
     ('file', 'src/js/130-book-detail.js'),
+    ('file', 'src/js/131-book-stats-share.js'),
+    ('file', 'src/js/132-author-page-resume-card.js'),
+    ('file', 'src/js/133-open-progress-saved-state.js'),
+    ('file', 'src/js/134-version-picker.js'),
     ('file', 'src/js/135-ratings.js'),
     ('file', 'src/js/140-open-book.js'),
     ('file', 'src/js/145-chapter-recap.js'),
@@ -74,7 +83,10 @@ PARTS = [
     ('file', 'src/js/200-player-controls.js'),
     ('file', 'src/js/210-sound-mixer.js'),
     ('file', 'src/js/220-story-sounds.js'),
-    ('file', 'src/js/230-scene-detection.js'),
+    ('file', 'src/js/230-scene-words.js'),
+    ('file', 'src/js/231-scene-scoring.js'),
+    ('file', 'src/js/232-scene-test.js'),
+    ('file', 'src/js/233-scene-chapters-label.js'),
     ('file', 'src/js/240-sound-presets.js'),
     ('file', 'src/js/250-characters.js'),
     ('file', 'src/js/260-audio-effects.js'),
@@ -116,7 +128,20 @@ def build(include_dev=False):
                 out.append(f.read())
     return b"".join(out)
 
+def check_names():
+    """Stop the build if two files declare the same top-level name (see tools/deps.py)."""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import deps
+    _files, _code, decls, _lines = deps.scan()
+    dups = deps.find_duplicates(decls)
+    if dups:
+        print("BUILD STOPPED: these names are declared more than once in the closure:")
+        for n, v in sorted(dups.items()):
+            print("  %s: %s" % (n, ", ".join("%s:%d" % x for x in v)))
+        sys.exit(1)
+
 if __name__ == "__main__":
+    check_names()
     dev = "--dev" in sys.argv
     data = build(include_dev=dev)
     dist = os.path.join(ROOT, "dist")

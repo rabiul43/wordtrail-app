@@ -14,6 +14,7 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:' + PORT,
     ...devices['Pixel 7'],                       // the app is a phone app: phone-sized screen
+    channel: process.env.CI ? undefined : 'chrome',   // locally use installed Chrome (no Chromium download)
     serviceWorkers: 'allow',
     trace: 'retain-on-failure',
     launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] }   // lets the test tone play in headless Chromium

@@ -17,7 +17,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/js/                   the app, one slice per feature
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
-    tools/                    helper scripts (i18n_check.py lists missing words in a language)
+    tools/                    helper scripts (i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md)
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/
     firebase/                 firestore.rules (paste into the Firebase console) and rules.test.js; not part of the app
@@ -37,6 +37,8 @@ If a change needs a name from another file, say so or upload that file too. Shar
 
 - All of `src/js/020` ... `src/js/999` are slices of ONE function. They share names; do not add `import` / `export`.
 - A new file needs one new line in `build.py`, at the right place.
+- After you change anything in `src/js/`, run `python tools/deps.py`. It refreshes `DEPENDENCIES.md` (who uses which shared name) and the line counts in `MODULES.md`. `python build.py` stops if two files declare the same name, and CI runs `python tools/deps.py --check`.
+- To see who uses a name before you change it: `python tools/deps.py --who toast`.
 - CSS order matters: later rules win.
 
 ## Checking reports (reviews)

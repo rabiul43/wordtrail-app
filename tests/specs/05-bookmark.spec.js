@@ -15,6 +15,7 @@ test.describe('bookmarks', () => {
     await startApp(page);
     await openPlayer(page);
     await expect.poll(async () => (await audioState(page)).time).toBeGreaterThan(0.5);
+    await page.evaluate(() => document.getElementById('au').pause());       // stop the tone so it can't move on to track 2 while the menus open
 
     await page.locator('#btn-fav').click();                                  // star: save the book to My books
     await expect(page.locator('#btn-fav')).toHaveAttribute('aria-label', 'Remove from My books');

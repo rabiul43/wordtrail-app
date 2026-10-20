@@ -27,6 +27,9 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Check names and docs (no name declared twice; DEPENDENCIES.md and MODULES.md up to date)
+        run: python tools/deps.py --check
+
       - name: Build the app (dist/index.html)
         run: python build.py
 
