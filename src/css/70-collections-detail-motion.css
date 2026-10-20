@@ -22,12 +22,12 @@
 body.genre-on #sec-tod, body:has(#filter-results:not([hidden])) #sec-tod { display: none; }
 /* with listening history, Continue listening is the hero: no Book of the day */
 #recents:not([hidden]) ~ #sec-botd { display: none; }
-/* scope / level chips only matter while searching */
-.searchbar:not(:focus-within):not(:has(#q:not(:placeholder-shown))):not(:has(.sfilt .fchip[aria-pressed="true"]:not([data-scope="all"]))) .sfilt { display: none; }
+/* scope chips only matter while searching. .sf-keep (set in rsPaint) keeps the row up while a scope other than All is chosen, so it does not depend on :has() re-evaluating aria-pressed */
+.searchbar:not(:focus-within):not(:has(#q:not(:placeholder-shown))):not(.sf-keep) .sfilt { display: none; }
 #sec-genre > * { grid-column: 1 / -1; }
 #sec-genre > .genre-row { grid-column: 1; grid-row: 1; margin-right: 0; }
 /* ---------- Collections tab ---------- */
-#collections { display: grid; gap: .9rem; align-content: start; padding-bottom: calc(7.5rem + env(safe-area-inset-bottom)); gap: var(--row-gap); }
+#collections { display: grid; gap: .9rem; align-content: start; padding-bottom: calc(var(--tabbar-h, calc(4.2rem + env(safe-area-inset-bottom))) + var(--mini-h, 0px) + 1.5rem); gap: var(--row-gap); }
 #collections[hidden] { display: none; }
 #collections .col-blurb { margin: -.3rem 0 .6rem; font-size: .82rem; color: var(--muted); }
 #collections .col-block + .col-block { margin-top: 1.4rem; }
@@ -105,7 +105,6 @@ body.genre-on #sec-tod, body:has(#filter-results:not([hidden])) #sec-tod { displ
 .seeall-head.col-sticky.is-compact .help { display: none; }
 .seeall-head.col-sticky .col-mini-go { flex: none; display: none; padding: .3rem .8rem; }
 .seeall-head.col-sticky.is-compact .col-mini-go { display: inline-flex; align-items: center; gap: .25rem; }
-body.has-mini #collections { padding-bottom: calc(11rem + env(safe-area-inset-bottom)); }
 /* v23 book cards (collection grid only): art-only covers, clean titles, duration + progress */
 #collections .grid3 { gap: 1.1rem .7rem; }
 #collections .tile .tile-cover { border-radius: 14px; aspect-ratio: 1 / 1.3; box-shadow: var(--shadow-cover); outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); outline-offset: -1px; }
@@ -364,7 +363,7 @@ html[data-lite] .w.on, html[data-lite] .nr .w.on { box-shadow: 0 0 0 .1em var(--
 .det-tools { margin-left: auto; display: flex; align-items: center; padding: 0 .15rem; border-radius: var(--r-pill); background: var(--surface-2); }
 .det-top .det-tools .ib { margin-left: 0; width: 2.75rem; height: 2.75rem; }
 .det-hero { --h: 40; position: relative; display: grid; justify-items: center; gap: .6rem; text-align: center; padding: 1.4rem 1.1rem 1.2rem; color: inherit; border: 1px solid color-mix(in srgb, hsl(var(--h) 60% 55%) 30%, var(--line)); background: linear-gradient(160deg, color-mix(in srgb, hsl(var(--h) 65% 55%) 22%, var(--surface)), var(--surface)); border-radius: var(--r-xl); }
-.det-cover { width: min(11rem, 52vw); aspect-ratio: 3 / 4; border-radius: var(--r-ctl); box-shadow: var(--shadow-cover); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 2rem; margin-bottom: .4rem; }
+.det-cover { width: min(11rem, 52vw); aspect-ratio: 2 / 3; border-radius: var(--r-ctl); box-shadow: var(--shadow-cover); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 2rem; margin-bottom: .4rem; }
 .det-cover.mc { display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; text-align: left; padding: 1rem .9rem .85rem; }
 .det-cover.mc .gc-t { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; padding: 0; text-align: left; font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; line-height: 1.15; }
 .det-cover.mc .gc-a { display: block; font: 600 .7rem/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; opacity: .85; border-top: 1px solid color-mix(in srgb, currentColor 35%, transparent); padding-top: .45rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

@@ -30,7 +30,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
 | `070-network-data.js` | 556 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
-| `080-ui-shell-favourites.js` | 228 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
+| `080-ui-shell-favourites.js` | 232 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 702 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 278 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 164 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
@@ -39,7 +39,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `104-see-all-suggestions.js` | 137 | "See all" button and page, empty/error states, recent searches, live suggestions while typing |
 | `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
 | `110-collections.js` | 238 | Collections tab |
-| `120-search-recommendations.js` | 536 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
+| `120-search-recommendations.js` | 537 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 193 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 150 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
@@ -67,7 +67,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `290-backup-maintenance.js` | 333 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 480 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 48 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 740 | wiring |
+| `300-wiring.js` | 741 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## CSS files (`src/css/`)

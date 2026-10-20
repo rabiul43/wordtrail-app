@@ -283,7 +283,7 @@ kbd { font: 600 .78rem var(--font-ui); border: 1px solid var(--line); border-bot
 .tile .tile-cover, .tile.sk .tile-cover { aspect-ratio: var(--tile-ratio); border-radius: var(--r-ctl); box-shadow: var(--shadow-cover); }
 .tile .tile-t { margin-top: .2rem; font-size: .92rem; font-weight: 600; line-height: 1.25; }
 .tile .tile-a { font-size: .8rem; }
-.hrow .tile-more { flex: none; align-self: flex-start; scroll-snap-align: start; width: 5.5rem; height: calc(var(--tile-w) * 4 / 3); aspect-ratio: auto; border-radius: var(--r-ctl); }
+.hrow .tile-more { flex: none; align-self: flex-start; scroll-snap-align: start; width: 5.5rem; height: calc(var(--tile-w) * 3 / 2); aspect-ratio: auto; border-radius: var(--r-ctl); }
 .grid3 .tile-wrap, .grid3 .tile { width: 100%; }
 /* generated cover: deep tinted gradient in dark, soft pastel in light */
 .cover, .tile .tile-cover, .tile-cover { background: linear-gradient(150deg, hsl(var(--ch, 40) var(--cv-a)), hsl(calc(var(--ch, 40) + 28) var(--cv-b))); color: hsl(var(--ch, 40) var(--cv-ink)); }

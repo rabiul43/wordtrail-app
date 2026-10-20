@@ -41,6 +41,7 @@
     $('#btn-player-settings').addEventListener('click', () => { if (P.quickCtl !== false) { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); } else openSettingsHome(); });
     $('#btn-fav').addEventListener('click', () => { if (S.book) toggleFav({ id: S.book.id, title: S.book.title, authors: S.book.authors, cover: S.book.cover, ia: S.book.ia, total: S.book.total, n: S.book.n, lang: S.book.lang }); });
     window.addEventListener('resize', setTabH);
+    if (window.ResizeObserver) { const ro = new ResizeObserver(setTabH); ['#tabbar', '#mini'].forEach(q => { const n = $(q); if (n) ro.observe(n); }); } /* mini-player or tab bar changes height (text size, long title) */
     $('#b-health').addEventListener('click', loadHealth);
     $('#dm-fin').addEventListener('click', dmDeleteFinished);
     $('#dm-all').addEventListener('click', dmDeleteAll);

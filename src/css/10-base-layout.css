@@ -36,7 +36,7 @@
   --dur-slow: 380ms; --spring: cubic-bezier(.3, 1.4, .5, 1); --stagger: 38ms;
   --press: .97; --press-lg: .985; --press-sm: .9;
   --focus-ring: #E0B15A; --focus-w: 2px; --focus-off: 2px; /* keyboard focus ring: >= 3:1 against --bg and --surface-2 on every theme */
-  color-scheme: dark; --tile-w: 8.75rem; --tile-ratio: 3 / 4; --gold: var(--sun); --hl-wash: color-mix(in srgb, var(--sun) 26%, transparent); --hl-edge: color-mix(in srgb, var(--sun) 70%, transparent); --hl-glow: color-mix(in srgb, var(--sun) 45%, transparent); --gold-ink: #1A1405; --row-gap: 1rem; --sec-space: 1.75rem;
+  color-scheme: dark; --tile-w: 8rem; --tile-ratio: 2 / 3; --gold: var(--sun); --hl-wash: color-mix(in srgb, var(--sun) 26%, transparent); --hl-edge: color-mix(in srgb, var(--sun) 70%, transparent); --hl-glow: color-mix(in srgb, var(--sun) 45%, transparent); --gold-ink: #1A1405; --row-gap: 1rem; --sec-space: 1.75rem;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {

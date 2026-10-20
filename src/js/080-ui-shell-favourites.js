@@ -47,7 +47,11 @@
   }
   guideDoc('player', 'Mini player', "When you leave a book, a bar at the bottom keeps it one tap away. Tap it to return, or tap its play button. Tap the x to stop and close it; it comes back when you play a book again.", '2026-10-10');
   /* ------ mini-player: keeps the current book one tap away while browsing ------ */
-  function setTabH() { const tb = $('#tabbar'); if (tb && !tb.hidden) document.documentElement.style.setProperty('--tabbar-h', tb.offsetHeight + 'px'); }
+  function setTabH() {
+    const rs = document.documentElement.style, tb = $('#tabbar'), mi = $('#mini');
+    if (tb && !tb.hidden) rs.setProperty('--tabbar-h', tb.offsetHeight + 'px');
+    rs.setProperty('--mini-h', (mi && !mi.hidden ? mi.offsetHeight : 0) + 'px'); /* page bottom padding = --tabbar-h + --mini-h */
+  }
   function miniProgress() { const i = $('#mini-prog'); if (i && S.book) i.style.width = Math.round(Math.min(1, bookPct()) * 1000) / 10 + '%'; }
   function miniPlayIcon(playing) {
     const b = $('#mini-play'); if (!b) return;

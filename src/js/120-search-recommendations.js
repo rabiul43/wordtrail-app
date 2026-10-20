@@ -119,6 +119,7 @@
   function rsPaint() {
     $$('#sfilt .fchip[data-scope]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scope === RS.scope)));
     lfPaint();
+    { const sb = $('#searchbar'); if (sb) sb.classList.toggle('sf-keep', RS.scope !== 'all'); }
     el.q.placeholder = SCOPE_HINT[RS.scope];
   }
   function showBooks(books) {
