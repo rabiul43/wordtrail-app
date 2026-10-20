@@ -29,7 +29,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `110-collections.js` | 238 | 21 | 11 | 39 |
 | `120-search-recommendations.js` | 537 | 60 | 21 | 58 |
 | `130-book-detail.js` | 193 | 30 | 16 | 20 |
-| `131-book-stats-share.js` | 150 | 13 | 4 | 30 |
+| `131-book-stats-share.js` | 151 | 13 | 4 | 30 |
 | `132-author-page-resume-card.js` | 95 | 6 | 4 | 26 |
 | `133-open-progress-saved-state.js` | 226 | 25 | 13 | 17 |
 | `134-version-picker.js` | 271 | 15 | 3 | 12 |

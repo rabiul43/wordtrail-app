@@ -41,7 +41,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `110-collections.js` | 238 | Collections tab |
 | `120-search-recommendations.js` | 537 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 193 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
-| `131-book-stats-share.js` | 150 | Book stats on the details page, start/finish sending, share button |
+| `131-book-stats-share.js` | 151 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
 | `133-open-progress-saved-state.js` | 226 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
