@@ -32,7 +32,7 @@ jobs:
 
       - name: Install test dependencies (tests/package.json only)
         working-directory: tests
-        run: npm install --no-audit --no-fund   # after you commit tests/package-lock.json, change this to: npm ci
+        run: npm ci   # after you commit tests/package-lock.json, change this to: npm ci
 
       - name: Install Chromium for Playwright
         working-directory: tests
