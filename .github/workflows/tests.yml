@@ -1,0 +1,57 @@
+# Standalone version: use this ONLY if you have no existing workflow to add the job to.
+# Copy to .github/workflows/tests.yml. (The same job is in workflow-job.yml, ready to paste into an existing workflow.)
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: Browser tests + Firestore rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5          # build.py only uses the Python standard library
+        with:
+          python-version: '3.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4            # the Firestore emulator needs Java
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build the app (dist/index.html)
+        run: python build.py
+
+      - name: Install test dependencies (tests/package.json only)
+        working-directory: tests
+        run: npm install --no-audit --no-fund   # after you commit tests/package-lock.json, change this to: npm ci
+
+      - name: Install Chromium for Playwright
+        working-directory: tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests (onboarding, search, open book, play/pause, bookmark, offline)
+        working-directory: tests
+        run: npx playwright test
+
+      - name: Firestore rules tests
+        working-directory: tests
+        run: npm run test:rules
+
+      - name: Keep the report when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            tests/playwright-report/
+            tests/test-results/
+          retention-days: 7

@@ -1,0 +1,19 @@
+{
+  "name": "wordtrail-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Test-only dependencies. The app itself (build.py + src/) has no dependencies and never reads this file.",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:rules": "firebase emulators:exec --only firestore --project wordtrail-rules-test \"node run-rules.js\"",
+    "browsers": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "3.0.4",
+    "@playwright/test": "1.56.0",
+    "firebase": "10.14.1",
+    "firebase-tools": "13.35.1"
+  },
+  "engines": { "node": ">=20" }
+}

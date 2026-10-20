@@ -21,6 +21,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/
     firebase/                 firestore.rules (paste into the Firebase console) and rules.test.js; not part of the app
+    tests/                    Playwright browser tests + the Firestore rules test runner, with their own package.json (the app has no dependencies). See tests/README.md
     .github/workflows/        builds and publishes on every push
 
 ## Working with Claude (saves usage)
