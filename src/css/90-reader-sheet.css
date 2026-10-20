@@ -150,6 +150,9 @@
   --font-read: 'Newsreader', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
 }
 :root:lang(bn) body { line-height: 1.6; }
+.nr:lang(bn), :root:lang(bn) .nr { font-family: 'Outfit', 'Noto Sans Bengali', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+/* letter-spacing pulls Bengali conjuncts (যুক্তাক্ষর) apart; Bengali has no capitals, so text-transform is harmless and left alone */
+:root:lang(bn) * { letter-spacing: normal; }
 :root:lang(bn) :is(.card .t, .tile .tile-t, .tile .tile-a, .tile .tile-r, .tile .tile-dur, .rm-t, .mini-txt strong, .track .tt,
   .col-tile strong, #collections .tile .tile-t, .tile-cover .gc-t, .det-cover.mc .gc-t, .vp-name, .vp-meta, .vp-delta, .mr-d,
   .hlp-t, .gh li, .ht-list li, .ob-lvl-t, .ob-lvl-d, .ob-sub, .ob-q-hd) { line-height: 1.55; }

@@ -644,9 +644,9 @@
   guideDoc('settings', 'Reading', "Theme (Auto, Light, Dark, Sepia, High contrast), text size, line spacing, reading font (including Lexend, Atkinson and OpenDyslexic), highlight style and colour, dialogue style and cover style.");
   /* Reading fonts: loaded only when picked, so they cost nothing for everyone else. */
   const READ_FONTS = {
-    lexend: { stack: "'Lexend', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap' },
-    atkinson: { stack: "'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap' },
-    opendyslexic: { stack: "'OpenDyslexic', 'Comic Sans MS', 'Segoe UI', system-ui, sans-serif", css: 'https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5/400.css' }
+    lexend: { stack: "'Lexend', 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap' },
+    atkinson: { stack: "'Atkinson Hyperlegible', 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap' },
+    opendyslexic: { stack: "'OpenDyslexic', 'Noto Sans Bengali', 'Comic Sans MS', 'Segoe UI', system-ui, sans-serif", css: 'https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5/400.css' }
   };
   const HL_COLORS = { yellow: '#FFD84D', green: '#5FCB8B', blue: '#5DB3FF', pink: '#FF8DB5', orange: '#FFA040' };
   const fontLoaded = new Set();
