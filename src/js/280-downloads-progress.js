@@ -218,8 +218,20 @@
     document.documentElement.style.setProperty('--offbar-h', OFF.on ? bar.offsetHeight + 'px' : '0px');
     offOrder();
   }
+  /* navigator.onLine is often wrong (some Android/VPN/Wi-Fi setups report false while the internet works), so "offline" is only
+     believed after a real request fails. Any answer at all (even an opaque one) means the internet is there. */
+  let offSeq = 0;
+  function offProbe() {
+    const one = u => { const c = new AbortController(), t = setTimeout(() => c.abort(), 6000); return fetch(u, { mode: 'no-cors', cache: 'no-store', signal: c.signal }).then(() => { clearTimeout(t); return true; }); };
+    const ts = Date.now();
+    return Promise.any([one(PROXY + '/?probe=' + ts), one('https://www.gstatic.com/generate_204?t=' + ts)]).then(() => true, () => false);
+  }
   function offSet() {
-    const on = navigator.onLine === false;
+    if (navigator.onLine !== false) { offApply(false); return; }
+    const my = ++offSeq;
+    offProbe().then(alive => { if (my === offSeq) offApply(!alive); });
+  }
+  function offApply(on) {
     if (on === OFF.on) { offRefresh(); return; }
     OFF.on = on;
     document.documentElement.toggleAttribute('data-off', on);
