@@ -323,6 +323,7 @@
     S.curId = id;
     ambStory(id);
     updateSyncUI();
+    if (P.liveTr) ltUpdate();
     const sp = S.spans.get(id);
     if (!sp) return;
     sp.classList.add('now');
