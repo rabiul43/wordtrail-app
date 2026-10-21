@@ -1,5 +1,7 @@
 # Wordtrail
 
+HEllo text
+
 One app, many small files. `build.py` joins them into a single `dist/index.html`.
 
 ## Build
