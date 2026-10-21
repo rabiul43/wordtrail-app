@@ -164,7 +164,7 @@
     const p = h('p', { class: 'det-desc clamp wp' }, rec.x);
     const more = h('button', { class: 'sec-more', type: 'button', 'aria-expanded': 'false', onclick: () => { const open = !p.classList.toggle('clamp'); more.textContent = open ? 'Show less' : 'Read more'; more.setAttribute('aria-expanded', String(open)); } }, 'Read more');
     sec.textContent = '';
-    sec.append(h('div', { class: 'home-section-head' }, h('h2', {}, title)), p, rec.x.length > 160 ? more : null,
+    sec.append(h('div', { class: 'home-section-head' }, h('h2', {}, title)), p, ...(rec.x.length > 160 ? [more] : []),
       h('p', { class: 'wp-src' }, 'From ', h('a', { href: rec.u, target: '_blank', rel: 'noopener noreferrer' }, 'Wikipedia'), ' \u00b7 CC BY-SA'));
     sec.hidden = false;
   }

@@ -421,7 +421,7 @@
         const shown = all ? rated : rows(rated, 8);
         host.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Your ratings'), h('span', {}, plural(rated.length, 'book') + ' · average ' + avg.toFixed(1))),
           h('ul', { class: 'rtl-list' }, shown.map(id => { const m = mine[id]; return cardOf(book(id, m), [rtStars(m.r), h('span', { class: m.c ? 'rtl-c' : 'rtl-c none' }, m.c || 'No review written')], 'Open ' + rtTitle(m.title || 'this book'), true); })),
-          rated.length > shown.length ? h('button', { class: 'btn ghost small rtl-all', type: 'button', onclick: () => { all = true; paint(); } }, 'Show all ' + rated.length) : null);
+          ...(rated.length > shown.length ? [h('button', { class: 'btn ghost small rtl-all', type: 'button', onclick: () => { all = true; paint(); } }, 'Show all ' + rated.length)] : []));
       }
       const ratedSet = new Set(rated), fin = (ST.done || []).filter(x => x && x.id != null && !ratedSet.has(String(x.id))).slice(0, 10);
       if (fin.length) host.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Finished, not rated yet')),

@@ -132,7 +132,7 @@
   function ambInit() {
     ambCustomInit(); try { sctInit(); } catch (e) { console.warn('scene test', e); }
     $('#amb-cshift').addEventListener('input', e => { P.ambCueShift = +e.target.value / 10; savePrefs(); ambShiftLabel(); });   // minus: sounds earlier, plus: later
-    ambBuildRows(); ambBuildPresets(); ambRecInit(); setTimeout(ambLoadRemote, 5000); setTimeout(ambRecManifest, 6000);
+    ambBuildRows(); ambBuildPresets(); ambRecInit(); try { osInit(); } catch (e) { console.warn('opening sound', e); } setTimeout(ambLoadRemote, 5000); setTimeout(ambRecManifest, 6000);
     $('#amb-rows').addEventListener('click', e => { const b = e.target.closest('.amb-hear'); if (b) ambAudition(b.dataset.k); });
     $('#amb-presets').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) ambPresetUse(c.dataset.k); });
     $('#amb-preset-undo').addEventListener('click', ambPresetUndo);

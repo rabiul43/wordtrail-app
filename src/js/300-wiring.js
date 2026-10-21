@@ -365,7 +365,7 @@
     $('#in-sharestats').addEventListener('change', e => { P.shareStats = e.target.checked; savePrefs(); });
     $('#in-lockseek').addEventListener('change', e => { P.lockSeek = e.target.checked; savePrefs(); initMediaSession(); });
     smWire();   // Settings home: search and Developer unlock (290)
-    homeCustInit();   // Customise home: apply the saved switches to the Library tab (100-home-rows-filters.js)
+    homeCustInit();   // Customise home: apply the saved switches to the Library tab (105-home-loaders.js)
     $('#in-calm').addEventListener('change', e => { P.calm = e.target.checked; applyTheme(); savePrefs(); toast(P.calm ? 'Calm mode is on.' : 'Calm mode is off.', 2000); try { renderStats(); } catch (x) {} });
     $('#in-haptics').addEventListener('change', e => { P.haptics = e.target.checked; savePrefs(); if (P.haptics) buzz('medium'); });
     $('#in-shake').addEventListener('change', e => {

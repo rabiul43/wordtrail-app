@@ -193,7 +193,7 @@
       h('button', { class: 'btn', type: 'button', onclick: () => grade(1) }, 'Good'),
       h('button', { class: 'btn', type: 'button', onclick: () => grade(2) }, 'Easy'));
     const show = h('button', { class: 'btn', type: 'button', onclick: ev => { ev.currentTarget.hidden = true; vocFill(mean, e.w); btns.hidden = false; } }, 'Show meaning');
-    list.append(h('div', { class: 'vrow' }, h('strong', { style: 'font-size:1.4rem' }, e.w), e.ex ? h('p', { class: 'vex' }, e.ex) : null, show, mean, btns));
+    list.append(h('div', { class: 'vrow' }, h('strong', { style: 'font-size:1.4rem' }, e.w), ...(e.ex ? [h('p', { class: 'vex' }, e.ex)] : []), show, mean, btns));
   }
   async function vocRender() {
     const list = $('#vw-list'), help = $('#vw-help'), my = ++VOC.seq;

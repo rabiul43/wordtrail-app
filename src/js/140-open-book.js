@@ -81,6 +81,7 @@
     rememberOpen(b);
     bookAccent(b);
     loadAudio(S.sec, resumeBack(b, saved.time || 0), autoplay);
+    try { osArm(b, saved); } catch (e) { /* the opening sound is optional */ }
     persist();
     attachText(saved);
   }
