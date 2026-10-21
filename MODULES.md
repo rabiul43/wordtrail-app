@@ -63,7 +63,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 371 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
-| `280-downloads-progress.js` | 475 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
+| `280-downloads-progress.js` | 487 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 333 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 480 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 48 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
