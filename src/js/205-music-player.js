@@ -10,7 +10,10 @@
   const MUS = {
     ctx: null,      // the shared AudioContext (audioCtx()); created even when ambient is off
     master: null,   // musicGain: user volume; every clip connects here
-    duck: null,     // musicDuck: gain between musicGain and ctx.destination (driven by the narrator duck in Task 2)
+    duck: null,     // musicDuck: gain between the carve filters and ctx.destination, driven by the narrator (musDuckTick)
+    ca: null, cb: null,   // speech-band carve (3 kHz, 800 Hz): flat until the narrator speaks
+    duckIv: 0,      // setInterval handle of musDuckTick (runs only while music is live, ambient on or off)
+    duckS: '',      // last duck state applied: s speaking, p pause, u unknown, o off
     live: false,    // music is wanted/playing (a clip is loading or sounding): the context must not be suspended
     sTimer: 0,      // setTimeout handle: suspend the context a moment after music stops (if ambient is silent too)
     manifest: null, // parsed music.json
@@ -62,6 +65,31 @@
 
   /* The book's narrator is being played (not paused or finished). Independent of ambient. */
   const musNarrating = () => !!S.book && !audio.paused && !audio.ended;
+
+  /* ---------- Ducking under the narrator ----------
+     Same states as the ambient duck (ambVoiceState: s speaking, p pause, u unknown, o off), but its own
+     numbers, because music is a louder, denser source than a rain bed:
+       speaking: gain 0.28 (about -11 dB) + a gentle carve of the voice band (-4 dB at 3 kHz, -2 dB at 800 Hz)
+       pause:    gain 0.70 (opens up between sentences, never to full)
+       unknown:  gain 0.50 (no exact times and no analyser: sit lower the whole time)
+       off:      gain 1 (narrator not playing, or P.musDuck switched off)
+     Fast attack (0.08 s), slow release (0.9 s), so the music dips before the word and breathes back in the gaps. */
+  const MUS_DUCK = { s: { v: [0.28, -4, -2], tc: 0.08 }, p: { v: [0.7, 0, 0], tc: 0.9 }, u: { v: [0.5, -2, -1], tc: 0.4 }, o: { v: [1, 0, 0], tc: 0.5 } };
+  function musDuckSet(st) {
+    if (!MUS.duck || !MUS.ctx) return;
+    const r = MUS_DUCK[st] || MUS_DUCK.o, t = MUS.ctx.currentTime;
+    MUS.duck.gain.setTargetAtTime(r.v[0], t, r.tc);
+    if (MUS.ca) { MUS.ca.gain.setTargetAtTime(r.v[1], t, r.tc); MUS.cb.gain.setTargetAtTime(r.v[2], t, r.tc); }
+  }
+  function musDuckTick() {
+    if (!MUS.on || !MUS.duck) return;
+    if (audio.seeking) return;   // a seek is a short gap: keep the music as it is
+    let st = 'o';
+    if (P.musDuck !== false && musNarrating() && !S.loadingAudio && !audio.error && audio.readyState > 2) st = ambVoiceState();
+    if (st !== MUS.duckS) { MUS.duckS = st; musDuckSet(st); }
+  }
+  function musDuckStart() { if (!MUS.duckIv) MUS.duckIv = setInterval(musDuckTick, 60); }
+  function musDuckStop() { clearInterval(MUS.duckIv); MUS.duckIv = 0; MUS.duckS = ''; }
 
   /* Fetch and cache music.json from the GitHub data repo. */
   async function musFetchManifest() {
@@ -208,6 +236,7 @@
     MUS.qi    = 0;
     clearTimeout(MUS.xTimer); clearTimeout(MUS.sTimer);
     MUS.live = true;   // keeps the shared context from being suspended while this loads and plays
+    musDuckStart();    // the narrator duck runs whenever music is live, with ambient on or off
     if (MUS.ctx.state !== 'running') MUS.ctx.resume().catch(() => {});
 
     const got = await musLoadNext(gen);
@@ -227,7 +256,7 @@
   function musStop(fadeDur) {
     MUS.gen++;
     clearTimeout(MUS.xTimer);
-    MUS.live = false;
+    MUS.live = false; musDuckStop();
     if (!MUS.ctx) return;
     const now = MUS.ctx.currentTime, d = fadeDur || 1.5;
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
@@ -259,16 +288,18 @@
   }
 
   /* Build the music's own bus on the shared AudioContext (created here if ambient has not made it).
-     musicGain (user volume) -> musicDuck -> ctx.destination. Does NOT use AMB.master, so ambient on/off
+     musicGain (user volume) -> carve filters -> musicDuck -> ctx.destination. Does NOT use AMB.master, so ambient on/off
      never mutes, suspends or restarts music. Idempotent — safe to call on every play event.
      Callers follow it with musicPlay(), so the cached-manifest case needs no play call here. */
   function musicAttach() {
     if (MUS.on) return;
     const ctx = audioCtx(); if (!ctx) return;
-    const master = ctx.createGain(), duck = ctx.createGain();
+    const master = ctx.createGain(), duck = ctx.createGain(), ca = ctx.createBiquadFilter(), cb = ctx.createBiquadFilter();
     master.gain.value = musBusLevel(); duck.gain.value = 1;
-    master.connect(duck); duck.connect(ctx.destination);
-    MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.on = true;
+    ca.type = 'peaking'; ca.frequency.value = 3000; ca.Q.value = 0.7; ca.gain.value = 0;   // speech-band carve, flat until the narrator speaks
+    cb.type = 'peaking'; cb.frequency.value = 800;  cb.Q.value = 0.9; cb.gain.value = 0;
+    master.connect(ca); ca.connect(cb); cb.connect(duck); duck.connect(ctx.destination);
+    MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.ca = ca; MUS.cb = cb; MUS.on = true;
     if (!MUS.manifest) musFetchManifest().then(() => { if (musNarrating()) musicPlay(); });
   }
 

@@ -168,9 +168,10 @@
     $('#amb-off').addEventListener('click', () => { P.ambOn = false; const c = $('#in-ambon'); if (c) c.checked = false; savePrefs(); AMB.preview = false; ambSync(); closeSheets(); toast('Cinematic sound is off.'); });
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
     $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
-    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); });
+    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); });
     $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
-    if ($('#in-muson')) { $('#in-muson').checked = P.musOn === true; $('#row-musvol').hidden = P.musOn !== true; if ($('#mus-vol')) $('#mus-vol').value = String(P.musVol == null ? 40 : P.musVol); }
+    $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; });   // re-apply the dip at once
+    if ($('#in-muson')) { $('#in-muson').checked = P.musOn === true; $('#row-musvol').hidden = P.musOn !== true; $('#row-musduck').hidden = P.musOn !== true; $('#in-musduck').checked = P.musDuck !== false; if ($('#mus-vol')) $('#mus-vol').value = String(P.musVol == null ? 40 : P.musVol); }
     musicInit();
     $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); });
     $('#mini-scene').addEventListener('click', e => { e.stopPropagation(); ambOpen(); });

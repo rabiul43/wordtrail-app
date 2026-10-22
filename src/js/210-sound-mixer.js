@@ -536,21 +536,22 @@
     AMB.duck.gain.setTargetAtTime(v[0], t, tc);
     if (AMB.ca) { AMB.ca.gain.setTargetAtTime(v[1], t, tc); AMB.cb.gain.setTargetAtTime(v[2], t, tc); }
   }
+  function ambVoiceState() {   // 's' narrator speaking (or about to), 'p' pause between sentences, 'u' unknown (no times, no analyser). Shared by the ambient and the music duck.
+    const soon = ambVoiceSoon();
+    let heard = null, an = null; try { an = vgraph; } catch (e) {}
+    if (an && an.getByteTimeDomainData) {
+      const buf = AMB.dbuf || (AMB.dbuf = new Uint8Array(an.fftSize)); an.getByteTimeDomainData(buf);
+      let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+      if (Math.sqrt(sum / buf.length) > 0.02) AMB.lastVoice = performance.now();
+      heard = performance.now() - (AMB.lastVoice || 0) < 400;
+    }
+    if (soon === null && heard === null) return 'u';
+    return (soon === true || heard === true) ? 's' : 'p';
+  }
   function ambDuckTick() {
     if (!AMB.on || !AMB.duck) return;
     let st = 'o';
-    if (P.ambDuck !== false && ambPlaying()) {
-      const soon = ambVoiceSoon();
-      let heard = null, an = null; try { an = vgraph; } catch (e) {}
-      if (an && an.getByteTimeDomainData) {
-        const buf = AMB.dbuf || (AMB.dbuf = new Uint8Array(an.fftSize)); an.getByteTimeDomainData(buf);
-        let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
-        if (Math.sqrt(sum / buf.length) > 0.02) AMB.lastVoice = performance.now();
-        heard = performance.now() - (AMB.lastVoice || 0) < 400;
-      }
-      if (soon === null && heard === null) st = 'u';
-      else st = (soon === true || heard === true) ? 's' : 'p';
-    }
+    if (P.ambDuck !== false && ambPlaying()) st = ambVoiceState();
     if (P.ambSmart !== false && (S.curId !== AMB.sceneId || S.sec !== AMB.lastSec)) ambDuckScene();
     if (P.ambAuto !== false && (S.curId !== AMB.autoId || S.sec !== AMB.autoSec)) ambAutoStep();
     if (st !== AMB.duckS) { AMB.duckS = st; if (st === 'p') AMB.pauseSince = performance.now(); ambDuckSet(st); }
