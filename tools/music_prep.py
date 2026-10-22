@@ -67,7 +67,9 @@ except ImportError:
 # Override with --data-dir on the command line.
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "wordtrail-data"
 
-# Target loudness for all clips (LUFS).  -18 sits well under speech.
+# Mastering loudness for all clips (LUFS). Files stay at -18 for headroom and a consistent library; the app
+# attenuates each clip to its playback target (-27 LUFS, MUS_TARGET_LUFS in 205-music-player.js) using the
+# `lufs` value written below, so do not change this to match the app.
 TARGET_LUFS = -18.0
 
 # How many seconds from the END of a clip to look for the best loop point

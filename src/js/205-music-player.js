@@ -26,6 +26,13 @@
     gen: 0,         // bumped on every mood switch and stop, so a clip that finishes loading late is dropped
     on: false,      // true once the music bus is built on the shared context
     base: '',       // data root override (local test mode only); '' = GitHub raw
+    pend: '',       // a mood the story has moved to, waiting to prove it is stable before the music follows
+    pendMs: 0,      // narration time (ms) the pending mood has held
+    pendAt: 0,      // performance.now() of the last evaluation of the pending mood
+    pendIv: 0,      // setInterval handle that re-evaluates the pending mood while it waits
+    lastSw: 0,      // Date.now() of the last mood crossfade (rate limit)
+    pre: null,      // prefetched + decoded first clip of the pending mood: { mood, queue, clip, buf, qi } (one at a time: decoded audio is large)
+    preTok: 0,      // bumped to cancel an in-flight prefetch
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and
@@ -43,14 +50,21 @@
   };
 
   /* Loudness normalisation: each clip carries its measured LUFS in the manifest.
-     Gain = 10 ^ ((target − measured) / 20). Target is −18 LUFS (quiet under speech). */
-  const MUS_TARGET_LUFS = -18;
+     Gain = 10 ^ ((target - measured) / 20).
+     Target is -27 LUFS. Narration sits around -18 to -20 LUFS, and a bed that is only a few dB under the
+     voice competes with it, especially for listeners with hearing loss or in noisy rooms. Music about
+     8 to 9 dB below speech (before the narrator duck dips it a further ~11 dB) is audible as a mood without
+     masking words. The files themselves stay mastered at -18 LUFS by tools/music_prep.py (headroom, a
+     consistent library), so the extra attenuation happens here, per clip, from the recorded `lufs`.
+     Level is now independent of the ambient volume: the music bus (MUS.master) holds only the user volume. */
+  const MUS_TARGET_LUFS = -27;
   function musLufsGain(lufs) {
     return Math.pow(10, (MUS_TARGET_LUFS - (lufs || MUS_TARGET_LUFS)) / 20);
   }
 
-  /* User volume: P.musVol is 0–100, default 40. */
-  const musVol = () => (P.musVol == null ? 40 : Math.max(0, Math.min(100, P.musVol))) / 100;
+  /* User volume: P.musVol is 0-100. Default 30 (was 40; with the lower LUFS target this is a soft bed). */
+  const MUS_DEFAULT_VOL = 30;
+  const musVol = () => (P.musVol == null ? MUS_DEFAULT_VOL : Math.max(0, Math.min(100, P.musVol))) / 100;
 
   /* The music bus level: user volume (0 when music is switched off). Clips carry only their LUFS gain. */
   const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0);
@@ -227,20 +241,27 @@
     MUS.xTimer = setTimeout(musNextClip, musPlayMs(clip, buf));
   }
 
-  /* Switch to a new mood with a crossfade. */
+  /* Switch to a new mood with a crossfade. Uses the prefetched clip when there is one (instant switch). */
   async function musSwitchMood(mood, force) {
     if (!MUS.on || !MUS.ctx || (mood === MUS.mood && !force)) return;   // force: restart the same mood after a pause
     MUS.mood  = mood;
     const gen = ++MUS.gen;
-    MUS.queue = musQueue(mood);
-    MUS.qi    = 0;
+    let got = null;
+    if (MUS.pre && MUS.pre.mood === mood) {   // taken before musPendClear(), which would drop it
+      const p = MUS.pre; MUS.pre = null; MUS.preTok++;
+      MUS.queue = p.queue; MUS.qi = p.qi; got = { clip: p.clip, buf: p.buf };
+    } else { MUS.queue = musQueue(mood); MUS.qi = 0; }
+    if (MUS.pend === mood) musPendClear();
+    MUS.lastSw = Date.now();
     clearTimeout(MUS.xTimer); clearTimeout(MUS.sTimer);
     MUS.live = true;   // keeps the shared context from being suspended while this loads and plays
     musDuckStart();    // the narrator duck runs whenever music is live, with ambient on or off
     if (MUS.ctx.state !== 'running') MUS.ctx.resume().catch(() => {});
 
-    const got = await musLoadNext(gen);
-    if (gen !== MUS.gen) return;   // a newer mood switch or a stop came in meanwhile
+    if (!got) {
+      got = await musLoadNext(gen);
+      if (gen !== MUS.gen) return;   // a newer mood switch or a stop came in meanwhile: this late result is dropped
+    }
     if (!got) { if (!MUS.playing) MUS.live = false; return; }   // nothing loaded (offline?)
     const { clip, buf } = got;
 
@@ -256,7 +277,7 @@
   function musStop(fadeDur) {
     MUS.gen++;
     clearTimeout(MUS.xTimer);
-    MUS.live = false; musDuckStop();
+    MUS.live = false; musDuckStop(); musPendClear();
     if (!MUS.ctx) return;
     const now = MUS.ctx.currentTime, d = fadeDur || 1.5;
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
@@ -274,10 +295,62 @@
   /* Called when the narrator pauses or ends. */
   function musicPause() { musStop(2); }
 
-  /* Called by scene detection when the mood changes (every paragraph). */
+  /* ---------- Mood switching with hysteresis ----------
+     Scene detection reports a mood whenever the scene signature changes, and an empty mood whenever only the
+     place or weather changes. Following that literally made the music hop between a mood and neutral, each hop
+     fetching a new clip and restarting it at 0:00. Rules now:
+       - an empty or unknown mood changes nothing (neutral is only the first clip, before anything is detected);
+       - a new mood must hold for MUS_DWELL_MS of narration before the music follows (danger: a shorter wait);
+       - at least MUS_GAP_MS between two crossfades (danger: a shorter gap);
+       - leaving the opening neutral clip for the first real mood is immediate;
+       - while it waits, the clip for the pending mood is fetched and decoded, so the switch itself is instant. */
+  const MUS_DWELL_MS = 25e3, MUS_DWELL_STRONG_MS = 6e3, MUS_GAP_MS = 45e3, MUS_GAP_STRONG_MS = 15e3;
+  const MUS_STRONG = { danger: true };
+
+  function musPendClear() {
+    clearInterval(MUS.pendIv); MUS.pendIv = 0;
+    MUS.pend = ''; MUS.pendMs = 0;
+    MUS.pre = null; MUS.preTok++;   // frees the decoded clip and cancels an in-flight prefetch
+  }
+
+  /* Fetch and decode the first clip of `mood` ahead of time. Only one prefetched clip is kept at a time. */
+  async function musPrefetch(mood) {
+    if (!MUS.on || !MUS.ctx || !MUS.manifest || (MUS.pre && MUS.pre.mood === mood)) return;
+    const tok = ++MUS.preTok; MUS.pre = null;
+    const queue = musQueue(mood);
+    for (let i = 0; i < queue.length; i++) {
+      const buf = await musFetch(queue[i].f);
+      if (tok !== MUS.preTok) return;   // the pending mood changed, or the music stopped, meanwhile
+      if (buf) { MUS.pre = { mood, queue, clip: queue[i], buf, qi: i + 1 }; return; }
+    }
+  }
+
+  function musMoodEval() {
+    if (!MUS.pend) return;
+    const now = performance.now();
+    if (musNarrating()) MUS.pendMs += now - MUS.pendAt;   // only narration time counts toward "held"
+    MUS.pendAt = now;
+    if (!MUS.live) { MUS.mood = MUS.pend; musPendClear(); return; }   // not sounding (stopped): the next play starts in the new mood
+    const first = MUS.mood === 'neutral', strong = MUS_STRONG[MUS.pend];
+    const dwell = first ? 0 : strong ? MUS_DWELL_STRONG_MS : MUS_DWELL_MS;
+    const gap   = first ? 0 : strong ? MUS_GAP_STRONG_MS   : MUS_GAP_MS;
+    if (MUS.pendMs < dwell || Date.now() - MUS.lastSw < gap) return;
+    musSwitchMood(MUS.pend);
+  }
+
+  /* Called by scene detection when the scene changes. `scMood` may be empty. */
   function musicMoodChange(scMood) {
-    const m = MUS_MOOD_MAP[scMood] || 'neutral';
-    if (m !== MUS.mood) musSwitchMood(m);
+    const m = MUS_MOOD_MAP[scMood];
+    if (!MUS.mood) { musSwitchMood(m || 'neutral'); return; }   // nothing playing yet: start
+    if (!m) return;                                             // empty or unknown: keep the current mood (and any pending one)
+    if (m === MUS.mood) { if (MUS.pend) musPendClear(); return; }   // the story is back: forget the candidate
+    if (m !== MUS.pend) {
+      if (MUS.pend) musPendClear();
+      MUS.pend = m; MUS.pendMs = 0; MUS.pendAt = performance.now();
+      musPrefetch(m);
+    }
+    if (!MUS.pendIv) MUS.pendIv = setInterval(musMoodEval, 2000);
+    musMoodEval();
   }
 
   /* Called from the Settings volume slider. */
