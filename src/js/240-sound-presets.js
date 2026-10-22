@@ -140,6 +140,9 @@
     $('#amb-scenes').addEventListener('click', ambPresetClear); $('#amb-sug-go').addEventListener('click', ambPresetClear);
     document.addEventListener('visibilitychange', () => { if (document.hidden && AMB.preview) { AMB.preview = false; ambSync(); } });   // a mixer left open with the screen off stops playing
     ['play', 'playing', 'pause', 'ended', 'waiting', 'stalled', 'error', 'emptied', 'abort', 'canplay', 'loadstart', 'loadedmetadata', 'seeked'].forEach(ev => audio.addEventListener(ev, ambSync));   // the sound follows what is really heard: it waits for the audio to start, and stops if it stalls or fails
+    audio.addEventListener('play',  () => { musicAttach(); musicPlay(); });
+    audio.addEventListener('pause', () => musicPause());
+    audio.addEventListener('ended', () => musicPause());
     audio.addEventListener('playing', () => { if (S.curId != null && S.curId >= 0) ambStory(S.curId); });   // after a jump or search the sentence is already current, so setCurrent will not run for it
     ['pause', 'seeking', 'ended'].forEach(ev => audio.addEventListener(ev, () => { ambCueClear(); ambSpaceReset(); }));
     AMB_SOUNDS.forEach(([k]) => $('#amb-' + k).addEventListener('input', e => {
@@ -165,6 +168,10 @@
     $('#amb-off').addEventListener('click', () => { P.ambOn = false; const c = $('#in-ambon'); if (c) c.checked = false; savePrefs(); AMB.preview = false; ambSync(); closeSheets(); toast('Cinematic sound is off.'); });
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
     $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
+    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); });
+    $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
+    if ($('#in-muson')) { $('#in-muson').checked = P.musOn === true; $('#row-musvol').hidden = P.musOn !== true; if ($('#mus-vol')) $('#mus-vol').value = String(P.musVol == null ? 40 : P.musVol); }
+    musicInit();
     $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); });
     $('#mini-scene').addEventListener('click', e => { e.stopPropagation(); ambOpen(); });
   }

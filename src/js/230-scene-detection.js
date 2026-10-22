@@ -801,6 +801,7 @@
       A.L = fx ? (fsc ? ambFull(fsc.L) : null) : (A.place || A.wx || A.mood) ? ambSceneMix(A, conf) : null;
       ambAutoPaint();
       if (AMB.built && AMB.on) ambApply(flip ? 4 : jump ? 1.2 : 2.4);   // a slow crossfade: the old bed fades out as the new one fades in
+      if (MUS.on) musicMoodChange(A.mood || '');
     } catch (e) { console.warn('scene detection', e); }   // never let it break reading
   }
   function ambAutoHold() {   // the reader moved a slider or picked a scene: their mix plays until the story changes place

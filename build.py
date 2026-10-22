@@ -83,6 +83,7 @@ PARTS = [
     ('file', 'src/js/180-sync-alignment.js'),
     ('file', 'src/js/190-sync-finish-retry.js'),
     ('file', 'src/js/200-player-controls.js'),
+    ('file', 'src/js/205-music-player.js'),
     ('file', 'src/js/210-sound-mixer.js'),
     ('file', 'src/js/215-opening-sound.js'),
     ('file', 'src/js/220-story-sounds.js'),
