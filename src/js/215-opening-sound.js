@@ -5,7 +5,44 @@
      Each mood plays a real royalty-free clip when openings.json in the repo lists one (cached for offline use, like
      the ambient recordings); until a clip is listed it plays a soft sound made on the device, so it always works.
      It never plays when a book is resumed from the middle. Settings: Cinematic sound > "Opening sound". */
-  const OSND = { armed: '', tok: 0, nodes: null, map: {}, buf: {}, busy: {}, fail: {}, mood: '' };
+  const OSND = { armed: '', tok: 0, nodes: null, map: {}, buf: {}, busy: {}, fail: {}, mood: '', lead: null };
+  /* ---- the start of a book: opening sound first, then music and ambient under the first words ----
+     ONE record, OSND.lead = { id, until, started, timer }, is the only thing the three layers look at.
+     osDecide() is the single place that decides "this start gets an opening sound"; the music start, the ambient start
+     and osOnPlaying all call it, so they cannot disagree. While performance.now() < lead.until, mood music
+     (musSwitchMood) and ambient (ambSync) wait; when it ends they start, and both fade in slowly (music: its normal
+     6 s clip fade-in; ambient: a slow ramp, see osFadeTc). No lead (opening off, volume 0, or a book resumed
+     mid-way) = nothing waits and everything behaves as before. */
+  const OS_LEAD_MS = 9000, OS_FADE_MS = 6000;
+  function osLeadDrop(release) {   // forget the lead; release: let music and ambient start now
+    const L = OSND.lead; if (!L) return;
+    clearTimeout(L.timer); OSND.lead = null;
+    if (release) osLeadKick();
+  }
+  function osLeadKick() { try { ambSync(); if (P.musOn && MUS.on && !MUS.leadT && !MUS.live && musNarrating()) musicPlay(); } catch (e) { /* optional */ } }
+  function osLeadSet(L, ms) {   // (re)anchor the end of the lead; wakes the ambient start when it passes
+    clearTimeout(L.timer); L.until = performance.now() + ms;
+    L.timer = setTimeout(() => { if (OSND.lead === L) osLeadKick(); }, ms + 80);
+  }
+  function osDecide() {   // the lead for this start, or null; creates it once, only while the narrator is really starting
+    const L = OSND.lead;
+    if (L) return S.book && L.id === String(S.book.id) ? L : null;
+    if (!OSND.armed || !S.book || OSND.armed !== String(S.book.id) || audio.paused) return null;
+    const c = typeof cutFor === 'function' ? cutFor(0) : null, floor = c && c[0] > 0 ? c[0] : 0;
+    if (S.sec !== 0 || audio.currentTime > floor + 20) { OSND.armed = ''; return null; }   // already jumped far into the book
+    if (!((P.openVol == null ? 60 : P.openVol) > 0) || P.openOn === false) { OSND.armed = ''; return null; }
+    const id = OSND.armed; OSND.armed = '';
+    const n = { id, until: 0, started: false, timer: 0 }; OSND.lead = n; osLeadSet(n, OS_LEAD_MS);
+    return n;
+  }
+  function osLeadLeft() {   // ms that music and ambient must still wait (0 = go)
+    const L = osDecide(); if (!L) return 0;
+    return Math.max(0, L.until - performance.now());
+  }
+  function osFadeTc() {   // ambient master time constant: slow (about a 6 s rise) just after the lead, normal otherwise
+    const L = OSND.lead, now = performance.now();
+    return L && S.book && L.id === String(S.book.id) && now >= L.until - 50 && now < L.until + OS_FADE_MS ? 2 : 0.8;
+  }
   const OS_MOODS = [   // [key, name, pattern on genres + title (first match wins)]
     ['gothic', 'Gothic', /gothic|horror|vampire|ghost|haunt|supernatural|dracula|frankenstein|macabre|\bterror\b|werewolf/],
     ['mystery', 'Mystery', /mystery|detective|crime|thriller|spy|sherlock|murder|suspense|\bnoir\b/],
@@ -105,7 +142,7 @@
   }
   /* ---- when: only from the beginning of a book ---- */
   function osArm(b, saved) {   // called by openBook: a start from the first track, near its start, arms the sound; a resume does not
-    OSND.armed = ''; osStop(0.3);
+    OSND.armed = ''; osLeadDrop(); osStop(0.3);
     if (P.openOn === false || !b || !b.secs || !b.secs.length) return;
     const t = saved && saved.time > 0 ? saved.time : 0;
     if (S.sec !== 0 || t > 15) return;   // resuming in the middle: stay silent
@@ -114,14 +151,15 @@
     if (AMB.ctx || ambBuild()) osManifest().then(() => { if (OSND.armed === String(b.id)) osLoad(m[0]); });
   }
   async function osOnPlaying() {
-    if (!OSND.armed || !S.book || OSND.armed !== String(S.book.id)) return;
-    const id = OSND.armed; OSND.armed = '';
-    const c = typeof cutFor === 'function' ? cutFor(0) : null, floor = c && c[0] > 0 ? c[0] : 0;
-    if (S.sec !== 0 || audio.currentTime > floor + 20) return;   // already jumped far into the book
-    const m = osMood(S.book);
+    const L = osDecide();
+    if (!L || L.started) return;   // no opening for this start, or it was already started (playing fires again after buffering)
+    L.started = true;
+    const m = osMood(S.book), id = L.id;
     await Promise.race([osLoad(m[0]), new Promise(r => setTimeout(r, 2000))]);   // give the clip a moment; otherwise the made sound plays
-    if (audio.paused || !S.book || String(S.book.id) !== id) return;
-    osPlay(m);
+    if (OSND.lead !== L) return;   // paused or switched off meanwhile: the drop already released the others
+    if (audio.paused || !S.book || String(S.book.id) !== id) { osLeadDrop(true); return; }
+    if (await osPlay(m)) { if (OSND.lead === L) osLeadSet(L, OS_LEAD_MS); }   // the 9 s count starts when the sound really starts
+    else osLeadDrop(true);   // it could not play: do not make music and ambient wait for nothing
   }
   function osPaint() {
     const on = $('#amb-open'); if (!on) return;
@@ -131,12 +169,12 @@
   }
   function osInit() {
     const on = $('#amb-open'); if (!on) return;
-    on.addEventListener('change', e => { P.openOn = e.target.checked; savePrefs(); if (!P.openOn) { OSND.armed = ''; osStop(0.3); } });
+    on.addEventListener('change', e => { P.openOn = e.target.checked; savePrefs(); if (!P.openOn) { OSND.armed = ''; osStop(0.3); osLeadDrop(true); } });
     $('#amb-open-vol').addEventListener('input', e => { P.openVol = +e.target.value; savePrefs(); });
     $('#amb-open-hear').addEventListener('click', async () => { const m = osMood(S.book); osManifest(); if (ambBuild()) { await osLoad(m[0]); osPlay(m); } else toast('Sound is not available here.'); });
     audio.addEventListener('playing', osOnPlaying);
-    audio.addEventListener('pause', () => { if (OSND.nodes) osStop(0.6); });
-    audio.addEventListener('emptied', () => osStop(0.2));
+    audio.addEventListener('pause', () => { if (OSND.nodes) osStop(0.6); osLeadDrop(); });   // a pause ends the opening: the next play starts music and ambient at once
+    audio.addEventListener('emptied', () => { osStop(0.2); osLeadDrop(); });
     setTimeout(osManifest, 7000); osPaint();
     const sheet = $('#sheet-amb'); if (sheet) new MutationObserver(osPaint).observe(sheet, { attributes: true, attributeFilter: ['hidden'] });
   }

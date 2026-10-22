@@ -63,12 +63,12 @@
   function ambSync() {
     ambBookCheck();
     const L = ambLive(), any = AMB_SOUNDS.some(([k]) => L[k] > 0);
-    const want = (any || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || (P.ambOn === true && ambPlaying()));
+    const want = (any || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || (P.ambOn === true && ambPlaying() && !(osLeadLeft() > 0)));   // a fresh book's opening sound plays first
     clearTimeout(AMB.timer);
     if (want) {
       if (!ambBuild()) return;
       AMB.ctx.resume().catch(() => {}); ambTod(true); ambApply();
-      AMB.slow = false; AMB.master.gain.setTargetAtTime(ambVol(), AMB.ctx.currentTime, 0.8);
+      AMB.slow = false; AMB.master.gain.setTargetAtTime(ambVol(), AMB.ctx.currentTime, osFadeTc());   // slow rise right after the opening sound
       AMB.on = true; if (!AMB.clinkIv) AMB.clinkIv = setInterval(ambClink, 4500);
       if (!AMB.duckIv) AMB.duckIv = setInterval(ambDuckTick, 60);
       if (!AMB.evIv) { AMB.evIv = setInterval(ambEvents, 400); AMB.nextThunder = Date.now() + 4000 + Math.random() * 8000; }

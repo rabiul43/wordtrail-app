@@ -185,7 +185,7 @@
   }
   function audioSuspendSoon(ms, key) {   // stop the engine to save battery, but only when ambient is silent AND music is not playing; ambient and music each keep their own timer
     clearTimeout(AMB[key]);
-    AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive()) AMB.ctx.suspend().catch(() => {}); }, ms);
+    AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive() && !OSND.nodes) AMB.ctx.suspend().catch(() => {}); }, ms);
   }
   function ambBuild() {   // the ambient engine; each sound's layer is built only while its level is above zero (ambLayerOn)
     if (AMB.built) return true;

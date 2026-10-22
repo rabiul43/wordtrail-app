@@ -37,6 +37,7 @@
     holdT: 0,       // setTimeout handle: a soft pause that lasts MUS_HOLD_MS becomes a full stop
     slow: false,    // set with AMB.slow by the sleep timer: the next pause is a slow, full stop (not a soft pause)
     bookId: null,   // id of the book the music belongs to; a different book never resumes the old clip
+    leadT: 0,       // setTimeout handle: the start is postponed while the opening sound plays (osLeadLeft in 215-opening-sound.js)
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and
@@ -79,7 +80,7 @@
 
   /* True while music is loading or sounding. Read by audioSuspendSoon() so the shared context stays
      running for the music even when ambient is silent. */
-  const musicActive = () => !!(MUS.on && MUS.live);
+  const musicActive = () => !!(MUS.on && (MUS.live || MUS.leadT));   // a postponed start still keeps the context awake
 
   /* The book's narrator is being played (not paused or finished). Independent of ambient. */
   const musNarrating = () => !!S.book && !audio.paused && !audio.ended;
@@ -248,6 +249,15 @@
   /* Switch to a new mood with a crossfade. Uses the prefetched clip when there is one (instant switch). */
   async function musSwitchMood(mood, force) {
     if (!MUS.on || !MUS.ctx || (mood === MUS.mood && !force)) return;   // force: restart the same mood after a pause
+    if (!MUS.playing && !MUS.live) {   // the opening sound of a fresh book is playing: start the music after it (same gate as ambient)
+      const wait = osLeadLeft();
+      if (wait > 0) {
+        MUS.mood = mood; clearTimeout(MUS.leadT);
+        MUS.leadT = setTimeout(() => { MUS.leadT = 0; if (P.musOn && MUS.on && !MUS.playing && !MUS.live && musNarrating()) musSwitchMood(MUS.mood || 'neutral', true); }, wait + 100);
+        return;
+      }
+    }
+    clearTimeout(MUS.leadT); MUS.leadT = 0;
     MUS.mood  = mood;
     const gen = ++MUS.gen;
     let got = null;
@@ -280,7 +290,7 @@
   /* Stop all music with a short fade. */
   function musStop(fadeDur) {
     MUS.gen++;
-    clearTimeout(MUS.xTimer);
+    clearTimeout(MUS.xTimer); clearTimeout(MUS.leadT); MUS.leadT = 0;
     MUS.live = false; musDuckStop(); musPendClear();
     MUS.held = false; clearTimeout(MUS.holdT);
     if (!MUS.ctx) return;
