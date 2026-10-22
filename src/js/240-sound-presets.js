@@ -76,7 +76,7 @@
       const tc = AMB.slow ? 3 : 0.6; AMB.slow = false;   // a sleep timer fades the sounds out slowly, after the voice is gone
       AMB.master.gain.setTargetAtTime(0, AMB.ctx.currentTime, tc);
       AMB.on = false; clearInterval(AMB.duckIv); AMB.duckIv = 0; AMB.duckS = ''; ambDuckSet('o'); clearInterval(AMB.clinkIv); AMB.clinkIv = 0; clearInterval(AMB.evIv); AMB.evIv = 0;
-      AMB.timer = setTimeout(() => { if (!AMB.on) AMB.ctx.suspend().catch(() => {}); }, tc * 3500 + 500);   // stop the engine when silent, to save battery
+      audioSuspendSoon(tc * 3500 + 500, 'timer');   // stop the engine when silent (and no music is playing), to save battery
     }
   }
   function ambOpen() {

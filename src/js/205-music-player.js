@@ -2,12 +2,17 @@
      Melodic background music that follows the story's mood.
      Clips are CC0/CC-BY files in music/ in the GitHub data repo, listed in music.json.
      The engine crossfades clips seamlessly to cover long chapters, and crossfades between
-     moods when the scene changes. Music sits under the narrator (shares AMB duck chain).
+     moods when the scene changes. Music has its own audio bus (musicGain -> musicDuck -> destination),
+     independent of the ambient engine: it plays with ambient off, and ambient on/off never touches it.
+     It shares only the AudioContext (audioCtx() in 210-sound-mixer.js).
      Settings > Audio: Music on/off toggle + volume slider. */
 
   const MUS = {
-    ctx: null,      // AudioContext — shared with AMB once it exists
-    master: null,   // GainNode connected to AMB.master
+    ctx: null,      // the shared AudioContext (audioCtx()); created even when ambient is off
+    master: null,   // musicGain: user volume; every clip connects here
+    duck: null,     // musicDuck: gain between musicGain and ctx.destination (driven by the narrator duck in Task 2)
+    live: false,    // music is wanted/playing (a clip is loading or sounding): the context must not be suspended
+    sTimer: 0,      // setTimeout handle: suspend the context a moment after music stops (if ambient is silent too)
     manifest: null, // parsed music.json
     mood: '',       // current mood key
     queue: [],      // shuffled clip list for current mood
@@ -16,7 +21,7 @@
     fading: null,   // previous clip still fading out
     xTimer: 0,      // setTimeout handle for the next crossfade
     gen: 0,         // bumped on every mood switch and stop, so a clip that finishes loading late is dropped
-    on: false,      // true once attached to AMB.ctx
+    on: false,      // true once the music bus is built on the shared context
     base: '',       // data root override (local test mode only); '' = GitHub raw
   };
 
@@ -43,6 +48,20 @@
 
   /* User volume: P.musVol is 0–100, default 40. */
   const musVol = () => (P.musVol == null ? 40 : Math.max(0, Math.min(100, P.musVol))) / 100;
+
+  /* The music bus level: user volume (0 when music is switched off). Clips carry only their LUFS gain. */
+  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0);
+  function musBusApply(tc) {
+    if (!MUS.master || !MUS.ctx) return;
+    MUS.master.gain.setTargetAtTime(musBusLevel(), MUS.ctx.currentTime, tc == null ? 0.1 : tc);
+  }
+
+  /* True while music is loading or sounding. Read by audioSuspendSoon() so the shared context stays
+     running for the music even when ambient is silent. */
+  const musicActive = () => !!(MUS.on && MUS.live);
+
+  /* The book's narrator is being played (not paused or finished). Independent of ambient. */
+  const musNarrating = () => !!S.book && !audio.paused && !audio.ended;
 
   /* Fetch and cache music.json from the GitHub data repo. */
   async function musFetchManifest() {
@@ -108,14 +127,15 @@
   }
 
   /* Schedule one clip at AudioContext time `when`, fading in over `fadeIn` seconds.
+     The clip's own gain is only its LUFS normalisation; the user volume lives on the bus (MUS.master).
      Returns a playing-node descriptor. */
-  function musSchedule(buf, clip, when, fadeIn, vol) {
+  function musSchedule(buf, clip, when, fadeIn) {
     const ctx = MUS.ctx;
     const lufsGain = musLufsGain(clip.lufs);
     const gain = ctx.createGain();
     gain.connect(MUS.master);
     gain.gain.setValueAtTime(0, when);
-    gain.gain.linearRampToValueAtTime(vol * lufsGain, when + fadeIn);
+    gain.gain.linearRampToValueAtTime(lufsGain, when + fadeIn);
 
     const src = ctx.createBufferSource();
     src.buffer = buf;
@@ -125,7 +145,7 @@
     src.loop = true;   // looping is stopped manually at the crossfade point
     src.start(when);
 
-    return { src, gain, _file: clip.f, _lkEnd: src.loopEnd, _vol: vol, _lufsGain: lufsGain };
+    return { src, gain, _file: clip.f, _lkEnd: src.loopEnd, _lufsGain: lufsGain };
   }
 
   /* Fade out a playing-node over `dur` seconds starting at `when`, then stop it. */
@@ -170,10 +190,10 @@
     const { clip, buf } = got;
 
     const now = MUS.ctx.currentTime;
-    const vol = musVol() * (P.musOn !== false ? 1 : 0);
+    musBusApply();
     musFadeOut(MUS.playing, now, MUS_FADE);
     MUS.fading  = MUS.playing;
-    MUS.playing = musSchedule(buf, clip, now, MUS_FADE, vol);
+    MUS.playing = musSchedule(buf, clip, now, MUS_FADE);
 
     clearTimeout(MUS.xTimer);
     MUS.xTimer = setTimeout(musNextClip, musPlayMs(clip, buf));
@@ -186,16 +206,19 @@
     const gen = ++MUS.gen;
     MUS.queue = musQueue(mood);
     MUS.qi    = 0;
-    clearTimeout(MUS.xTimer);
+    clearTimeout(MUS.xTimer); clearTimeout(MUS.sTimer);
+    MUS.live = true;   // keeps the shared context from being suspended while this loads and plays
+    if (MUS.ctx.state !== 'running') MUS.ctx.resume().catch(() => {});
 
     const got = await musLoadNext(gen);
-    if (!got || gen !== MUS.gen) return;   // nothing loaded, or a newer mood switch or a stop came in meanwhile
+    if (gen !== MUS.gen) return;   // a newer mood switch or a stop came in meanwhile
+    if (!got) { if (!MUS.playing) MUS.live = false; return; }   // nothing loaded (offline?)
     const { clip, buf } = got;
 
     const now = MUS.ctx.currentTime;
-    const vol = musVol() * (P.musOn !== false ? 1 : 0);
+    musBusApply();
     if (MUS.playing) musFadeOut(MUS.playing, now, MUS_FADE);
-    MUS.playing = musSchedule(buf, clip, now, MUS_FADE, vol);
+    MUS.playing = musSchedule(buf, clip, now, MUS_FADE);
 
     MUS.xTimer  = setTimeout(musNextClip, musPlayMs(clip, buf));
   }
@@ -204,15 +227,17 @@
   function musStop(fadeDur) {
     MUS.gen++;
     clearTimeout(MUS.xTimer);
+    MUS.live = false;
     if (!MUS.ctx) return;
     const now = MUS.ctx.currentTime, d = fadeDur || 1.5;
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
     if (MUS.fading)  { musFadeOut(MUS.fading,  now, d); MUS.fading  = null; }
+    audioSuspendSoon((d + 0.6) * 1000, 'sTimer');   // after the fade, stop the engine if ambient is silent too
   }
 
   /* Called when the narrator starts playing. */
   function musicPlay() {
-    if (!P.musOn || !MUS.on || !MUS.manifest) return;
+    if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing; ambient is irrelevant
     if (MUS.playing) return;
     musSwitchMood(MUS.mood || 'neutral', true);   // after a pause MUS.mood is unchanged, so force the restart
   }
@@ -230,30 +255,26 @@
   function musicVolChange(v) {
     P.musVol = Math.max(0, Math.min(100, Math.round(v)));
     savePrefs();
-    if (MUS.playing && MUS.ctx) {
-      const now = MUS.ctx.currentTime;
-      const target = musVol() * MUS.playing._lufsGain;
-      const g = MUS.playing.gain.gain;
-      g.cancelScheduledValues(now);
-      g.setValueAtTime(g.value, now);   // start the ramp from the level heard now, so moving the slider mid-fade-in doesn't jump
-      g.linearRampToValueAtTime(target, now + 0.3);
-    }
+    musBusApply(0.1);   // the user volume is the bus gain, so a clip that is mid-crossfade keeps its own fade untouched
   }
 
-  /* Hook into AMB's AudioContext once it exists.
-     Idempotent — safe to call on every play event. */
+  /* Build the music's own bus on the shared AudioContext (created here if ambient has not made it).
+     musicGain (user volume) -> musicDuck -> ctx.destination. Does NOT use AMB.master, so ambient on/off
+     never mutes, suspends or restarts music. Idempotent — safe to call on every play event.
+     Callers follow it with musicPlay(), so the cached-manifest case needs no play call here. */
   function musicAttach() {
-    if (MUS.on || !AMB.ctx || !AMB.master) return;
-    MUS.ctx    = AMB.ctx;
-    MUS.master = AMB.master;   // music → same master gain → same duck chain as ambient
-    MUS.on     = true;
-    if (!MUS.manifest) musFetchManifest().then(() => { if (ambPlaying()) musicPlay(); });
-    else if (ambPlaying()) musicPlay();
+    if (MUS.on) return;
+    const ctx = audioCtx(); if (!ctx) return;
+    const master = ctx.createGain(), duck = ctx.createGain();
+    master.gain.value = musBusLevel(); duck.gain.value = 1;
+    master.connect(duck); duck.connect(ctx.destination);
+    MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.on = true;
+    if (!MUS.manifest) musFetchManifest().then(() => { if (musNarrating()) musicPlay(); });
   }
 
   /* Called once at startup to pre-fetch the manifest in the background. */
   async function musicInit() {
-    if (!MUS.manifest) musFetchManifest();   // fire and forget; attach waits for AMB.ctx
+    if (!MUS.manifest) musFetchManifest();   // fire and forget; the bus is built on the first play
   }
 
   /* ---------- Music credits ----------
