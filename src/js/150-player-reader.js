@@ -344,7 +344,7 @@
       if (c && c[1] != null && audio.currentTime >= c[1]) {
         S.outroHit = true; // once per track load
         lpDone(S.sec);
-        if (S.sleep === 'chapter') { AMB.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: stopped at the end of the track.'); persist(); return; }
+        if (S.sleep === 'chapter') { AMB.slow = MUS.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: stopped at the end of the track.'); persist(); return; }
         if (S.sec < S.secs.length - 1) { goTrack(S.sec + 1, 0, true, true); return; }
       }
     }
@@ -674,7 +674,7 @@
   });
   audio.addEventListener('ended', () => {
     lpDone(S.sec);
-    if (S.sleep === 'chapter') { AMB.slow = true; setSleep(0); toast('Sleep timer: stopped at the end of the track.'); persist(); return; }
+    if (S.sleep === 'chapter') { AMB.slow = MUS.slow = true; setSleep(0); toast('Sleep timer: stopped at the end of the track.'); persist(); return; }
     if (S.sec < S.secs.length - 1) goTrack(S.sec + 1, 0, true, true);
     else { toast('You have finished this book.'); stFinish(); try { if (S.book) statSend(S.book.id, 'finish'); } catch (e) { /* stats are optional */ } persist(); setTimeout(() => { if (S.book && audio.ended && !sheetOpen() && P.calm !== true) nextOpen(true); }, 1200); }
   });

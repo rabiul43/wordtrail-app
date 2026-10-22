@@ -33,6 +33,10 @@
     lastSw: 0,      // Date.now() of the last mood crossfade (rate limit)
     pre: null,      // prefetched + decoded first clip of the pending mood: { mood, queue, clip, buf, qi } (one at a time: decoded audio is large)
     preTok: 0,      // bumped to cancel an in-flight prefetch
+    held: false,    // soft pause: the bus is faded to silence but the same clip is kept, ready to fade back in
+    holdT: 0,       // setTimeout handle: a soft pause that lasts MUS_HOLD_MS becomes a full stop
+    slow: false,    // set with AMB.slow by the sleep timer: the next pause is a slow, full stop (not a soft pause)
+    bookId: null,   // id of the book the music belongs to; a different book never resumes the old clip
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and
@@ -67,7 +71,7 @@
   const musVol = () => (P.musVol == null ? MUS_DEFAULT_VOL : Math.max(0, Math.min(100, P.musVol))) / 100;
 
   /* The music bus level: user volume (0 when music is switched off). Clips carry only their LUFS gain. */
-  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0);
+  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0) * (MUS.held ? 0 : 1);   // held: soft pause, silent but kept
   function musBusApply(tc) {
     if (!MUS.master || !MUS.ctx) return;
     MUS.master.gain.setTargetAtTime(musBusLevel(), MUS.ctx.currentTime, tc == null ? 0.1 : tc);
@@ -278,6 +282,7 @@
     MUS.gen++;
     clearTimeout(MUS.xTimer);
     MUS.live = false; musDuckStop(); musPendClear();
+    MUS.held = false; clearTimeout(MUS.holdT);
     if (!MUS.ctx) return;
     const now = MUS.ctx.currentTime, d = fadeDur || 1.5;
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
@@ -285,15 +290,44 @@
     audioSuspendSoon((d + 0.6) * 1000, 'sTimer');   // after the fade, stop the engine if ambient is silent too
   }
 
-  /* Called when the narrator starts playing. */
-  function musicPlay() {
-    if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing; ambient is irrelevant
-    if (MUS.playing) return;
-    musSwitchMood(MUS.mood || 'neutral', true);   // after a pause MUS.mood is unchanged, so force the restart
+  /* A different book never inherits the old book's clip or mood: stop what is there and start clean. */
+  function musBookCheck() {
+    const id = S.book ? String(S.book.id) : null;
+    if (id === MUS.bookId) return;
+    MUS.bookId = id;
+    if (MUS.live || MUS.held || MUS.playing) musStop(1);
+    MUS.mood = '';
   }
 
-  /* Called when the narrator pauses or ends. */
-  function musicPause() { musStop(2); }
+  /* Called when the narrator starts playing (or resumes). */
+  function musicPlay() {
+    if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing; ambient is irrelevant
+    MUS.slow = false;
+    musBookCheck();
+    if (MUS.held) {   // back from a soft pause: the same clip fades back in
+      MUS.held = false; clearTimeout(MUS.holdT);
+      if (MUS.playing) {
+        if (MUS.ctx.state !== 'running') MUS.ctx.resume().catch(() => {});
+        musDuckStart(); musBusApply(0.5);
+        return;
+      }
+    }
+    if (MUS.playing) return;
+    musSwitchMood(MUS.mood || 'neutral', true);   // after a full stop MUS.mood is unchanged, so force the restart
+  }
+
+  /* Soft pause. A pause (or the end of a track) under MUS_HOLD_MS fades the music to silence over ~1.5 s and
+     keeps the same clip, so it fades back in on resume instead of restarting. After MUS_HOLD_MS it stops fully.
+     A seek is not a pause. The sleep timer (MUS.slow) fades everything out slowly and stops fully. */
+  const MUS_HOLD_MS = 30e3;
+  function musicPause() {
+    if (!MUS.on || audio.seeking) return;
+    if (MUS.slow) { MUS.slow = false; musStop(4); return; }
+    if (!MUS.live || !MUS.playing) { musStop(1.5); return; }   // nothing sounding yet (still loading): drop it
+    if (MUS.held) return;
+    MUS.held = true; musBusApply(0.4);   // time constant 0.4 s: silent in about 1.5 s
+    clearTimeout(MUS.holdT); MUS.holdT = setTimeout(() => { if (MUS.held) musStop(0.3); }, MUS_HOLD_MS);
+  }
 
   /* ---------- Mood switching with hysteresis ----------
      Scene detection reports a mood whenever the scene signature changes, and an empty mood whenever only the
@@ -341,6 +375,7 @@
   /* Called by scene detection when the scene changes. `scMood` may be empty. */
   function musicMoodChange(scMood) {
     const m = MUS_MOOD_MAP[scMood];
+    musBookCheck();
     if (!MUS.mood) { musSwitchMood(m || 'neutral'); return; }   // nothing playing yet: start
     if (!m) return;                                             // empty or unknown: keep the current mood (and any pending one)
     if (m === MUS.mood) { if (MUS.pend) musPendClear(); return; }   // the story is back: forget the candidate

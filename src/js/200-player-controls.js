@@ -189,7 +189,7 @@
     S.fadeIv = setInterval(() => {
       if (audio.paused) { setSleep(0); return; } // already stopped by the listener: just reset
       const x = 1 - (performance.now() - t0) / D;
-      if (x <= 0) { AMB.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: paused.'); }
+      if (x <= 0) { AMB.slow = MUS.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: paused.'); }
       else setVol(fadeCurve(x));
     }, 100);
   }
