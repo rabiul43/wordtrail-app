@@ -53,13 +53,13 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
 | `200-player-controls.js` | 487 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
-| `210-sound-mixer.js` | 689 | background sound mixer, real recordings |
+| `210-sound-mixer.js` | 690 | background sound mixer, real recordings |
 | `220-story-sounds.js` | 406 | story sounds |
 | `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
-| `233-scene-chapters-label.js` | 109 | chapter titles and look-ahead, scene label on the mini-player |
-| `240-sound-presets.js` | 178 | hear a sound; quick presets |
+| `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
+| `240-sound-presets.js` | 283 | hear a sound; quick presets |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 371 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
