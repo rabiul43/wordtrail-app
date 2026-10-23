@@ -137,8 +137,17 @@
     MUS.duck.gain.setTargetAtTime(r.v[0], t, r.tc);
     if (MUS.ca) { MUS.ca.gain.setTargetAtTime(r.v[1], t, r.tc); MUS.cb.gain.setTargetAtTime(r.v[2], t, r.tc); }
   }
+  /* Scene detection (and so the music's mood) is stepped by the ambient tick (ambDuckTick) only while the ambient engine is on
+     and "Scene sounds" is on. Music is independent of both, so when that tick is not running it, the music steps it itself.
+     ambAutoStep never touches the ambient sound when AMB.on is false, and ambLevels() ignores its result when P.ambAuto is false. */
+  function musSceneStep() {
+    if (AMB.on && P.ambAuto !== false) return;   // the ambient tick already does it
+    if (S.curId === AMB.autoId && S.sec === AMB.autoSec) return;   // same sentence as last time
+    try { ambAutoStep(); } catch (e) { /* the mood is a help, never a reason to stop the music */ }
+  }
   function musDuckTick() {
     if (!MUS.on || !MUS.duck) return;
+    if (musNarrating()) musSceneStep();
     if (audio.seeking) return;   // a seek is a short gap: keep the music as it is
     let st = 'o';
     if (P.musDuck !== false && musNarrating() && !S.loadingAudio && !audio.error && audio.readyState > 2) st = ambVoiceState();
@@ -189,8 +198,17 @@
   }
 
   /* How busy the music should be for what is being read: quiet under talk, fuller in action. 0 = soft, 1 = full. */
+  function musDens() {   // share of the last three sentences that are quoted speech (computed here: AMB.scene.dens only exists while the ambient engine runs, and AMB.scene is also a plain scene name)
+    try {
+      const sents = S.model && S.model.sents, id = S.curId;
+      if (!sents || id == null || id < 0 || !sents[id]) return 0.5;
+      let q = 0, n = 0;
+      for (let i = Math.max(0, id - 2); i <= id; i++) { const t = sents[i] && sents[i].t; if (t == null) continue; n++; if (/[\"\u201c\u201d]/.test(t)) q++; }
+      return n ? q / n : 0.5;
+    } catch (e) { return 0.5; }
+  }
   function musTargetEnergy() {
-    const dens = (AMB.scene && AMB.scene.dens != null) ? AMB.scene.dens : 0.5;   // share of recent sentences that are quoted speech
+    const dens = musDens();
     let t = dens >= 0.5 ? 0.2 : dens >= 0.25 ? 0.4 : 0.55;
     if (MUS.mood === 'danger' || MUS.mood === 'chase') t = Math.max(t, 0.75);
     else if (MUS.mood === 'peace' || MUS.mood === 'sorrow') t = Math.min(t, 0.4);
@@ -396,6 +414,8 @@
     if (MUS.playing) return;
     const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
     if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
+    musSceneStep();   // read the scene here first, so the very first clip already fits the story (this may start the music itself)
+    if (MUS.playing || MUS.live) return;
     musSwitchMood(MUS.mood || 'neutral', true);   // after a pause MUS.mood is unchanged, so force the restart
   }
 

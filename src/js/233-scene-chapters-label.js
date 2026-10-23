@@ -67,6 +67,7 @@
       const flip = A.time !== t0; if (flip) ambTod(true, true);   // day <-> night in the story: the night softening eases in or out over several seconds
       const fx0 = ambFixNear(m, pi), fsc = fx0 && fx0.k !== '-' ? AMB_SCENES.find(x => x.k === fx0.k) : null, fx = fx0 && (fx0.k === '-' || fsc) ? fx0 : null;   // a correction from the reader: a strong prior that rules this paragraph and its neighbours
       A.fix = fx ? { k: fx.k, n: fsc ? fsc.n : '' } : null;
+      if (!look && MUS.on) musicMoodChange(A.mood || '');   // the music follows the story's mood: once per paragraph, even when the ambient scene itself did not change (a look ahead skips it: mood waits for its own paragraph)
       const sig = [A.place, A.wx, A.time, A.mood, fx ? fx.k : '', A.wi || 1].join('|'); if (sig === A.sig) return;
       A.sig = sig;
       if (place0 && A.place && A.place !== place0) ambTrans(place0, A.place, look ? id + 1 : id, look, skipped);   // the story moved to a new place: a door, gate or footsteps
@@ -75,7 +76,6 @@
       A.L = fx ? (fsc ? ambFull(fsc.L) : null) : (A.place || A.wx || A.mood) ? ambSceneMix(A, conf) : null;
       ambAutoPaint();
       if (AMB.built && AMB.on) ambApply(flip ? 4 : jump ? 1.2 : 2.4);   // a slow crossfade: the old bed fades out as the new one fades in
-      if (MUS.on) musicMoodChange(A.mood || '');   // the music follows the story's mood
     } catch (e) { console.warn('scene detection', e); }   // never let it break reading
   }
   function ambAutoHold() {   // the reader moved a slider or picked a scene: their mix plays until the story changes place
