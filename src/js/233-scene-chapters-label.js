@@ -75,6 +75,7 @@
       A.L = fx ? (fsc ? ambFull(fsc.L) : null) : (A.place || A.wx || A.mood) ? ambSceneMix(A, conf) : null;
       ambAutoPaint();
       if (AMB.built && AMB.on) ambApply(flip ? 4 : jump ? 1.2 : 2.4);   // a slow crossfade: the old bed fades out as the new one fades in
+      if (MUS.on) musicMoodChange(A.mood || '');   // the music follows the story's mood
     } catch (e) { console.warn('scene detection', e); }   // never let it break reading
   }
   function ambAutoHold() {   // the reader moved a slider or picked a scene: their mix plays until the story changes place
@@ -102,6 +103,7 @@
 
   /* Scene label on the mini-player: shown only when P.sceneLabel is true and a scene is active. */
   function miniScenePaint(label) {
+    AMB.lbl = label ? String(label).replace(/^Now: /, '') : ''; sndNowPaint();
     const btn = $('#mini-scene'); if (!btn) return;
     const show = P.sceneLabel === true && !!label && P.ambOn === true && AMB.on;
     btn.hidden = !show;

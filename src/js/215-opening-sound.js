@@ -82,7 +82,7 @@
   };
   /* ---- playing it ---- */
   function osStop(fade) {
-    const n = OSND.nodes; OSND.tok++; OSND.nodes = null; OSND.until = 0; if (!n) return;
+    const n = OSND.nodes; OSND.tok++; OSND.nodes = null; OSND.until = 0; sndNowPaint(); if (!n) return;
     try { const t = AMB.ctx.currentTime; n.g.gain.cancelScheduledValues(t); n.g.gain.setValueAtTime(n.g.gain.value, t); n.g.gain.linearRampToValueAtTime(0, t + (fade == null ? 0.5 : fade)); setTimeout(() => { try { n.g.disconnect(); n.lp.disconnect(); } catch (e) { /* already gone */ } }, ((fade == null ? 0.5 : fade) + 0.3) * 1000); } catch (e) { /* context gone */ }
   }
   async function osPlay(mood) {   // mood: [key, name]
@@ -100,6 +100,7 @@
     if (buf) { const s = ctx.createBufferSource(); s.buffer = buf; s.connect(lp); s.start(t); s.stop(t + len + 0.1); }
     else (OS_SYNTH[k] || OS_SYNTH.calm)(lp, t);
     OSND.nodes = { g, lp }; OSND.mood = k;
+    sndNowPaint();
     OSND.until = Date.now() + Math.max(6, len - 4) * 1000;   // music may start about 4 s before the opening ends (never earlier than 6 s)
     setTimeout(() => { if (OSND.nodes && OSND.nodes.g === g) osStop(0.1); }, (len + 0.5) * 1000);
     return true;
@@ -134,6 +135,7 @@
   }
   function osPaint() {
     const on = $('#amb-open'); if (!on) return;
+    sndNowPaint();
     on.checked = P.openOn !== false; $('#amb-open-vol').value = String(P.openVol == null ? 60 : P.openVol);
     const m = osMood(S.book), note = $('#amb-open-note');
     if (note) note.textContent = (S.book ? 'This book: ' + m[1] + (OSND.map[m[0]] ? ' (real clip' + (OSND.map[m[0]].by ? ', ' + OSND.map[m[0]].by : '') + ').' : ' (made on the device).') : 'Open a book to hear its opening sound.') + ' Plays only when a book starts from the beginning.';
@@ -146,6 +148,7 @@
     audio.addEventListener('playing', osOnPlaying);
     audio.addEventListener('pause', () => { if (OSND.nodes) osStop(0.6); });
     audio.addEventListener('emptied', () => osStop(0.2));
+    ['play', 'pause', 'playing', 'emptied'].forEach(ev => audio.addEventListener(ev, () => setTimeout(sndNowPaint, 50)));   // after the music and ambient listeners have run
     setTimeout(osManifest, 7000); osPaint();
     const sheet = $('#sheet-amb'); if (sheet) new MutationObserver(osPaint).observe(sheet, { attributes: true, attributeFilter: ['hidden'] });
   }

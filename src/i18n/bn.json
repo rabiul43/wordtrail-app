@@ -1736,7 +1736,21 @@
   "transition sound": "পরিবর্তনের শব্দ",
   "open a book to use it": "ব্যবহার করতে একটি বই খুলুন",
   "now": "এখন",
-  "Settings > Display": "সেটিংস > ডিসপ্লে"
+  "Settings > Display": "সেটিংস > ডিসপ্লে",
+  "Music": "সংগীত",
+  "Opening": "শুরুর শব্দ",
+  "paused": "থামানো",
+  "starts after the opening": "শুরুর শব্দের পর শুরু হবে",
+  "loading": "লোড হচ্ছে",
+  "not playing yet": "এখনো বাজছে না",
+  "recorded clip": "রেকর্ড করা ক্লিপ",
+  "made on the device": "ফোনে তৈরি",
+  "Neutral": "সাধারণ",
+  "Dread": "ভয়ের ছায়া",
+  "Danger": "বিপদ",
+  "Peaceful": "শান্ত",
+  "Sad": "বিষণ্ণ",
+  "Merry": "আনন্দময়"
  },
  "rx": [
   [

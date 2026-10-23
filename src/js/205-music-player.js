@@ -175,7 +175,7 @@
     src.loop = true;   // looping is stopped manually at the crossfade point
     src.start(when);
 
-    return { src, gain, _file: clip.f, _lkEnd: src.loopEnd, _lufsGain: lufsGain };
+    return { src, gain, _file: clip.f, _clip: clip, _lkEnd: src.loopEnd, _lufsGain: lufsGain };
   }
 
   /* Fade out a playing-node over `dur` seconds starting at `when`, then stop it. */
@@ -227,6 +227,7 @@
 
     clearTimeout(MUS.xTimer);
     MUS.xTimer = setTimeout(musNextClip, musPlayMs(clip, buf));
+    sndNowPaint();
   }
 
   /* Switch to a new mood with a crossfade. */
@@ -257,6 +258,7 @@
     MUS.playing = musSchedule(buf, clip, now, MUS_FADE);
 
     MUS.xTimer  = setTimeout(musNextClip, musPlayMs(clip, buf));
+    sndNowPaint();
   }
 
   /* Stop all music with a short fade. */
@@ -269,6 +271,36 @@
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
     if (MUS.fading)  { musFadeOut(MUS.fading,  now, d); MUS.fading  = null; }
     audioSuspendSoon((d + 0.6) * 1000, 'sTimer');   // after the fade, stop the engine if ambient is silent too
+    sndNowPaint();
+  }
+
+  /* ---------- Now playing ----------
+     One short block at the top of the sound sheet (#amb-now): the music (mood, track, artist), the scene, and the
+     opening sound. Each piece is its own element so the translator can match fixed words one by one. */
+  const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry' };
+  function sndNowPaint() {
+    try {
+      const box = $('#amb-now'); if (!box) return;
+      const rows = [];
+      if (P.musOn) {
+        const p = MUS.playing, c = p && p._clip;
+        if (c) {
+          const slug = String(c.f).split('/').pop().replace(/\.mp3$/i, '');
+          rows.push(['Music', MUS_MOOD_NAME[MUS.mood] || 'Neutral', c.t || MUS_TITLES[slug] || musPrettyTitle(slug), c.by || '']);
+        } else if (!musNarrating()) rows.push(['Music', 'paused']);
+        else if (osLeadWait() > 0) rows.push(['Music', 'starts after the opening']);
+        else if (MUS.live) rows.push(['Music', 'loading']);
+        else rows.push(['Music', 'not playing yet']);
+      }
+      if (P.ambOn === true && AMB.on && AMB.lbl) rows.push(['Scene', AMB.lbl]);
+      if (OSND.nodes) rows.push(['Opening', OSND.buf[OSND.mood] ? 'recorded clip' : 'made on the device']);
+      box.textContent = ''; box.hidden = !rows.length;
+      rows.forEach(r => {
+        const row = h('div', {}, h('span', { class: 'k', text: r[0] }), ' ');
+        r.slice(1).filter(Boolean).forEach((t, i) => { if (i) row.append(' \u00b7 '); row.append(h('span', { text: t })); });
+        box.append(row);
+      });
+    } catch (e) { /* a status line must never break playback */ }
   }
 
   /* Called when the narrator starts playing. */
@@ -276,7 +308,7 @@
     if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing; ambient is irrelevant
     if (MUS.playing) return;
     const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
-    if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); return; }
+    if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
     musSwitchMood(MUS.mood || 'neutral', true);   // after a pause MUS.mood is unchanged, so force the restart
   }
 

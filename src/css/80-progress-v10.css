@@ -388,3 +388,9 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 .acct-links { justify-content: center; }
 .tab.signed .tab-ic { position: relative; }
 .tab.signed .tab-ic::after { content: ""; position: absolute; top: -1px; right: -3px; width: .55rem; height: .55rem; border-radius: 50%; background: #4FB477; border: 2px solid var(--bg); }
+
+/* Now playing line in the sound sheet (sndNowPaint) */
+.amb-now { margin: 0 0 .6rem; font-size: .85rem; color: var(--muted); display: grid; gap: .15rem; }
+.amb-now[hidden] { display: none; }
+.amb-now .k { color: var(--ink); font-weight: 600; }
+.amb-now .k::after { content: ':'; }
