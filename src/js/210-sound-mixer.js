@@ -63,7 +63,7 @@
     const box = $('#amb-scenes'), sug0 = ambSuggest(S.book), sug = sug0 || ambTonight();
     box.textContent = '';
     const list = AMB_SCENES.slice(); if (sug) { list.splice(list.indexOf(sug), 1); list.unshift(sug); }
-    list.forEach(sc => box.append(h('button', { class: 'chip', type: 'button', 'data-k': sc.k, 'aria-pressed': 'false' }, (sug && sc === sug ? '\u2605 ' : '') + sc.n)));
+    list.forEach(sc => box.append(h('button', { class: 'chip', type: 'button', 'data-k': sc.k, 'aria-pressed': 'false' }, sc.n, sug && sc === sug ? h('small', { class: 'amb-tag' }, 'Suggested') : null)));
     const card = $('#amb-sug');
     if (sug) { $('#amb-sug-n').textContent = sug.n; $('#amb-sug-for').textContent = sug0 ? 'Suggested for \u201c' + (S.book.title || 'this book') + '\u201d' : 'Suggested for tonight: quieter and softer'; }
     card.hidden = !sug; card.dataset.k = sug ? sug.k : '';

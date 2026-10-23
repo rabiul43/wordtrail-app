@@ -34,9 +34,14 @@
 .snd-ltxt small { display: block; color: var(--muted); font-size: .82rem; margin-top: .1rem; }
 .snd-sub { padding-left: .8rem; border-left: 2px solid var(--line); }
 .snd-panel .amb-h { margin-bottom: 0; }
-#row-musvol[hidden] { display: grid; }   /* the music volume stays in place; it dims with the rest when music is off */
+#row-musvol[hidden] { display: grid; }
+.snd-panel .snd-vrow[data-hide] { display: none; }   /* a sound's own volume is hidden while that sound is off */
 
 .snd-body .amb-sug { padding: .55rem .8rem; margin: 0 0 .9rem; }
 .snd-body .amb-sug > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .4rem; min-width: 0; }
 .snd-body .amb-sug strong { font-size: 1rem; }
+.amb-scenes .chip { display: inline-flex; align-items: center; gap: .4rem; }
+.amb-tag { font-size: .68rem; font-weight: 600; padding: .05rem .4rem; border-radius: 999px; background: var(--accent-soft); color: var(--ink); }
+.amb-more summary { cursor: pointer; color: var(--muted); font-size: .82rem; padding: .3rem 0; }
+.amb-more[open] summary { margin-bottom: .2rem; }
 @media (prefers-reduced-motion: reduce) { .snd-sw, .snd-sw::after, .snd-tab { transition: none; } }
