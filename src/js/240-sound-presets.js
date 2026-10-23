@@ -73,7 +73,7 @@
     set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
     set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); });
-    sndNowPaint();
+    sndNowPaint(); sndTabsPaint();
   }
   function sndApplyAll() {   // after the master switch, the master volume or a preset: make every layer follow the saved settings
     ambMaster(); ambSync(); musBusApply(0.2);
@@ -277,6 +277,7 @@
     $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; });   // re-apply the dip at once
     sndPaint(); ambPresetPaint();
+    try { sndTabsInit(); } catch (e) { console.warn('sound tabs', e); }
     musicInit();
     $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); });
     $('#mini-scene').addEventListener('click', e => { e.stopPropagation(); ambOpen(); });

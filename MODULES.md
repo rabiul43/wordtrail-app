@@ -59,7 +59,8 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
-| `240-sound-presets.js` | 283 | hear a sound; quick presets |
+| `240-sound-presets.js` | 284 | hear a sound; quick presets |
+| `245-sound-tabs.js` | 45 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when that layer is on, and the dimmed look while Sound is off (`sndTabsPaint`, `sndTabsInit`; styles in `src/css/96-sound-tabs.css`) |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 371 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
