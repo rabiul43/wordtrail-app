@@ -137,6 +137,14 @@ def main():
     check_music(a.data_dir, a.min_clips)
     check_openings(a.data_dir)
     print(f"\nSUMMARY: {len(errors)} error(s), {len(warnings)} warning(s)")
+    print("\nWHAT TO DO NEXT (full steps: MUSIC-GUIDE.md in the app repo)")
+    w = " ".join(warnings + errors)
+    if "no energy" in w: print("  - Add energy values:  python tools\\music_prep.py --energy-only --data-dir " + a.data_dir)
+    if "only" in w and "clip(s)" in w or "no clips" in w: print("  - Thin or empty moods: add MP3s to music/_inbox/<mood>/ in the data repo (3 or more each), then:  python tools\\music_prep.py --build --data-dir " + a.data_dir)
+    if "memory" in w: print("  - Very long clips use a lot of phone memory: replace them with 60-120 s versions.")
+    if "openings" in w or "openings.json" in w: print("  - Opening sounds: optional. Add openings.json and clips in the data repo for recorded openings.")
+    if errors: print("  - Fix the ERROR lines first.")
+    print("  - Then commit and push the data repo. The app picks it up by itself.")
     sys.exit(1 if errors else 0)
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/js/                   the app, one slice per feature
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
+    MUSIC-GUIDE.md            how to add or change music (steps to follow when you forget)
     tools/                    helper scripts (i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md)
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/

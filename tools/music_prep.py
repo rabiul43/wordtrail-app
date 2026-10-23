@@ -335,7 +335,7 @@ def inbox_clips(data_dir, by, lic):
             slug = re.sub(r"[^a-z0-9]+", "-", p.stem.lower()).strip("-") or "clip"
             c = credits.get(p.name, {})
             out.append(dict(mood=mood, slug=slug, raw=p,
-                            by=c.get("by", by), lic=c.get("lic", lic)))
+                            by=c.get("by", by), lic=c.get("lic", lic), explicit=p.name in credits))
     return out
 
 
@@ -396,7 +396,6 @@ def step_build(data_dir, dry_run, by="Kevin MacLeod", lic="CC-BY"):
             try:
                 dur = ffprobe_duration(out)
                 lufs = measure_lufs(out)
-                busy = measure_busy(out)
                 loop_end, loop_rms = find_loop_point(out, dur)
                 loop_start = 0.0
 
@@ -408,26 +407,38 @@ def step_build(data_dir, dry_run, by="Kevin MacLeod", lic="CC-BY"):
                     "by":   clip["by"],
                     "lic":  clip["lic"],
                 }
-                if busy is not None: entry["_busy"] = busy
                 manifest["moods"][mood].append(entry)
                 print(f"    → dur={dur:.1f}s  lufs={lufs:.1f}  loop_end={loop_end:.1f}s  rms_at_loop={loop_rms:.4f}")
             except Exception as e:
                 print(f"    ERROR measuring {out}: {e}")
 
-    # Energy "e" (0 = soft, 1 = full): each clip's rank by busyness across the whole library. The app uses it to pick
-    # quieter clips under dialogue and fuller ones in action.
-    allc = [c for v in manifest["moods"].values() for c in v]
-    ranked = sorted((c for c in allc if "_busy" in c), key=lambda c: c["_busy"])
-    for i, c in enumerate(ranked):
-        c["e"] = round(i / (len(ranked) - 1), 2) if len(ranked) > 1 else 0.5
-    for c in allc: c.pop("_busy", None)
+    # Keep what is already in music.json: a clip that is not in the inbox any more stays (if its file is on disk), and a
+    # clip that is rebuilt keeps its old credit unless music/_inbox/credits.json names it. Nothing is lost by a rebuild.
+    old_path = data_dir / "music.json"
+    if old_path.exists():
+        try: old = json.loads(old_path.read_text(encoding="utf-8"))
+        except Exception: old = {}
+        explicit = {f"{c['mood']}/{c['slug']}.mp3" for c in all_inbox if c.get("explicit")}
+        for mood, olds in (old.get("moods") or {}).items():
+            lst = manifest["moods"].setdefault(mood, [])
+            have = {c["f"]: c for c in lst}
+            for oc in olds:
+                f = oc.get("f")
+                if not f: continue
+                if f in have:
+                    if f not in explicit:
+                        for k in ("by", "lic"):
+                            if oc.get(k): have[f][k] = oc[k]
+                elif (data_dir / "music" / f).is_file():
+                    lst.append(oc); print(f"  kept {f} (already in music.json)")
 
     if not dry_run:
         out_path = data_dir / "music.json"
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=2)
         total = sum(len(v) for v in manifest["moods"].values())
-        print(f"\n── Wrote {out_path}  ({total} clips across {len(MOODS)} moods) ──")
+        print(f"\n── Wrote {out_path}  ({total} clips across {len(manifest['moods'])} moods) ──")
+        step_energy(data_dir, dry_run=False)   # energy "e" for every clip, ranked across the whole library
         _print_attribution(manifest)
     else:
         print("\n── Dry run: music.json not written ──")
@@ -459,10 +470,45 @@ def _print_attribution(manifest):
 # CLI
 # ---------------------------------------------------------------------------
 
+def step_energy(data_dir, dry_run):
+    """SAFE way to add the energy value "e" to an existing music.json. It only adds "e" to each clip. It does not
+    re-encode anything, does not touch credits, lengths or loop points, and keeps clips that are not in music/_inbox.
+    The old file is saved as music.json.bak first."""
+    mj = data_dir / "music.json"
+    if not mj.exists():
+        sys.exit(f"ERROR: {mj} not found")
+    manifest = json.loads(mj.read_text(encoding="utf-8"))
+    clips = [c for v in (manifest.get("moods") or {}).values() for c in v]
+    print(f"\n── Measuring energy for {len(clips)} clips ──")
+    busy = {}
+    for c in clips:
+        p = data_dir / "music" / c["f"]
+        if not p.is_file():
+            print(f"  {c['f']}: file not found, skipped"); continue
+        try:
+            b = measure_busy(p)
+        except Exception as e:
+            print(f"  {c['f']}: could not measure ({e})"); continue
+        if b is not None:
+            busy[c["f"]] = b
+            print(f"  {c['f']}: busyness {b:.3f}")
+    ranked = sorted(busy, key=busy.get)
+    for i, f in enumerate(ranked):
+        e = round(i / (len(ranked) - 1), 2) if len(ranked) > 1 else 0.5
+        for c in clips:
+            if c["f"] == f: c["e"] = e
+    if dry_run:
+        print("\n── Dry run: music.json not changed ──"); return
+    shutil.copyfile(mj, data_dir / "music.json.bak")
+    mj.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"\n── Added energy to {len(ranked)} clips in {mj} (old file: music.json.bak) ──")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--download", action="store_true", help="Download raw clips from CLIP_SOURCES")
     ap.add_argument("--build",    action="store_true", help="Normalise clips and write music.json")
+    ap.add_argument("--energy-only", action="store_true", help="SAFE: only add the energy value e to the existing music.json (nothing is re-encoded, credits are kept)")
     ap.add_argument("--data-dir", default=str(DATA_DIR), help="Path to your wordtrail-data repo (default: %(default)s)")
     ap.add_argument("--init",     action="store_true", help="Create music/_inbox/<mood>/ folders and exit")
     ap.add_argument("--by",       default="Kevin MacLeod", help="Credit for inbox clips (default: %(default)s)")
@@ -470,7 +516,7 @@ def main():
     ap.add_argument("--dry-run",  action="store_true", help="Print what would happen without doing it")
     args = ap.parse_args()
 
-    if not args.download and not args.build and not args.init:
+    if not args.download and not args.build and not args.init and not args.energy_only:
         ap.print_help()
         sys.exit(0)
 
@@ -486,12 +532,15 @@ def main():
         return
 
     # Quick sanity check for ffmpeg
-    if args.build and not args.dry_run:
+    if (args.build or args.energy_only) and not args.dry_run:
         if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
             sys.exit("ERROR: ffmpeg and ffprobe must be on your PATH.\nInstall from https://ffmpeg.org")
 
     if args.download:
         step_download(data_dir, dry_run=args.dry_run)
+
+    if args.energy_only:
+        step_energy(data_dir, dry_run=args.dry_run)
 
     if args.build:
         step_build(data_dir, dry_run=args.dry_run, by=args.by, lic=args.lic)
