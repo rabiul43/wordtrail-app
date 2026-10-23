@@ -86,6 +86,9 @@
     <div class="row" style="flex-wrap:wrap;gap:.5rem"><label for="amb-rec-k" style="flex:1 1 8rem">Try a real recording<small class="spd-s">Pick a sound, then choose an audio file or paste a link, and the mixer opens so you can hear it</small></label><select id="amb-rec-k" class="num" style="width:auto"></select>
       <div style="flex-basis:100%;display:flex;gap:.5rem;flex-wrap:wrap"><button id="amb-rec-pick" class="btn small ghost" type="button">Choose file</button><button id="amb-rec-url" class="btn small ghost" type="button">Use a link</button><button id="amb-rec-reset" class="btn small ghost" type="button">Remove</button></div>
       <input id="amb-rec-file" type="file" accept="audio/*" hidden><small class="spd-s" id="amb-rec-st" style="flex-basis:100%"></small></div>
+      <h3 class="amb-h">Storage</h3>
+    <div class="row" style="flex-wrap:wrap;gap:.5rem"><label style="flex:1 1 8rem">Saved sound files<small class="spd-s">Music and opening clips kept on this device. The oldest are removed above 150 MB.</small></label><span class="spd-s" id="snd-cache-size"></span>
+      <div style="flex-basis:100%"><button id="snd-cache-clear" class="btn small ghost" type="button">Clear sound cache</button></div></div>
       <h3 class="amb-h">Reset</h3>
       <div class="amb-fixrow"><button id="snd-reset-all" class="btn small ghost" type="button">Reset all sound settings</button></div>
     </details>

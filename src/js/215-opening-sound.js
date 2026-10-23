@@ -45,12 +45,12 @@
     OSND.busy[k] = (async () => {
       try {
         let resp = null, cache = null;
-        try { cache = await caches.open('wt-amb-rec'); resp = await cache.match(m.url); } catch (e) { /* no cache here: download each time */ }
+        try { cache = await caches.open('wt-amb-rec'); resp = await cache.match(m.url); if (resp) sndTouch(m.url); } catch (e) { /* no cache here: download each time */ }
         if (!resp) {
           const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
           const r = await fetch(m.url, { signal: ctl.signal }); clearTimeout(to);
           if (!r.ok) throw new Error('http ' + r.status);
-          if (cache) { try { await cache.put(m.url, r.clone()); } catch (e) { /* too big or blocked: still play it */ } }
+          if (cache) { try { await cache.put(m.url, r.clone()); sndTouch(m.url); sndCachePrune(); } catch (e) { /* too big or blocked: still play it */ } }
           resp = r;
         }
         OSND.buf[k] = await AMB.ctx.decodeAudioData(await resp.arrayBuffer()); delete OSND.fail[k];

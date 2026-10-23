@@ -354,13 +354,13 @@
     AMB.recBusy[k] = true; ambRecPaint();
     try {
       let resp = null, cache = null;
-      try { cache = await caches.open('wt-amb-rec'); resp = await cache.match(u.key); } catch (e) { /* no cache here: download each time */ }
+      try { cache = await caches.open('wt-amb-rec'); resp = await cache.match(u.key); if (resp) sndTouch(u.key); } catch (e) { /* no cache here: download each time */ }
       if (!resp) {
         if (!u.url) throw new Error('missing');
         const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
         const r = await fetch(u.url, { signal: ctl.signal }); clearTimeout(to);
         if (!r.ok) throw new Error('http ' + r.status);
-        if (cache) { try { await cache.put(u.key, r.clone()); } catch (e) { /* too big or blocked: still play it */ } }
+        if (cache) { try { await cache.put(u.key, r.clone()); sndTouch(u.key); sndCachePrune(); } catch (e) { /* too big or blocked: still play it */ } }
         resp = r;
       }
       const buf = await AMB.ctx.decodeAudioData(await resp.arrayBuffer());

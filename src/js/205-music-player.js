@@ -149,7 +149,8 @@
       } else try {
         const c = await caches.open('wt-music');
         resp = await c.match(url);
-        if (!resp) { resp = await fetch(url); if (resp.ok) await c.put(url, resp.clone()); }
+        if (!resp) { resp = await fetch(url); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); } }
+        else sndTouch(url);
       } catch (e) { resp = await fetch(url); }
       if (!resp || !resp.ok) return null;
       return await MUS.ctx.decodeAudioData(await resp.arrayBuffer());
