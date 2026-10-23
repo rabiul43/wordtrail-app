@@ -394,3 +394,17 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 .amb-now[hidden] { display: none; }
 .amb-now .k { color: var(--ink); font-weight: 600; }
 .amb-now .k::after { content: ':'; }
+
+/* Sound screen (sheet-amb): master card, layer cards, Advanced */
+.snd-card { border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 14px; padding: .7rem .85rem; margin: 0 0 .6rem; background: var(--surface); }
+.snd-card .amb-opt { margin: 0; font-weight: 600; }
+.snd-head { display: grid; gap: .1rem; margin-bottom: .35rem; }
+.snd-head small { color: var(--muted); font-size: .8rem; padding-left: 1.9rem; }
+.snd-card .amb-row { margin: .2rem 0; }
+.snd-more { margin-top: .3rem; }
+.snd-more > summary, .snd-adv > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--accent); font-size: .9rem; }
+.snd-adv { margin: .8rem 0 1rem; border-top: 1px solid var(--line, rgba(255,255,255,.12)); }
+.snd-adv > summary { color: var(--ink); font-weight: 600; }
+.snd-master { border-color: var(--accent); }
+#amb-presets { flex-wrap: wrap; overflow-x: visible; }
+.amb-pnote[hidden] { display: none; }

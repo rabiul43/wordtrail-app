@@ -136,7 +136,7 @@
     $('#qk-t-speed').addEventListener('click', () => { buzz('tick'); qkOpt('speed'); });
     $('#qk-t-sleep').addEventListener('click', () => { buzz('tick'); qkOpt('sleep'); });
     /* Turning the sound on also lets the app read the scene from where the reader is now, so no scene has to be picked by hand */
-    const qkAmbSet = on => { P.ambOn = on; const c = $('#in-ambon'); if (c) c.checked = on; if (on && P.ambAuto !== false) { AMB.auto = null; AMB.autoId = null; } savePrefs(); ambSync(); if (on && P.ambAuto !== false) { try { ambAutoStep(); } catch (e) { /* optional */ } ambApply(1.5); } qkPaint(); };
+    const qkAmbSet = on => { if (on && !sndOn()) { P.sndOn = true; sndApplyAll(); } P.ambOn = on; const c = $('#in-ambon'); if (c) c.checked = on; if (on && P.ambAuto !== false) { AMB.auto = null; AMB.autoId = null; } savePrefs(); ambSync(); if (on && P.ambAuto !== false) { try { ambAutoStep(); } catch (e) { /* optional */ } ambApply(1.5); } qkPaint(); };
     $('#qk-t-amb').addEventListener('click', () => { buzz('tick'); if ($('#qk-o-amb').hidden && P.ambOn !== true) qkAmbSet(true); qkOpt('amb'); });   // first tap on Sound turns it on and opens its panel
     $('#qk-amb-vol').addEventListener('input', e => { P.ambVol = +e.target.value; const v = $('#amb-vol'); if (v) v.value = e.target.value; savePrefs(); ambMaster(); qkPaint(); });
     $('#qk-amb-mix').addEventListener('click', () => { closeSheets(); ambOpen(); });

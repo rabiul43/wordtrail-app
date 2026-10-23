@@ -1,52 +1,94 @@
 <section id="sheet-amb" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-amb">
-  <header><h2 id="h-amb">Cinematic sound</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <header><h2 id="h-amb">Sound</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body">
-    <p class="help">Mix the sounds you like. They play quietly under the book, start when the book plays and fade out when it pauses or the sleep timer ends. The sounds are made on your device, so they work offline.</p>
+    <div class="snd-card snd-master">
+      <label class="amb-opt"><input type="checkbox" id="snd-on"> Sound</label>
+      <p class="help amb-note">One switch for everything. When it is off, every sound is silent and your settings are kept.</p>
+      <div class="amb-row"><label for="snd-vol">Master volume</label><input id="snd-vol" type="range" min="0" max="100" step="1" aria-label="Master volume for all sound"></div>
+    </div>
     <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
     <div class="amb-now" id="amb-now" aria-live="polite" hidden></div>
-    <h3 class="amb-h">Scene</h3>
-    <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
-    <div class="amb-row"><label for="amb-vol">Volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Cinematic sound master volume"></div>
-    <details class="amb-fine" id="amb-fine"><summary>Fine-tune</summary>
-    <label class="amb-opt"><input type="checkbox" id="amb-auto"> Follow the story's scenes</label>
-    <p class="help amb-note" id="amb-auto-st" aria-live="polite">Listening for the next scene. Between scenes your own mix plays.</p>
-    <div class="amb-fixrow" id="amb-fixrow"><button id="amb-wrong" class="btn small ghost" type="button" aria-expanded="false" aria-controls="amb-wrong-pick">Wrong scene?</button><button id="amb-fix-clear" class="btn small ghost" type="button" hidden>Clear corrections for this book</button></div>
-    <div id="amb-wrong-pick" class="amb-wrongpick" hidden><p class="help amb-note">What fits this part of the story?</p><div id="amb-wrong-chips" class="amb-scenes" role="group" aria-label="Pick the right scene for this part of the story"></div></div>
     <h3 class="amb-h">Presets</h3>
     <div id="amb-presets" class="amb-scenes" role="group" aria-label="Quick presets"></div>
     <div id="amb-preset-note" class="amb-pnote" hidden><span id="amb-preset-txt" class="help amb-note"></span><button id="amb-preset-undo" class="btn small ghost" type="button">Undo</button></div>
-    <h3 class="amb-h">Intensity</h3>
-    <div class="amb-row"><label for="amb-int">Calm to full</label><input id="amb-int" type="range" min="0" max="100" step="1" aria-label="Cinematic sound intensity"></div>
-    <p class="help amb-note">One slider for the whole scene. Turn it up and the extra details (thunder, creaks, a bell) join the steady sounds.</p>
-    <h3 class="amb-h">Customize</h3>
-    <div id="amb-rows" class="amb-rows"></div>
-    <h3 class="amb-h">Sound behaviour</h3>
-    <label class="amb-opt"><input type="checkbox" id="amb-duck"> Dip under the narrator's voice</label>
-    <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt the dip to the scene</label>
-    <label class="amb-opt"><input type="checkbox" id="amb-cues"> Story sounds</label>
-    <label class="amb-opt"><input type="checkbox" id="amb-trans"> Transition sounds</label>
-    <p class="help amb-note">When the story moves somewhere new, a short door, gate or footsteps sound plays as the scene changes. Needs "Follow the story's scenes". Off in Calm mode.</p>
-    <div class="amb-row"><label for="amb-cshift" id="amb-cshift-l">Sound timing</label><input id="amb-cshift" type="range" min="-10" max="10" step="1" aria-label="Story sound timing: earlier or later"></div>
-    <div class="amb-sub" id="amb-cats">
-      <label class="amb-opt"><input type="checkbox" id="amb-cat-nature"> Nature</label>
-      <label class="amb-opt"><input type="checkbox" id="amb-cat-home"> Home</label>
-      <label class="amb-opt"><input type="checkbox" id="amb-cat-travel"> Travel</label>
-      <label class="amb-opt"><input type="checkbox" id="amb-cat-people"> People</label>
+
+    <h3 class="amb-h">Layers</h3>
+    <div class="snd-card">
+      <div class="snd-head"><label class="amb-opt"><input type="checkbox" id="in-ambon"> Ambient scenes</label><small>Rain, wind, café, waves under the narrator</small></div>
+      <div class="amb-row"><label for="amb-vol">Volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Ambient scenes volume"></div>
+      <details class="snd-more"><summary>Details</summary>
+        <h3 class="amb-h">Scene</h3>
+        <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
+        <p class="help amb-note">The sounds are made on your device, so they work offline. They start when the book plays and fade out when it pauses or the sleep timer ends.</p>
+      </details>
     </div>
-    <h3 class="amb-h">My own words</h3>
-    <div class="amb-cw"><input id="amb-cw-w" type="text" maxlength="24" placeholder="A word, e.g. bang" aria-label="Word that triggers a sound" autocapitalize="none" autocomplete="off" spellcheck="false"><select id="amb-cw-k" aria-label="Sound to play"></select><button id="amb-cw-add" class="btn small" type="button">Add</button></div>
-    <ul id="amb-cw-list" class="amb-cwl"></ul>
-    <p class="help amb-note" id="amb-cw-msg" aria-live="polite">Plays that sound whenever the exact word is read. The same limits apply as for the other story sounds.</p>
-    <label class="amb-opt"><input type="checkbox" id="amb-tod"> Softer and warmer at night</label>
-    <label class="amb-opt"><input type="checkbox" id="amb-open"> Opening sound</label>
-    <div class="amb-row"><label for="amb-open-vol">Opening sound volume</label><input id="amb-open-vol" type="range" min="0" max="100" step="1" aria-label="Opening sound volume"></div>
-    <p class="help amb-note" id="amb-open-note"></p>
-    <div class="amb-fixrow"><button id="amb-open-hear" class="btn small ghost" type="button">Hear the opening sound</button></div>
-    <p class="help amb-note">When the book mentions thunder, a knock, a bell, birds or a gust of wind, a short matching sound plays at that word. Off in Calm mode.</p>
+    <div class="snd-card">
+      <div class="snd-head"><label class="amb-opt"><input type="checkbox" id="amb-cues"> Story sounds</label><small>A short sound at a word like thunder, a knock or a bell</small></div>
+      <details class="snd-more"><summary>Details</summary>
+        <label class="amb-opt"><input type="checkbox" id="amb-trans"> Transition sounds</label>
+        <p class="help amb-note">When the story moves somewhere new, a short door, gate or footsteps sound plays as the scene changes. Needs "Follow the story". Off in Calm mode.</p>
+        <div class="amb-row"><label for="amb-cshift" id="amb-cshift-l">Sound timing</label><input id="amb-cshift" type="range" min="-10" max="10" step="1" aria-label="Story sound timing: earlier or later"></div>
+        <div class="amb-sub" id="amb-cats">
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-nature"> Nature</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-home"> Home</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-travel"> Travel</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-people"> People</label>
+        </div>
+        <h3 class="amb-h">My own words</h3>
+        <div class="amb-cw"><input id="amb-cw-w" type="text" maxlength="24" placeholder="A word, e.g. bang" aria-label="Word that triggers a sound" autocapitalize="none" autocomplete="off" spellcheck="false"><select id="amb-cw-k" aria-label="Sound to play"></select><button id="amb-cw-add" class="btn small" type="button">Add</button></div>
+        <ul id="amb-cw-list" class="amb-cwl"></ul>
+        <p class="help amb-note" id="amb-cw-msg" aria-live="polite">Plays that sound whenever the exact word is read. The same limits apply as for the other story sounds.</p>
+        <p class="help amb-note">Story sounds play together with the ambient scenes, at the ambient volume. Off in Calm mode.</p>
+      </details>
+    </div>
+    <div class="snd-card">
+      <div class="snd-head"><label class="amb-opt"><input type="checkbox" id="in-muson"> Background music</label><small>Instrumental music that matches the mood of the story</small></div>
+      <div class="amb-row" id="row-musvol" hidden><label for="mus-vol">Volume</label><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume"></div>
+      <details class="snd-more"><summary>Details</summary>
+        <p class="help amb-note">The music changes with the mood of the story and crossfades between moods. It always plays quietly under the narrator's voice. The mood needs "Follow the story" to be on.</p>
+      </details>
+    </div>
+    <div class="snd-card">
+      <div class="snd-head"><label class="amb-opt"><input type="checkbox" id="amb-open"> Opening sound</label><small>A short sound when a book starts from the beginning</small></div>
+      <div class="amb-row"><label for="amb-open-vol">Volume</label><input id="amb-open-vol" type="range" min="0" max="100" step="1" aria-label="Opening sound volume"></div>
+      <details class="snd-more"><summary>Details</summary>
+        <p class="help amb-note" id="amb-open-note"></p>
+        <div class="amb-fixrow"><button id="amb-open-hear" class="btn small ghost" type="button">Hear the opening sound</button></div>
+      </details>
+    </div>
+
+    <h3 class="amb-h">How it behaves</h3>
+    <label class="amb-opt"><input type="checkbox" id="amb-auto"> Follow the story</label>
+    <p class="help amb-note" id="amb-auto-st" aria-live="polite">Listening for the next scene. Between scenes your own mix plays.</p>
+    <label class="amb-opt"><input type="checkbox" id="snd-duck"> Dip under the narrator</label>
+    <label class="amb-opt"><input type="checkbox" id="amb-tod"> Softer at night</label>
+    <label class="amb-opt"><input type="checkbox" id="in-scenelabel"> Show scene label</label>
+    <p class="help amb-note">The scene label shows what is playing, like "Now: Saloon", on the mini-player. Tap it to open this screen.</p>
+
+    <h3 class="amb-h">This book</h3>
+    <div class="amb-fixrow" id="amb-fixrow"><button id="amb-wrong" class="btn small ghost" type="button" aria-expanded="false" aria-controls="amb-wrong-pick">Wrong scene?</button><button id="amb-fix-clear" class="btn small ghost" type="button" hidden>Clear corrections for this book</button></div>
+    <div id="amb-wrong-pick" class="amb-wrongpick" hidden><p class="help amb-note">What fits this part of the story?</p><div id="amb-wrong-chips" class="amb-scenes" role="group" aria-label="Pick the right scene for this part of the story"></div></div>
+    <div class="amb-fixrow"><button id="snd-book-reset" class="btn small ghost" type="button">Reset sound for this book</button></div>
     <p class="help amb-note" id="amb-note">Your mix is remembered for each book.</p>
-    <p class="help amb-note">Where the sounds come from (made on your device or recorded) is chosen in Settings, Audio.</p>
+
+    <details class="snd-adv" id="amb-fine"><summary>Advanced</summary>
+      <h3 class="amb-h">Mixer</h3>
+      <div class="amb-row"><label for="amb-int">Calm to full</label><input id="amb-int" type="range" min="0" max="100" step="1" aria-label="Ambient intensity"></div>
+      <p class="help amb-note">One slider for the whole scene. Turn it up and the extra details (thunder, creaks, a bell) join the steady sounds.</p>
+      <div id="amb-rows" class="amb-rows"></div>
+      <h3 class="amb-h">Dipping</h3>
+      <label class="amb-opt"><input type="checkbox" id="amb-duck"> Dip ambient sounds under the narrator</label>
+      <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt the dip to the scene</label>
+    <div class="row" id="row-musduck" hidden><label for="in-musduck" style="flex:1">Dip music under the narrator<small class="spd-s">Lowers the music while the narrator speaks and lets it back up in the pauses</small></label><input id="in-musduck" type="checkbox"></div>
+      <h3 class="amb-h">Sound source</h3>
+    <div class="row" style="flex-wrap:wrap"><label style="flex:1 1 8rem">Sound source<small class="spd-s" id="amb-src-note"></small></label><div class="seg" id="seg-ambsrc"><button data-v="gen">Generated</button><button data-v="hybrid">Hybrid</button><button data-v="rec">Recordings</button></div></div>
+      <h3 class="amb-h">Developer</h3>
+    <div class="row" style="flex-wrap:wrap;gap:.5rem"><label for="amb-rec-k" style="flex:1 1 8rem">Try a real recording<small class="spd-s">Pick a sound, then choose an audio file or paste a link, and the mixer opens so you can hear it</small></label><select id="amb-rec-k" class="num" style="width:auto"></select>
+      <div style="flex-basis:100%;display:flex;gap:.5rem;flex-wrap:wrap"><button id="amb-rec-pick" class="btn small ghost" type="button">Choose file</button><button id="amb-rec-url" class="btn small ghost" type="button">Use a link</button><button id="amb-rec-reset" class="btn small ghost" type="button">Remove</button></div>
+      <input id="amb-rec-file" type="file" accept="audio/*" hidden><small class="spd-s" id="amb-rec-st" style="flex-basis:100%"></small></div>
+      <h3 class="amb-h">Reset</h3>
+      <div class="amb-fixrow"><button id="snd-reset-all" class="btn small ghost" type="button">Reset all sound settings</button></div>
     </details>
-    <div class="row"><button id="amb-off" class="btn small ghost" type="button">Turn background sound off</button></div>
   </div>
 </section>
 
@@ -94,8 +136,8 @@
       </div>
     </div>
     <div id="qk-o-amb" class="qk-opt" data-for="amb" hidden>
-      <div class="qk-oh"><h3>Cinematic sound</h3><button id="qk-amb-mix" class="qk-link" type="button">Open mixer &#8250;</button></div>
-      <input id="qk-amb-vol" class="spd-range" type="range" min="0" max="100" step="1" aria-label="Cinematic sound volume">
+      <div class="qk-oh"><h3>Sound</h3><button id="qk-amb-mix" class="qk-link" type="button">Open Sound &#8250;</button></div>
+      <input id="qk-amb-vol" class="spd-range" type="range" min="0" max="100" step="1" aria-label="Ambient volume">
     </div>
     <div class="qk-tiles qk4">
       <button id="qk-read" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg><span>Text only</span></button>
@@ -268,15 +310,7 @@
     <div class="row"><label for="in-skipbtn"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>Skip intro button</h3><small style="color:var(--muted)">Shows for the first 30 seconds of a track, to jump past the spoken LibriVox notice</small></label><input id="in-skipbtn" type="checkbox"></div>
     <div class="row"><label for="in-smartrw"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Smart rewind</h3><small style="color:var(--muted)">After a pause, or when you come back to a book, go back a few seconds (more after a longer break) so you don't lose the thread</small></label><input id="in-smartrw" type="checkbox"></div>
     <div class="row"><label for="in-autonext"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Download ahead</h3><small style="color:var(--muted)">Saves the next tracks while you listen, on Wi-Fi only, so a weak connection never stops the book. Remove them in Settings &gt; Storage</small></label><select id="in-autonext" class="num" style="width:auto"><option value="0">Off</option><option value="2">Next 2 tracks</option><option value="3">Next 3 tracks</option></select></div>
-    <div class="row"><label for="in-ambon"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Cinematic sound</h3><small style="color:var(--muted)">Turn the book into a scene. Rain, café, wind or waves play under the narrator, follow the story and dip when the narrator speaks. It starts when the audio starts and stops when it stops</small></label><input id="in-ambon" type="checkbox"><button id="b-amb-set" class="btn small ghost" type="button" style="flex-basis:100%">Open sound mixer</button></div>
-    <div class="row"><label for="in-muson"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Background music</h3><small style="color:var(--muted)">Instrumental music that matches the mood of the story — tense, peaceful, sorrowful — and crossfades automatically as the scene changes. Always plays quietly under the narrator’s voice</small></label><input id="in-muson" type="checkbox"></div>
-    <div class="row" id="row-musvol" hidden><label for="mus-vol" style="flex:1">Music volume<small class="spd-s">Keeps music well below the narrator</small></label><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume" style="flex:1 1 8rem"></div>
-    <div class="row" id="row-musduck" hidden><label for="in-musduck" style="flex:1">Dip music under the narrator<small class="spd-s">Lowers the music while the narrator speaks and lets it back up in the pauses</small></label><input id="in-musduck" type="checkbox"></div>
-    <div class="row"><label for="in-scenelabel" style="flex:1">Scene label on player<small class="spd-s">Shows the active sound scene — like "Now: Saloon" — on the mini-player so you can see the auto-choice at a glance. Tap it to open the mixer and adjust. Off by default.</small></label><input id="in-scenelabel" type="checkbox"></div>
-    <div class="row" style="flex-wrap:wrap"><label style="flex:1 1 8rem">Sound source<small class="spd-s" id="amb-src-note"></small></label><div class="seg" id="seg-ambsrc"><button data-v="gen">Generated</button><button data-v="hybrid">Hybrid</button><button data-v="rec">Recordings</button></div></div>
-    <div class="row" style="flex-wrap:wrap;gap:.5rem"><label for="amb-rec-k" style="flex:1 1 8rem">Try a real recording<small class="spd-s">Pick a sound, then choose an audio file or paste a link, and the mixer opens so you can hear it</small></label><select id="amb-rec-k" class="num" style="width:auto"></select>
-      <div style="flex-basis:100%;display:flex;gap:.5rem;flex-wrap:wrap"><button id="amb-rec-pick" class="btn small ghost" type="button">Choose file</button><button id="amb-rec-url" class="btn small ghost" type="button">Use a link</button><button id="amb-rec-reset" class="btn small ghost" type="button">Remove</button></div>
-      <input id="amb-rec-file" type="file" accept="audio/*" hidden><small class="spd-s" id="amb-rec-st" style="flex-basis:100%"></small></div>
+    <div class="row"><label style="flex:1"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Sound</h3><small style="color:var(--muted)">Background sounds, story sounds, music and the opening sound, all in one place. Presets, volume and a master switch are there too</small></label><button id="b-amb-set" class="btn small ghost" type="button" >Open sound mixer</button></div>
     <div class="row"><label for="in-lockseek"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Lock-screen buttons</h3><small style="color:var(--muted)">Skip back and forward 15 seconds. Turn off to get previous and next track instead</small></label><input id="in-lockseek" type="checkbox"></div>
     <div class="row"><label for="in-autodel"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Auto-delete finished downloads</h3><small style="color:var(--muted)">When you reach the end of a book, its downloaded audio is removed from this device to free space. Your position, stats and favourites are kept</small></label><input id="in-autodel" type="checkbox"></div>
     <div class="row" id="row-sharestats"><label for="in-sharestats"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Share anonymous listen counts</h3><small style="color:var(--muted)">Counts a book once after you have listened for a minute, and once when you finish it, so others can see how popular it is. Sends a random number made on this device. Never your name, your history or what you read</small></label><input id="in-sharestats" type="checkbox"></div>

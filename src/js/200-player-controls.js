@@ -153,7 +153,7 @@
     if (sv) { sv.textContent = +(+P.speed).toFixed(2) + 'x'; $('#qk-t-speed').dataset.on = String(P.speed !== 1); }
     if (sl) { sl.textContent = !S.sleep ? 'Off' : S.sleep === 'chapter' ? 'End of track' : S.sleep + ' min'; $('#qk-t-sleep').dataset.on = String(!!S.sleep); }
     if (rg) { const ri = Math.round((spdClamp(P.speed) - 0.5) / 0.05); if (+rg.value !== ri) rg.value = String(ri); rg.style.setProperty('--fill', (ri / 50 * 100) + '%'); if ($('#spd-big')) { $('#spd-big').textContent = spdFmt(P.speed); $('#spd-mood').textContent = (P.speed < 0.8 ? 'Taking it slow' : P.speed < 0.95 ? 'Slightly slower' : P.speed === 1 ? 'Normal speed' : P.speed <= 1.3 ? 'Slightly faster' : P.speed <= 1.6 ? 'Crisp pace' : P.speed <= 2 ? 'Quick listen' : 'Full speed ahead'); $('#qk-speed-go').textContent = 'No change'; } }
-    const av = $('#qk-v-amb'), on = P.ambOn === true;
+    const av = $('#qk-v-amb'), on = P.ambOn === true && sndOn();
     if (av) { av.textContent = on ? (P.ambVol == null ? 70 : P.ambVol) + '%' : 'Off'; $('#qk-t-amb').dataset.on = String(on); const c = $('#qk-amb-on'), r = $('#qk-amb-vol'); if (c) c.checked = on; if (r) { r.value = String(P.ambVol == null ? 70 : P.ambVol); r.style.setProperty('--fill', r.value + '%'); } }
     /* Text only is on while the player is hidden; More shows a dot when something needs a look */
     const ro = !!(el.player && el.player.classList.contains('ro')), moreBtn = $('#b-more'), rt = $('#qk-read'), mt = $('#qk-more');
@@ -189,7 +189,7 @@
     S.fadeIv = setInterval(() => {
       if (audio.paused) { setSleep(0); return; } // already stopped by the listener: just reset
       const x = 1 - (performance.now() - t0) / D;
-      if (x <= 0) { AMB.slow = MUS.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: paused.'); }
+      if (x <= 0) { AMB.slow = true; audio.pause(); setSleep(0); toast('Sleep timer: paused.'); }
       else setVol(fadeCurve(x));
     }, 100);
   }

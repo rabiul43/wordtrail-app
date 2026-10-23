@@ -12,17 +12,22 @@
     a.h = setTimeout(() => { if (AMB.aud !== a) return; AMB.aud = null; ambHearPaint(); ambApply(0.5); ambSync(); }, 4500);
   }
   const AMB_PRESETS = [
-    ['subtle', 'Subtle', 'Quiet beds that follow the story. No story sounds, no thunder or creaks.', { ambInt: 35, ambVol: 50, ambCues: false, ambTrans: false, ambAuto: true, ambDuck: true, ambSmart: true }],
-    ['cinematic', 'Cinematic', 'Full scenes that follow the story, with story sounds and all the detail.', { ambInt: 100, ambVol: 80, ambCues: true, ambTrans: true, ambAuto: true, ambDuck: true, ambSmart: true }],
-    ['sleep', 'Sleep', 'Soft steady rain and brown noise. Scenes and story sounds are off, so nothing surprises you.', { ambInt: 30, ambVol: 40, ambCues: false, ambTrans: false, ambAuto: false, ambDuck: true, ambTod: true, scene: 'sleep' }]
+    ['subtle', 'Quiet', 'Quiet scenes and soft music that follow the story. No story sounds and no opening sound.', { ambInt: 35, ambVol: 50, ambCues: false, ambTrans: false, ambAuto: true, ambDuck: true, ambSmart: true, musOn: true, musVol: 20, musDuck: true, openOn: false, openVol: 40 }],
+    ['cinematic', 'Cinematic', 'Full scenes that follow the story, with story sounds, music and an opening sound.', { ambInt: 100, ambVol: 80, ambCues: true, ambTrans: true, ambAuto: true, ambDuck: true, ambSmart: true, musOn: true, musVol: 35, musDuck: true, openOn: true, openVol: 60 }],
+    ['sleep', 'Sleep', 'Soft steady rain and brown noise. Scenes, story sounds, music and the opening sound are off, so nothing surprises you.', { ambInt: 30, ambVol: 40, ambCues: false, ambTrans: false, ambAuto: false, ambDuck: true, ambTod: true, musOn: false, openOn: false, scene: 'sleep' }]
   ];
+  /* The preset row is Off, the three above, and Custom. Off is the master switch (settings are kept); Custom is what shows once
+     anything has been moved by hand. */
+  const AMB_OFF_PRESET = ['off', 'Off', 'Everything is silent. Your settings are kept; turn Sound back on to hear them again.'];
+  const AMB_PRESET_KEYS = ['ambInt', 'ambVol', 'ambCues', 'ambTrans', 'ambAuto', 'ambDuck', 'ambSmart', 'ambTod', 'musOn', 'musVol', 'musDuck', 'openOn', 'openVol'];
   function ambBuildPresets() {
     const box = $('#amb-presets'); box.textContent = '';
-    AMB_PRESETS.forEach(([k, n]) => box.append(h('button', { class: 'chip', type: 'button', 'data-k': k, 'aria-pressed': 'false' }, n)));
+    [AMB_OFF_PRESET].concat(AMB_PRESETS, [['custom', 'Custom']]).forEach(([k, n]) => box.append(h('button', { class: 'chip', type: 'button', 'data-k': k, 'aria-pressed': 'false' }, n)));
   }
   function ambPresetPaint() {
-    $$('#amb-presets .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === AMB.preset ? 'true' : 'false'));
-    const pr = AMB_PRESETS.find(x => x[0] === AMB.preset), n = $('#amb-preset-note');
+    const cur = !sndOn() ? 'off' : (AMB.preset || 'custom');   // Sound off always reads as Off; no preset reads as Custom
+    $$('#amb-presets .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === cur ? 'true' : 'false'));
+    const pr = [AMB_OFF_PRESET].concat(AMB_PRESETS).find(x => x[0] === AMB.preset), n = $('#amb-preset-note');
     n.hidden = !pr; if (pr) $('#amb-preset-txt').textContent = pr[2];
   }
   function ambPresetClear() { if (!AMB.preset) return; AMB.preset = ''; AMB.undo = null; ambPresetPaint(); }   // any change by hand ends the preset
@@ -32,24 +37,66 @@
     $('#amb-duck').checked = P.ambDuck !== false; $('#amb-smart').checked = P.ambSmart !== false; $('#amb-cues').checked = P.ambCues !== false; $('#amb-trans').checked = P.ambTrans !== false;
     $('#amb-auto').checked = P.ambAuto !== false; $('#amb-tod').checked = P.ambTod !== false;
     const c = $('#in-ambon'); if (c) c.checked = P.ambOn === true;
-    ambGroups(); ambMaster(); ambAutoPaint();
+    ambGroups(); ambMaster(); ambAutoPaint(); sndPaint();
   }
   function ambPresetUse(k) {
-    const pr = AMB_PRESETS.find(x => x[0] === k); if (!pr) return;
+    if (k === 'off') {   // the master switch: everything silent, nothing else changes
+      AMB.undo = { v: {}, amb: P.amb, on: P.ambOn, snd: P.sndOn };
+      P.sndOn = false; AMB.preset = 'off'; savePrefs(); sndApplyAll(); ambPresetPaint(); return;
+    }
+    const pr = AMB_PRESETS.find(x => x[0] === k); if (!pr) return;   // 'custom' only shows the state; it does nothing when tapped
     const set = pr[3], keys = Object.keys(set).filter(x => x !== 'scene');
     ambBookCheck();
-    AMB.undo = { v: Object.fromEntries(keys.map(x => [x, P[x]])), amb: P.amb, on: P.ambOn };
+    AMB.undo = { v: Object.fromEntries(keys.map(x => [x, P[x]])), amb: P.amb, on: P.ambOn, snd: P.sndOn };
     keys.forEach(x => { P[x] = set[x]; });
     if (set.scene) { const sc = AMB_SCENES.find(x => x.k === set.scene); P.amb = ambFull(sc ? sc.L : { rain: 45, brown: 25 }); }
-    P.ambOn = true; AMB.auto = null; AMB.autoId = null; AMB.preset = k;
+    P.ambOn = true; P.sndOn = true; AMB.auto = null; AMB.autoId = null; AMB.preset = k;
     if (set.scene) ambSaveMix(); else savePrefs();
-    ambRefresh(); ambApply(0.9); ambSync(); ambMatchScene(); ambPresetPaint();
+    ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint();
   }
   function ambPresetUndo() {
     const u = AMB.undo; if (!u) return;
-    Object.keys(u.v).forEach(x => { P[x] = u.v[x]; }); P.amb = u.amb; P.ambOn = u.on;
+    Object.keys(u.v).forEach(x => { P[x] = u.v[x]; }); P.amb = u.amb; P.ambOn = u.on; P.sndOn = u.snd;
     AMB.auto = null; AMB.autoId = null; AMB.preset = ''; AMB.undo = null;
-    ambSaveMix(); ambRefresh(); ambApply(0.9); ambSync(); ambMatchScene(); ambPresetPaint();
+    ambSaveMix(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint();
+  }
+  /* ---------- the Sound screen: master switch, master volume and the glue between its controls ---------- */
+  function sndOn() { return P.sndOn !== false; }
+  function sndMul() { return sndOn() ? (P.sndVol == null ? 100 : Math.max(0, Math.min(100, P.sndVol))) / 100 : 0; }
+  function sndPaint() {   // show the saved settings in the controls that live on the Sound screen
+    const set = (id, fn) => { const e = $(id); if (e) fn(e); };
+    set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); });
+    set('#in-ambon', e => { e.checked = P.ambOn === true; });
+    set('#in-muson', e => { e.checked = P.musOn === true; });
+    set('#row-musvol', e => { e.hidden = P.musOn !== true; }); set('#row-musduck', e => { e.hidden = P.musOn !== true; });
+    set('#mus-vol', e => { e.value = String(P.musVol == null ? 40 : P.musVol); }); set('#in-musduck', e => { e.checked = P.musDuck !== false; });
+    set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });
+    set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
+    set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); });
+    sndNowPaint();
+  }
+  function sndApplyAll() {   // after the master switch, the master volume or a preset: make every layer follow the saved settings
+    ambMaster(); ambSync(); musBusApply(0.2);
+    if (sndOn() && P.musOn === true) { musicAttach(); musicPlay(); } else musicPause();
+    if (!sndOn()) { OSND.armed = ''; osStop(0.3); }
+    sndPaint(); try { qkPaint(); } catch (e) { /* the player tile is optional */ } miniScenePaint(AMB.lbl ? 'Now: ' + AMB.lbl : null);
+  }
+  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'ambBook', 'ambG'];
+  function sndResetAll() {
+    if (!confirm('Put all sound settings back to normal? Your saved mixes for each book are cleared too.')) return;
+    SND_RESET_KEYS.forEach(x => { delete P[x]; });
+    AMB.preset = ''; AMB.undo = null; AMB.auto = null; AMB.autoId = null; AMB.bookId = '';
+    savePrefs(); ambBookCheck(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambPaintScenes(); ambMatchScene(); ambCustomPaint(); ambShiftLabel(); ambPresetPaint();
+    toast('All sound settings are back to normal.');
+  }
+  function sndBookReset() {
+    if (!S.book) { toast('Open a book first.'); return; }
+    const id = String(S.book.id);
+    if (P.ambBook) delete P.ambBook[id];
+    if (P.ambFix) delete P.ambFix[id];
+    AMB.bookId = ''; AMB.auto = null; AMB.autoId = null; AMB.preset = '';
+    savePrefs(); ambBookCheck(); ambRefresh(); ambApply(0.9); ambSync(); ambMatchScene(); ambPresetPaint();
+    toast('Sound for this book is back to its starting mix.');
   }
   function ambHearIcon() {
     const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), u = document.createElementNS(ns, 'use');
@@ -63,12 +110,12 @@
   function ambSync() {
     ambBookCheck();
     const L = ambLive(), any = AMB_SOUNDS.some(([k]) => L[k] > 0);
-    const want = (any || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || (P.ambOn === true && ambPlaying() && !(osLeadLeft() > 0)));   // a fresh book's opening sound plays first
+    const want = sndOn() && (any || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || (P.ambOn === true && ambPlaying()));
     clearTimeout(AMB.timer);
     if (want) {
       if (!ambBuild()) return;
       AMB.ctx.resume().catch(() => {}); ambTod(true); ambApply();
-      AMB.slow = false; AMB.master.gain.setTargetAtTime(ambVol(), AMB.ctx.currentTime, osFadeTc());   // slow rise right after the opening sound
+      AMB.slow = false; AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, 0.8);
       AMB.on = true; if (!AMB.clinkIv) AMB.clinkIv = setInterval(ambClink, 4500);
       if (!AMB.duckIv) AMB.duckIv = setInterval(ambDuckTick, 60);
       if (!AMB.evIv) { AMB.evIv = setInterval(ambEvents, 400); AMB.nextThunder = Date.now() + 4000 + Math.random() * 8000; }
@@ -84,7 +131,7 @@
     AMB_SOUNDS.forEach(([k]) => { $('#amb-' + k).value = String(L[k] || 0); });
     ambGroups(); $('#amb-vol').value = String(Math.round(ambVol() * 100)); $('#amb-duck').checked = P.ambDuck !== false; $('#amb-smart').checked = P.ambSmart !== false; $('#amb-cues').checked = P.ambCues !== false; $('#amb-trans').checked = P.ambTrans !== false; Object.keys(CUE_CATS).forEach(c => { $('#amb-cat-' + c).checked = (P.ambCats || {})[c] !== false; }); ambCustomPaint(); ambShiftLabel(); $('#amb-int').value = String(P.ambInt == null ? 100 : P.ambInt); $('#amb-tod').checked = P.ambTod !== false;
     $('#amb-auto').checked = P.ambAuto !== false; ambAutoPaint(); AMB.preset = ''; AMB.undo = null; ambPresetPaint();
-    ambPaintScenes(); ambMatchScene();
+    ambPaintScenes(); ambMatchScene(); sndPaint();
     AMB.preview = true; openSheet('sheet-amb'); ambSync();
   }
   function ambBuildRows() {   // the sliders are generated from AMB_SOUNDS, in collapsible groups
@@ -165,13 +212,17 @@
     $('#amb-tod').addEventListener('change', e => { P.ambTod = e.target.checked; savePrefs(); ambTod(); ambPaintScenes(); });
     $('#amb-scenes').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) ambUseScene(c.dataset.k); });
     $('#amb-sug-go').addEventListener('click', () => ambUseScene($('#amb-sug').dataset.k));
-    $('#amb-off').addEventListener('click', () => { P.ambOn = false; const c = $('#in-ambon'); if (c) c.checked = false; savePrefs(); AMB.preview = false; ambSync(); closeSheets(); toast('Cinematic sound is off.'); });
+    $('#snd-on').addEventListener('change', e => { P.sndOn = e.target.checked; savePrefs(); AMB.preset = e.target.checked ? '' : AMB.preset; sndApplyAll(); ambPresetPaint(); });
+    $('#snd-vol').addEventListener('input', e => { P.sndVol = +e.target.value; savePrefs(); ambMaster(); musBusApply(0.1); });
+    $('#snd-duck').addEventListener('change', e => { P.ambDuck = e.target.checked; P.musDuck = e.target.checked; savePrefs(); AMB.duckS = ''; MUS.duckS = ''; sndPaint(); });   // one switch for both; the two separate ones are under Advanced
+    ['#amb-duck', '#in-musduck'].forEach(id => $(id).addEventListener('change', sndPaint));
+    $('#snd-book-reset').addEventListener('click', sndBookReset); $('#snd-reset-all').addEventListener('click', sndResetAll);
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
     $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
-    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musStop(2); });   // switched off by hand: a full stop, not a soft pause
+    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); });
     $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; });   // re-apply the dip at once
-    if ($('#in-muson')) { $('#in-muson').checked = P.musOn === true; $('#row-musvol').hidden = P.musOn !== true; $('#row-musduck').hidden = P.musOn !== true; $('#in-musduck').checked = P.musDuck !== false; if ($('#mus-vol')) $('#mus-vol').value = String(P.musVol == null ? MUS_DEFAULT_VOL : P.musVol); }
+    sndPaint(); ambPresetPaint();
     musicInit();
     $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); });
     $('#mini-scene').addEventListener('click', e => { e.stopPropagation(); ambOpen(); });

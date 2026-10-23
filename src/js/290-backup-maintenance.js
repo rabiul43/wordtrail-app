@@ -232,7 +232,7 @@
     ['basics', 'all', 'i-m-sliders', 'All basic settings', 'Language, Calm mode, Customise home, audio, storage', '', 'language calm home audio storage reading everything', () => smOpenTab('reading')],
     ['advanced', 'timing', 'i-m-target', 'Precise timing', 'Read-along from speech recognition', '', 'sync highlight alignment drift timing', () => smOpenTab('sync', () => smH3('sync', 'Precise read-along'))],
     ['advanced', 'presync', 'i-m-refresh', 'Pre-sync books', 'Prepare timing ahead of time', '', 'github precompute sync batch', () => { SMH.from = true; $('#btn-presync').click(); }],
-    ['advanced', 'amb', 'i-m-wave', 'Cinematic sound', 'Background sounds, story sounds and presets', '', 'ambient rain fire background music effects scene sound', () => { SMH.from = true; ambOpen(); }],
+    ['advanced', 'amb', 'i-m-wave', 'Sound', 'Ambient, story sounds, music, opening sound and presets', '', 'sound ambient rain fire background music opening effects scene preset master volume', () => { SMH.from = true; ambOpen(); }],
     ['advanced', 'dev', 'i-m-code', 'Developer', 'Scene tests, sync and performance, clean-up', '', 'debug developer tools', () => smOpenTab('dev'), 'dev'],
     ['advanced', 'diag', 'i-m-info', 'Diagnostics', 'Log errors and slow moments', '', 'log errors debug report', () => smOpenTab('dev', () => { const c = document.getElementById('in-diag'); return c && (c.closest('.row') || c); }), 'dev']
   ];

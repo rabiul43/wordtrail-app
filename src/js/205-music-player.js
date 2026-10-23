@@ -55,7 +55,7 @@
   const musVol = () => (P.musVol == null ? 40 : Math.max(0, Math.min(100, P.musVol))) / 100;
 
   /* The music bus level: user volume (0 when music is switched off). Clips carry only their LUFS gain. */
-  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0);
+  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0) * sndMul();   // user volume x the Sound master
   function musBusApply(tc) {
     if (!MUS.master || !MUS.ctx) return;
     MUS.master.gain.setTargetAtTime(musBusLevel(), MUS.ctx.currentTime, tc == null ? 0.1 : tc);
@@ -282,7 +282,8 @@
     try {
       const box = $('#amb-now'); if (!box) return;
       const rows = [];
-      if (P.musOn) {
+      if (!sndOn()) rows.push(['Sound', 'off']);
+      else if (P.musOn) {
         const p = MUS.playing, c = p && p._clip;
         if (c) {
           const slug = String(c.f).split('/').pop().replace(/\.mp3$/i, '');
@@ -292,7 +293,7 @@
         else if (MUS.live) rows.push(['Music', 'loading']);
         else rows.push(['Music', 'not playing yet']);
       }
-      if (P.ambOn === true && AMB.on && AMB.lbl) rows.push(['Scene', AMB.lbl]);
+      if (sndOn() && P.ambOn === true && AMB.on && AMB.lbl) rows.push(['Scene', AMB.lbl]);
       if (OSND.nodes) rows.push(['Opening', OSND.buf[OSND.mood] ? 'recorded clip' : 'made on the device']);
       box.textContent = ''; box.hidden = !rows.length;
       rows.forEach(r => {
@@ -305,7 +306,7 @@
 
   /* Called when the narrator starts playing. */
   function musicPlay() {
-    if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing; ambient is irrelevant
+    if (!P.musOn || !sndOn() || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing and Sound on; ambient is irrelevant
     if (MUS.playing) return;
     const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
     if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
@@ -317,7 +318,7 @@
 
   /* Called by scene detection when the mood changes (every paragraph). */
   function musicMoodChange(scMood) {
-    if (!P.musOn || !MUS.on || !MUS.manifest || !musNarrating()) return;   // paused, finished or music off: a tap on a sentence must not start music
+    if (!P.musOn || !sndOn() || !MUS.on || !MUS.manifest || !musNarrating()) return;   // paused, finished, music off or Sound off: a tap on a sentence must not start music
     const m = MUS_MOOD_MAP[scMood] || 'neutral';
     if (osLeadWait() > 0) { MUS.mood = m; return; }   // opening sound still playing: remember the mood, musicPlay starts it later
     if (m !== MUS.mood || (!MUS.playing && !MUS.live)) musSwitchMood(m, true);   // also starts music that never got going (failed first load)

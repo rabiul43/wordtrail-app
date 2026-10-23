@@ -4,7 +4,7 @@
      (gothic, mystery, romance, adventure, fantasy, children, drama, science fiction, or a calm default).
      Each mood plays a real royalty-free clip when openings.json in the repo lists one (cached for offline use, like
      the ambient recordings); until a clip is listed it plays a soft sound made on the device, so it always works.
-     It never plays when a book is resumed from the middle. Settings: Cinematic sound > "Opening sound". */
+     It never plays when a book is resumed from the middle. Sound screen > "Opening sound". */
   const OSND = { armed: '', tok: 0, nodes: null, map: {}, buf: {}, busy: {}, fail: {}, mood: '', until: 0 };
   const OS_MOODS = [   // [key, name, pattern on genres + title (first match wins)]
     ['gothic', 'Gothic', /gothic|horror|vampire|ghost|haunt|supernatural|dracula|frankenstein|macabre|\bterror\b|werewolf/],
@@ -90,7 +90,7 @@
     const ctx = AMB.ctx, tok = ++OSND.tok, k = mood[0];
     try { if (ctx.state !== 'running') await ctx.resume(); } catch (e) { /* needs a tap first: skip quietly */ }
     if (tok !== OSND.tok) return false;
-    const vol = (P.openVol == null ? 60 : P.openVol) / 100;
+    const vol = (P.openVol == null ? 60 : P.openVol) / 100 * sndMul();
     if (!(vol > 0)) return false;
     osStop(0.2); OSND.tok = tok;
     const lp = ctx.createBiquadFilter(), g = ctx.createGain(), t = ctx.currentTime + 0.05;
@@ -108,7 +108,7 @@
   /* ---- when: only from the beginning of a book ---- */
   function osArm(b, saved) {   // called by openBook: a start from the first track, near its start, arms the sound; a resume does not
     OSND.armed = ''; osStop(0.3);
-    if (P.openOn === false || !b || !b.secs || !b.secs.length) return;
+    if (P.openOn === false || !sndOn() || !b || !b.secs || !b.secs.length) return;
     const t = saved && saved.time > 0 ? saved.time : 0;
     if (S.sec !== 0 || t > 15) return;   // resuming in the middle: stay silent
     OSND.armed = String(b.id);
@@ -117,6 +117,7 @@
   }
   async function osOnPlaying() {
     if (!OSND.armed || !S.book || OSND.armed !== String(S.book.id)) return;
+    if (!sndOn()) { OSND.armed = ''; return; }
     const id = OSND.armed; OSND.armed = '';
     OSND.until = Date.now() + 2500;   // an opening is about to start: music holds back (osLeadWait)
     const c = typeof cutFor === 'function' ? cutFor(0) : null, floor = c && c[0] > 0 ? c[0] : 0;
