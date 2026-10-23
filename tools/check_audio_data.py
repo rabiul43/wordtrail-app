@@ -20,6 +20,8 @@ import argparse, json, os, sys
 
 # Must match MUS_MOOD_MAP in src/js/205-music-player.js and OS_MOODS / OS_CALM in src/js/215-opening-sound.js.
 MUSIC_MOODS = ["neutral", "peace", "dread", "danger", "sorrow", "merry"]
+# Finer moods, optional: with no clips the app plays the nearest mood instead (see MUS_FALLBACK in 205-music-player.js).
+FINE_MOODS = {"tension": "dread", "wonder": "peace", "romance": "peace", "chase": "danger"}
 OPENING_MOODS = ["gothic", "mystery", "romance", "adventure", "fantasy", "children", "scifi", "drama", "calm"]
 MIN_DUR, MAX_DUR = 30, 240      # seconds: a clip shorter than the crossfade runway repeats too fast; very long ones use a lot of memory
 OPEN_MAX = 24                   # the app plays at most 24 s of an opening clip
@@ -48,18 +50,29 @@ def check_music(root, min_clips):
     if d.get("v") != 1 or not isinstance(d.get("moods"), dict): print("  music.json is not version 1 or has no 'moods'."); sys.exit(2)
     moods, listed = d["moods"], set()
     for m in moods:
-        if m not in MUSIC_MOODS: warn(f"mood '{m}' is in music.json but the app does not know it; its clips are never played")
+        if m not in MUSIC_MOODS and m not in FINE_MOODS: warn(f"mood '{m}' is in music.json but the app does not know it; its clips are never played")
     print(f"  {'mood':<9}{'clips':>6}  note")
     for m in MUSIC_MOODS:
         clips = moods.get(m) or []
         note = "ok"
-        if not clips: note = "EMPTY: the app plays nothing for this mood" + (" (also the default mood!)" if m == "neutral" else "")
+        if not clips: note = "EMPTY: nothing plays at all for a book with no mood!" if m == "neutral" else "EMPTY: the app plays neutral music for this mood instead"
         elif len(clips) < min_clips: note = f"thin: under {min_clips} clips, will sound repetitive"
         print(f"  {m:<9}{len(clips):>6}  {note}")
         if not clips:
             if m == "neutral": errors.append("music mood 'neutral' has no clips: nothing plays at the start of a book")
             else: warnings.append(f"music mood '{m}' has no clips")
         elif len(clips) < min_clips: warnings.append(f"music mood '{m}' has only {len(clips)} clip(s)")
+        check_clips(root, m, clips, listed)
+    for m, fb in FINE_MOODS.items():
+        clips = moods.get(m) or []
+        note = f"none yet: plays '{fb}' music instead (fine)" if not clips else ("ok" if len(clips) >= min_clips else f"thin: under {min_clips} clips")
+        print(f"  {m:<9}{len(clips):>6}  {note}")
+        if clips and len(clips) < min_clips: warnings.append(f"music mood '{m}' has only {len(clips)} clip(s)")
+        check_clips(root, m, clips, listed)
+    return finish_music(root, listed)
+
+def check_clips(root, m, clips, listed):
+    if True:
         for c in clips:
             f = c.get("f") if isinstance(c, dict) else None
             if not f: err(f"{m}: a clip has no file name (f)"); continue
@@ -75,6 +88,9 @@ def check_music(root, min_clips):
             elif dur > MAX_DUR: warn(f"{f}: {dur:.0f} s long, it takes a lot of phone memory; 60-120 s is better")
             if not c.get("by"): warn(f"{f}: no artist (by); the credits list will say 'Unknown artist'")
             if not c.get("lic"): warn(f"{f}: no licence (lic); credits are required for CC BY")
+            if not isinstance(c.get("e"), (int, float)) or not 0 <= c["e"] <= 1: warn(f"{f}: no energy (e, 0-1); the app treats it as medium, so it cannot pick quieter clips under dialogue. Rebuild with music_prep.py")
+
+def finish_music(root, listed):
     disk = os.path.join(root, "music")
     extra = []
     if os.path.isdir(disk):

@@ -25,6 +25,8 @@
     xTimer: 0,      // setTimeout handle for the next crossfade
     rt: 0,          // setTimeout handle: retry after a failed load (offline), while the narrator plays
     lt: 0,          // setTimeout handle: music waits for the opening sound to finish
+    recent: [],     // the last clips played (file names), so the same song does not come straight back
+    cand: '', candN: 0,   // a finer mood must show up in two paragraphs in a row before the music changes
     gen: 0,         // bumped on every mood switch and stop, so a clip that finishes loading late is dropped
     on: false,      // true once the music bus is built on the shared context
     base: '',       // data root override (local test mode only); '' = GitHub raw
@@ -43,6 +45,58 @@
     sorrow: 'sorrow',
     merry:  'merry',
   };
+
+  /* Finer music moods. Scene detection only knows five moods; these four are read from the paragraph itself and used
+     only for music. Until music.json has clips for one, it falls back to the nearest existing mood (MUS_FALLBACK), and it
+     starts to sound different on its own once clips are added under that name. */
+  const MUS_FALLBACK = { tension: 'dread', wonder: 'peace', romance: 'peace', chase: 'danger' };
+  const MUS_FINE_RX = {
+    tension: /\b(silence|silent|listened|listening|waited|waiting|footsteps?|creak(?:ed|ing)?|shadows?|hushed|hesitated|trembl\w*|nervous\w*|suspicio\w*|uneasy|dread|whisper(?:ed|s)?|suddenly|hidden|watched|watching)\b/g,
+    wonder:  /\b(wonder\w*|marvel\w*|astonish\w*|amaz\w*|magnificent|splendid|glittering|glistening|dazzl\w*|enchant\w*|miracle|vast|majestic|gleaming|shimmer\w*|radiant)\b/g,
+    romance: /\b(love[ds]?|loving|beloved|darling|kiss(?:ed|es)?|embrace[ds]?|sweetheart|tender\w*|devotion|passion\w*|affection|adore[ds]?|longing|heart)\b/g,
+    chase:   /\b(chase[ds]?|chasing|pursu\w+|fled|flee(?:ing)?|fugitive|galloped|gallop\w*|raced|racing|dashed|sprinted|bolted|escap\w+|hurried|seized|hounds?|hunted)\b/g,
+  };
+  const MUS_FINE_BASE = { tension: ['neutral', 'dread', 'danger'], chase: ['neutral', 'danger'], wonder: ['neutral', 'peace'], romance: ['neutral', 'peace'] };   // the scene moods each may refine
+  const MUS_GENRE_MOOD = [['horror|ghost|gothic|supernatural|vampire|haunt', 'dread'], ['mystery|detective|crime|suspense|thriller', 'tension'], ['romance|love stor', 'romance'], ['fantasy|fairy|myth|legend|science fiction|sci-?fi|magic', 'wonder']];
+
+  function musParaText() {   // the current paragraph (up to 8 sentences), lower case
+    try {
+      const sents = S.model && S.model.sents, id = S.curId;
+      if (!sents || id == null || id < 0 || !sents[id]) return '';
+      const p = sents[id].p; let a = id, b = id;
+      while (a > 0 && sents[a - 1] && sents[a - 1].p === p && id - a < 7) a--;
+      while (sents[b + 1] && sents[b + 1].p === p && b - id < 7) b++;
+      let t = ''; for (let i = a; i <= b; i++) t += ' ' + (sents[i].t || '');
+      return t.toLowerCase();
+    } catch (e) { return ''; }
+  }
+  function musGenreMood() {   // a book's own default mood, used only when the text itself shows none
+    try {
+      const b = S.book; if (!b) return '';
+      const row = String(b.genres || ((typeof CAT !== 'undefined' && CAT.books || []).find(x => x.id === String(b.id)) || {}).genres || '');
+      if (!row.trim()) return '';
+      const text = (row + ' ' + (b.title || '')).toLowerCase();
+      for (const [rx, m] of MUS_GENRE_MOOD) if (new RegExp(rx).test(text)) return m;
+    } catch (e) { /* no genre */ }
+    return '';
+  }
+  function musFineMood(scMood) {   // the music mood for this paragraph: a fine one when the words clearly say so, else the scene's
+    const base = MUS_MOOD_MAP[scMood] || 'neutral';
+    const t = musParaText(); let best = '', bestN = 1;   // needs two or more hits
+    if (t) for (const k in MUS_FINE_RX) {
+      if (MUS_FINE_BASE[k].indexOf(base) < 0) continue;
+      const n = (t.match(MUS_FINE_RX[k]) || []).length;
+      if (n > bestN) { best = k; bestN = n; }
+    }
+    if (best) return best;
+    return base === 'neutral' ? (musGenreMood() || base) : base;
+  }
+  function musHas(k) { const c = MUS.manifest && MUS.manifest.moods && MUS.manifest.moods[k]; return !!(c && c.length); }
+  function musResolve(k) {   // the mood that has clips: itself, its nearest existing mood, or neutral. Never a silent mood.
+    if (musHas(k)) return k;
+    const f = MUS_FALLBACK[k]; if (f && musHas(f)) return f;
+    return musHas('neutral') ? 'neutral' : k;
+  }
 
   /* Loudness normalisation: each clip carries its measured LUFS in the manifest.
      Gain = 10 ^ ((target − measured) / 20). Target is −18 LUFS (quiet under speech). */
@@ -129,9 +183,40 @@
   function musQueue(mood) {
     const clips = (MUS.manifest && MUS.manifest.moods && MUS.manifest.moods[mood]) || [];
     if (!clips.length) return [];
-    const arr = clips.slice().sort(() => Math.random() - 0.5);
-    if (MUS.playing && arr[0] && arr[0].f === MUS.playing._file) arr.push(arr.shift());
-    return arr;
+    const skip = MUS.recent.slice(-2).concat(MUS.playing ? [MUS.playing._file] : []);   // never the clip now playing or the one before it
+    const fresh = clips.filter(c => skip.indexOf(c.f) < 0);
+    return (fresh.length ? fresh : clips.filter(c => !MUS.playing || c.f !== MUS.playing._file).length ? clips.filter(c => !MUS.playing || c.f !== MUS.playing._file) : clips).slice();
+  }
+
+  /* How busy the music should be for what is being read: quiet under talk, fuller in action. 0 = soft, 1 = full. */
+  function musTargetEnergy() {
+    const dens = (AMB.scene && AMB.scene.dens != null) ? AMB.scene.dens : 0.5;   // share of recent sentences that are quoted speech
+    let t = dens >= 0.5 ? 0.2 : dens >= 0.25 ? 0.4 : 0.55;
+    if (MUS.mood === 'danger' || MUS.mood === 'chase') t = Math.max(t, 0.75);
+    else if (MUS.mood === 'peace' || MUS.mood === 'sorrow') t = Math.min(t, 0.4);
+    return t;
+  }
+  function musSeenList() { const b = S.book; return (b && P.musSeen && P.musSeen[String(b.id)]) || []; }
+  function musRemember(clip) {   // note a clip as played: not repeated soon, and the book prefers clips it has not heard yet
+    MUS.recent.push(clip.f); if (MUS.recent.length > 4) MUS.recent.shift();
+    try {
+      const b = S.book; if (!b) return;
+      const all = P.musSeen || (P.musSeen = {}), id = String(b.id), list = all[id] || (all[id] = []);
+      const i = list.indexOf(clip.f); if (i >= 0) list.splice(i, 1);
+      list.push(clip.f); if (list.length > 80) list.shift();
+      const ids = Object.keys(all); if (ids.length > 40) delete all[ids[0]];   // keep the 40 most recent books
+      savePrefs();
+    } catch (e) { /* memory is a nicety */ }
+  }
+  function musTake() {   // remove and return the best clip left in the queue for now: unheard in this book first, then the right energy
+    const q = MUS.queue; if (!q.length) return null;
+    const seen = musSeenList(), want = musTargetEnergy();
+    let bi = 0, bs = 1e9;
+    q.forEach((c, i) => {
+      const s = Math.abs((typeof c.e === 'number' ? c.e : 0.5) - want) + (seen.indexOf(c.f) >= 0 ? 0.6 : 0) + Math.random() * 0.3;   // the random part keeps it varied
+      if (s < bs) { bs = s; bi = i; }
+    });
+    return q.splice(bi, 1)[0];
   }
 
   /* Resolve a clip path to an absolute raw GitHub URL. */
@@ -199,10 +284,10 @@
   async function musLoadNext(gen) {
     const n = MUS.queue.length;
     for (let i = 0; i < n; i++) {
-      const clip = MUS.queue[MUS.qi % n]; MUS.qi++;
+      const clip = musTake(); if (!clip) break;
       const buf = await musFetch(clip.f);
       if (gen !== MUS.gen) return null;
-      if (buf) return { clip, buf };
+      if (buf) { musRemember(clip); return { clip, buf }; }
     }
     return null;
   }
@@ -278,7 +363,7 @@
   /* ---------- Now playing ----------
      One short block at the top of the sound sheet (#amb-now): the music (mood, track, artist), the scene, and the
      opening sound. Each piece is its own element so the translator can match fixed words one by one. */
-  const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry' };
+  const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
   function sndNowPaint() {
     try {
       const box = $('#amb-now'); if (!box) return;
@@ -320,9 +405,15 @@
   /* Called by scene detection when the mood changes (every paragraph). */
   function musicMoodChange(scMood) {
     if (!P.musOn || !sndOn() || !MUS.on || !MUS.manifest || !musNarrating()) return;   // paused, finished, music off or Sound off: a tap on a sentence must not start music
-    const m = MUS_MOOD_MAP[scMood] || 'neutral';
+    const want = musFineMood(scMood), m = musResolve(want);
     if (osLeadWait() > 0) { MUS.mood = m; return; }   // opening sound still playing: remember the mood, musicPlay starts it later
-    if (m !== MUS.mood || (!MUS.playing && !MUS.live)) musSwitchMood(m, true);   // also starts music that never got going (failed first load)
+    if (!MUS.playing && !MUS.live) { MUS.cand = ''; musSwitchMood(m, true); return; }   // also starts music that never got going (failed first load)
+    if (m === MUS.mood) { MUS.cand = ''; return; }
+    if (MUS_FALLBACK[want]) {   // a finer mood only counts once it shows in two paragraphs in a row, so the music does not flap
+      if (MUS.cand === m) MUS.candN++; else { MUS.cand = m; MUS.candN = 1; }
+      if (MUS.candN < 2) return;
+    }
+    MUS.cand = ''; musSwitchMood(m);
   }
 
   /* Called from the Settings volume slider. */

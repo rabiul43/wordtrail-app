@@ -114,7 +114,9 @@ CLIP_SOURCES = []
 # Helpers
 # ---------------------------------------------------------------------------
 
-MOODS = {"peace", "dread", "danger", "sorrow", "merry", "neutral"}
+# The first six are what the app asks for. The last four are optional finer moods: until a folder has clips the app
+# plays the nearest existing mood instead (tension -> dread, wonder -> peace, romance -> peace, chase -> danger).
+MOODS = {"peace", "dread", "danger", "sorrow", "merry", "neutral", "tension", "wonder", "romance", "chase"}
 
 
 def ffmpeg(*args, capture=False):
@@ -150,6 +152,22 @@ def measure_lufs(path):
         v = float(m.group(1))
         return v if v > -120 else None
     return None
+
+
+def measure_busy(path):
+    """How busy a clip sounds (higher = more notes, brighter): the average sample-to-sample change relative to the
+    loudness, from the clip as 8 kHz mono. Only meaningful compared with the other clips; step_build ranks them 0-1."""
+    import array
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-ac", "1", "-ar", "8000", "-f", "s16le", "-"],
+                         capture_output=True, check=True).stdout
+    a = array.array("h"); a.frombytes(raw[: len(raw) // 2 * 2])
+    n = len(a)
+    if n < 100: return None
+    step = 1  # every sample of an 8 kHz clip is fine
+    rms = math.sqrt(sum(x * x for x in a) / n)
+    if rms < 1: return None
+    diff = sum(abs(a[i] - a[i - 1]) for i in range(1, n, step)) / (n - 1)
+    return diff / rms
 
 
 def find_loop_point(path, duration):
@@ -378,6 +396,7 @@ def step_build(data_dir, dry_run, by="Kevin MacLeod", lic="CC-BY"):
             try:
                 dur = ffprobe_duration(out)
                 lufs = measure_lufs(out)
+                busy = measure_busy(out)
                 loop_end, loop_rms = find_loop_point(out, dur)
                 loop_start = 0.0
 
@@ -389,10 +408,19 @@ def step_build(data_dir, dry_run, by="Kevin MacLeod", lic="CC-BY"):
                     "by":   clip["by"],
                     "lic":  clip["lic"],
                 }
+                if busy is not None: entry["_busy"] = busy
                 manifest["moods"][mood].append(entry)
                 print(f"    → dur={dur:.1f}s  lufs={lufs:.1f}  loop_end={loop_end:.1f}s  rms_at_loop={loop_rms:.4f}")
             except Exception as e:
                 print(f"    ERROR measuring {out}: {e}")
+
+    # Energy "e" (0 = soft, 1 = full): each clip's rank by busyness across the whole library. The app uses it to pick
+    # quieter clips under dialogue and fuller ones in action.
+    allc = [c for v in manifest["moods"].values() for c in v]
+    ranked = sorted((c for c in allc if "_busy" in c), key=lambda c: c["_busy"])
+    for i, c in enumerate(ranked):
+        c["e"] = round(i / (len(ranked) - 1), 2) if len(ranked) > 1 else 0.5
+    for c in allc: c.pop("_busy", None)
 
     if not dry_run:
         out_path = data_dir / "music.json"
