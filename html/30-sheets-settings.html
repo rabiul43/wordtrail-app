@@ -1,0 +1,472 @@
+<section id="sheet-amb" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-amb">
+  <header><h2 id="h-amb">Sound</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body snd-body" id="snd-body" data-off>
+    <div class="snd-top">
+      <div class="snd-mrow">
+        <label for="snd-on" class="snd-mlab"><span class="snd-mt">Sound</span><span class="snd-ms" id="snd-state" aria-live="polite">Off</span></label>
+        <input type="checkbox" id="snd-on" class="snd-sw" role="switch">
+      </div>
+      <div class="amb-row snd-mvol"><label for="snd-vol">Master volume</label><input id="snd-vol" type="range" min="0" max="100" step="1" aria-label="Master volume for all sound"></div>
+    </div>
+
+    <div class="snd-tabs" role="tablist" aria-label="Sound types">
+      <button type="button" role="tab" id="snd-t-amb" class="snd-tab" aria-selected="true" aria-controls="snd-p-amb" data-p="amb"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-m-rain"/></svg><span>Background sounds</span><i class="snd-dot" id="snd-d-amb" hidden></i></button>
+      <button type="button" role="tab" id="snd-t-mus" class="snd-tab" aria-selected="false" aria-controls="snd-p-mus" data-p="mus" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg><span>Music</span><i class="snd-dot" id="snd-d-mus" hidden></i></button>
+      <button type="button" role="tab" id="snd-t-open" class="snd-tab" aria-selected="false" aria-controls="snd-p-open" data-p="open" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4a1 1 0 011-1h7a1 1 0 011 1v17M4 21h14M12 12h.01M19 4v4M17 6h4"/></svg><span>Intro chime</span><i class="snd-dot" id="snd-d-open" hidden></i></button>
+      <button type="button" role="tab" id="snd-t-story" class="snd-tab" aria-selected="false" aria-controls="snd-p-story" data-p="story" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2h16l-2-2zM10 21h4"/></svg><span>Sound effects</span><i class="snd-dot" id="snd-d-story" hidden></i></button>
+    </div>
+
+    <div class="snd-panels" id="snd-panels">
+      <div class="snd-panel" id="snd-p-amb" role="tabpanel" aria-labelledby="snd-t-amb">
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-ambon">Background sounds</label><small>Rain, wind, café, waves under the narrator</small></div><input type="checkbox" id="in-ambon" class="snd-sw" role="switch"></div>
+        <div class="amb-row snd-vrow" id="row-ambvol"><label for="amb-vol">Background sounds volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Background sounds volume"></div>
+        <h3 class="amb-h">Choose a scene</h3>
+        <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
+        <p class="help amb-note">Made on your device, so it works offline.</p>
+        <details class="amb-more"><summary>When does it play?</summary><p class="help amb-note">Sounds start when the book plays and fade out when it pauses or the sleep timer ends.</p></details>
+      </div>
+
+      <div class="snd-panel" id="snd-p-mus" role="tabpanel" aria-labelledby="snd-t-mus" hidden>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-muson">Background music</label><small>Instrumental music that matches the mood of the story</small></div><input type="checkbox" id="in-muson" class="snd-sw" role="switch"></div>
+        <div class="amb-row snd-vrow" id="row-musvol"><label for="mus-vol">Music volume</label><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume"></div>
+        <p class="help amb-note">The music changes with the mood of the story and crossfades between moods. It always plays quietly under the narrator's voice.</p>
+      </div>
+
+      <div class="snd-panel" id="snd-p-open" role="tabpanel" aria-labelledby="snd-t-open" hidden>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-open">Intro chime</label><small>A short sound when a book starts from the beginning</small></div><input type="checkbox" id="amb-open" class="snd-sw" role="switch"></div>
+        <div class="amb-row snd-vrow" id="row-openvol"><label for="amb-open-vol">Intro chime volume</label><input id="amb-open-vol" type="range" min="0" max="100" step="1" aria-label="Intro chime volume"></div>
+        <p class="help amb-note" id="amb-open-note"></p>
+        <div class="amb-fixrow"><button id="amb-open-hear" class="btn small ghost" type="button">Hear the intro chime</button></div>
+      </div>
+
+      <div class="snd-panel" id="snd-p-story" role="tabpanel" aria-labelledby="snd-t-story" hidden>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-cues">Story sound effects</label><small>A short sound at a word like thunder, a knock or a bell</small></div><input type="checkbox" id="amb-cues" class="snd-sw" role="switch"></div>
+        <div class="snd-lrow snd-sub"><div class="snd-ltxt"><label for="amb-trans">Transition sounds</label><small>A door, gate or footsteps when the story moves somewhere new. Needs "Ambient follows the story". Off in Calm mode.</small></div><input type="checkbox" id="amb-trans" class="snd-sw" role="switch"></div>
+        <div class="amb-row"><label for="amb-cshift" id="amb-cshift-l">Sound timing</label><input id="amb-cshift" type="range" min="-10" max="10" step="1" aria-label="Story sound timing: earlier or later"></div>
+        <h3 class="amb-h">Kinds of sounds</h3>
+        <div class="amb-sub" id="amb-cats">
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-nature"> Nature</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-home"> Home</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-travel"> Travel</label>
+          <label class="amb-opt"><input type="checkbox" id="amb-cat-people"> People</label>
+        </div>
+        <h3 class="amb-h">My own words</h3>
+        <div class="amb-cw"><input id="amb-cw-w" type="text" maxlength="24" placeholder="A word, e.g. bang" aria-label="Word that triggers a sound" autocapitalize="none" autocomplete="off" spellcheck="false"><select id="amb-cw-k" aria-label="Sound to play"></select><button id="amb-cw-add" class="btn small" type="button">Add</button></div>
+        <ul id="amb-cw-list" class="amb-cwl"></ul>
+        <p class="help amb-note" id="amb-cw-msg" aria-live="polite">Plays that sound whenever the exact word is read. The same limits apply as for the other story sounds.</p>
+        <p class="help amb-note">Story sounds play together with the ambient scenes, at the ambient volume. Off in Calm mode.</p>
+      </div>
+    </div>
+
+    <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
+    <div class="amb-now" id="amb-now" aria-live="polite" hidden></div>
+
+    <details class="snd-adv" id="snd-presets-d"><summary>Presets</summary>
+      <div id="amb-presets" class="amb-scenes" role="group" aria-label="Quick presets"></div>
+      <div id="amb-preset-note" class="amb-pnote" hidden><span id="amb-preset-txt" class="help amb-note"></span><button id="amb-preset-undo" class="btn small ghost" type="button">Undo</button></div>
+    </details>
+
+    <details class="snd-adv snd-opts" id="amb-more"><summary>More options</summary>
+      <h3 class="amb-h">Playback</h3>
+      <label class="amb-opt"><input type="checkbox" id="snd-duck"> Dip under the narrator</label>
+      <label class="amb-opt"><input type="checkbox" id="amb-tod"> Softer at night</label>
+      <label class="amb-opt"><input type="checkbox" id="in-scenelabel"> Show scene label</label>
+      <p class="help amb-note">The scene label shows what is playing, like "Now: Saloon", on the mini-player. Tap it to open this screen.</p>
+      <h3 class="amb-h">Ambient</h3>
+      <label class="amb-opt"><input type="checkbox" id="amb-auto"> Ambient follows the story</label>
+      <p class="help amb-note" id="amb-auto-st" aria-live="polite">Listening for the next scene. Between scenes your own mix plays.</p>
+      <h3 class="amb-h">This book</h3>
+      <div class="amb-fixrow" id="amb-fixrow"><button id="amb-wrong" class="btn small ghost" type="button" aria-expanded="false" aria-controls="amb-wrong-pick">Wrong scene?</button><button id="amb-fix-clear" class="btn small ghost" type="button" hidden>Clear corrections for this book</button></div>
+      <div id="amb-wrong-pick" class="amb-wrongpick" hidden><p class="help amb-note">What fits this part of the story?</p><div id="amb-wrong-chips" class="amb-scenes" role="group" aria-label="Pick the right scene for this part of the story"></div></div>
+      <div class="amb-fixrow"><button id="snd-book-reset" class="btn small ghost" type="button">Reset sound for this book</button></div>
+      <p class="help amb-note" id="amb-note">Your mix is remembered for each book.</p>
+    </details>
+
+    <details class="snd-adv" id="amb-fine"><summary>Advanced</summary>
+      <h3 class="amb-h">Mixer</h3>
+      <div class="amb-row"><label for="amb-int">Calm to full</label><input id="amb-int" type="range" min="0" max="100" step="1" aria-label="Ambient intensity"></div>
+      <p class="help amb-note">One slider for the whole scene. Turn it up and the extra details (thunder, creaks, a bell) join the steady sounds.</p>
+      <div id="amb-rows" class="amb-rows"></div>
+      <h3 class="amb-h">Dipping</h3>
+      <label class="amb-opt"><input type="checkbox" id="amb-duck"> Dip ambient sounds under the narrator</label>
+      <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt the dip to the scene</label>
+    <div class="row" id="row-musduck" hidden><label for="in-musduck" style="flex:1">Dip music under the narrator<small class="spd-s">Lowers the music while the narrator speaks and lets it back up in the pauses</small></label><input id="in-musduck" type="checkbox"></div>
+      <h3 class="amb-h">Sound source</h3>
+    <div class="row" style="flex-wrap:wrap"><label style="flex:1 1 8rem">Sound source<small class="spd-s" id="amb-src-note"></small></label><div class="seg" id="seg-ambsrc"><button data-v="gen">Generated</button><button data-v="hybrid">Hybrid</button><button data-v="rec">Recordings</button></div></div>
+      <h3 class="amb-h">Developer</h3>
+    <div class="row" style="flex-wrap:wrap;gap:.5rem"><label for="amb-rec-k" style="flex:1 1 8rem">Try a real recording<small class="spd-s">Pick a sound, then choose an audio file or paste a link, and the mixer opens so you can hear it</small></label><select id="amb-rec-k" class="num" style="width:auto"></select>
+      <div style="flex-basis:100%;display:flex;gap:.5rem;flex-wrap:wrap"><button id="amb-rec-pick" class="btn small ghost" type="button">Choose file</button><button id="amb-rec-url" class="btn small ghost" type="button">Use a link</button><button id="amb-rec-reset" class="btn small ghost" type="button">Remove</button></div>
+      <input id="amb-rec-file" type="file" accept="audio/*" hidden><small class="spd-s" id="amb-rec-st" style="flex-basis:100%"></small></div>
+      <h3 class="amb-h">Storage</h3>
+    <div class="row" style="flex-wrap:wrap;gap:.5rem"><label style="flex:1 1 8rem">Saved sound files<small class="spd-s">Music and opening clips kept on this device. The oldest are removed above 150 MB.</small></label><span class="spd-s" id="snd-cache-size"></span>
+      <div style="flex-basis:100%"><button id="snd-cache-clear" class="btn small ghost" type="button">Clear sound cache</button></div></div>
+      <h3 class="amb-h">Reset</h3>
+      <div class="amb-fixrow"><button id="snd-reset-all" class="btn small ghost" type="button">Reset all sound settings</button></div>
+    </details>
+  </div>
+</section>
+
+<section id="sheet-chars" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-chars">
+  <header><h2 id="h-chars">Characters</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body"><p class="help">Found automatically from the book's text by weighing clues such as who speaks and which names are places. Names we are unsure about wait under Maybe.</p><p id="ch-empty" class="help" hidden></p><div id="ch-tools" class="ch-tools" hidden></div><div id="ch-list" class="ch-list"></div></div>
+</section>
+
+<section id="sheet-card" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-card">
+  <header><h2 id="h-card">Quote card</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <canvas id="card-cv" class="card-cv" width="1080" height="1350" role="img" aria-label="Quote card preview"></canvas>
+    <div id="card-styles" class="shelf-seg" role="group" aria-label="Card style"><button type="button" class="chip" data-s="night" aria-pressed="true">Night</button><button type="button" class="chip" data-s="paper" aria-pressed="false">Paper</button><button type="button" class="chip" data-s="gold" aria-pressed="false">Gold</button></div>
+    <div class="row" style="gap:.5rem"><button id="card-share" class="btn" type="button" style="flex:1">Share</button><button id="card-save" class="btn ghost" type="button" style="flex:1">Save image</button></div>
+  </div>
+</section>
+
+<section id="sheet-quick" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-quick">
+  <header><h2 id="h-quick">Quick controls</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="qk-tiles">
+      <button id="qk-t-speed" class="qk-tile" type="button" aria-expanded="false" aria-controls="qk-o-speed"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4.5-5"/></svg><span>Speed</span><small id="qk-v-speed">1x</small></button>
+      <button id="qk-t-sleep" class="qk-tile" type="button" aria-expanded="false" aria-controls="qk-o-sleep"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#n-moon"/></svg><span>Sleep timer</span><small id="qk-v-sleep">Off</small></button>
+      <button id="qk-t-amb" class="qk-tile" type="button" aria-expanded="false" aria-controls="qk-o-amb"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-m-rain"/></svg><span>Sound</span><small id="qk-v-amb">Off</small></button>
+    </div>
+    <div id="qk-o-speed" class="qk-opt" data-for="speed" hidden>
+      <div class="qk-oh"><h3>Speed</h3><button id="qk-fine" class="qk-link" type="button" aria-label="Fine-tune speed, skip silence, voice boost">Fine-tune &#8250;</button></div>
+      <div id="qk-speed-c" class="slp">
+        <div class="slp-top"><div class="slp-big" id="spd-big" aria-live="polite">1x</div><div class="slp-mood" id="spd-mood">Normal speed</div></div>
+        <div class="slp-end" id="spd-end"></div>
+        <div class="slp-ctl"><button id="spd-dec" class="slp-step" type="button" aria-label="Slower">&minus;</button><input id="qk-range" class="slp-range" type="range" min="0" max="50" step="1" value="10" aria-label="Playback speed"><button id="spd-inc" class="slp-step" type="button" aria-label="Faster">+</button></div>
+        <div class="slp-ends spd-ends"><span data-idx="0" role="button" tabindex="0">0.5x</span><span data-idx="10" role="button" tabindex="0">1x</span><span data-idx="20" role="button" tabindex="0">1.5x</span><span data-idx="30" role="button" tabindex="0">2x</span><span data-idx="50" role="button" tabindex="0">3x</span></div>
+        <button id="qk-speed-go" class="btn slp-go" type="button">Apply</button>
+      </div>
+    </div>
+    <div id="qk-o-sleep" class="qk-opt" data-for="sleep" hidden>
+      <div class="qk-oh"><h3>Sleep timer</h3></div>
+      
+      <div id="qk-sleep-c" class="slp">
+        <div class="slp-top"><div class="slp-big" id="slp-big" aria-live="polite">Off</div><div class="slp-mood" id="slp-mood"></div></div>
+        <div class="slp-end" id="slp-end"></div>
+        <div class="slp-ctl"><button id="slp-dec" class="slp-step" type="button" aria-label="Shorter">&minus;</button><input id="qk-sleep-min" class="slp-range" type="range" min="0" max="27" step="1" value="0" aria-label="Custom sleep timer length"><button id="slp-inc" class="slp-step" type="button" aria-label="Longer">+</button></div>
+        <div class="slp-ends"><span data-idx="0" role="button" tabindex="0">Off</span><span data-idx="6" role="button" tabindex="0">30 min</span><span data-idx="12" role="button" tabindex="0">1 h</span><span data-idx="18" role="button" tabindex="0">2 h</span><span data-idx="27" role="button" tabindex="0">End of track</span></div>
+        <button id="qk-sleep-go" class="btn slp-go" type="button">No timer</button>
+      </div>
+    </div>
+    <div id="qk-o-amb" class="qk-opt" data-for="amb" hidden>
+      <div class="qk-oh"><h3>Sound</h3><button id="qk-amb-mix" class="qk-link" type="button">Open Sound &#8250;</button></div>
+      <input id="qk-amb-vol" class="spd-range" type="range" min="0" max="100" step="1" aria-label="Ambient volume">
+    </div>
+    <div class="qk-tiles qk4">
+      <button id="qk-read" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg><span>Text only</span></button>
+      <button id="qk-clip" class="qk-tile" type="button" aria-label="Make an audio clip"><svg class="ic" aria-hidden="true"><use href="#i-m-wave"/></svg><span>Clip</span></button>
+      <button id="qk-more" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg><span>More</span></button>
+      <button id="qk-set" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><span>Settings</span></button>
+    </div>
+  </div>
+</section>
+
+<section id="fpanel" class="sheet fpanel" hidden role="dialog" aria-modal="true" aria-labelledby="h-fpanel">
+  <header><h2 id="h-fpanel">Filters</h2><button class="ib" data-close aria-label="Close filters"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <button type="button" class="btn small ghost fp-inside" id="f-find" title="Find a word or quote in the texts saved on this device">&#128269; Search inside books</button>
+    <div class="flt-g"><h3>Sort</h3><div id="flt-sort" class="flt-chips"></div></div>
+    <div class="flt-g flt-rate"><h3>Minimum rating</h3><div id="flt-rate" class="flt-chips"></div><p class="help">Books with fewer than 5 ratings are left out of Top rated and the rating filter.</p></div>
+    <div class="flt-g"><h3>Level</h3><div id="flt-lvl" class="flt-chips"></div><p class="help">Pick one or more. Estimated from the book's text; CEFR and age are rough guides.</p></div>
+    <div class="flt-g"><h3>Length</h3><div id="flt-len" class="flt-chips"></div></div>
+    <div class="flt-g"><h3>Mood</h3><div id="flt-mood" class="flt-chips"></div></div>
+    <div class="flt-g"><h3>Genre</h3><div id="genre-chips" class="genre-row" role="group" aria-label="Genres"></div></div>
+    <div class="flt-g"><h3>Language</h3><select id="flt-lang" class="num" aria-label="Language"></select></div>
+    <div class="flt-g"><h3>Narrator</h3><select id="flt-nar" class="num" aria-label="Narrator"></select><p class="help" id="flt-nar-help"></p></div>
+    <div class="flt-g"><h3>Read-along ready</h3><button id="flt-ready" class="fp-switch" type="button" role="switch" aria-checked="false" title="Books with sentence timing ready, so the text follows the narrator"><span><b>Read-along ready only</b><small>Text follows the narrator</small></span><i class="fp-tg" aria-hidden="true"></i></button></div>
+  </div>
+  <footer class="fp-foot"><button id="fp-clear" class="btn ghost" type="button">Clear all</button><button id="fp-done" class="btn" type="button">Done</button></footer>
+</section>
+
+<section id="sheet-more" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-more">
+  <header><h2 id="h-more">More</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="more-list" id="more-list">
+      <button id="btn-tracks" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-headphones"/></svg></span><span class="mr-main"><span class="mr-t">Tracks</span><span class="mr-d">Pick a track, skip ahead, listen offline</span></span></button>
+      <button id="b-ver" class="mrow" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-person"/></svg></span><span class="mr-main"><span class="mr-t" id="b-ver-t">Reader</span><span class="mr-d" id="b-ver-d">Choose who reads this book</span></span><span class="mr-badge" id="b-ver-b" hidden>Better match</span></button>
+      <button id="b-next" class="mrow" aria-label="More like this and next books"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-layers"/></svg></span><span class="mr-main"><span class="mr-t">Next up</span><span class="mr-d">Similar books, and what to listen to next</span></span></button>
+      <button id="b-textsync" class="mrow" aria-label="Choose the book text and adjust the timing"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="mr-main"><span class="mr-t">Text and timing</span><span class="mr-d">Choose the text, line it up with the audio, fix timing</span></span></button>
+      <button id="b-words" class="mrow" aria-label="Words in this book and my saved words"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-dict"/></svg></span><span class="mr-main"><span class="mr-t">Words</span><span class="mr-d">Look up words in this book and review the ones you saved</span></span></button>
+      <button id="b-find" class="mrow" type="button" aria-label="Search the text of this book"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-search"/></svg></span><span class="mr-main"><span class="mr-t">Search this book</span><span class="mr-d">Find a word or quote and jump to it</span></span></button>
+      <button id="b-trail" class="mrow" type="button" aria-label="Find my place, go back to an earlier position"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-refresh"/></svg></span><span class="mr-main"><span class="mr-t">Find my place</span><span class="mr-d">Go back after a seek, or to where you fell asleep</span></span></button>
+      <button id="b-bm" class="mrow" type="button" aria-label="Bookmark this place and add a note"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="mr-main"><span class="mr-t">Bookmark and note</span><span class="mr-d">Save this place and add a note to it</span></span></button>
+      <button id="b-chars" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="mr-main"><span class="mr-t">Characters</span><span class="mr-d" id="b-chars-d">Who is who, with where each one first appears</span></span></button>
+      <button id="b-hl" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="mr-main"><span class="mr-t">Highlights and notes</span><span class="mr-d" id="b-hl-d">Saved sentences, your notes, quote cards</span></span></button>
+      <button id="b-clips" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Audio clips</span><span class="mr-d" id="b-clips-d">Save short moments, replay them, export as a file</span></span></button>
+      <button id="b-shadow" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Shadow reading</span><span class="mr-d">Say a sentence after the narrator and compare</span></span></button>
+      <button id="b-quiz" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-help"/></svg></span><span class="mr-main"><span class="mr-t">Quick quiz</span><span class="mr-d">Test yourself on the chapter you are in</span></span></button>
+      <button id="btn-nr" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-expand"/></svg></span><span class="mr-main"><span class="mr-t">Focus page</span><span class="mr-d">Classic: every tool. Focus: just the text and the essentials.</span></span></button>
+      <button id="btn-howto" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-info"/></svg></span><span class="mr-main"><span class="mr-t">How to use</span><span class="mr-d">Double-tap, press and hold, swipe</span></span></button>
+      <button id="b-cal" class="mrow" aria-pressed="false" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-target"/></svg></span><span class="mr-main"><span class="mr-t">Tap to align</span></span></button>
+    </div>
+  </div>
+</section>
+
+<section id="sheet-next" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-next">
+  <header><h2 id="h-next">Next up</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="next-body"></div>
+</section>
+
+<section id="sheet-presync" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-presync">
+  <header><h2 id="h-presync">Pre-sync books</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <p class="help">Pick books and send them to GitHub in one go. Their precise timing is prepared in the background, so they open ready next time. Up to 20 at a time.</p>
+    <div class="row"><input id="ps-q" class="num" type="search" placeholder="Search title or author" style="flex:1;width:auto"><select id="ps-g" class="num" style="width:auto"></select></div>
+    <div id="ps-list" style="display:grid;gap:.4rem"></div>
+    <div class="row"><span id="ps-count">0 selected</span><button id="ps-send" class="btn" type="button" disabled>Send to GitHub</button></div>
+    <p id="ps-msg" class="help" role="status" aria-live="polite"></p>
+  </div>
+</section>
+<section id="sheet-sethome" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-sethome">
+  <header><h2 id="h-sethome">Settings</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="sh-search">
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <label class="sr-only" for="sh-q">Search settings</label>
+      <input id="sh-q" type="search" placeholder="Search settings" autocomplete="off" enterkeyhint="search">
+      <button id="sh-clear" class="ib" type="button" aria-label="Clear search" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <p id="sh-count" class="help" role="status" aria-live="polite" hidden></p>
+    <div id="sh-home"></div>
+    <div id="sh-res" class="more-list" hidden></div>
+  </div>
+</section>
+<section id="sheet-settings" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-settings">
+  <header><h2 id="h-settings">All settings</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+  <div class="sp-tabs" id="sp-tabs" role="tablist" aria-label="Settings sections">
+    <button type="button" role="tab" data-sp="reading" aria-selected="true"><svg class="ic ti" aria-hidden="true"><use href="#i-m-book"/></svg><span>Reading</span></button>
+    <button type="button" role="tab" data-sp="audio" aria-selected="false"><svg class="ic ti" aria-hidden="true"><use href="#i-m-headphones"/></svg><span>Audio</span></button>
+    <button type="button" role="tab" data-sp="sync" aria-selected="false"><svg class="ic ti" aria-hidden="true"><use href="#i-m-clock"/></svg><span>Timing</span></button>
+    <button type="button" role="tab" data-sp="storage" aria-selected="false"><svg class="ic ti" aria-hidden="true"><use href="#i-m-archive"/></svg><span>Storage</span></button>
+    <button type="button" role="tab" data-sp="dev" aria-selected="false" hidden><svg class="ic ti" aria-hidden="true"><use href="#i-m-code"/></svg><span>Developer</span></button>
+  </div>
+  <div class="sp" data-sp="reading">    <div class="row"><label for="in-uilang"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-globe"/></svg>Language</h3><small style="color:var(--muted)">App language. Arabic and Urdu use right-to-left layout. The book text stays as written</small></label><select id="in-uilang" class="num" style="width:auto"></select></div>
+
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-contrast"/></svg>Theme</h3>
+      <div class="seg" id="seg-theme">
+        <button data-v="auto">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button><button data-v="sepia">Sepia</button><button data-v="contrast">High contrast</button>
+      </div>
+    </div>
+    <div class="row"><label for="in-calm"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Calm mode</h3><small style="color:var(--muted)">No streaks, daily goals, scores or milestones. No motion, vibration or auto-opening of the next book. Just listening and reading at your own pace</small></label><input id="in-calm" type="checkbox"></div>
+    <div id="home-cust">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-layers"/></svg>Customise home</h3>
+      <p class="help">Switch parts of the Library tab on or off. Continue listening always stays first. Home shows one card and up to three rows.</p>
+      <div id="hc-list" class="hc-list" role="group" aria-label="Home rows"></div>
+    </div>
+    <div class="row">
+      <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-texts"/></svg>Text size</h3>
+      <div class="seg"><button id="size-down" aria-label="Smaller text">A-</button><button id="size-up" aria-label="Larger text">A+</button></div>
+    </div>
+    <div class="row">
+      <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-lines"/></svg>Line spacing</h3>
+      <div class="seg"><button id="lh-down" aria-label="Tighter line spacing">&minus;</button><button id="lh-up" aria-label="Looser line spacing">+</button></div>
+    </div>
+    <div class="row">
+      <label for="in-font" style="flex:1">Reading font</label>
+      <select id="in-font" class="num" style="width:auto"><option value="">Default (Newsreader)</option><option value="lexend">Lexend (easy to read)</option><option value="atkinson">Atkinson Hyperlegible</option><option value="opendyslexic">OpenDyslexic</option></select>
+    </div>
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-focus"/></svg>Line focus</h3>
+      <div class="row"><label for="in-lf" style="flex:1">Dim everything except what is being read<small class="spd-s">Off by default</small></label><input id="in-lf" type="checkbox"></div>
+      <div class="row" id="lf-scope" style="margin-top:.5rem"><label style="flex:1">Keep lit</label><div class="seg" id="seg-lf"><button data-v="sentence">Sentence</button><button data-v="paragraph">Paragraph</button></div></div>
+    </div>
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-pen"/></svg>Highlight</h3>
+      <div class="row"><label style="flex:1">Style</label><div class="seg" id="seg-hl"><button data-v="fill">Fill</button><button data-v="underline">Underline</button></div></div>
+      <div class="row" style="margin-top:.5rem"><label style="flex:1">Color</label>
+        <div class="swatches" id="hl-colors">
+          <button type="button" data-c="" aria-label="Automatic color">Auto</button>
+          <button type="button" data-c="yellow" style="--c:#FFD84D" aria-label="Yellow"></button>
+          <button type="button" data-c="green" style="--c:#5FCB8B" aria-label="Green"></button>
+          <button type="button" data-c="blue" style="--c:#5DB3FF" aria-label="Blue"></button>
+          <button type="button" data-c="pink" style="--c:#FF8DB5" aria-label="Pink"></button>
+          <button type="button" data-c="orange" style="--c:#FFA040" aria-label="Orange"></button>
+        </div></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-wordhl" style="flex:1">Highlight each word as it is read<small id="wordhl-help" style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Off: only the whole sentence is highlighted.</small></label><input id="in-wordhl" type="checkbox"></div>
+      <div class="row" id="row-wordshift" style="margin-top:.5rem"><label style="flex:1">Word timing<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">If the word is ahead of the voice, press &minus;. If it is behind, press +.</small></label><div class="seg"><button type="button" id="ws-down" aria-label="Highlight words later">&minus;</button><button type="button" id="ws-val" aria-label="Reset word timing" style="min-width:4.2rem;font-variant-numeric:tabular-nums">0.0 s</button><button type="button" id="ws-up" aria-label="Highlight words earlier">+</button></div></div>
+      <div class="row" id="row-clpro" style="margin-top:.5rem"><label for="in-clpro" style="flex:1">Video-style clip editor<small id="clpro-help" style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Off: simple trim handles only.</small></label><input id="in-clpro" type="checkbox"></div>
+      <div class="row" id="row-wordest" style="margin-top:.5rem"><label for="in-wordest" style="flex:1">Estimate words in books without word timing<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Exact timing is always used when a book has it. Estimates can run a little ahead or behind.</small></label><input id="in-wordest" type="checkbox"></div>
+    </div>
+    <div class="row">
+      <label for="in-langs" style="flex:1">Show books in other languages (German, French, Spanish, etc.)</label><input id="in-langs" type="checkbox">
+    </div>
+    <div class="row">
+      <label for="in-resume" style="flex:1">Pick up where you left off<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">How many unfinished books to show on Home, most recent first.</small></label>
+      <select id="in-resume" class="num" style="width:auto"><option value="1">Last book only</option><option value="2">2 books</option><option value="3">3 books</option><option value="4">4 books</option><option value="5">5 books</option></select>
+    </div>
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-image"/></svg>Cover style</h3>
+      <div class="seg" id="seg-cover">
+        <button data-v="original">Original</button><button data-v="modern">Modern</button>
+      </div>
+      <p class="help">Original (default) shows the LibriVox cover art for each book. Modern shows a clean designed cover instead. Your choice is remembered.</p>
+    </div>
+    <div class="row">
+      <label for="in-bcol" style="flex:1">Match app colors to the book cover</label><input id="in-bcol" type="checkbox">
+    </div>
+    <div class="row">
+      <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-chat"/></svg>Dialogue</h3>
+      <div class="seg" id="seg-dlg"><button data-v="color">Color</button><button data-v="italic">Italic</button><button data-v="off">Off</button></div>
+    </div>
+    <div class="row">
+      <label for="in-awake" style="flex:1">Keep the screen on while a book is open</label><input id="in-awake" type="checkbox">
+    </div>
+    <p class="help" id="awake-note" hidden></p>
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-kbd"/></svg>Keyboard</h3>
+      <div class="keys"><span><kbd>Space</kbd></span><span>Play or pause</span><span><kbd>←</kbd> <kbd>→</kbd></span><span>Previous or next sentence</span><span><kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd></span><span>Back or forward 15 seconds</span><span><kbd>N</kbd> <kbd>P</kbd></span><span>Next or previous track</span></div>
+    </div>
+  </div>
+  <div class="sp" data-sp="audio" hidden>
+    <div class="row"><label for="in-skipbtn"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>Skip intro button</h3><small style="color:var(--muted)">Shows for the first 30 seconds of a track, to jump past the spoken LibriVox notice</small></label><input id="in-skipbtn" type="checkbox"></div>
+    <div class="row"><label for="in-smartrw"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Smart rewind</h3><small style="color:var(--muted)">After a pause, or when you come back to a book, go back a few seconds (more after a longer break) so you don't lose the thread</small></label><input id="in-smartrw" type="checkbox"></div>
+    <div class="row"><label for="in-autonext"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Download ahead</h3><small style="color:var(--muted)">Saves the next tracks while you listen, on Wi-Fi only, so a weak connection never stops the book. Remove them in Settings &gt; Storage</small></label><select id="in-autonext" class="num" style="width:auto"><option value="0">Off</option><option value="2">Next 2 tracks</option><option value="3">Next 3 tracks</option></select></div>
+    <div class="row"><label style="flex:1"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Sound</h3><small style="color:var(--muted)">Background sounds, story sounds, music and the opening sound, all in one place. Presets, volume and a master switch are there too</small></label><button id="b-amb-set" class="btn small ghost" type="button" >Open sound mixer</button></div>
+    <div class="row"><label for="in-lockseek"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Lock-screen buttons</h3><small style="color:var(--muted)">Skip back and forward 15 seconds. Turn off to get previous and next track instead</small></label><input id="in-lockseek" type="checkbox"></div>
+    <div class="row"><label for="in-autodel"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Auto-delete finished downloads</h3><small style="color:var(--muted)">When you reach the end of a book, its downloaded audio is removed from this device to free space. Your position, stats and favourites are kept</small></label><input id="in-autodel" type="checkbox"></div>
+    <div class="row" id="row-sharestats"><label for="in-sharestats"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Share anonymous listen counts</h3><small style="color:var(--muted)">Counts a book once after you have listened for a minute, and once when you finish it, so others can see how popular it is. Sends a random number made on this device. Never your name, your history or what you read</small></label><input id="in-sharestats" type="checkbox"></div>
+    <div class="row"><label for="in-haptics"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-phone"/></svg>Haptic feedback</h3><small style="color:var(--muted)">Small vibrations when you tap play, skip, change speed and reach your goal</small></label><input id="in-haptics" type="checkbox"></div>
+    <div class="row"><label for="in-shake"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-phone"/></svg>Shake to extend sleep timer</h3><small style="color:var(--muted)">While a sleep timer is running, shake the phone to add more time. Works while the screen is on. The sleep timer must be set to minutes (not End of track)</small></label><input id="in-shake" type="checkbox"></div>
+    <div class="row" id="row-shakemin" hidden><label for="in-shakemin" style="flex:1">Add this much time per shake</label><select id="in-shakemin"><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option></select></div>
+    <div class="row">
+      <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-wave"/></svg>Sound wave</h3>
+      <div class="seg" id="seg-viz"><button data-v="bars">Bars</button><button data-v="wave">Wave</button><button data-v="off">Off</button></div>
+    </div>
+    <div class="row">
+      <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-sliders"/></svg>Audio enhancer</h3>
+      <div class="seg" id="seg-enh"><button data-v="off">Off</button><button data-v="clear">Clear voice</button><button data-v="night">Night</button><button data-v="voice">Voice boost</button><button data-v="restore">Old recording</button><button data-v="lowq">Low quality</button></div>
+    </div>
+    <div class="row">
+      <label for="in-skipcuts" style="flex:1">Skip LibriVox intro and outro automatically</label><input id="in-skipcuts" type="checkbox">
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <label for="in-nn" style="flex:1">Fold away text the narrator does not read (tables, almanacs, notes) into a tap-to-show line</label><input id="in-nn" type="checkbox">
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <label for="in-quick" style="flex:1">Quick controls button (&#8943;) at the top of the player, for speed, sleep timer, settings and more</label><input id="in-quick" type="checkbox">
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <label for="in-recap" style="flex:1">Chapter recaps: 3 sentences when a chapter ends, and &ldquo;Previously&hellip;&rdquo; after 3 or more days away</label><input id="in-recap" type="checkbox">
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <label for="in-tidy" style="flex:1">Simpler player: one progress line, with the whole-book progress as small text</label><input id="in-tidy" type="checkbox">
+    </div>
+  </div>
+  
+  <div class="sp" data-sp="sync" hidden>
+    <div id="synccard" class="synccard">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>Precise read-along</h3>
+      <p class="help">Makes the highlighted words follow the narrator's voice exactly. The first time takes a few minutes and runs in the background, so you can keep listening.</p>
+      <button id="b-syncnow" class="btn" type="button">Check timing for this book</button>
+      <div id="sync-status" class="syncstat" hidden role="status" aria-live="polite" data-kind="info">
+        <div class="ss-head"><span class="ss-ic" aria-hidden="true"></span><strong class="ss-title"></strong></div>
+        <p class="ss-msg"></p>
+        <div class="ss-bar" hidden><i></i></div>
+        <div class="ss-cap" hidden><span></span><span></span></div>
+        <div class="ss-stats" hidden></div>
+        <details class="ss-more" hidden><summary>Track by track</summary><div class="ss-detail"></div></details>
+      </div>
+    </div>
+    <div style="display:none" id="healthcard" class="synccard">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-chart"/></svg>Sync dashboard</h3>
+      <p id="health-sum" class="help">See which books are synced, pending or failed.</p>
+      <button id="b-health" class="btn" type="button">Open dashboard</button>
+      <div id="health-list" hidden></div>
+    </div>
+    <div class="synccard" style="display:none">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-refresh"/></svg>Pre-sync books</h3>
+      <p class="help">Pick several books and prepare their precise timing ahead of time, so they open ready.</p>
+      <button id="btn-presync" class="btn" type="button">Choose books</button>
+    </div>
+    <div class="synccard">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-archive"/></svg>Backup</h3>
+      <p class="help">Save your favourites, saved words, bookmarks, listening history and positions to a file, or restore them from one. Downloaded audio is not included.</p>
+      <div class="row" style="justify-content:flex-start;gap:.5rem"><button id="b-bkdl" class="btn" type="button">Download backup</button><button id="b-bkrs" class="btn" type="button">Restore backup</button></div>
+      <input id="in-bkfile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Highlight timing</h3>
+      <p class="help">Every LibriVox track opens with a spoken notice and ends with "End of chapter". If the highlight starts early or late in every track, adjust these.</p>
+      <div class="row" style="margin-top:.7rem"><label for="in-lead">Skip at start (seconds, blank = automatic)</label><input id="in-lead" class="num" type="number" min="0" max="60" step="0.5" placeholder="Auto"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-outro">Skip at end (seconds)</label><input id="in-outro" class="num" type="number" min="0" max="60" step="0.5"></div>
+    </div>
+  </div>
+  <div class="sp" data-sp="storage" hidden>
+    <div class="synccard">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-archive"/></svg>Offline storage</h3>
+      <div class="dm-big" id="dm-big" aria-live="polite">&ndash;</div>
+      <p id="dm-sum" class="help">Checking downloads…</p>
+      <p id="dm-space" class="dm-space"></p>
+      <p id="dm-note" class="dm-note" role="status" hidden></p>
+      <p id="dm-warn" class="dm-warn" role="status" hidden></p>
+      <div id="dm-list" class="dm-list"></div>
+      <div class="dm-acts"><button id="dm-fin" class="btn small" type="button" disabled>Delete finished books</button><button id="dm-all" class="btn small ghost" type="button" disabled>Delete all downloads</button></div>
+    </div>
+  </div>
+  <div class="sp" data-sp="dev" hidden>
+    <div class="dev-search"><input id="dev-q" type="search" placeholder="Search developer settings" aria-label="Search developer settings" autocomplete="off"></div>
+    <p id="dev-none" class="dev-none" hidden>No settings match.</p>
+    <div class="synccard" id="sct-card"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-code"/></svg>Scene test</h3>
+      <p class="help">Checks the scene detection against sample paragraphs with known answers. Paste your own cases into the box (the format is explained at the top), then run. A starting baseline is built in (it has no wrong guesses). Save your own once you have reviewed a result; later runs show what is newly wrong. Wrong guesses count against a batch of new words; missed and late do not. Cases stay on this device.</p>
+      <textarea id="sct-src" rows="12" spellcheck="false" autocapitalize="none" autocomplete="off" aria-label="Scene test cases" style="width:100%;box-sizing:border-box;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:.6rem"></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem"><button id="sct-run" class="btn small" type="button">Run test</button><button id="sct-base" class="btn small ghost" type="button">Save as baseline</button><button id="sct-copy" class="btn small ghost" type="button">Copy report</button><button id="sct-reset" class="btn small ghost" type="button">Restore samples</button></div>
+      <pre id="sct-out" class="help" aria-live="polite" style="white-space:pre-wrap;word-break:break-word;margin-top:.6rem"></pre>
+    </div>
+    <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-zap"/></svg>Sync and performance</h3>
+      <p id="dev-startup" class="help">Startup time: measuring…</p>
+      <details class="adv" open>
+        <summary>Advanced</summary>
+        <div class="row" style="margin-top:.6rem"><label for="in-worker">Background processing (Web Worker)</label><input id="in-worker" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Runs the heavy sync maths away from the screen so reading and highlighting stay smooth. Leave it on; turn it off only if syncing fails or the app behaves oddly on this device.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-layout">Smoother highlight scrolling (batch page measuring)</label><input id="in-layout" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Measures the page once per update instead of several times, so following the highlight uses less processing. Leave it on; turn it off only if the page scrolls to the wrong place on this device.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-idle">Save battery while playing and in the background</label><input id="in-idle" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Runs the save and check timers only while audio plays, saves just the listening position every few seconds (everything else every 30 seconds and whenever something changes), and pauses progress animations when the app is hidden. Leave it on; turn it off only if your place is not remembered on this device.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-net">Faster network (race routes, skip unchanged catalog)</label><input id="in-net" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">If the direct route is slow, tries the backup routes after a short delay instead of waiting 20 seconds for each one, and does not re-download the book catalog when it has not changed. Leave it on; turn it off only if books fail to load on this device.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-load">Faster loading (fonts do not block the first screen)</label><input id="in-load" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Shows the app straight away in your phone's own font and switches to the app fonts when they arrive, which helps on slow networks. Takes effect the next time you open the app. Leave it on; turn it off only if text flickers or looks wrong.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-lite">Lighter graphics on weak devices (auto)</label><input id="in-lite" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">On an older or low-memory phone, or when the phone asks for reduced motion, removes the blur behind the bottom bar, search bar and pop-ups and the soft drop shadows, so scrolling and taps stay smooth. Other phones keep the current look. Leave it on.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-liteforce">Always use lighter graphics (even on a fast phone)</label><input id="in-liteforce" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Off by default. Turn it on to force the lighter look, for example to test it on your own phone.</p>
+        <div class="row" style="margin-top:.8rem"><label for="in-diag">Diagnostics (log errors and slow moments)</label><input id="in-diag" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Keeps the last 50 errors, freezes longer than 50 ms and taps slower than 200 ms in memory only (nothing is sent anywhere) so problems can be found. Press Refresh to see them and Copy to share them. Leave it on.</p>
+        <pre id="diag-out" style="margin:.4rem 0 0;padding:.5rem;max-height:9rem;overflow:auto;font-size:.68rem;line-height:1.35;white-space:pre-wrap;word-break:break-word;background:var(--surface-2);border-radius:8px">Press Refresh.</pre>
+        <div class="row" style="margin-top:.4rem;justify-content:flex-end;gap:.5rem"><button id="b-diagrefresh" class="btn" type="button">Refresh</button><button id="b-diagcopy" class="btn" type="button">Copy</button><button id="b-diagclear" class="btn" type="button">Clear</button></div>
+        <div class="row" style="margin-top:.8rem"><label for="in-lowpower">Lower power while playing</label><input id="in-lowpower" type="checkbox"></div>
+        <p class="help" style="margin-top:.3rem">Updates the highlight about 20 times a second instead of 60 and draws the sound wave less often, and lets the screen sleep when audio is paused and you have not touched the phone for 2 minutes. Highlighting looks the same. Leave it on; turn it off only if the highlight seems to lag.</p>
+        <div class="row" style="display:none;margin-top:.8rem"><label for="in-ghrepo">Sync repository (name/repo)</label><input id="in-ghrepo" class="num" type="text" placeholder="rabiul43/wordtrail-data" style="width:11rem"></div>
+        <div class="row" style="display:none;margin-top:.5rem"><label for="in-ntfy">Phone alert when sync finishes</label><input id="in-ntfy" type="checkbox"></div>
+        <p id="ntfy-help" class="help" hidden></p>
+        <div class="row" style="margin-top:.5rem"><label for="in-tim">Load a timing file (.json)</label><input id="in-tim" type="file" accept=".json,application/json" style="max-width:11rem"></div>
+        <div class="row" style="margin-top:.5rem"><label for="b-booklist">Library check: book list for the computer</label><button id="b-booklist" class="btn" type="button">Export book list</button></div>
+        <p class="help" style="margin-top:.3rem">Saves books.csv with every synced book (book id, Gutenberg id, title). Put it next to wt_sync_check.js on your computer. Books you have not opened on this device have no Gutenberg id yet: fill it in by hand, or open the book once and export again.</p>
+      </details>
+    </div>
+    <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Timing</h3>
+      <details class="adv" open><summary>Advanced timing</summary>
+      <div class="row" style="margin-top:.5rem"><label for="in-fast">Faster audio check (reuse saved results, download each track once, clearer status)</label><input id="in-fast" type="checkbox"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-smart">Smarter sync (sync around where you are first, analyse in small pieces, check the next tracks ahead on Wi-Fi)</label><input id="in-smart" type="checkbox"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-auto">Find where the text starts automatically (uses about 2.5 MB per track)</label><input id="in-auto" type="checkbox"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-bg">Align whole tracks in the background (about 30 MB per track)</label><select id="in-bg" class="num" style="width:auto"><option value="wifi">Wi-Fi only</option><option value="always">Always</option><option value="off">Off</option></select></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-drift">Quietly correct drift while playing (reads about 1 MB of audio per check)</label><input id="in-drift" type="checkbox"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-hlp">Ask for help when the highlight seems off</label><input id="in-hlp" type="checkbox"></div>
+      <div class="row" style="margin-top:.5rem"><label for="in-nudge">Highlight earlier by (seconds)</label><input id="in-nudge" class="num" type="number" min="-2" max="2" step="0.05"></div>
+      </details>
+    </div>
+    <div class="synccard" style="display:none"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-trash"/></svg>Clean-up</h3>
+      <details class="adv" open>
+        <summary>Clean-up</summary>
+        <div class="row" style="margin-top:.6rem"><label for="in-mdays">Delete leftovers older than (days)</label><input id="in-mdays" class="num" type="number" min="7" max="365" value="40" style="width:5rem"></div>
+        <div class="row" style="margin-top:.5rem"><label for="in-mlive">Delete automatically (off = only report)</label><input id="in-mlive" type="checkbox"></div>
+        <p id="maint-help" class="help" style="margin-top:.4rem"></p>
+      </details>
+    </div>
+  </div>
+  </div>
+</section>
+

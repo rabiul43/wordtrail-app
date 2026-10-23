@@ -1,0 +1,47 @@
+/* Sound screen: master switch, four layer tabs (Ambient, Music, Opening, Story), one panel at a time.
+   A dot on a tab shows that layer is on. When Sound is off the tabs and panel look dim and the panel cannot be used. */
+.snd-top { display: grid; gap: .4rem; margin: 0 0 .9rem; }
+.snd-mrow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 2.75rem; }
+.snd-mlab { flex: 1; min-width: 0; cursor: pointer; }
+.snd-mt { display: block; font-size: 1.05rem; font-weight: 700; }
+.snd-ms { display: block; font-size: .82rem; color: var(--muted); }
+.snd-body[data-off] .snd-mvol { opacity: .55; }
+
+.snd-sw { -webkit-appearance: none; appearance: none; position: relative; flex: none; width: 2.9rem; height: 1.6rem; margin: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); cursor: pointer; transition: background-color .18s, border-color .18s; -webkit-tap-highlight-color: transparent; }
+.snd-sw::before { content: ""; position: absolute; inset: -.6rem -.3rem; }   /* 44px touch target around the small switch */
+.snd-sw::after { content: ""; position: absolute; top: 50%; left: .2rem; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--ink); transform: translateY(-50%); transition: left .18s, background-color .18s; }
+.snd-sw:checked { background: var(--accent); border-color: var(--accent); }
+.snd-sw:checked::after { left: calc(100% - 1.3rem); background: var(--accent-ink); }
+.snd-sw:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
+.snd-sw:disabled { opacity: .5; cursor: default; }
+
+.snd-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; margin: 0 0 .9rem; }
+.snd-tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; min-height: 3.5rem; padding: .45rem .2rem; border: 1px solid var(--line); border-radius: var(--r-ctl, 12px); background: var(--surface); color: var(--muted); font: inherit; font-size: .84rem; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .15s, border-color .15s, color .15s; }
+.snd-tab .ic { width: 1.3rem; height: 1.3rem; }
+.snd-tab[aria-selected="true"] { color: var(--ink); border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.snd-tab:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
+.snd-dot { position: absolute; top: .4rem; right: .4rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); }
+.snd-dot[hidden] { display: none; }
+
+.snd-panels { margin: 0 0 .9rem; }
+.snd-panel { display: grid; gap: .7rem; }
+.snd-panel[hidden] { display: none; }
+.snd-body[data-off] .snd-tab, .snd-body[data-off] .snd-panels, .snd-body[data-off] .amb-sug { opacity: .55; }
+.snd-body[data-off] #amb-now { display: none; }
+.snd-lrow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 2.75rem; }
+.snd-ltxt { flex: 1; min-width: 0; }
+.snd-ltxt label { display: block; font-size: 1rem; font-weight: 600; cursor: pointer; }
+.snd-ltxt small { display: block; color: var(--muted); font-size: .82rem; margin-top: .1rem; }
+.snd-sub { padding-left: .8rem; border-left: 2px solid var(--line); }
+.snd-panel .amb-h { margin-bottom: 0; }
+#row-musvol[hidden] { display: grid; }
+.snd-panel .snd-vrow[data-hide] { display: none; }   /* a sound's own volume is hidden while that sound is off */
+
+.snd-body .amb-sug { padding: .55rem .8rem; margin: 0 0 .9rem; }
+.snd-body .amb-sug > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .4rem; min-width: 0; }
+.snd-body .amb-sug strong { font-size: 1rem; }
+.amb-scenes .chip { display: inline-flex; align-items: center; gap: .4rem; }
+.amb-tag { font-size: .68rem; font-weight: 600; padding: .05rem .4rem; border-radius: 999px; background: var(--accent-soft); color: var(--ink); }
+.amb-more summary { cursor: pointer; color: var(--muted); font-size: .82rem; padding: .3rem 0; }
+.amb-more[open] summary { margin-bottom: .2rem; }
+@media (prefers-reduced-motion: reduce) { .snd-sw, .snd-sw::after, .snd-tab { transition: none; } }
