@@ -20,6 +20,7 @@
       <div class="snd-panel" id="snd-p-amb" role="tabpanel" aria-labelledby="snd-t-amb">
         <div class="snd-lrow"><div class="snd-ltxt"><label for="in-ambon">Background sounds</label><small>Rain, wind, café, waves under the narrator</small></div><input type="checkbox" id="in-ambon" class="snd-sw" role="switch"></div>
         <div class="amb-row snd-vrow" id="row-ambvol"><label for="amb-vol">Background sounds volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Background sounds volume"></div>
+        <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
         <h3 class="amb-h">Choose a scene</h3>
         <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
         <p class="help amb-note">Made on your device, so it works offline.</p>
@@ -58,7 +59,6 @@
       </div>
     </div>
 
-    <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
     <div class="amb-now" id="amb-now" aria-live="polite" hidden></div>
 
     <details class="snd-adv" id="snd-presets-d"><summary>Presets</summary>
