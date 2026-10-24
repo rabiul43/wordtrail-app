@@ -30,6 +30,12 @@
     gen: 0,         // bumped on every mood switch and stop, so a clip that finishes loading late is dropped
     on: false,      // true once the music bus is built on the shared context
     base: '',       // data root override (local test mode only); '' = GitHub raw
+    fail: false,    // the last load of a clip failed (offline?): the Music panel shows a line about it
+    mfT: 0,         // when the manifest was last fetched (ms)
+    mfBusy: false,  // a manifest retry is running
+    offBusy: false, // the offline panel is fetching the music list
+    dl: null,       // { ctl } while "Download music for offline" runs
+    dlPick: null,   // Set of moods chosen for the offline download
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and
@@ -156,36 +162,51 @@
   function musDuckStart() { if (!MUS.duckIv) MUS.duckIv = setInterval(musDuckTick, 60); }
   function musDuckStop() { clearInterval(MUS.duckIv); MUS.duckIv = 0; MUS.duckS = ''; }
 
-  /* Fetch and cache music.json from the GitHub data repo. */
-  async function musFetchManifest() {
+  /* Fetch and cache music.json from the GitHub data repo. `force` skips the 24 hour saved copy (used before an offline download).
+     When the network fails, an older saved copy is used whatever its age, so music that is already on the device still plays offline. */
+  async function musFetchManifest(force) {
     if (MUS_LOCAL) {
       try {
         const r = await fetch('/_data/music.json', { cache: 'no-store' });
         if (r.ok) {
           const d = await r.json();
           if (d && d.v === 1 && d.moods) {
-            MUS.manifest = d; MUS.base = location.origin + '/_data/';
+            MUS.manifest = d; MUS.base = location.origin + '/_data/'; MUS.mfT = Date.now();
             console.info('[music] local test mode: using /_data/music.json');
             return;
           }
         }
       } catch (e) { /* no local data — fall through to GitHub */ }
     }
+    let cached = null;
     try {
-      const cached = store.get('wt:music-manifest', null);
-      if (cached && cached.d && Date.now() - cached.t < 24 * 3600e3) {
-        MUS.manifest = cached.d; return;
+      cached = store.get('wt:music-manifest', null);
+      if (!force && cached && cached.d && Date.now() - cached.t < 24 * 3600e3) {
+        MUS.manifest = cached.d; MUS.mfT = cached.t; return;
       }
       const base = 'https://raw.githubusercontent.com/' + ghCfg().repo + '/main/';
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
       const r = await fetch(base + 'music.json', { signal: ctl.signal }); clearTimeout(to);
-      if (!r.ok) return;
-      const d = await r.json();
-      if (d && d.v === 1 && d.moods) {
-        MUS.manifest = d;
-        store.set('wt:music-manifest', { t: Date.now(), d });
+      if (r.ok) {
+        const d = await r.json();
+        if (d && d.v === 1 && d.moods) {
+          MUS.manifest = d; MUS.mfT = Date.now();
+          store.set('wt:music-manifest', { t: MUS.mfT, d });
+          return;
+        }
       }
-    } catch (e) { /* offline or not yet published — silent */ }
+    } catch (e) { /* offline or not yet published: use the saved copy below */ }
+    if (!MUS.manifest && cached && cached.d) { MUS.manifest = cached.d; MUS.mfT = cached.t || 0; }   // an old list is better than silence
+  }
+  /* The manifest is missing (first play offline, or the first fetch failed): try again, once at a time. */
+  function musManifestRetry() {
+    if (MUS.mfBusy) return;
+    MUS.mfBusy = true;
+    musFetchManifest().then(() => {
+      MUS.mfBusy = false;
+      if (MUS.manifest) { if (musNarrating()) musicPlay(); }
+      else if (P.musOn === true && sndOn() && musNarrating()) { MUS.fail = true; musWarnPaint(); }
+    });
   }
 
   /* Build a shuffled clip queue for a mood. Rotates if first clip equals the last-played one. */
@@ -322,6 +343,7 @@
       clearTimeout(MUS.xTimer); MUS.xTimer = setTimeout(musNextClip, 60e3); return;
     }
     const { clip, buf } = got;
+    MUS.fail = false; musWarnPaint();
 
     const now = MUS.ctx.currentTime;
     musBusApply();
@@ -349,12 +371,14 @@
     const got = await musLoadNext(gen);
     if (gen !== MUS.gen) return;   // a newer mood switch or a stop came in meanwhile
     if (!got) {   // nothing loaded (offline?): stop holding the engine, and try again in 45 s while the story is being read
+      MUS.fail = true; musWarnPaint();   // tell the reader in the Music panel
       if (!MUS.playing) MUS.live = false;
       clearTimeout(MUS.rt);
       MUS.rt = setTimeout(() => { if (P.musOn && !MUS.playing && musNarrating()) musSwitchMood(MUS.mood || 'neutral', true); }, 45e3);
       return;
     }
     const { clip, buf } = got;
+    MUS.fail = false; musWarnPaint();
 
     const now = MUS.ctx.currentTime;
     musBusApply();
@@ -369,7 +393,7 @@
   function musStop(fadeDur) {
     MUS.gen++;
     clearTimeout(MUS.xTimer); clearTimeout(MUS.rt); clearTimeout(MUS.lt);
-    MUS.live = false; musDuckStop();
+    MUS.live = false; MUS.fail = false; musDuckStop();
     if (!MUS.ctx) return;
     const now = MUS.ctx.currentTime, d = fadeDur || 1.5;
     if (MUS.playing) { musFadeOut(MUS.playing, now, d); MUS.playing = null; }
@@ -383,6 +407,7 @@
      opening sound. Each piece is its own element so the translator can match fixed words one by one. */
   const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
   function sndNowPaint() {
+    musWarnPaint();
     try {
       const box = $('#amb-now'); if (!box) return;
       const rows = [];
@@ -410,7 +435,8 @@
 
   /* Called when the narrator starts playing. */
   function musicPlay() {
-    if (!P.musOn || !sndOn() || !MUS.on || !MUS.manifest || !musNarrating()) return;   // needs the narrator playing and Sound on; ambient is irrelevant
+    if (!P.musOn || !sndOn() || !MUS.on || !musNarrating()) return;   // needs the narrator playing and Sound on; ambient is irrelevant
+    if (!MUS.manifest) { musManifestRetry(); return; }   // the list never loaded (offline at the first play): try again now
     if (MUS.playing) return;
     const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
     if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
@@ -456,11 +482,153 @@
     cb.type = 'peaking'; cb.frequency.value = 800;  cb.Q.value = 0.9; cb.gain.value = 0;
     master.connect(ca); ca.connect(cb); cb.connect(duck); duck.connect(ctx.destination);
     MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.ca = ca; MUS.cb = cb; MUS.on = true;
-    if (!MUS.manifest) musFetchManifest().then(() => { if (musNarrating()) musicPlay(); });
+    if (!MUS.manifest) musManifestRetry();
+  }
+
+  /* A short line in the Music panel when music is on but a clip could not load. */
+  function musWarnPaint() {
+    try {
+      const box = $('#mus-warn'); if (!box) return;
+      const show = P.musOn === true && sndOn() && MUS.fail;
+      box.hidden = !show;
+      if (show) box.textContent = navigator.onLine === false
+        ? 'Music needs a connection for this mood. Download music to use it offline.'
+        : 'Music could not load. Check your connection and try again.';
+    } catch (err) { /* a status line must never break playback */ }
+  }
+
+  /* ---------- Offline music ----------
+     "Download music for offline" saves clips into the 'wt-music' cache and puts their addresses on a keep list
+     (localStorage 'wt-music-keep', see sndKeepSet in 240). The 150 MB prune never removes a clip on that list.
+     The keep list itself is limited to SND_KEEP_CAP, and the panel says so before it starts. Clips are encoded at 128 kbps. */
+  const MUS_BYTES_PER_SEC = 16000;
+  function musOffMoods() { const m = (MUS.manifest && MUS.manifest.moods) || {}; return Object.keys(m).filter(musHas); }
+  function musOffClips(moods) {   // each clip once, even when it sits under two moods
+    const m = (MUS.manifest && MUS.manifest.moods) || {}, seen = new Set(), out = [];
+    moods.forEach(k => (m[k] || []).forEach(c => { if (c && c.f && !seen.has(c.f)) { seen.add(c.f); out.push({ f: c.f, bytes: Math.round((+c.dur || 90) * MUS_BYTES_PER_SEC) }); } }));
+    return out;
+  }
+  const musMB = n => Math.round(n / 1048576);
+  function musOffMsg(t) { const e = $('#mus-off-msg'); if (e) e.textContent = t || ''; }
+  async function musKeptInfo() {   // the clips of the current list that are saved for offline: how many and how big
+    const keep = sndKeepSet(), want = new Set(musOffClips(musOffMoods()).map(c => new Request(musClipUrl(c.f)).url));
+    let n = 0, bytes = 0;
+    for (const x of await sndCacheList()) if (x.cache === 'wt-music' && keep.has(x.url)) { bytes += x.size; if (want.has(x.url)) n++; }
+    return { n, bytes, total: want.size };
+  }
+  function musOffPaint(again) {
+    try {
+      const box = $('#mus-off-moods'); if (!box) return;
+      const est = $('#mus-off-est'), have = $('#mus-off-have'), go = $('#mus-off-go'), cancel = $('#mus-off-cancel'), clr = $('#mus-off-clear'), when = $('#mus-off-when');
+      cancel.hidden = !MUS.dl; go.disabled = !!MUS.dl;
+      if (!MUS.manifest) {
+        box.textContent = ''; box.dataset.sig = ''; have.textContent = ''; clr.hidden = true; go.disabled = true; when.hidden = true;
+        est.textContent = again ? 'The music list could not load. Connect to the internet and try again.' : 'Loading the music list…';
+        if (!again && !MUS.offBusy) { MUS.offBusy = true; musFetchManifest().then(() => { MUS.offBusy = false; musOffPaint(true); }); }
+        return;
+      }
+      const moods = musOffMoods(), sig = moods.join(',');
+      if (!MUS.dlPick) MUS.dlPick = new Set();
+      if (box.dataset.sig !== sig) {   // build the mood choices once per list; a mood new to the list starts ticked
+        const old = (box.dataset.sig || '').split(','); moods.forEach(k => { if (old.indexOf(k) < 0) MUS.dlPick.add(k); });
+        box.dataset.sig = sig; box.textContent = '';
+        moods.forEach(k => {
+          const cb = h('input', { type: 'checkbox' }); cb.checked = MUS.dlPick.has(k); cb.dataset.k = k;
+          box.append(h('label', { class: 'amb-opt' }, cb, h('span', { text: MUS_MOOD_NAME[k] || k }), h('small', { class: 'spd-s', text: '~' + Math.max(1, musMB(musOffClips([k]).reduce((a, c) => a + c.bytes, 0))) + ' MB' })));
+        });
+      }
+      when.hidden = !MUS.mfT;
+      if (MUS.mfT) { const d = $('#mus-off-date'); if (d) d.textContent = new Date(MUS.mfT).toLocaleDateString(document.documentElement.lang || undefined, { day: 'numeric', month: 'short', year: 'numeric' }); }
+      musKeptInfo().then(k => {
+        const picked = musOffClips([...MUS.dlPick].filter(x => moods.indexOf(x) >= 0)), keep = sndKeepSet();
+        const todo = picked.filter(c => !keep.has(new Request(musClipUrl(c.f)).url));
+        const need = todo.reduce((a, c) => a + c.bytes, 0), over = k.bytes + need > SND_KEEP_CAP;
+        est.textContent = over ? 'That is more than the 100 MB limit. Choose fewer moods.'
+          : !picked.length ? 'Choose at least one mood.'
+          : !todo.length ? 'All of this music is already saved.'
+          : 'Selected: ' + todo.length + (todo.length === 1 ? ' clip' : ' clips') + ', about ' + Math.max(1, musMB(need)) + ' MB';
+        go.disabled = !!MUS.dl || over || !todo.length;
+        have.textContent = k.n ? 'Saved on this device: ' + k.n + ' of ' + k.total + (k.total === 1 ? ' clip' : ' clips') + ' (' + musMB(k.bytes) + ' MB)' : '';
+        clr.hidden = !k.n || !!MUS.dl;
+      }).catch(() => { /* the numbers are a help only */ });
+    } catch (err) { /* the offline panel must never break the sound screen */ }
+  }
+  async function musOffRun() {
+    if (MUS.dl) return;
+    if (MUS_LOCAL) { musOffMsg('Offline music is not available in local test mode.'); return; }
+    if (!self.caches) { musOffMsg('This browser cannot save music for offline.'); return; }
+    if (navigator.onLine === false) { musOffMsg('You are offline. Connect to the internet to download music.'); return; }
+    const ctl = new AbortController(); MUS.dl = { ctl }; musOffPaint();
+    let c = null, done = 0, bytes = 0, failed = 0, full = false, list = [];
+    try {
+      musOffMsg('Checking the music list…');
+      await musFetchManifest(true);   // a fresh list first, so new clips are included
+      const moods = musOffMoods().filter(k => MUS.dlPick && MUS.dlPick.has(k));
+      list = musOffClips(moods);
+      c = await caches.open('wt-music');
+      const keep = sndKeepSet();
+      for (const clip of list) {
+        if (ctl.signal.aborted) break;
+        const url = musClipUrl(clip.f);
+        try {
+          if (!(await c.match(url))) {   // a clip that already played once is in the cache: only mark it as kept
+            const resp = await fetch(url, { signal: ctl.signal });
+            if (!resp.ok) throw new Error('http ' + resp.status);
+            const buf = await resp.arrayBuffer();
+            await c.put(url, new Response(buf, { headers: { 'content-type': 'audio/mpeg', 'content-length': String(buf.byteLength) } }));
+            bytes += buf.byteLength;
+          }
+          keep.add(new Request(url).url); sndKeepSave(keep); sndTouch(url); done++;
+        } catch (err) {
+          if (ctl.signal.aborted) break;
+          if (err && err.name === 'QuotaExceededError') { full = true; break; }
+          failed++;
+        }
+        musOffMsg('Saving music: ' + (done + failed) + ' of ' + list.length + ' clips (' + musMB(bytes) + ' MB)');
+      }
+    } catch (err) { failed++; }
+    const cancelled = ctl.signal.aborted;
+    MUS.dl = null;
+    musOffMsg(cancelled ? 'Download cancelled. Music already saved stays on this device.'
+      : full ? 'Not enough space on this device. Remove some files and try again.'
+      : failed || !list.length ? 'Some music could not be downloaded. Check your connection and try again.'
+      : 'Music saved. It now plays without a connection.');
+    try { await sndCachePrune(true); } catch (err) { /* best effort */ }
+    musOffPaint(); sndCacheSizePaint();
+  }
+  async function musOffClear() {
+    if (!confirm('Remove the music saved for offline? It downloads again when needed.')) return;
+    try {
+      const keep = sndKeepSet(), c = await caches.open('wt-music');
+      for (const url of keep) { try { await c.delete(url); } catch (err) { /* skip */ } }
+      try { localStorage.removeItem(SND_KEEP_KEY); } catch (err) { /* ignore */ }
+    } catch (err) { /* ignore */ }
+    musOffMsg(''); musOffPaint(); sndCacheSizePaint(); toast('Saved music removed.');
+  }
+  function musOffInit() {
+    const go = $('#mus-off-go'); if (!go) return;
+    go.addEventListener('click', musOffRun);
+    $('#mus-off-cancel').addEventListener('click', () => { if (MUS.dl) MUS.dl.ctl.abort(); });
+    $('#mus-off-clear').addEventListener('click', musOffClear);
+    $('#mus-off-moods').addEventListener('change', e => {
+      const cb = e.target.closest('input[data-k]'); if (!cb || !MUS.dlPick) return;
+      if (cb.checked) MUS.dlPick.add(cb.dataset.k); else MUS.dlPick.delete(cb.dataset.k);
+      musOffMsg(''); musOffPaint();
+    });
+    window.addEventListener('online', () => {   // the connection is back: a mood that failed to load is tried again at once
+      try {
+        musWarnPaint(); musOffPaint();
+        if (P.musOn === true && sndOn() && MUS.on && musNarrating() && (MUS.fail || !MUS.playing) && osLeadWait() <= 0) {
+          if (!MUS.manifest) musManifestRetry(); else { clearTimeout(MUS.rt); musSwitchMood(MUS.mood || 'neutral', true); }
+        }
+      } catch (err) { /* a help only */ }
+    });
+    window.addEventListener('offline', () => { musWarnPaint(); musOffPaint(); });
   }
 
   /* Called once at startup to pre-fetch the manifest in the background. */
   async function musicInit() {
+    try { musOffInit(); } catch (e) { console.warn('offline music', e); }
     if (!MUS.manifest) musFetchManifest();   // fire and forget; the bus is built on the first play
   }
 

@@ -30,7 +30,16 @@
       <div class="snd-panel" id="snd-p-mus" role="tabpanel" aria-labelledby="snd-t-mus" hidden>
         <div class="snd-lrow"><div class="snd-ltxt"><label for="in-muson">Background music</label><small>Instrumental music that matches the mood of the story</small></div><input type="checkbox" id="in-muson" class="snd-sw" role="switch"></div>
         <div class="amb-row snd-vrow" id="row-musvol"><label for="mus-vol">Music volume</label><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume"></div>
+        <p class="help amb-note" id="mus-warn" role="status" aria-live="polite" hidden></p>
         <p class="help amb-note">The music changes with the mood of the story and crossfades between moods. It always plays quietly under the narrator's voice.</p>
+        <h3 class="amb-h">Offline music</h3>
+        <p class="help amb-note">Save music on this device so it plays without a connection.</p>
+        <details class="amb-more"><summary>Choose moods</summary><div class="amb-sub" id="mus-off-moods" role="group" aria-label="Moods to save"></div></details>
+        <p class="help amb-note" id="mus-off-est"></p>
+        <div class="amb-fixrow"><button id="mus-off-go" class="btn small" type="button">Download music for offline</button><button id="mus-off-cancel" class="btn small ghost" type="button" hidden>Cancel</button><button id="mus-off-clear" class="btn small ghost" type="button" hidden>Remove saved music</button></div>
+        <p class="help amb-note" id="mus-off-msg" role="status" aria-live="polite"></p>
+        <p class="help amb-note" id="mus-off-have"></p>
+        <p class="help amb-note" id="mus-off-when" hidden><span>Music list updated</span> <span id="mus-off-date"></span></p>
       </div>
 
       <div class="snd-panel" id="snd-p-open" role="tabpanel" aria-labelledby="snd-t-open" hidden>
