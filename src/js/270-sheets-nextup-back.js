@@ -65,7 +65,7 @@
     $('#btn-presync').addEventListener('click', () => { openSheet('sheet-presync'); psSearch(); psCount(); });
   }
 
-  guideDoc('player', 'Next up', "More > Next up suggests similar books and books at your level. The Slightly easier, Same level and Slightly harder buttons show what comes next.");
+  guideDoc('player', 'Next up', "Controls > Next up suggests similar books and books at your level. The Slightly easier, Same level and Slightly harder buttons show what comes next.");
   /* ---------- Next up: more like this + books at your level (similar.json + levels.json) ---------- */
   const NX = { lvl: 'same', token: 0 };
   const nxPub = ({ _t, _a, _l, _g, ...b }) => b;
@@ -273,4 +273,4 @@
   }
   const sheetOpen = () => !el.backdrop.hidden;
 
-  guideDoc('offline', 'Download a book', "Open More > Tracks, then Listen offline > Download book. Remove download frees the space. A downloaded book plays without a connection.");
+  guideDoc('offline', 'Download a book', "Open Controls > Tracks, then Listen offline > Download book. Remove download frees the space. A downloaded book plays without a connection.");

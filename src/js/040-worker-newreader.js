@@ -75,7 +75,7 @@
   };
   const audio = el.audio;
 
-  guideDoc('reading', 'Focus page', "More > Focus page gives a calm full-screen page that follows the narrator, with a bookmark.");
+  guideDoc('reading', 'Focus page', "Controls > Focus page gives a calm full-screen page that follows the narrator, with a bookmark.");
   /* ---------- new reader ----------
      Opened from the book icon in the player. The text container and the "Back to narrator" button are moved
      into it while it is open and put back when it closes, so the highlight, scrolling and tapping work as before. */

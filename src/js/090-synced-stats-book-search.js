@@ -665,9 +665,8 @@
     const on = P.liteForce === true || (P.liteGfx !== false && liteWeak());
     document.documentElement.toggleAttribute('data-lite', on);
   }
-  function applyQuick() {
-    const q = P.quickCtl !== false; document.documentElement.toggleAttribute('data-quick', q);
-    const b = document.getElementById('btn-player-settings'); if (b) b.setAttribute('aria-label', q ? 'Speed, sleep timer, settings and more' : 'Settings');
+  function applyQuick() {   // the Controls sheet is the only player menu, so the old bottom chips (Text only, More) stay hidden
+    document.documentElement.setAttribute('data-quick', '');
   }
   function applyTidy() { document.documentElement.toggleAttribute('data-tidy', P.tidyPlayer !== false); }
   function applyTheme() {

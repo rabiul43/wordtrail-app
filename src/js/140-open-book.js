@@ -325,7 +325,7 @@
     return cache[ci] ? h('details', { class: 'sum' }, h('summary', { text: 'Summary' }), h('p', { text: cache[ci] })) : null;
   }
 
-  guideDoc('words', 'Quick quiz', "More > Quick quiz tests you on the chapter you are in with fill-in-the-blank, who-said-it and sentence-order questions.");
+  guideDoc('words', 'Quick quiz', "Controls > Quick quiz tests you on the chapter you are in with fill-in-the-blank, who-said-it and sentence-order questions.");
   /* ================= Quick quiz (no AI: built from the chapter text by rules, on the device) =================
      Three kinds of question: a vocabulary word blanked out of its sentence, who said a quoted line, and
      putting consecutive sentences back in order. Best score per chapter is kept in localStorage. */
@@ -534,7 +534,7 @@
       h('button', { class: 'btn ghost', type: 'button', text: 'Close', onclick: closeSheets })));
   }
 
-  guideDoc('words', 'Shadow reading', "More > Shadow reading: hear a sentence, say it after the narrator, then compare the timing and listen to both.");
+  guideDoc('words', 'Shadow reading', "Controls > Shadow reading: hear a sentence, say it after the narrator, then compare the timing and listen to both.");
   /* ================= Shadow reading =================
      Hear one sentence from the narrator, say it yourself, then compare. The comparison shows the length of
      your sentence against the narrator's, plays them one after the other, and (where the browser has speech

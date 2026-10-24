@@ -240,7 +240,6 @@
     })();
     $('#qk-fine').addEventListener('click', () => { spdPaint(); openSheet('sheet-speed'); });
     $('#qk-read').addEventListener('click', () => { closeSheets(); $('#b-read').click(); });
-    $('#qk-more').addEventListener('click', () => $('#b-more').click());
     try { new MutationObserver(qkPaint).observe($('#b-more'), { attributes: true, attributeFilter: ['class'] }); } catch (e) { /* no observer */ }
     qkPaint();
     $$('#card-styles .chip').forEach(b => b.addEventListener('click', () => { CARD.style = b.dataset.s; $$('#card-styles .chip').forEach(x => x.setAttribute('aria-pressed', String(x === b))); cardDraw(); }));

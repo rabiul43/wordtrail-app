@@ -128,12 +128,12 @@
   { const b = $('#hlp'); if (b) b.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); hlpHide(); } }); }
   guideDoc('timing', 'Highlight off? prompt', "If the highlight is only a guess for a while, or you keep pausing and jumping, a small card asks you to tap the sentence you hear. Dismiss it, or choose Don't show again (turn it back on in Settings > Advanced timing).");
 
-  guideDoc('player', 'Speed', "Open Quick controls (the three-dot button) and choose 0.5x to 3x. Fine-tune sets exact steps.");
-  guideDoc('player', 'Sleep timer', "In Quick controls pick 15, 30, 45 or 60 minutes, or End of track. The sound fades out and the audio stops by itself.");
+  guideDoc('player', 'Speed', "Open Controls (the three-dot button) and choose 0.5x to 3x. Fine-tune sets exact steps.");
+  guideDoc('player', 'Sleep timer', "In Controls pick 15, 30, 45 or 60 minutes, or End of track. The sound fades out and the audio stops by itself.");
   guideDoc('player', 'Lock screen controls', "The lock screen and notification show the track, a progress bar and play, skip and seek buttons.");
   /* ---------- sleep timer, speed, media session ---------- */
   const SLEEPS = [0, 15, 30, 45, 60, 'chapter'];
-  /* Quick controls panel (the three-dot button): shows what is on, and a dot on the button when something is. */
+  /* Controls sheet (the three-dot button): shows what is on, and a dot on the button when something is. */
   function qkOpt(which) {
     ['speed', 'sleep', 'amb', 'mus'].forEach(k => {
       const open = k === which && $('#qk-o-' + k).hidden;
@@ -158,9 +158,8 @@
     const mv = $('#qk-v-mus'), mon = P.musOn === true && sndOn();
     if (mv) { const vol = P.musVol == null ? 40 : P.musVol; mv.textContent = mon ? vol + '%' : 'Off'; $('#qk-t-mus').dataset.on = String(mon); const c = $('#qk-mus-on'), r = $('#qk-mus-vol'); if (c) c.checked = mon; if (r) { r.value = String(vol); r.style.setProperty('--fill', vol + '%'); } }
     /* Text only is on while the player is hidden; More shows a dot when something needs a look */
-    const ro = !!(el.player && el.player.classList.contains('ro')), moreBtn = $('#b-more'), rt = $('#qk-read'), mt = $('#qk-more');
-    if (rt) { rt.dataset.on = String(ro); rt.setAttribute('aria-label', 'Text only, ' + (ro ? 'active' : 'not active')); }
-    if (mt) mt.classList.toggle('has-dot', !!(moreBtn && moreBtn.classList.contains('has-dot')));
+    const ro = !!(el.player && el.player.classList.contains('ro')), moreBtn = $('#b-more'), rt = $('#qk-read');
+    if (rt) { rt.dataset.on = String(ro); rt.setAttribute('aria-label', 'Hide player, ' + (ro ? 'active' : 'not active')); }
     [['speed', 'Speed'], ['sleep', 'Sleep timer'], ['amb', 'Sound'], ['mus', 'Music']].forEach(([k, nm]) => {
       const t = $('#qk-t-' + k), v = $('#qk-v-' + k); if (t && v) t.setAttribute('aria-label', nm + ', ' + v.textContent + (t.dataset.on === 'true' ? ', active' : ', not active'));
     });
@@ -320,7 +319,7 @@
 
 
   guideDoc('highlights', 'Highlight a sentence', "Press and hold a sentence, then tap Highlight. Add a note if you like.");
-  guideDoc('highlights', 'See them all and share', "More > Highlights and notes lists saved sentences and your notes. A quote card turns a sentence into an image in Night, Paper or Gold style, to share or save. Export bookmarks saves your bookmarks to a file.");
+  guideDoc('highlights', 'See them all and share', "Controls > Highlights and notes lists saved sentences and your notes. A quote card turns a sentence into an image in Night, Paper or Gold style, to share or save. Export bookmarks saves your bookmarks to a file.");
   /* ---------- Highlights, notes and quote cards (saved on this device, per book) ---------- */
   let trSid = -1;
   const hlKey = () => 'wt:hl:' + (S.book ? S.book.id : '');

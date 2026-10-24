@@ -354,7 +354,7 @@
   /* ---------- chapter progress: ticks for finished chapters, a bar for ones in progress ----------
      S.lp[i] is the furthest point reached in track i (0..1, 1 = finished). It only grows from normal
      playback, so scrubbing to the end of a track does not count as listening to it. */
-  guideDoc('player', 'Tracks and progress', "More > Tracks lists every track with a tick for finished chapters and a bar for ones in progress. The small text under the controls shows how far you are through the whole book and how long is left.");
+  guideDoc('player', 'Tracks and progress', "Controls > Tracks lists every track with a tick for finished chapters and a bar for ones in progress. The small text under the controls shows how far you are through the whole book and how long is left.");
   /* ---------- whole-book progress: percent and time left across every track ----------
      Position based: finished tracks before this one plus the point reached in this one. Time left is
      shown at the current playback speed. */

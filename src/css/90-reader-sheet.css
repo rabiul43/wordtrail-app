@@ -82,23 +82,11 @@
 .topbar #btn-topmore { position: relative; }
 .topbar #btn-topmore[aria-expanded="true"] { background: var(--surface-2); }
 .topbar #btn-topmore.has-dot::after { content: ""; position: absolute; top: .6rem; right: .6rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--bg); }
-.topbar #btn-topmore:focus-visible, .tb-menu .mi:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.tb-menu { position: absolute; z-index: 7; top: calc(100% - .2rem); right: .6rem; width: min(15.5rem, calc(100% - 1.2rem)); padding: .35rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow-pop); animation: pop var(--dur) var(--ease); }
-.tb-menu .mi { position: relative; display: flex; align-items: center; gap: .75rem; width: 100%; min-height: 2.75rem; padding: 0 .65rem; border: 0; border-radius: 10px; background: transparent; color: var(--ink); font: 500 .95rem var(--font-ui); text-align: left; }
-.tb-menu .mi[hidden] { display: none; }
-.tb-menu .mi:active { background: var(--surface-2); }
-@media (hover: hover) { .tb-menu .mi:hover { background: var(--surface-2); } }
-.tb-menu .mi-ic { width: 1.5rem; height: 1.5rem; flex: none; display: flex; align-items: center; justify-content: center; }
-.tb-menu .mi-l { min-width: 0; overflow-wrap: anywhere; }
-.tb-menu .mi .ic { width: 1.4rem; height: 1.4rem; stroke-width: 1.7; }
-.tb-menu .mi .ic circle { fill: currentColor; stroke: none; }
-.tb-menu .mi-aa { font: 500 1.15rem/1 var(--font-ui); letter-spacing: -.02em; }
-.tb-menu .mi-dot::before { content: ""; box-sizing: border-box; width: .7rem; height: .7rem; border-radius: 50%; background: var(--accent); }
+.topbar #btn-topmore:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#b-timing .mi-dot::before { content: ""; box-sizing: border-box; width: .7rem; height: .7rem; border-radius: 50%; background: var(--accent); }
 #b-timing[data-state="estimated"] .mi-dot::before { background: transparent; border: 2px dashed var(--muted); }
 #b-timing[data-state="preparing"] .mi-dot::before { background: transparent; border: 2px dashed var(--accent); animation: shimmer 1.2s ease-in-out infinite; }
-.tb-menu #btn-player-settings .ic { display: block; }   /* quick mode hides this icon on the old round button; in the menu it is the row icon */
-.tb-menu #btn-player-settings.has-dot::after { top: 50%; right: .8rem; transform: translateY(-50%); }
-@media (prefers-reduced-motion: reduce) { .tb-menu, #b-timing[data-state="preparing"] .mi-dot::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #b-timing[data-state="preparing"] .mi-dot::before { animation: none; } }
 
 /* ---------- One set of playback tools in both players: Speed, Sleep, Tracks, Bookmark, Next track (same icons, labels and order in the Classic player and the Focus page) ---------- */
 .uc { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); justify-items: center; margin: .45rem 0 0; }
@@ -180,3 +168,31 @@
 :root[data-theme="contrast"] .aa-themes button { border-color: #FFFFFF; }
 :root[data-theme="contrast"] .aa-themes button[aria-pressed="true"] { border-color: #FFE600; background: #000; }
 #reader { touch-action: pan-y; }
+
+/* Controls sheet (the one ⋯ menu): Listen, Read, Book and Fix groups */
+#sheet-quick { max-height: 82%; }
+.qk-hbtns { display: flex; align-items: center; gap: .2rem; }
+.qk-grp { display: grid; gap: .55rem; align-content: start; }
+.qk-grp > h3 { margin: .1rem 0 0; color: var(--accent); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
+#sheet-quick .qk-tile > span { text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
+#sheet-quick .qk-tile[hidden] { display: none; }
+#sheet-quick .qk-tile[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.qk-aa { font: 600 1.25rem/1.5rem var(--font-ui); letter-spacing: -.02em; color: var(--muted); }
+#sheet-quick .more-list { gap: .4rem; }
+#sheet-quick .mrow { min-height: 2.9rem; padding: .5rem .8rem; }
+#sheet-quick .mrow:not(:has(.mr-d:not(:empty))) .mr-main { gap: 0; }
+#b-timing .mi-ic { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; }
+
+/* Controls sheet, half height and see-through, with a search box (task 6).
+   Only Listen shows at first; Read, Book and Fix are one swipe (or one tap on the hint) away. */
+#sheet-quick { max-height: 50dvh; }
+#sheet-quick:has(.qk-opt:not([hidden])) { max-height: 72dvh; }
+#sheet-quick { background: color-mix(in srgb, var(--surface) 94%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+#sheet-quick .qk-searchbar { padding: .6rem 1.2rem 0; }
+#sheet-quick .qk-searchbar .sh-search { margin-bottom: 0; min-height: 2.75rem; }
+#sheet-quick .qk-nomatch, #sheet-quick .qk-empty { display: none; }
+#sheet-quick.qk-searching .qk-opt, #sheet-quick.qk-searching .qk-hint { display: none; }
+.qk-hint { justify-self: center; min-height: 2.75rem; padding: 0 .9rem; background: none; border: 0; font: inherit; font-size: var(--small, .88rem); color: var(--muted); }
+.qk-hint:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .6rem; }
+/* room under the last line so the highlighted sentence can be scrolled above the sheet */
+body:has(#sheet-quick:not([hidden])) #reader { padding-bottom: 50dvh; }

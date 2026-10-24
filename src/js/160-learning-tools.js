@@ -76,7 +76,7 @@
       pop.out.className = 'tr-out dim'; pop.out.textContent = 'Could not translate this sentence. Check your connection and try again.';
     }
   }
-  guideDoc('words', 'Words in this book', "More > Words lists the hard words of the book with a level and an example. Tap a word for its meaning, and Save to keep it.");
+  guideDoc('words', 'Words in this book', "Controls > Words lists the hard words of the book with a level and an example. Tap a word for its meaning, and Save to keep it.");
   /* ---------- book vocabulary: vocab/<book id>.json (built by build_vocab.py) and a saved-words list ----------
      Each book has a list of its most useful hard words with a CEFR level and an example from the book.
      A meaning comes from the free dictionaryapi.dev service when a word is opened, together with a
@@ -291,7 +291,7 @@
     box.append(h('div', { class: 'vtop' }, h('strong', {}, w), vocSaveBtn(e, false)), prButtons(w, PR.ref), meaning);
     vocFill(meaning, w);
   }
-  guideDoc('player', 'Text only', "Quick controls has a Text only option for reading without the player controls.");
+  guideDoc('player', 'Hide player', "Controls has a Hide player option for reading without the player controls.");
   guideDoc('player', 'Swipe to hide controls', "Swipe up on the text to leave a slim bar. Swipe down, or tap the bar or its handle, to bring the controls back.");
   /* ---------- reading-only mode: just the text, which keeps scrolling after the narrator ---------- */
   /* Focus mode: reading forward (finger drags up, or wheel down) shrinks the dock to a slim bar with a
@@ -341,6 +341,6 @@
   });
 
 
-  guideDoc('timing', 'Choose the text', "More > Text and timing lets you pick which Gutenberg text goes with the book, or use your own.");
+  guideDoc('timing', 'Choose the text', "Controls > Fix highlight sync lets you pick which Gutenberg text goes with the book, or use your own.");
   guideDoc('timing', 'Adjust timing', "If the highlight is early or late, tap Adjust timing, then tap the sentence you hear. The sentences around it move too, and Undo is offered.");
   guideDoc('timing', 'Skip at start and end', "Settings > Timing lets you set how many seconds of the LibriVox intro and outro to skip. Automatic skipping is on by default.");

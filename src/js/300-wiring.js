@@ -38,7 +38,6 @@
     audio.addEventListener('play', () => { S._miniOff = null; });
     const ssMore = document.querySelector('#sync-status .ss-more');
     if (ssMore) ssMore.addEventListener('toggle', () => { if (ssMore.open && S.book) measureFits(S.book); });
-    $('#btn-player-settings').addEventListener('click', () => { if (P.quickCtl !== false) { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); } else openSettingsHome(); });
     $('#btn-fav').addEventListener('click', () => { if (S.book) toggleFav({ id: S.book.id, title: S.book.title, authors: S.book.authors, cover: S.book.cover, ia: S.book.ia, total: S.book.total, n: S.book.n, lang: S.book.lang }); });
     window.addEventListener('resize', setTabH);
     if (window.ResizeObserver) { const ro = new ResizeObserver(setTabH); ['#tabbar', '#mini'].forEach(q => { const n = $(q); if (n) ro.observe(n); }); } /* mini-player or tab bar changes height (text size, long title) */
@@ -60,7 +59,6 @@
     histInit();
     $('#btn-back').addEventListener('click', () => { persist(); renderRecents(); closeSheets(); showView('home'); restoreBack(); document.title = 'Wordtrail'; if (!el.results.hidden) syncHomeRows(true); else syncHomeRows(false); });
     $('#btn-tracks').addEventListener('click', () => openSheet('sheet-tracks'));
-    $('#btn-tracks-top').addEventListener('click', () => { buzz('tick'); openSheet('sheet-tracks'); });
     $('#btn-aa').addEventListener('click', () => { buzz('tick'); $('#aa-font').value = $('#in-font').value; openSheet('sheet-aa'); });
     /* the Aa sheet only has the text controls; each one presses the matching Settings control, so the saved values stay in one place */
     $('#aa-size-down').addEventListener('click', () => $('#size-down').click());
@@ -68,9 +66,9 @@
     $('#aa-lh-down').addEventListener('click', () => $('#lh-down').click());
     $('#aa-lh-up').addEventListener('click', () => $('#lh-up').click());
     $('#aa-font').addEventListener('change', e => { const f = $('#in-font'); f.value = e.target.value; f.dispatchEvent(new Event('change', { bubbles: true })); });
-    $('#b-more').addEventListener('click', () => { if (S.book) VER.dotSeen.add(String(S.book.id)); verChip(); openSheet('sheet-more'); });
-    $('#b-cal').addEventListener('click', () => { if (!$('#sheet-more').hidden) closeSheets(); });
-    $('#btn-nr').addEventListener('click', () => { if (!$('#sheet-more').hidden) closeSheets(); });
+    $('#b-more').addEventListener('click', () => { if (S.book) VER.dotSeen.add(String(S.book.id)); verChip(); qkOpt(''); qkPaint(); openSheet('sheet-quick'); });
+    $('#b-cal').addEventListener('click', () => { if (!$('#sheet-quick').hidden) closeSheets(); });
+    $('#btn-nr').addEventListener('click', () => { if (!$('#sheet-quick').hidden) closeSheets(); });
     $('#b-ver').addEventListener('click', () => openSheet('sheet-versions'));
     $('#dl-go').addEventListener('click', () => { if (DL.running) dlCancel(); else dlStart(); });
     { const dh = $('#b-dl-hint'); if (dh) dh.addEventListener('click', () => { hideDlHint(); dlStart(); }); }
@@ -96,35 +94,12 @@
         let t = 0;
         const close = () => { clearTimeout(t); el.syncbar.classList.remove('pop'); td.setAttribute('aria-expanded', 'false'); };
         const open = () => { el.syncbar.classList.add('pop'); td.setAttribute('aria-expanded', 'true'); clearTimeout(t); t = setTimeout(() => { if (!S.calibrate && !S.aligning) close(); }, 7000); };
-        td.addEventListener('click', e => { e.stopPropagation(); if (el.syncbar.classList.contains('pop')) close(); else open(); });
+        td.addEventListener('click', e => { e.stopPropagation(); if (!$('#sheet-quick').hidden) { closeSheets(); open(); return; } if (el.syncbar.classList.contains('pop')) close(); else open(); });
         document.addEventListener('click', e => { if (!S.calibrate && !e.target.closest('#syncbar, #b-timing')) close(); });
       } }
-    /* Player top bar: the \u22ef button opens a small menu (Timing, Text and reading, Tracks, Settings). The four buttons keep their ids and handlers. */
-    { const mb = $('#btn-topmore'), mn = $('#tb-menu');
-      if (mb && mn) {
-        const items = () => $$('.mi', mn).filter(b => !b.hidden), isOpen = () => !mn.hidden;
-        const close = back => { if (mn.hidden) return; mn.hidden = true; mb.setAttribute('aria-expanded', 'false'); if (back) mb.focus(); };
-        const open = at => { mn.hidden = false; mb.setAttribute('aria-expanded', 'true'); buzz('tick'); const it = items(); if (at != null && it.length) it[at < 0 ? it.length - 1 : 0].focus(); };
-        mb.addEventListener('click', e => { e.stopPropagation(); if (isOpen()) close(); else open(e.detail === 0 ? 0 : null); });
-        mb.addEventListener('keydown', e => {
-          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const at = e.key === 'ArrowDown' ? 0 : -1; if (!isOpen()) open(at); else { const it = items(); if (it.length) it[at < 0 ? it.length - 1 : 0].focus(); } }
-          else if (e.key === 'Escape' && isOpen()) { e.preventDefault(); e.stopPropagation(); close(); }
-        });
-        mn.addEventListener('click', () => close(true), true);   // capture: the menu closes first, then the chosen button's own handler runs
-        mn.addEventListener('keydown', e => {
-          const it = items(), i = it.indexOf(document.activeElement), k = e.key;
-          const go = n => { e.preventDefault(); e.stopPropagation(); if (it.length) it[(n + it.length) % it.length].focus(); };
-          if (k === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
-          else if (k === 'ArrowDown') go(i + 1);
-          else if (k === 'ArrowUp') go(i < 0 ? -1 : i - 1);
-          else if (k === 'Home') go(0);
-          else if (k === 'End') go(-1);
-          else if (k === 'ArrowLeft' || k === 'ArrowRight') e.stopPropagation();
-          else if (k === 'Tab') close(true);
-        });
-        document.addEventListener('click', e => { if (isOpen() && !e.target.closest('#tb-menu, #btn-topmore')) close(); });
-        if (window.MutationObserver) new MutationObserver(() => { if (el.player.hidden) close(); }).observe(el.player, { attributes: true, attributeFilter: ['hidden'] });
-      } }
+    /* Player top bar: the \u22ef button opens the one Controls sheet (Listen, Read, Book, Fix; Settings is the gear in its header). */
+    { const mb = $('#btn-topmore');
+      if (mb) mb.addEventListener('click', () => { buzz('tick'); if (S.book) VER.dotSeen.add(String(S.book.id)); verChip(); qkOpt(''); qkPaint(); openSheet('sheet-quick'); }); }
     el.cal.addEventListener('click', () => {
       S.calibrate = !S.calibrate; syncCalUI();
       if (S.calibrate && !(S.plan[S.sec] && S.plan[S.sec].ids.length)) { S.calibrate = false; syncCalUI(); toast('This track has no text to sync.'); }
@@ -401,7 +376,6 @@
       }); }
     $('#in-lite').addEventListener('change', e => { P.liteGfx = e.target.checked; savePrefs(); applyLite(); });
     $('#in-liteforce').addEventListener('change', e => { P.liteForce = e.target.checked; savePrefs(); applyLite(); });
-    $('#in-quick').addEventListener('change', e => { P.quickCtl = e.target.checked; savePrefs(); applyQuick(); });
     $('#in-tidy').addEventListener('change', e => { P.tidyPlayer = e.target.checked; savePrefs(); applyTidy(); paintBookProg(); });
     $('#in-load').addEventListener('change', e => { P.fastLoad = e.target.checked; savePrefs(); });
     $('#in-resume').addEventListener('change', e => { P.resumeCount = parseInt(e.target.value, 10) || 3; savePrefs(); renderRecents(); });

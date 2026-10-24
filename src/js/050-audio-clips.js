@@ -355,4 +355,4 @@
     clSync(); clPaintCount();
   }
 
-  guideDoc('player', 'Find my place', "More > Find my place lists earlier positions: before a big jump, when you set the sleep timer, and the last time you touched the screen before a long stretch of listening. After a big seek, a Go back button appears for a few seconds. When you come back after a long gap and the audio has stopped, the same button offers the last place you touched the screen.");
+  guideDoc('player', 'Find my place', "Controls > Where was I? lists earlier positions: before a big jump, when you set the sleep timer, and the last time you touched the screen before a long stretch of listening. After a big seek, a Go back button appears for a few seconds. When you come back after a long gap and the audio has stopped, the same button offers the last place you touched the screen.");

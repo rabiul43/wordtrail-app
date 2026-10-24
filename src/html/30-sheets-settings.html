@@ -13,8 +13,17 @@
 </section>
 
 <section id="sheet-quick" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-quick">
-  <header><h2 id="h-quick">Quick controls</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <header><h2 id="h-quick">Controls</h2><div class="qk-hbtns"><button id="qk-set" class="ib" type="button" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg></button><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div></header>
+  <div class="qk-searchbar"><div class="sh-search">
+    <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+    <label class="sr-only" for="qk-q">Search controls</label>
+    <input id="qk-q" type="search" placeholder="Search controls: sleep, font, translate" autocomplete="off" enterkeyhint="search">
+    <button id="qk-q-clear" class="ib" type="button" aria-label="Clear search" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+  </div></div>
   <div class="body">
+    <p id="qk-nomatch" class="help" role="status" aria-live="polite" hidden>No control matches that. Try &ldquo;speed&rdquo; or &ldquo;font&rdquo;.</p>
+    <section class="qk-grp" aria-labelledby="qg-listen">
+      <h3 id="qg-listen">Listen</h3>
     <div class="qk-tiles qk-t4">
       <button id="qk-t-speed" class="qk-tile" type="button" aria-expanded="false" aria-controls="qk-o-speed"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4.5-5"/></svg><span>Speed</span><small id="qk-v-speed">1x</small></button>
       <button id="qk-t-sleep" class="qk-tile" type="button" aria-expanded="false" aria-controls="qk-o-sleep"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#n-moon"/></svg><span>Sleep timer</span><small id="qk-v-sleep">Off</small></button>
@@ -51,12 +60,50 @@
       <label class="amb-opt"><input type="checkbox" id="qk-mus-on"> Music on</label>
       <input id="qk-mus-vol" class="spd-range" type="range" min="0" max="100" step="1" aria-label="Music volume">
     </div>
-    <div class="qk-tiles qk4">
-      <button id="qk-read" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg><span>Text only</span></button>
-      <button id="qk-clip" class="qk-tile" type="button" aria-label="Make an audio clip"><svg class="ic" aria-hidden="true"><use href="#i-m-wave"/></svg><span>Clip</span></button>
-      <button id="qk-more" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg><span>More</span></button>
-      <button id="qk-set" class="qk-tile" type="button"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><span>Settings</span></button>
-    </div>
+    <button id="qk-hint" class="qk-hint" type="button" aria-controls="qg-read">&#8597; Swipe up for Read &middot; Book &middot; Fix</button>
+    </section>
+    <section class="qk-grp" aria-labelledby="qg-read">
+      <h3 id="qg-read">Read</h3>
+      <div class="qk-tiles qk-t4">
+      <button id="btn-aa" class="qk-tile" type="button" data-n="Text size and font" data-d="Size, line spacing and font" aria-label="Text size and font: size, line spacing and font"><span class="qk-aa" aria-hidden="true">Aa</span><span>Text size &amp; font</span></button>
+      <button id="qk-read" class="qk-tile" type="button" data-n="Hide player" data-d="Hide the player and just read" aria-label="Hide player: hide the player and just read"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg><span>Hide player</span></button>
+      <button id="b-words" class="qk-tile" type="button" data-n="Words" data-d="Look up words in this book and review the ones you saved" aria-label="Words: Look up words in this book and review the ones you saved"><svg class="ic" aria-hidden="true"><use href="#i-m-dict"/></svg><span>Words</span></button>
+      </div>
+      <div class="more-list">
+        <button id="btn-live" class="mrow" type="button" aria-pressed="false"><span class="mr-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 2.600 5.600 5.500 7M11 5c-.7 3.400-3 6.200-6.500 7.500M13 21l4-10 4 10M14.500 18h5"/></svg></span><span class="mr-main"><span class="mr-t mi-l">Live translation</span><span class="mr-d">See each sentence in your language</span></span></button>
+        <button id="b-shadow" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Shadow reading</span><span class="mr-d">Say a sentence after the narrator and compare</span></span></button>
+        <button id="b-quiz" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-help"/></svg></span><span class="mr-main"><span class="mr-t">Quick quiz</span><span class="mr-d">Test yourself on the chapter you are in</span></span></button>
+      </div>
+    </section>
+    <section class="qk-grp" aria-labelledby="qg-book">
+      <h3 id="qg-book">Book</h3>
+      <div class="qk-tiles qk-t4">
+      <button id="btn-tracks" class="qk-tile" type="button" data-n="Tracks" data-d="Pick a track, skip ahead, listen offline" aria-label="Tracks: Pick a track, skip ahead, listen offline"><svg class="ic" aria-hidden="true"><use href="#i-m-headphones"/></svg><span>Tracks</span></button>
+      <button id="b-next" class="qk-tile" type="button" data-n="Next up" data-d="Similar books, and what to listen to next" aria-label="Next up: Similar books, and what to listen to next"><svg class="ic" aria-hidden="true"><use href="#i-m-layers"/></svg><span>Next up</span></button>
+      <button id="b-find" class="qk-tile" type="button" data-n="Search this book" data-d="Find a word or quote and jump to it" aria-label="Search this book: Find a word or quote and jump to it"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Search</span></button>
+      </div>
+      <div class="more-list" id="more-list">
+        <button id="b-trail" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-refresh"/></svg></span><span class="mr-main"><span class="mr-t">Where was I?</span><span class="mr-d">Go back after a seek, or to where you fell asleep</span></span></button>
+        <button id="b-ver" class="mrow" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-person"/></svg></span><span class="mr-main"><span class="mr-t" id="b-ver-t">Reader</span><span class="mr-d" id="b-ver-d">Choose who reads this book</span></span><span class="mr-badge" id="b-ver-b" hidden>Better match</span></button>
+        <button id="b-bm" class="mrow" type="button" aria-label="Bookmark this place and add a note"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="mr-main"><span class="mr-t">Bookmark and note</span><span class="mr-d">Save this place and add a note to it</span></span></button>
+        <button id="b-chars" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="mr-main"><span class="mr-t">Characters</span><span class="mr-d" id="b-chars-d">Who is who, with where each one first appears</span></span></button>
+        <button id="b-hl" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="mr-main"><span class="mr-t">Highlights and notes</span><span class="mr-d" id="b-hl-d">Saved sentences, your notes, quote cards</span></span></button>
+        <button id="b-clips" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Audio clips</span><span class="mr-d" id="b-clips-d">Save short moments, replay them, export as a file</span></span></button>
+        <button id="btn-nr" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-expand"/></svg></span><span class="mr-main"><span class="mr-t">Focus page</span><span class="mr-d">Classic: every tool. Focus: just the text and the essentials.</span></span></button>
+        <button id="btn-howto" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-info"/></svg></span><span class="mr-main"><span class="mr-t">How to use</span><span class="mr-d">Double-tap, press and hold, swipe</span></span></button>
+      </div>
+    </section>
+    <section class="qk-grp" aria-labelledby="qg-fix">
+      <h3 id="qg-fix">Fix</h3>
+      <div class="qk-tiles qk-t4">
+      <button id="b-timing" class="qk-tile" type="button" aria-expanded="false" aria-controls="syncbar" aria-label="Timing" hidden><i class="mi-ic mi-dot" aria-hidden="true"></i><span id="b-timing-l" class="mi-l">Timing</span></button>
+      </div>
+      <div class="more-list">
+        <button id="b-textsync" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="mr-main"><span class="mr-t">Fix highlight sync</span><span class="mr-d">Pick the text, line it up with the audio</span></span></button>
+        <button id="qk-clip" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Clip</span><span class="mr-d">Save a short audio snippet to share</span></span></button>
+        <button id="b-cal" class="mrow" aria-pressed="false" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-target"/></svg></span><span class="mr-main"><span class="mr-t">Tap to align</span></span></button>
+      </div>
+    </section>
   </div>
 </section>
 
@@ -76,31 +123,6 @@
   </div>
   <footer class="fp-foot"><button id="fp-clear" class="btn ghost" type="button">Clear all</button><button id="fp-done" class="btn" type="button">Done</button></footer>
 </section>
-
-<section id="sheet-more" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-more">
-  <header><h2 id="h-more">More</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
-  <div class="body">
-    <div class="more-list" id="more-list">
-      <button id="btn-tracks" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-headphones"/></svg></span><span class="mr-main"><span class="mr-t">Tracks</span><span class="mr-d">Pick a track, skip ahead, listen offline</span></span></button>
-      <button id="b-ver" class="mrow" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-person"/></svg></span><span class="mr-main"><span class="mr-t" id="b-ver-t">Reader</span><span class="mr-d" id="b-ver-d">Choose who reads this book</span></span><span class="mr-badge" id="b-ver-b" hidden>Better match</span></button>
-      <button id="b-next" class="mrow" aria-label="More like this and next books"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-layers"/></svg></span><span class="mr-main"><span class="mr-t">Next up</span><span class="mr-d">Similar books, and what to listen to next</span></span></button>
-      <button id="b-textsync" class="mrow" aria-label="Choose the book text and adjust the timing"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="mr-main"><span class="mr-t">Text and timing</span><span class="mr-d">Choose the text, line it up with the audio, fix timing</span></span></button>
-      <button id="b-words" class="mrow" aria-label="Words in this book and my saved words"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-dict"/></svg></span><span class="mr-main"><span class="mr-t">Words</span><span class="mr-d">Look up words in this book and review the ones you saved</span></span></button>
-      <button id="b-find" class="mrow" type="button" aria-label="Search the text of this book"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-search"/></svg></span><span class="mr-main"><span class="mr-t">Search this book</span><span class="mr-d">Find a word or quote and jump to it</span></span></button>
-      <button id="b-trail" class="mrow" type="button" aria-label="Find my place, go back to an earlier position"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-refresh"/></svg></span><span class="mr-main"><span class="mr-t">Find my place</span><span class="mr-d">Go back after a seek, or to where you fell asleep</span></span></button>
-      <button id="b-bm" class="mrow" type="button" aria-label="Bookmark this place and add a note"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="mr-main"><span class="mr-t">Bookmark and note</span><span class="mr-d">Save this place and add a note to it</span></span></button>
-      <button id="b-chars" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="mr-main"><span class="mr-t">Characters</span><span class="mr-d" id="b-chars-d">Who is who, with where each one first appears</span></span></button>
-      <button id="b-hl" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="mr-main"><span class="mr-t">Highlights and notes</span><span class="mr-d" id="b-hl-d">Saved sentences, your notes, quote cards</span></span></button>
-      <button id="b-clips" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Audio clips</span><span class="mr-d" id="b-clips-d">Save short moments, replay them, export as a file</span></span></button>
-      <button id="b-shadow" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Shadow reading</span><span class="mr-d">Say a sentence after the narrator and compare</span></span></button>
-      <button id="b-quiz" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-help"/></svg></span><span class="mr-main"><span class="mr-t">Quick quiz</span><span class="mr-d">Test yourself on the chapter you are in</span></span></button>
-      <button id="btn-nr" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-expand"/></svg></span><span class="mr-main"><span class="mr-t">Focus page</span><span class="mr-d">Classic: every tool. Focus: just the text and the essentials.</span></span></button>
-      <button id="btn-howto" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-info"/></svg></span><span class="mr-main"><span class="mr-t">How to use</span><span class="mr-d">Double-tap, press and hold, swipe</span></span></button>
-      <button id="b-cal" class="mrow" aria-pressed="false" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-target"/></svg></span><span class="mr-main"><span class="mr-t">Tap to align</span></span></button>
-    </div>
-  </div>
-</section>
-
 <section id="sheet-next" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-next">
   <header><h2 id="h-next">Next up</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body" id="next-body"></div>
@@ -242,9 +264,6 @@
     </div>
     <div class="row" style="margin-top:.5rem">
       <label for="in-nn" style="flex:1">Fold away text the narrator does not read (tables, almanacs, notes) into a tap-to-show line</label><input id="in-nn" type="checkbox">
-    </div>
-    <div class="row" style="margin-top:.5rem">
-      <label for="in-quick" style="flex:1">Quick controls button (&#8943;) at the top of the player, for speed, sleep timer, settings and more</label><input id="in-quick" type="checkbox">
     </div>
     <div class="row" style="margin-top:.5rem">
       <label for="in-recap" style="flex:1">Chapter recaps: 3 sentences when a chapter ends, and &ldquo;Previously&hellip;&rdquo; after 3 or more days away</label><input id="in-recap" type="checkbox">

@@ -1,5 +1,5 @@
   /* ---------- live translation: follows the narrator, sentence by sentence ----------
-     Menu (the three dots) > Live translation. A panel shows the sentence being read (highlighted) with the one
+     Controls (the three-dot button) > Live translation. A panel shows the sentence being read (highlighted) with the one
      before and the one after in a softer colour. Wide screens: a card in the empty space left of the text.
      Narrow screens and the Focus page: a fixed-height strip above the player controls.
      Translation comes from the on-device browser translator when it is ready (Chrome), else from the same free
@@ -101,13 +101,13 @@
   function ltSyncMenu() {
     const m = $('#btn-live'); if (!m) return;
     m.setAttribute('aria-pressed', String(!!P.liveTr));
-    const l = $('.mi-l', m); if (l) l.textContent = P.liveTr ? 'Live translation: on' : 'Live translation';
+    const l = $('.mi-l', m); if (l) l.textContent = 'Live translation';   // on/off shows through aria-pressed (gold icon), not the label
   }
   function ltSet(on) {
     P.liveTr = !!on; savePrefs(); ltSyncMenu(); LT.failUntil = 0;
     if (on) { ltOnDevice('Hello', trLang(), true).catch(() => {}); ltUpdate(); } else ltHide();
   }
-  guideDoc('reading', 'Live translation', 'Menu (the three dots) > Live translation shows each sentence in your language while the narrator reads it, with the sentence being read highlighted. Pick the language in the panel.');
+  guideDoc('reading', 'Live translation', 'Controls (the three-dot button) > Live translation shows each sentence in your language while the narrator reads it, with the sentence being read highlighted. Pick the language in the panel.');
   { const m = $('#btn-live');
     if (m) m.addEventListener('click', () => ltSet(!P.liveTr));
     ltSyncMenu();

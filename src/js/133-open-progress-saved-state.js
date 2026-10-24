@@ -223,4 +223,4 @@
   }
 
 
-  guideDoc('player', 'Choose a reader', "More > Reader lists the other recordings of the same book. Hear a 20-second sample from where you are, then switch and carry on at the same place.", '2026-10-03');
+  guideDoc('player', 'Choose a reader', "Controls > Reader lists the other recordings of the same book. Hear a 20-second sample from where you are, then switch and carry on at the same place.", '2026-10-03');
