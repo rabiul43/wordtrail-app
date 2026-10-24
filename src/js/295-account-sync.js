@@ -35,12 +35,16 @@
     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
   ];
-  let acFb = null, acLoading = null, acDb = null, acUser = null, acBusy = false, acTimer = null, acMsg = '', acErr = '';
+  let acFb = null, acLoading = null, acDb = null, acUser = null, acStale = false, acBusy = false, acTimer = null, acMsg = '', acErr = '';
   /* keys changed here and not uploaded yet. Kept in wt:syncdirty so a closed page or a restart cannot forget them
      (an incremental sync only looks at changed cloud items, so it could not rediscover them). Not part of backups. */
   const AC_DIRTY = 'wt:syncdirty', acDirty = new Set();
   try { JSON.parse(localStorage.getItem(AC_DIRTY) || '[]').forEach(k => { if (typeof k === 'string') acDirty.add(k); }); } catch (e) { /* none saved */ }
   const acDirtySave = () => { try { if (acDirty.size) localStorage.setItem(AC_DIRTY, JSON.stringify([...acDirty])); else localStorage.removeItem(AC_DIRTY); } catch (e) { /* storage unavailable */ } };
+  /* The note in localStorage (wt:acct) only remembers WHO signed in. Whether the sign-in still works is decided by Firebase:
+     when it reports no user for a remembered account, acStale is set (the screens then ask to sign in again) and it clears
+     when Firebase confirms a user. acSignedIn() = remembered AND confirmed (or not yet checked this session). */
+  const acSignedIn = () => !!acInfo() && !acStale;
   const acInfo = () => { try { return JSON.parse(localStorage.getItem(AC_KEY) || 'null'); } catch (e) { return null; } };
   const acSaveInfo = o => { try { if (o) localStorage.setItem(AC_KEY, JSON.stringify(o)); else localStorage.removeItem(AC_KEY); } catch (e) { /* storage unavailable */ } };
   const acMeta = () => { try { return JSON.parse(localStorage.getItem(AC_META) || '{}') || {}; } catch (e) { return {}; } };
@@ -170,13 +174,14 @@
   async function acSignOut() {
     if (!confirm('Sign out? Your data stays on this device and in your account.')) return;
     try { if (acFb) await acFb.auth().signOut(); } catch (e) { /* ignore */ }
-    acUser = null; acSaveInfo(null); try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
+    acUser = null; acStale = false; acSaveInfo(null); try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
     acDirty.clear(); acDirtySave(); acMsg = ''; renderAcctSync();
   }
 
   function acAuthChanged(u) {
     acUser = u || null;
-    if (!u) { renderAcctSync(); return; }
+    if (!u) { if (acInfo()) acStale = true; renderAcctSync(); return; }
+    acStale = false;
     const old = acInfo(), same = old && old.uid === u.uid;
     acSaveInfo({ uid: u.uid, email: u.email || '', name: u.displayName || '', photo: u.photoURL || '',
       cats: same && old.cats ? old.cats : { settings: true, library: true, marks: true, progress: true },
@@ -436,11 +441,11 @@
     box.textContent = '';
     const info = acInfo();
     const err = acErr ? h('p', { class: 'acct-err', role: 'alert' }, acErr) : null;
-    if (!info) {
+    if (!info || acStale) {
       acGisPreload();
       const gbtn = h('button', { class: 'acct-g', type: 'button', onclick: acSignIn }, h('span', {}), 'Sign in with Google');
       gbtn.firstChild.replaceWith(acSvg(AC_G, 'acct-g-logo'));
-      box.append(h('div', { class: 'acct-out' }, gbtn, err));
+      box.append(h('div', { class: 'acct-out' }, acStale ? h('p', { class: 'acct-err', role: 'status' }, 'Your sign-in has expired on this device. Sign in again to keep syncing. Your data is safe.') : null, gbtn, err));
       return;
     }
     const last = info.last ? 'Synced ' + new Date(info.last).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not synced yet';
@@ -467,9 +472,9 @@
   /* shows who is signed in: a green dot on the Account tab, and the line under the Account title */
   function acTabMark() {
     const i = acInfo(), t = document.querySelector('.tab[data-tab="account"]');
-    if (t) t.classList.toggle('signed', !!i);
+    if (t) t.classList.toggle('signed', !!i && !acStale);
     const p = document.querySelector('#account .tab-head p');
-    if (p) p.textContent = i ? 'Signed in as ' + (i.email || i.name) : 'Your library, settings and progress. Sign in to sync them across devices.';
+    if (p) p.textContent = i && !acStale ? 'Signed in as ' + (i.email || i.name) : 'Your library, settings and progress. Sign in to sync them across devices.';
   }
   acTabMark();
 

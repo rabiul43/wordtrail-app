@@ -72,8 +72,9 @@
   async function rtUser() {
     if (!acInfo()) return null;
     const fb = await acLoad(), a = fb.auth();
-    if (a.currentUser) return a.currentUser;
-    return new Promise(res => { const off = a.onAuthStateChanged(u => { off(); res(u || null); }); });
+    const u = a.currentUser || await new Promise(res => { const off = a.onAuthStateChanged(x => { off(); res(x || null); }); });
+    if (!u && !acStale) { acStale = true; renderAcctSync(); }   // Firebase says nobody is signed in: the saved note is out of date
+    return u;
   }
   const rtRefs = (b, uid) => { const t = acDb.collection('ratings').doc(String(b.id)); return { t, v: t.collection('votes').doc(uid) }; };
   async function rtMine(b) {
@@ -100,7 +101,7 @@
   const starMoves = (now, was, inc) => { const o = {}; for (let k = 1; k <= 5; k++) o['c' + k] = inc((now === k ? 1 : 0) - (was === k ? 1 : 0)); return o; };
   /* r = 0 removes the rating. One batch: the vote and the totals change together, by exactly the same amount. */
   async function rtSave(b, r, c) {
-    const u = await rtUser(); if (!u) throw new Error('Sign in to rate this book.');
+    const u = await rtUser(); if (!u) throw Object.assign(new Error('Your sign-in has expired. Tap "Sign in again" to save your rating.'), { code: 'rt/signin' });   // this device still remembers an account, but Firebase has no signed-in user (its sign-in was cleared or expired)
     const inc = acFb.firestore.FieldValue.increment, ref = rtRefs(b, u.uid);
     const first = String((acInfo() || {}).name || u.displayName || '').trim().split(/\s+/)[0].slice(0, 40);
     for (let tries = 0; ; tries++) {
@@ -205,7 +206,7 @@
     const seeAll = h('button', { class: 'btn ghost small rt-all', type: 'button', hidden: true, onclick: () => openReviews(b) }, 'All reviews', h('span', { class: 'rt-arrow', 'aria-hidden': 'true' }, '\u2192'));
     const cap = h('p', { class: 'rt-cap', hidden: true }, 'Top review');
     const live = () => DET.book === b;
-    let own = null, draftR = 0, draftC = '', busy = false;
+    let own = null, draftR = 0, draftC = '', busy = false, expired = false;
     const paintAvg = d => {
       if (!live()) return;
       avg.textContent = '';
@@ -236,20 +237,20 @@
     const run = async (r, c, done) => {
       busy = true; paintMine();
       try { await rtSave(b, r, c); own = { r, c }; draftR = r; draftC = c; toast(done); }
-      catch (e) { toast(e && e.code === 'permission-denied' ? 'Could not save your rating. Try again in a moment.' : (e && e.message) || 'Could not save your rating.', 4500); }
+      catch (e) { if (e && e.code === 'rt/signin') expired = true; toast(e && e.code === 'permission-denied' ? 'Could not save your rating. Try again in a moment.' : (e && e.message) || 'Could not save your rating.', 4500); }
       busy = false; paintMine(); reload(true);
     };
     const paintMine = () => {
       if (!live()) return;
       mine.textContent = '';
-      if (!acInfo()) {
+      if (!acSignedIn() || expired) {
         mine.append(h('button', { class: 'btn ghost small', type: 'button', onclick: () => {
           acSignIn().then(async () => {
-            for (let i = 0; i < 25 && !acInfo() && !acErr; i++) await new Promise(r => setTimeout(r, 200));   // the sign-in answer can land a moment after the pop-up closes
+            for (let i = 0; i < 25 && !(acInfo() && acUser) && !acErr; i++) await new Promise(r => setTimeout(r, 200));   // the sign-in answer can land a moment after the pop-up closes
             if (!live()) return;
-            if (acErr && !acInfo()) toast(acErr, 5000); else init();
+            if (acErr && !(acInfo() && acUser)) toast(acErr, 5000); else { expired = false; init(); }
           }).catch(() => {});
-        } }, 'Sign in to rate this book'));
+        } }, expired ? 'Sign in again to rate this book' : 'Sign in to rate this book'));
         return;
       }
       if (own === null) { mine.append(h('p', { class: 'rt-note' }, 'Checking your rating…')); return; }
@@ -268,10 +269,14 @@
       mine.append(h('p', { class: 'rt-note' }, own.r ? 'Your rating' : 'Rate this book'), group, box, h('div', { class: 'rt-row' }, left, h('span', { class: 'rt-btns' }, clear, save)));
     };
     const init = () => {
-      own = null; draftR = 0; draftC = ''; paintMine();
+      const keepR = expired ? draftR : 0, keepC = expired ? draftC : '';
+      own = null; draftR = keepR; draftC = keepC; paintMine();
       if (!acInfo()) return;
-      rtMine(b).then(m => { if (!live()) return; own = m || { r: 0, c: '' }; draftR = own.r; draftC = own.c; paintMine(); })
-        .catch(() => { if (!live()) return; own = { r: 0, c: '' }; paintMine(); });
+      rtMine(b).then(m => {
+        if (!live()) return;
+        if (!m) { expired = true; own = { r: 0, c: '' }; paintMine(); return; }   // remembered account but no Firebase user: ask to sign in again instead of failing on Save
+        expired = false; own = m; draftR = keepR || own.r; draftC = keepR ? keepC : own.c; paintMine();
+      }).catch(() => { if (!live()) return; own = { r: 0, c: '' }; paintMine(); });
     };
     reload(false); init();
     return h('section', { class: 'det-rate', 'aria-label': 'Ratings and reviews' },
@@ -281,7 +286,7 @@
      book. "Not now" is remembered for that book on this device (wt:rtskip), so it is never asked twice.
      show() is called when the box has something to say, so the card can appear even without suggestions. */
   function ratePrompt(b, show) {
-    if (!acInfo() || P.calm === true) return null;
+    if (!acSignedIn() || P.calm === true) return null;
     const skip = store.get('wt:rtskip', {}) || {};
     if (skip[String(b.id)] || !rtListened(b)) return null;
     const box = h('div', { class: 'rt-prompt', hidden: true });
