@@ -3,12 +3,19 @@
   /* ---------- the Sound screen: master switch, master volume and the glue between its controls ---------- */
   function sndOn() { return P.sndOn !== false; }
   function sndMul() { return sndOn() ? (P.sndVol == null ? 100 : Math.max(0, Math.min(100, P.sndVol))) / 100 : 0; }
+  function sndVolPaint() {   // master volume: filled track, % readout and a speaker icon that shows mute at 0
+    const r = $('#snd-vol'); if (!r) return;
+    const v = Math.max(0, Math.min(100, +r.value || 0));
+    r.style.setProperty('--fill', v + '%');
+    const o = $('#snd-vpct'); if (o) o.textContent = v + '%';
+    const i = $('#snd-vic'); if (i) i.classList.toggle('mute', v === 0);
+  }
   function sndPaint() {   // show the saved settings in the controls that live on the Sound screen
     const set = (id, fn) => { const e = $(id); if (e) fn(e); };
-    set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); });
+    set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); sndVolPaint(); });
     set('#in-ambon', e => { e.checked = P.ambOn === true; });
     set('#in-muson', e => { e.checked = P.musOn === true; });
-    set('#row-musvol', e => { e.hidden = P.musOn !== true; }); set('#row-musduck', e => { e.hidden = P.musOn !== true; }); set('#row-musdip', e => { e.hidden = P.musOn !== true; });
+    set('#row-musduck', e => { e.hidden = P.musOn !== true; }); set('#row-musdip', e => { e.hidden = P.musOn !== true; });
     $$('#seg-musdip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (MUS_DIP[P.musDip] ? P.musDip : 'normal'))));
     set('#mus-vol', e => { e.value = String(P.musVol == null ? 40 : P.musVol); }); set('#in-musduck', e => { e.checked = P.musDuck !== false; });
     set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });

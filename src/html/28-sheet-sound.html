@@ -6,8 +6,10 @@
         <label for="snd-on" class="snd-mlab"><span class="snd-mt">Sound</span><span class="snd-ms" id="snd-state" aria-live="polite">Off</span></label>
         <input type="checkbox" id="snd-on" class="snd-sw" role="switch">
       </div>
-      <div class="amb-row snd-mvol"><label for="snd-vol">Master volume</label><input id="snd-vol" type="range" min="0" max="100" step="1" aria-label="Master volume for all sound"></div>
+      <div class="snd-mv snd-mvol"><span class="snd-vic" id="snd-vic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="snd-vw" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="snd-vx" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></span><input id="snd-vol" type="range" min="0" max="100" step="1" aria-label="Master volume for all sound"><output id="snd-vpct" for="snd-vol" aria-hidden="true">100%</output></div>
     </div>
+
+    <div class="snd-offbar" id="snd-offbar" role="status"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span>Sound is off. Your settings are saved but locked.</span><button id="snd-offbar-on" class="btn small" type="button">Turn on</button></div>
 
     <div class="snd-tabs" role="tablist" aria-label="Sound types">
       <button type="button" role="tab" id="snd-t-amb" class="snd-tab" aria-selected="true" aria-controls="snd-p-amb" data-p="amb"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-m-rain"/></svg><span>Background sounds</span><i class="snd-dot" id="snd-d-amb" hidden></i></button>
@@ -68,7 +70,6 @@
       </div>
     </div>
 
-    <div class="amb-now" id="amb-now" aria-live="polite" hidden></div>
 
     <details class="snd-adv" id="snd-presets-d"><summary>Presets</summary>
       <div id="amb-presets" class="amb-scenes" role="group" aria-label="Quick presets"></div>
@@ -113,6 +114,11 @@
       <h3 class="amb-h">Reset</h3>
       <div class="amb-fixrow"><button id="snd-reset-all" class="btn small ghost" type="button">Reset all sound settings</button></div>
     </details>
+
+    <div class="snd-nowbar" id="snd-nowbar" hidden>
+      <div class="amb-now" id="amb-now" aria-live="polite"></div>
+      <button type="button" id="snd-now-pp" class="snd-pp" aria-label="Play"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="pl" d="M8 5v14l11-7z"/><path class="pa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
+    </div>
   </div>
 </section>
 

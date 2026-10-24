@@ -188,6 +188,9 @@
       if (sndOn() && P.ambOn === true && AMB.on && AMB.lbl) rows.push(['Scene', AMB.lbl]);
       if (OSND.nodes) rows.push(['Opening', OSND.buf[OSND.mood] ? 'recorded clip' : 'made on the device']);
       box.textContent = ''; box.hidden = !rows.length;
+      const bar = $('#snd-nowbar'); if (bar) bar.hidden = !rows.length;   // the pinned strip follows the status text
+      const pp = $('#snd-now-pp');
+      if (pp) { const pl = !!S.book && !audio.paused && !audio.ended; pp.hidden = !S.book; pp.classList.toggle('playing', pl); pp.setAttribute('aria-label', pl ? 'Pause' : 'Play'); }
       rows.forEach(r => {
         const row = h('div', {}, h('span', { class: 'k', text: r[0] }), ' ');
         r.slice(1).filter(Boolean).forEach((t, i) => { if (i) row.append(' \u00b7 '); row.append(h('span', { text: t })); });

@@ -21,8 +21,8 @@
         if (d) d.hidden = !live[k];
         if (t) t.setAttribute('aria-label', n + (live[k] ? ', on' : ', off'));
       });
-      // each sound's own volume only shows while that sound is on, so the only always-visible volume is the master one
-      [['row-ambvol', 'amb'], ['row-musvol', 'mus'], ['row-openvol', 'open']].forEach(([id, k]) => { const r = $('#' + id); if (r) r.toggleAttribute('data-hide', !live[k]); });
+      // each sound's own volume stays in place (so the panel does not jump) but is greyed out and locked while that sound is off
+      [['row-ambvol', 'amb'], ['row-musvol', 'mus'], ['row-openvol', 'open']].forEach(([id, k]) => { const r = $('#' + id); if (!r) return; r.toggleAttribute('data-hide', !live[k]); const i = r.querySelector('input'); if (i) i.disabled = !live[k]; });
       const pn = $('#snd-panels'); if (pn) pn.inert = !on;   // the settings stay, but nothing can be changed while Sound is off
       ['#snd-vol', '#amb-sug-go'].forEach(id => { const e = $(id); if (e) e.disabled = !on; });
     } catch (e) { /* the tabs are cosmetic; the sound itself does not depend on them */ }

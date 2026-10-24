@@ -131,15 +131,22 @@
     $('#amb-tod').addEventListener('change', e => { P.ambTod = e.target.checked; savePrefs(); ambTod(); ambPaintScenes(); });
     $('#amb-scenes').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) ambUseScene(c.dataset.k); });
     $('#amb-sug-go').addEventListener('click', () => ambUseScene($('#amb-sug').dataset.k));
+    $('#snd-now-pp').addEventListener('click', () => { togglePlay(); setTimeout(sndNowPaint, 120); });   // the pinned strip's play/pause drives the narrator
+    $('#snd-offbar-on').addEventListener('click', () => { const c = $('#snd-on'); if (c && !c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } });   // the banner's one-tap fix
+    $('#snd-body').addEventListener('click', e => {   // a tap on the locked panel does nothing, so point at the banner instead
+      const body = $('#snd-body'); if (!body.hasAttribute('data-off')) return;
+      const r = $('#snd-panels').getBoundingClientRect(); if (e.clientY < r.top || e.clientY > r.bottom) return;
+      const b = $('#snd-offbar'); b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge');
+    });
     $('#snd-on').addEventListener('change', e => { P.sndOn = e.target.checked; savePrefs(); AMB.preset = e.target.checked ? '' : AMB.preset; sndApplyAll(); ambPresetPaint(); });
-    $('#snd-vol').addEventListener('input', e => { P.sndVol = +e.target.value; savePrefs(); ambMaster(); musBusApply(0.1); });
+    $('#snd-vol').addEventListener('input', e => { P.sndVol = +e.target.value; sndVolPaint(); savePrefs(); ambMaster(); musBusApply(0.1); });
     $('#snd-duck').addEventListener('change', e => { P.ambDuck = e.target.checked; P.musDuck = e.target.checked; savePrefs(); AMB.duckS = ''; MUS.duckS = ''; sndPaint(); });   // one switch for both; the two separate ones are under Advanced
     ['#amb-duck', '#in-musduck'].forEach(id => $(id).addEventListener('change', sndPaint));
     $('#snd-book-reset').addEventListener('click', sndBookReset); $('#snd-reset-all').addEventListener('click', sndResetAll);
     $('#snd-cache-clear').addEventListener('click', sndCacheClear); setTimeout(() => sndCachePrune(true), 20000);   // trim an oversized cache shortly after start
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
     $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
-    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; $('#row-musdip').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); try { qkPaint(); } catch (err) { /* the tile is optional */ } });
+    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musduck').hidden = !e.target.checked; $('#row-musdip').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); try { qkPaint(); } catch (err) { /* the tile is optional */ } });
     $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; });   // re-apply the dip at once
     sndPaint(); ambPresetPaint();

@@ -5,7 +5,20 @@
 .snd-mlab { flex: 1; min-width: 0; cursor: pointer; }
 .snd-mt { display: block; font-size: 1.05rem; font-weight: 700; }
 .snd-ms { display: block; font-size: .82rem; color: var(--muted); }
-.snd-body[data-off] .snd-mvol { opacity: .55; }
+/* master volume: icon, clearly visible track, and a % readout */
+.snd-mv { display: flex; align-items: center; gap: .7rem; min-height: 2.5rem; }
+.snd-vic { flex: none; display: inline-flex; color: var(--muted); }
+.snd-vic .ic { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.snd-vic .snd-vx, .snd-vic.mute .snd-vw { display: none; }
+.snd-vic.mute .snd-vx { display: inline; }
+.snd-mv input[type="range"] { flex: 1; min-width: 0; height: 2rem; }
+.snd-mv input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: linear-gradient(to right, var(--accent) var(--fill, 100%), color-mix(in srgb, var(--ink) 24%, var(--surface-2)) var(--fill, 100%)); }
+.snd-mv input[type="range"]::-moz-range-track { height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 24%, var(--surface-2)); }
+.snd-mv input[type="range"]::-moz-range-progress { height: 8px; border-radius: 999px; background: var(--accent); }
+.snd-mv input[type="range"]::-webkit-slider-thumb { width: 1.35rem; height: 1.35rem; margin-top: -.34rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); }
+.snd-mv input[type="range"]::-moz-range-thumb { width: 1rem; height: 1rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); }
+.snd-mv output { flex: none; min-width: 2.8rem; text-align: right; font-size: .88rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.snd-body[data-off] .snd-mvol { opacity: .45; }
 
 .snd-sw { -webkit-appearance: none; appearance: none; position: relative; flex: none; width: 2.9rem; height: 1.6rem; margin: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); cursor: pointer; transition: background-color .18s, border-color .18s; -webkit-tap-highlight-color: transparent; }
 .snd-sw::before { content: ""; position: absolute; inset: -.6rem -.3rem; }   /* 44px touch target around the small switch */
@@ -23,19 +36,35 @@
 .snd-dot { position: absolute; top: .4rem; right: .4rem; width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); }
 .snd-dot[hidden] { display: none; }
 
+.snd-offbar { display: none; align-items: center; gap: .6rem; margin: 0 0 .8rem; padding: .55rem .7rem; border: 1px solid var(--accent); border-radius: var(--r-ctl, 12px); background: var(--accent-soft); font-size: .88rem; }
+.snd-offbar .ic { flex: none; width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.snd-offbar span { flex: 1; min-width: 0; }
+.snd-offbar .btn { flex: none; }
+.snd-body[data-off] .snd-offbar { display: flex; }
+.snd-offbar.nudge { animation: snd-nudge .5s; }
+@keyframes snd-nudge { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 .snd-panels { margin: 0 0 .9rem; }
 .snd-panel { display: grid; gap: .7rem; }
 .snd-panel[hidden] { display: none; }
 .snd-body[data-off] .snd-tab, .snd-body[data-off] .snd-panels, .snd-body[data-off] .amb-sug { opacity: .55; }
-.snd-body[data-off] #amb-now { display: none; }
+/* Now playing: a strip pinned to the bottom of the sheet, with a play/pause button for the narrator */
+.snd-nowbar { --snd-pad: max(1.5rem, env(safe-area-inset-bottom)); position: sticky; bottom: calc(-1 * var(--snd-pad)); z-index: 2; display: flex; align-items: center; gap: .8rem; margin: 0 -1.3rem calc(-1 * var(--snd-pad)); padding: .6rem 1.3rem max(.6rem, env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--surface-2) 92%, var(--accent) 8%); border-top: 1px solid var(--line); box-shadow: 0 -8px 14px -10px rgba(0, 0, 0, .5); }
+.snd-nowbar[hidden], .snd-body[data-off] .snd-nowbar { display: none; }
+.snd-nowbar .amb-now { flex: 1; min-width: 0; margin: 0; }
+.snd-pp { flex: none; width: 2.6rem; height: 2.6rem; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.snd-pp[hidden] { display: none; }
+.snd-pp .ic { width: 1.2rem; height: 1.2rem; fill: currentColor; stroke: none; }
+.snd-pp .pa, .snd-pp.playing .pl { display: none; }
+.snd-pp.playing .pa { display: inline; }
+.snd-pp:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
 .snd-lrow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 2.75rem; }
 .snd-ltxt { flex: 1; min-width: 0; }
 .snd-ltxt label { display: block; font-size: 1rem; font-weight: 600; cursor: pointer; }
 .snd-ltxt small { display: block; color: var(--muted); font-size: .82rem; margin-top: .1rem; }
 .snd-sub { padding-left: .8rem; border-left: 2px solid var(--line); }
 .snd-panel .amb-h { margin-bottom: 0; }
-#row-musvol[hidden] { display: grid; }
-.snd-panel .snd-vrow[data-hide] { display: none; }   /* a sound's own volume is hidden while that sound is off */
+.snd-panel .snd-vrow[data-hide] { opacity: .4; }   /* a sound's own volume stays in place but is greyed out while that sound is off */
+.snd-panel .snd-vrow input:disabled { cursor: default; }
 
 .snd-body .amb-sug { padding: .55rem .8rem; margin: 0 0 .9rem; }
 .snd-body .amb-sug > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .4rem; min-width: 0; }
@@ -44,7 +73,7 @@
 .amb-tag { font-size: .68rem; font-weight: 600; padding: .05rem .4rem; border-radius: 999px; background: var(--accent-soft); color: var(--ink); }
 .amb-more summary { cursor: pointer; color: var(--muted); font-size: .82rem; padding: .3rem 0; }
 .amb-more[open] summary { margin-bottom: .2rem; }
-@media (prefers-reduced-motion: reduce) { .snd-sw, .snd-sw::after, .snd-tab { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .snd-sw, .snd-sw::after, .snd-tab { transition: none; } .snd-offbar.nudge { animation: none; } }
 
 /* Quick controls: four tiles in the top row (Speed, Sleep timer, Sound, Music) */
 .qk-tiles.qk-t4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
