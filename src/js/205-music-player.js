@@ -39,6 +39,7 @@
     slow: false,    // the pause comes from the sleep timer: fade the music out slowly, like the ambient sounds (set in 200 and 150)
     rs: null,       // where a pause left the music: { clip, pos, mood, book, t }, used by the next play to carry on (musResumeSave / musResumeTake)
     tail: null,     // the nodes of the last stop, still fading: cut short if the same clip carries on
+    gest: false,    // one tap/key listener is waiting to wake the audio engine (musGestureArm)
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and
@@ -417,6 +418,10 @@
       MUS.rt = setTimeout(() => { if (P.musOn && !MUS.playing && musNarrating()) musSwitchMood(MUS.mood || 'neutral', true); }, 45e3);
       return;
     }
+    if (!musNarrating()) {   // the narrator was paused while the clip loaded: stay silent; the next play starts it
+      if (!MUS.playing) { MUS.live = false; musDuckStop(); audioSuspendSoon(600, 'sTimer'); }
+      sndNowPaint(); return;
+    }
     const { clip, buf } = got;
     MUS.fail = false; musWarnPaint();
 
@@ -481,7 +486,7 @@
     MUS.slow = false;   // a sleep-timer flag left from an earlier pause must not slow down a later, ordinary pause
     if (!P.musOn || !sndOn() || !MUS.on || !musNarrating()) return;   // needs the narrator playing and Sound on; ambient is irrelevant
     if (!MUS.manifest) { musManifestRetry(); return; }   // the list never loaded (offline at the first play): try again now
-    if (MUS.playing) return;
+    if (MUS.playing) { musCtxHeal(); return; }   // already sounding: make sure the engine is really running
     const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
     if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
     musSceneStep();   // read the scene here first, so the very first clip already fits the story (this may start the music itself)
@@ -530,6 +535,7 @@
     cb.type = 'peaking'; cb.frequency.value = 800;  cb.Q.value = 0.9; cb.gain.value = 0;
     master.connect(ca); ca.connect(cb); cb.connect(duck); duck.connect(ctx.destination);
     MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.ca = ca; MUS.cb = cb; MUS.on = true;
+    try { if (ctx.addEventListener) ctx.addEventListener('statechange', musCtxHeal); else ctx.onstatechange = musCtxHeal; } catch (e) { /* the other triggers still work */ }
     if (!MUS.manifest) musManifestRetry();
   }
 
@@ -674,9 +680,40 @@
     window.addEventListener('offline', () => { musWarnPaint(); musOffPaint(); });
   }
 
+  /* ---------- Screen lock, calls and other apps ----------
+     When the screen locks, a call comes in or another app takes the sound, the shared AudioContext can go to 'suspended' or
+     (Safari) 'interrupted' while the narrator is still wanted. musCtxHeal wakes it again, but only while music is wanted:
+     music on, Sound on, the narrator really playing and a clip sounding or loading. With the narrator paused it does nothing,
+     so it never starts music or keeps the engine awake for nothing. It runs on the context's own state change, when the page
+     is shown again, when the narrator reports it is playing, and on play. If the browser refuses (it wants a tap first),
+     ONE tap or key listener waits and tries again; it removes itself on the first use. */
+  function musWanted() { return !!(P.musOn === true && sndOn() && MUS.on && MUS.ctx && S.book && musNarrating() && (MUS.live || MUS.playing)); }
+  function musCtxHeal() {
+    try {
+      if (!musWanted()) return;
+      const ctx = MUS.ctx, st = ctx.state;
+      if (st === 'running' || st === 'closed') return;
+      const p = ctx.resume();   // 'suspended', or Safari's 'interrupted'
+      if (p && p.then) p.then(() => { if (ctx.state !== 'running' && musWanted()) musGestureArm(); }, () => { if (musWanted()) musGestureArm(); });
+    } catch (e) { /* a help only: never break playback */ }
+  }
+  function musGestureArm() {
+    if (MUS.gest) return;
+    MUS.gest = true;
+    const evs = ['pointerdown', 'touchend', 'keydown'];
+    const go = () => { MUS.gest = false; evs.forEach(ev => document.removeEventListener(ev, go, true)); musCtxHeal(); };
+    evs.forEach(ev => document.addEventListener(ev, go, true));
+  }
+  function musHealInit() {
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) musCtxHeal(); });
+    window.addEventListener('pageshow', musCtxHeal);
+    audio.addEventListener('playing', musCtxHeal);
+  }
+
   /* Called once at startup to pre-fetch the manifest in the background. */
   async function musicInit() {
     try { musOffInit(); } catch (e) { console.warn('offline music', e); }
+    try { musHealInit(); } catch (e) { console.warn('music wake-up', e); }
     if (!MUS.manifest) musFetchManifest();   // fire and forget; the bus is built on the first play
   }
 
