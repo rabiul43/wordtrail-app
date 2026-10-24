@@ -330,3 +330,18 @@ kbd { font: 600 .78rem var(--font-ui); border: 1px solid var(--line); border-bot
 .grid3 .tile .tile-a { font-size: var(--label); }
 .grid3 .tile-more { min-height: 0; height: auto; aspect-ratio: var(--tile-ratio); }
 
+
+/* Task 5: partly downloaded book while offline (chapter list) */
+.dlbar[hidden] { display: none; }
+.trkoff { margin: .6rem 0; padding: .8rem 1rem; border: 1px solid var(--accent); border-radius: 14px; background: var(--surface); color: var(--ink); line-height: 1.5; font-size: .92rem; }
+.trkoff[hidden] { display: none; }
+.trkoff strong { font-weight: 700; }
+.track .ds.off-st { display: inline-flex; align-items: center; gap: .45rem; font-size: .8rem; }
+.track .ds.off-st.ok { color: var(--accent); font-weight: 500; }
+.track .ds.off-st.lock { color: var(--muted); }
+.track .ds .dlmark { position: static; left: auto; bottom: auto; flex: none; box-shadow: none; }
+.track .ds .trk-lock { display: inline-flex; flex: none; }
+.track .ds .trk-lock svg { display: block; width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.track.off-lock .tt, .track.off-lock .n, .track.off-lock .d { opacity: .6; }
+.track.off-lock, .track.off-lock:active { cursor: default; background: transparent; }
+@media (hover: hover) { .track.off-lock:hover { background: transparent; } }

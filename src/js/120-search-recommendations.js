@@ -12,17 +12,47 @@
     if (store.get('wt:rdy:' + id, null) === 1) return '✓ Sync ready';
     return !quiet && PKI.ready ? 'Not synced' : '';
   }
-  function dlBadgeText(id) {
-    const m = dlMeta.get(String(id)), have = m ? Object.keys(m.tracks).length : 0;
-    if (DL.running && DL.id === String(id)) return '↓ Downloading ' + have + '/' + DL.book.secs.length;
-    if (!have) return '';
-    return have >= m.n ? '✓ Available offline' : 'Offline ' + have + '/' + m.n;
+  /* Download mark on a cover (replaces the text pill): none / downloading (ring fills) / partly (ring at the saved share) / downloaded (gold check).
+     dlState says which, dlLabel is the words for screen readers (the cover is aria-hidden, so tiles put it in their aria-label and cards in a
+     sr-only line), dlMarkPaint draws .dlmark inside a cover box (coverFill in 100 keeps it when the cover is redrawn). */
+  function dlState(id) {
+    const m = dlMeta.get(String(id)), have = m ? Object.keys(m.tracks).length : 0, n = (DL.running && DL.id === String(id) && DL.book) ? DL.book.secs.length : (m ? m.n : 0);
+    if (DL.running && DL.id === String(id) && n) {
+      let busy = 0; for (const k in DL.st) { const t = DL.st[k]; if (t.state === 'busy' && !(m && m.tracks[k])) busy += t.total ? Math.min(1, t.got / t.total) : 0; }
+      return { k: 'run', f: Math.min(1, (have + busy) / n), have, n };
+    }
+    if (!have) return { k: '', f: 0, have: 0, n };
+    return have >= m.n ? { k: 'full', f: 1, have, n } : { k: 'part', f: have / m.n, have, n };
+  }
+  function dlLabel(id) {
+    const s = dlState(id);
+    return s.k === 'full' ? 'Downloaded' : s.k === 'run' ? 'Downloading' : s.k === 'part' ? 'Partly downloaded, ' + s.have + ' of ' + s.n + ' chapters' : '';
+  }
+  const DLM_FULL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="mk" d="M6.5 12.5l3.8 3.8 7.2-7.6"/></svg>';
+  function dlMarkSvg(f) {
+    const C = 62.83;
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle class="rg-bg" cx="12" cy="12" r="10"/><circle class="rg-fg" cx="12" cy="12" r="10" transform="rotate(-90 12 12)" stroke-dasharray="' + (C * f).toFixed(2) + ' ' + C + '"/><path class="mk" d="M12 7.5v8M8.7 12.6l3.3 3.3 3.3-3.3"/></svg>';
+  }
+  function dlMarkPaint(host, id) {
+    if (!host) return;
+    host._wtDlHost = true;
+    const s = dlState(id); let mk = host._wtMk;
+    if (!s.k) { if (mk) { mk.remove(); host._wtMk = null; } return; }
+    if (!mk) { mk = host._wtMk = h('span', { class: 'dlmark', role: 'img' }); }
+    if (mk.parentNode !== host) host.append(mk);
+    const key = s.k + ':' + Math.round(s.f * 50) + ':' + s.have + '/' + s.n;
+    if (mk._k === key) return;
+    mk._k = key; mk.dataset.s = s.k;
+    mk.innerHTML = s.k === 'full' ? DLM_FULL : dlMarkSvg(s.f);
+    mk.setAttribute('aria-label', dlLabel(id));
   }
   function paintBadge(card) {
     offDim(card);
     const t = badgeText(card._wtId);
     card._wtBadge.textContent = t; card._wtBadge.hidden = !t; card._wtBadge.dataset.s = t === 'Not synced' ? 'no' : '';
-    if (card._wtDl) { const d = dlBadgeText(card._wtId); card._wtDl.textContent = d; card._wtDl.hidden = !d; card._wtDl.classList.toggle('full', /^✓/.test(d)); }
+    if (card._wtCv === undefined) card._wtCv = card.querySelector('[data-cv]');
+    dlMarkPaint(card._wtCv, card._wtId);
+    if (card._wtDl) { const d = dlLabel(card._wtId); if (card._wtDl.textContent !== d) card._wtDl.textContent = d; card._wtDl.hidden = !d; }   // sr-only: the cover (and its mark) is aria-hidden
     if (card._wtLvl) {
       const v = LVL.map.get(String(card._wtId)), c = v && LVL.cefr[v[1]], t = v ? (LVL.tiers[v[0]] || '') : '';
       card._wtLvl.textContent = t ? t + (c ? ' \u00b7 ' + c[0] : '') : ''; card._wtLvl.hidden = !t;
@@ -32,7 +62,7 @@
     if (card._wtRate) { const rl = rtLineText(card._wtId); card._wtRate.textContent = rl; card._wtRate.hidden = !rl; }
     if (card._wtChip) card._wtChip.hidden = !Array.from(card._wtChip.children).some(c => !c.hidden && c.textContent);
   }
-  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); offRefresh(); }
+  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); $$('[data-cv]').forEach(n => { if (n._wtDlHost && n._b && n._b.id) dlMarkPaint(n, n._b.id); }); offRefresh(); }   // marks: also the book page cover, which is not a tile or card
   async function checkReady(cards) {
     let ids = null;
     try { ids = await loadHFSyncedIds(); } catch (e) { return; }
@@ -49,7 +79,7 @@
     const meta = [narr ? 'Read by ' + narr : '', b.total ? fmtLong(b.total) : '', lang].filter(Boolean).join(' \u00b7 ');
     const v = VER.ready && b.id ? VER.map.get(String(b.id)) : null;
     const bestSp = h('span', { class: 'cb-best', title: v && v.why ? v.why : 'Best audio version', hidden: !(v && v.k === 0) }, v && v.sc != null ? '\u2605 Best match \u00b7 ' + Math.round(v.sc) + '%' : '\u2605 Best match');
-    const badge = h('span', { class: 'cb-sync', hidden: true }), dlb = h('div', { class: 'sbadge dl', hidden: true });
+    const badge = h('span', { class: 'cb-sync', hidden: true }), dlb = h('div', { class: 'sr-only', hidden: true });
     const chip = h('div', { class: 'sbadge combo', hidden: true }, bestSp, badge);
     const lvl = h('span', { class: 'lvl', hidden: true }), rateLine = h('div', { class: 'cb-rate' }); rateLine.hidden = true;
     rtSumLoad();
@@ -496,13 +526,14 @@
   function renderRecents() {
     loadPicks();
     el.recentList.textContent = '';
-    if (!P.recents.length) { el.recents.hidden = true; return; }
+    const recs = OFF.on ? recs.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played
+    if (!recs.length) { el.recents.hidden = true; return; }
     el.recents.hidden = false;
     const want = Math.max(1, Math.min(5, parseInt(P.resumeCount, 10) || 3));
     /* Separate in-progress from finished; promote the first unfinished book to the hero slot. */
-    const inProgress = P.recents.filter(r => Math.round((r.pct || 0) * 100) < 100);
-    const finished   = P.recents.filter(r => Math.round((r.pct || 0) * 100) >= 100);
-    const hero = inProgress[0] || P.recents[0]; // fall back to most-recent if all done
+    const inProgress = recs.filter(r => Math.round((r.pct || 0) * 100) < 100);
+    const finished   = recs.filter(r => Math.round((r.pct || 0) * 100) >= 100);
+    const hero = inProgress[0] || recs[0]; // fall back to most-recent if all done
     el.recentList.append(resumeHero(hero));
     if (Math.round((hero.pct || 0) * 100) >= 100) el.recentList.append(finishCard(hero, { compact: true }));
     /* More books in progress: show up to (want - 1) additional unfinished books as mini cards. */

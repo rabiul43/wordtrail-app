@@ -137,7 +137,7 @@
         h('div', { class: 'det-tools' }, h('button', { class: 'ib', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
       h('section', { class: 'det-hero', style: '--h:' + colHue(0, (parseInt(b.id, 10) || 0) + 3) },
         heartNode(b, 'on-detail'),
-        coverBox(b, 'tile-cover det-cover'),
+        (() => { const c = coverBox(b, 'tile-cover det-cover'); if (b.id) dlMarkPaint(c, b.id); return c; })(),
         h('h1', {}, b.title),
         authorLine(b),
         meta ? h('p', { class: 'det-meta' }, meta) : null,

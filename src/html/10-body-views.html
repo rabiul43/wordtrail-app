@@ -162,6 +162,16 @@
     <div id="recent-list" class="list"></div>
   </section>
 
+  <!-- Offline home (shown only while OFF.on; filled by offGridDraw in 280): the downloaded books, nothing else -->
+  <section id="sec-off" class="home-section off-home" aria-label="Downloaded books" hidden>
+    <div class="home-section-head"><h2>Downloaded</h2><span id="off-count" class="off-count" aria-live="polite"></span></div>
+    <div id="off-grid" class="off-grid"></div>
+    <div id="off-none" class="tab-empty off-none" hidden>
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>
+      <p id="off-none-t"></p>
+    </div>
+  </section>
+
   <!-- Time-of-day card: a review in the morning, a short story at bedtime (filled by loadTod) -->
   <section id="sec-tod" class="home-section" aria-label="For this time of day" hidden></section>
 
@@ -264,6 +274,7 @@
   <div id="shelf-seg" class="shelf-seg" role="group" aria-label="My books view">
     <button type="button" class="chip" data-m="saved" aria-pressed="true">Saved</button>
     <button type="button" class="chip" data-m="ra" aria-pressed="false">Synced books</button>
+    <button type="button" class="chip" data-m="dl" aria-pressed="false">Downloaded</button>
   </div>
   <div id="shelf-saved">
     <div id="shelf-list" class="list"></div>
@@ -272,6 +283,19 @@
       <h2>Nothing saved yet</h2>
       <p>Tap the heart on any book and it will wait for you here.</p>
       <button id="shelf-browse" class="resume-btn" type="button">Browse the library</button>
+    </div>
+  </div>
+  <div id="shelf-dl" hidden>
+    <div id="sd-sum" class="sd-sum" hidden>
+      <div class="sd-k">On this device</div>
+      <div id="sd-big" class="sd-big"></div>
+      <div id="sd-bar" class="sd-bar" role="img" hidden><i id="sd-bar-i"></i></div>
+      <div class="sd-line"><span id="sd-books"></span><span id="sd-free"></span></div>
+    </div>
+    <div id="sd-list" class="sd-list"></div>
+    <div id="sd-empty" class="tab-empty" hidden>
+      <svg class="ic sd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>
+      <p>No downloads yet. Open a book and tap Download book.</p>
     </div>
   </div>
   <div id="shelf-ra" hidden>

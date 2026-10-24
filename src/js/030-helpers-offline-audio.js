@@ -156,19 +156,30 @@
   const isLocal = (id, i, url) => { const m = dlMeta.get(String(id)), t = m && m.tracks[i]; return !!t && (!url || t.u === url); };
   const dlSaved = id => { const m = dlMeta.get(String(id)); return m ? Object.keys(m.tracks).length : 0; };
   /* Offline mode (navigator.onLine === false; screen code in 280). A book counts as available when at least one of its tracks is saved here. */
-  const OFF = { on: false, ready: false };
+  const OFF = { on: false, ready: false, net: false };   // on = what the screens obey; net = the real-request probe says there is no connection (280)
   const offHave = id => !!id && dlSaved(id) > 0;
   const offBooks = () => { let n = 0; for (const m of dlMeta.values()) if (Object.keys(m.tracks || {}).length) n++; return n; };
-  function offDim(node) {   // a tile or card whose book is not on this device is dimmed (and announced as unavailable) while offline
+  function offDim(node) {   // (name kept) a tile or card whose book is not on this device is HIDDEN while offline (.off-hide); 280 offHide() also hides rows and sections left empty
     if (!node || !node._wtId) return;
-    const dim = OFF.on && !offHave(node._wtId);
-    node.classList.toggle('off-dim', dim);
-    if (dim) node.setAttribute('aria-disabled', 'true'); else node.removeAttribute('aria-disabled');
+    const hide = OFF.on && !offHave(node._wtId);
+    node.classList.toggle('off-hide', hide);
+    const w = node.parentElement; if (w && w.classList.contains('card-wrap')) w.classList.toggle('off-hide', hide);   // the heart sits in the wrap
   }
+  /* OFF.on = P.offForce (Settings > Storage > Offline > Downloads only) OR (P.offAuto, default on, AND the probe says offline). */
+  const offForced = () => P.offForce === true && !(P.offAuto !== false && OFF.net);   // "Downloads only" chosen by hand, not just a lost connection
+  const offMsg = () => (offForced() ? 'Downloads only is on and this book is not downloaded.' : "You're offline and this book is not downloaded.");
   function offBlock(b) {   // true (with a message) when this book cannot be played now: offline and nothing of it is saved
     if (!OFF.on || !b || !b.id || offHave(b.id)) return false;
-    toast("You're offline and this book is not downloaded.", 4000);
+    toast(offMsg(), 4000);
     return true;
+  }
+  /* Partly downloaded book while offline: a track (chapter) plays only when it is saved here. offNearSaved scans from `from` (included) in
+     direction dir (+1 / -1) and returns the nearest saved track index, or -1. Used by the chapter list and the skipping in 280, and by openBook in 140. */
+  const offTrackOn = (b, i) => !!b && !!b.secs && !!b.secs[i] && isLocal(b.id, i, b.secs[i].url);
+  function offNearSaved(b, from, dir) {
+    if (!b || !b.secs) return -1;
+    for (let j = from; j >= 0 && j < b.secs.length; j += dir) if (offTrackOn(b, j)) return j;
+    return -1;
   }
   function dlLocalFor(url) { for (const m of dlMeta.values()) for (const i in m.tracks) if (m.tracks[i].u === url) return [m.id, +i]; return null; }
   /* The saved Blob of a track file, or null when it is not on this device. Used to read audio without the network. */

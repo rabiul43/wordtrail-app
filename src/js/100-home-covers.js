@@ -227,12 +227,14 @@
     const st = covStyle(), title = (b.title || '?').trim();
     box.className = box._cls + (st === 'original' ? '' : ' mc mc-' + coverVariant(title));
     box.style.setProperty('--ch', coverHue(title));
+    const keep = [...box.children].filter(c => c.classList.contains('dlmark'));   // the download mark survives a redraw
     box.textContent = '';
     box.append(h('span', { class: 'gc-i' }, title.charAt(0).toUpperCase()), h('span', { class: 'gc-t' }, title));
     if (st !== 'original') {
       const first = String(b.authors || '').split(/[,;&]| and /)[0].trim();
       box.append(h('span', { class: 'gc-a' }, first && !/^unknown/i.test(first) ? first : ''));
     }
+    if (keep.length) box.append(...keep);
     const large = box._cls === 'pcover-art', tok = box._tok = (box._tok || 0) + 1;
     if (large && box.parentNode && box.parentNode.style) box.parentNode.style.removeProperty('--ar');   // redrawn (style change): back to the default shape until the new image loads
     const real = st === 'se' ? [] : coverSources(b);

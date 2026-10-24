@@ -334,6 +334,8 @@
     $('#in-skipbtn').addEventListener('change', e => { P.skipBtn = e.target.checked; savePrefs(); paintSkipIntro(); });
     $('#in-smartrw').addEventListener('change', e => { P.smartRewind = e.target.checked; savePrefs(); });
     $('#in-autonext').addEventListener('change', e => { P.autoNext = e.target.value; savePrefs(); AP.key = ''; if (e.target.value !== '0') autoPrefetch(true); });
+    $('#in-offforce').addEventListener('click', () => offSetForce(P.offForce !== true));
+    $('#in-offauto').addEventListener('click', () => offSetAuto(P.offAuto === false));
     $('#in-autodel').addEventListener('change', e => { P.autoDel = e.target.checked; savePrefs(); toast(P.autoDel ? 'Finished books will be removed from this device.' : 'Finished downloads are kept.', 2500); });
     $('#in-sharestats').addEventListener('change', e => { P.shareStats = e.target.checked; savePrefs(); });
     $('#in-lockseek').addEventListener('change', e => { P.lockSeek = e.target.checked; savePrefs(); initMediaSession(); });

@@ -327,7 +327,7 @@
     $('#in-lockseek').checked = P.lockSeek !== false;
     $('#in-ambon').checked = P.ambOn === true;
     $('#in-scenelabel').checked = P.sceneLabel === true;
-    $('#in-autonext').value = String(P.autoNext == null ? '2' : P.autoNext); $('#in-autodel').checked = P.autoDel === true;
+    $('#in-autonext').value = String(P.autoNext == null ? '2' : P.autoNext); $('#in-autodel').checked = P.autoDel === true; offSyncSwitches();
     $('#in-smartrw').checked = P.smartRewind !== false;
     $('#in-skipbtn').checked = P.skipBtn !== false;
     $('#in-sharestats').checked = P.shareStats !== false; $('#row-sharestats').style.display = STATS_API ? '' : 'none';

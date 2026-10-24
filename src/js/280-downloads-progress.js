@@ -135,7 +135,7 @@
   let dqBusy = false;
   async function dlResumePending(force) {
     const q = dqGet();
-    if (!q || DL.running || dqBusy || !dlOk || navigator.onLine === false) return;
+    if (!q || DL.running || dqBusy || !dlOk || navigator.onLine === false || OFF.on) return;   // never by itself in Downloads only
     dqBusy = true;
     try {
       await dlReady;
@@ -165,7 +165,7 @@
   async function autoPrefetch(force) {
     const n = parseInt(P.autoNext == null ? '2' : P.autoNext, 10) || 0;
     const b = S.book;
-    if (!(n > 0) || !b || !dlOk || DL.running || AP.busy || audio.paused || Date.now() < AP.until) return;
+    if (!(n > 0) || !b || !dlOk || OFF.on || DL.running || AP.busy || audio.paused || Date.now() < AP.until) return;   // OFF.on: Downloads only or no connection
     const key = b.id + ':' + S.sec + ':' + n;
     if (!force && AP.key === key) return;
     if (!apNetOk()) return;
@@ -191,32 +191,171 @@
       }
     } finally { AP.busy = false; }
   }
-  /* ---------- offline mode: banner, downloaded books first, the rest dimmed ----------
-     Runs while navigator.onLine is false. #offbar says how many books are on this device (OFF/offHave/offBooks, 030). Every tile and
-     card is dimmed and blocked when its book is not saved (offDim in 030; the capture-phase click below). In every row and list of
-     Library and My books the saved books move first; each keeps its first-seen place (_wtOi) so going online puts the order back. */
+  /* ---------- offline mode: banner, books that are not on this device are hidden ----------
+     OFF.on is true while offline or in Downloads only (see 030). #offbar says how many books are on this device (OFF/offHave/offBooks, 030).
+     Every tile and card whose book is not saved gets .off-hide (display:none; offDim in 030 and offHide below), in the Library, See all,
+     search, collections, author page and My books. A row or section whose books are all hidden is hidden too (.off-empty), and each view
+     shows one short note. Nothing is removed or reordered, so going online only has to take the classes off. */
   let offMo = null, offTimer = 0;
-  function offOrder(force) {
+  const OFF_VIEWS = ['#home', '#seeall', '#detail', '#collections', '#shelf'];
+  function offHide(force) {
     if (!OFF.on && !force) return;
-    const items = $$('#home .tile, #home .card-wrap, #home .card, #shelf .card-wrap, #shelf .card').filter(n => n._wtId && !(n.classList.contains('card') && n.parentElement && n.parentElement.classList.contains('card-wrap')));
-    const groups = new Map();
-    for (const n of items) { const p = n.parentElement; if (!p) continue; if (!groups.has(p)) groups.set(p, []); groups.get(p).push(n); }
-    groups.forEach((list, parent) => {
-      if (list.length < 2) return;
-      for (const n of list) if (n._wtOi == null) n._wtOi = (parent._wtOiN = (parent._wtOiN || 0) + 1);
-      const rank = n => (OFF.on && !offHave(n._wtId) ? 1 : 0);
-      const sorted = list.slice().sort((a, b) => rank(a) - rank(b) || a._wtOi - b._wtOi);
-      if (sorted.every((n, i) => n === list[i])) return;
-      const kids = [...parent.children]; let k = 0;
-      parent.append(...kids.map(c => (list.includes(c) ? sorted[k++] : c)));   // books change places, anything else (the Show more tile) stays where it was
-    });
+    for (const sel of OFF_VIEWS) {
+      const v = $(sel); if (!v) continue;
+      $$('.off-empty', v).forEach(n => n.classList.remove('off-empty'));
+      const items = $$('.tile, .card-wrap, .card', v).filter(n => n._wtId && !(n.classList.contains('card') && n.parentElement && n.parentElement.classList.contains('card-wrap')));
+      const rows = new Map(), secs = new Map();
+      let hid = 0, shown = 0;
+      for (const n of items) {
+        const hide = OFF.on && !offHave(n._wtId);
+        n.classList.toggle('off-hide', hide);
+        if (hide) hid++; else shown++;
+        const p = n.parentElement, s = n.closest('.home-section, #recents, #results');
+        if (p) { if (!rows.has(p)) rows.set(p, []); rows.get(p).push(hide); }
+        if (s && v.contains(s)) { if (!secs.has(s)) secs.set(s, []); secs.get(s).push(hide); }
+      }
+      if (OFF.on) [rows, secs].forEach(m => m.forEach((flags, node) => { if (flags.every(Boolean)) node.classList.add('off-empty'); }));
+      let note = v.querySelector(':scope > .off-note');
+      if (OFF.on && hid) {
+        if (!note) { note = h('p', { class: 'off-note', role: 'status' }); (v.firstElementChild ? v.firstElementChild.after(note) : v.append(note)); }
+        const t = shown ? 'Showing downloaded books only' : 'None of these books are downloaded';
+        if (note.textContent !== t) note.textContent = t;
+        note.hidden = false;
+      } else if (note) note.hidden = true;
+    }
+  }
+  /* ---------- offline home: only what can be played (#sec-off in 10-body-views, CSS in 70) ----------
+     While OFF.on the online sections are hidden by CSS (html[data-off]). Here: the Downloaded grid (from dlMeta only), Continue listening
+     limited to saved books (renderRecents in 120), and the search field, which then filters the grid by title and author without any
+     network call (capture listeners on #searchbar keep the online search from running). */
+  let offGridKey = '', offQUsed = false;
+  const offQ = () => (OFF.on && $('#q') ? $('#q').value.trim().toLowerCase() : '');
+  function offGridDraw(force) {
+    const sec = $('#sec-off'), grid = $('#off-grid'); if (!sec || !grid) return;
+    sec.hidden = !OFF.on;
+    const q = $('#q'); if (q) { if (q.dataset.ph == null) q.dataset.ph = q.placeholder; const ph = OFF.on ? 'Search your downloads' : q.dataset.ph; if (q.placeholder !== ph) q.placeholder = ph; }
+    if (!OFF.on) { offGridKey = ''; return; }
+    const all = [...dlMeta.values()].filter(m => m && m.tracks && Object.keys(m.tracks).length).sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const qs = offQ();
+    const vis = qs ? all.filter(m => ((m.title || '') + ' ' + (m.authors || '')).toLowerCase().includes(qs)) : all;
+    const key = vis.map(m => m.id + ':' + Object.keys(m.tracks).length).join(',') + '|' + qs + '|' + all.length + '|' + OFF.ready;
+    if (key === offGridKey && !force) return;
+    offGridKey = key;
+    grid.textContent = '';
+    for (const m of vis) { const b = { id: m.id, title: m.title || '', authors: m.authors || '', cover: m.cover }; grid.append(tileNode(b, () => resumeRecent(b))); }
+    $('#off-count').textContent = vis.length ? plural(vis.length, 'book') : '';
+    const none = $('#off-none');
+    none.hidden = vis.length > 0 || !OFF.ready;
+    $('#off-none-t').textContent = qs && all.length ? 'No downloaded book matches your search.' : 'No downloads yet. When you are back online, open a book and tap Download.';
+    grid.hidden = !vis.length;
+  }
+  function offSearchInit() {
+    const bar = $('#searchbar'), q = $('#q'); if (!bar || !q) return;
+    const cb = $('#btn-clear-q');
+    bar.addEventListener('input', e => {
+      if (!OFF.on || e.target !== q) return;
+      e.stopImmediatePropagation(); offQUsed = true;
+      if (cb) cb.hidden = !q.value;
+      offGridDraw();
+    }, true);
+    bar.addEventListener('submit', e => { if (!OFF.on) return; e.preventDefault(); e.stopImmediatePropagation(); q.blur(); }, true);
+    if (cb) cb.addEventListener('click', () => { if (OFF.on) setTimeout(offGridDraw, 0); });
+  }
+  function offRecentsRefresh() { try { if (typeof renderRecents === 'function') renderRecents(); } catch (e) { /* home not drawn yet */ } }
+  /* ---------- My books > Downloaded (chip data-m="dl"; drawn from dlMeta only, so it works online and offline) ----------
+     Summary card (size of everything saved here, share of the browser's quota when the Storage API tells), then one row per book
+     with its cover, a download mark, the chapters saved and a Remove button. shelfDlDraw runs from offRefresh (paintCards: a
+     download started, finished or was removed) and skips the redraw when nothing changed. */
+  let sdKey = '';
+  function renderShelfDl() { Promise.resolve(dlReady).then(() => shelfDlDraw(true)); }
+  function shelfDlDraw(force) {
+    if (shelfMode !== 'dl') return;
+    const list = $('#sd-list'); if (!list) return;
+    const rows = [...dlMeta.values()].filter(m => m && m.tracks && Object.keys(m.tracks).length).map(m => ({ m, size: dmSize(m), n: Object.keys(m.tracks).length })).sort((a, b) => (b.m.ts || 0) - (a.m.ts || 0));
+    const total = rows.reduce((a, r) => a + r.size, 0);
+    $('#shelf-sub').textContent = rows.length ? plural(rows.length, 'book') + ' downloaded' : '';
+    const key = rows.map(r => r.m.id + ':' + r.n + ':' + r.size + ':' + r.m.n).join(',');
+    if (key === sdKey && !force) return;
+    sdKey = key;
+    $('#sd-sum').hidden = !rows.length; $('#sd-empty').hidden = rows.length > 0;
+    $('#sd-big').textContent = dmMB(total); $('#sd-books').textContent = plural(rows.length, 'book');
+    list.textContent = '';
+    rows.forEach(r => list.append(sdRow(r)));
+    const bar = $('#sd-bar'), free = $('#sd-free'); bar.hidden = true; free.textContent = '';
+    try {
+      if (rows.length && navigator.storage && navigator.storage.estimate) navigator.storage.estimate().then(e => {
+        if (!e || !e.quota || key !== sdKey) return;
+        const pct = Math.max(2, Math.min(100, Math.round(total / e.quota * 100)));
+        $('#sd-bar-i').style.width = pct + '%'; bar.hidden = false; bar.setAttribute('aria-label', dmMB(total) + ' of ' + fmtMB(e.quota) + ' available to the app');
+        free.textContent = fmtMB(Math.max(0, e.quota - (e.usage || 0))) + ' free';
+      }).catch(() => {});
+    } catch (e) { /* no Storage API: the bar and the free space stay hidden */ }
+  }
+  function sdRow(r) {
+    const m = r.m, b = { id: m.id, title: m.title || 'Untitled', authors: m.authors || '', cover: m.cover };
+    const full = r.n >= (m.n || r.n);
+    const cv = coverNode(b); dlMarkPaint(cv, m.id);   // the shared download mark (120)
+    const status = h('span', { class: 'sd-st' + (full ? ' full' : '') }, (full ? 'All ' + r.n + ' chapters' : r.n + ' of ' + m.n + ' chapters') + ' \u00b7 ' + dmMB(r.size));
+    return h('div', { class: 'sd-row' },
+      h('button', { class: 'sd-open', type: 'button', 'aria-label': 'Open ' + b.title, onclick: () => { pendingBack = { tab: 'shelf', see: false }; showTab('library'); resumeRecent(b); } },
+        h('span', { class: 'sd-cover', 'aria-hidden': 'true' }, cv),
+        h('span', { class: 'sd-body' }, h('span', { class: 'sd-t' }, b.title), h('span', { class: 'sd-a' }, b.authors), status)),
+      h('button', { class: 'sd-rm', type: 'button', 'aria-label': 'Remove download of ' + b.title, onclick: async () => {
+        if (!confirm('Remove the downloaded audio of "' + b.title + '" (' + dmMB(r.size) + ') from this device?')) return;
+        if (!await dmDrop(m.id)) toast('Could not remove it right now.', 4000); else toast('Download removed.');
+        paintCards(); paintDl(); dmRender(); shelfDlDraw(true);
+      } }, 'Remove'));
+  }
+  /* The strip sits under the tab bar. Offline: stays until the connection is back. Back online: a green "Back online" for 2 s, then it
+     slides away. Layout (html[data-offbar], --offbar-h) follows the strip, so nothing jumps while it slides. */
+  let offHideT = 0, offBackT = 0;
+  function offBarPlace(bar, on) {
+    const rs = document.documentElement;
+    if (on) {
+      clearTimeout(offHideT);
+      bar.hidden = false;
+      rs.setAttribute('data-offbar', '');
+      rs.style.setProperty('--offbar-h', bar.offsetHeight + 'px');
+      void bar.offsetWidth;   // let the slide-in start from the hidden position
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+      clearTimeout(offHideT);
+      offHideT = setTimeout(() => { bar.hidden = true; rs.removeAttribute('data-offbar'); rs.style.setProperty('--offbar-h', '0px'); try { setTabH(); } catch (e) { /* not ready */ } }, 260);
+    }
+    try { setTabH(); } catch (e) { /* not ready */ }
+  }
+  function offBarText(bar, key, text, forced) {
+    if (bar._k === key) return;
+    bar._k = key; bar.textContent = '';
+    const s = document.createElement('span'); s.textContent = text; bar.append(s);
+    if (forced) { const g = document.createElement('button'); g.type = 'button'; g.className = 'offbar-go'; g.textContent = 'Go online'; bar.append(g); }
+    bar.classList.toggle('forced', forced);
   }
   function offRefresh() {
     const bar = $('#offbar'); if (!bar) return;
-    bar.hidden = !OFF.on;
-    if (OFF.on) { const t = OFF.ready ? "You're offline \u2014 " + plural(offBooks(), 'book') + ' available' : "You're offline"; if (bar.textContent !== t) bar.textContent = t; }
-    document.documentElement.style.setProperty('--offbar-h', OFF.on ? bar.offsetHeight + 'px' : '0px');
-    offOrder();
+    if (OFF.on) {
+      clearTimeout(offBackT);
+      const forced = offForced();
+      const t = forced ? 'Downloads only' : (OFF.ready ? "You're offline \u2014 " + plural(offBooks(), 'book') + ' available' : "You're offline");
+      bar.classList.remove('back');
+      offBarText(bar, (forced ? 'f|' : 'o|') + t, t, forced);
+      bar._was = forced ? 'f' : 'o';
+      offBarPlace(bar, true);
+    } else if (bar._was === 'o') {   // the connection came back: say so for 2 seconds
+      bar._was = '';
+      bar.classList.add('back');
+      offBarText(bar, 'b|Back online', 'Back online', false);
+      offBarPlace(bar, true);
+      clearTimeout(offBackT);
+      offBackT = setTimeout(() => { if (!OFF.on) offBarPlace(bar, false); }, 2000);
+    } else if (!bar.classList.contains('back')) {
+      bar._was = '';
+      if (!bar.hidden) offBarPlace(bar, false);
+    }
+    offGridDraw();
+    shelfDlDraw();
+    offHide();
   }
   /* navigator.onLine is often wrong (some Android/VPN/Wi-Fi setups report false while the internet works), so "offline" is only
      believed after a real request fails. Any answer at all (even an opaque one) means the internet is there. */
@@ -226,35 +365,55 @@
     const ts = Date.now();
     return Promise.any([one(PROXY + '/?probe=' + ts), one('https://www.gstatic.com/generate_204?t=' + ts)]).then(() => true, () => false);
   }
+  function offEval() { offApply(P.offForce === true || (P.offAuto !== false && OFF.net)); }
   function offSet() {
-    if (navigator.onLine !== false) { offApply(false); return; }
+    if (navigator.onLine !== false) { OFF.net = false; offEval(); return; }
+    offEval();   // Downloads only (or a changed switch) applies at once; the probe below only decides the automatic part
     const my = ++offSeq;
-    offProbe().then(alive => { if (my === offSeq) offApply(!alive); });
+    offProbe().then(alive => { if (my === offSeq) { OFF.net = !alive; offEval(); } });
   }
+  function offSyncSwitches() {
+    const a = $('#in-offforce'), b = $('#in-offauto');
+    if (a) a.setAttribute('aria-checked', String(P.offForce === true));
+    if (b) b.setAttribute('aria-checked', String(P.offAuto !== false));
+  }
+  function offSetForce(v) {   // Settings switch and the bar's Go online button
+    P.offForce = !!v; savePrefs(); offSyncSwitches(); offEval();
+    if (v) { toast('Downloads only is on.', 2200); return; }
+    if (OFF.on) { toast('No connection yet. Still offline.', 3000); return; }
+    toast('Back online.', 2200);
+    setTimeout(() => { autoPrefetch(true); dlResumePending(false); }, 1500);   // what was held back while Downloads only was on
+  }
+  function offSetAuto(v) { P.offAuto = !!v; savePrefs(); offSyncSwitches(); offSet(); }
   function offApply(on) {
     if (on === OFF.on) { offRefresh(); return; }
     OFF.on = on;
     document.documentElement.toggleAttribute('data-off', on);
-    paintCards();   // dims or restores every tile and card, then offRefresh (banner, order)
-    if (!on) offOrder(true);   // back online: the original order returns
+    if (!on && offQUsed) { offQUsed = false; const q = $('#q'), cb = $('#btn-clear-q'); if (q) q.value = ''; if (cb) cb.hidden = true; }   // the offline search text does not leak into the online home
+    offRecentsRefresh();   // Continue listening: saved books only while offline
+    paintCards();   // hides or restores every tile and card, then offRefresh (banner, rows, notes)
+    markTracks();   // the chapter list (if open): lock / "On device" rows and the banner, or back to normal
+    if (!on) offHide(true);   // back online: everything is shown again
     if (!window.MutationObserver) return;
-    if (!offMo) offMo = new MutationObserver(() => { clearTimeout(offTimer); offTimer = setTimeout(offOrder, 150); });   // rows and lists drawn while offline get ordered too
+    if (!offMo) offMo = new MutationObserver(() => { clearTimeout(offTimer); offTimer = setTimeout(offHide, 60); });   // rows and lists drawn while offline get filtered too
     offMo.disconnect();
-    if (on) ['#home', '#shelf'].forEach(s => { const n = $(s); if (n) offMo.observe(n, { childList: true, subtree: true }); });
+    if (on) OFF_VIEWS.forEach(s => { const n = $(s); if (n) offMo.observe(n, { childList: true, subtree: true }); });
   }
   function offInit() {
     window.addEventListener('offline', offSet); window.addEventListener('online', offSet);
     document.addEventListener('click', e => {   // capture phase: runs before the tile's own handler
       if (!OFF.on || !e.target.closest) return;
-      const n = e.target.closest('.tile.off-dim, .card.off-dim'); if (!n) return;
+      const n = e.target.closest('.tile.off-hide, .card.off-hide'); if (!n) return;
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      toast("You're offline and this book is not downloaded.", 3500);
+      toast(offMsg(), 3500);
     }, true);
-    Promise.resolve(dlReady).then(() => { OFF.ready = true; offRefresh(); });
+    const bar = $('#offbar'); if (bar) bar.addEventListener('click', e => { if (e.target.closest && e.target.closest('.offbar-go')) offSetForce(false); });
+    offSyncSwitches(); offSearchInit();
+    Promise.resolve(dlReady).then(() => { OFF.ready = true; offRecentsRefresh(); offRefresh(); });
     offSet();   // the page may open while offline
   }
   function initAutoPrefetch() {
-    offInit();
+    offInit(); offGoInit();
     audio.addEventListener('playing', () => autoPrefetch(false));
     window.addEventListener('online', () => { autoPrefetch(true); setTimeout(() => dlResumePending(false), 1500); });
     setTimeout(() => dlResumePending(false), 2500);   // a download cut short last time carries on
@@ -284,6 +443,7 @@
   }
 
   let trackRows = [];
+  const TRK_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   function trackState(i) {
     const b = S.book;
     const t = DL.id === String(b.id) ? DL.st[i] : null;
@@ -297,6 +457,26 @@
     const r = trackRows[i];
     if (!r || !S.book) return;
     const t = trackState(i), sec = S.secs[i];
+    const offRow = OFF.on && t.state !== 'busy';   // offline: a saved track shows the download mark + "On device", the others a lock + "Needs internet" (display only)
+    if (r.row) {
+      const lock = offRow && t.state !== 'done';
+      r.row.classList.toggle('off-lock', lock);
+      if (lock) r.row.setAttribute('aria-disabled', 'true'); else r.row.removeAttribute('aria-disabled');
+    }
+    if (offRow) {
+      const kind = t.state === 'done' ? 'offok' : 'offlock';
+      r.tp.hidden = true; r.bar.style.width = '0%';
+      r.stat.className = 'ds off-st ' + (kind === 'offok' ? 'ok' : 'lock');
+      if (r.stat.dataset.ic !== kind) {
+        r.stat.dataset.ic = kind; r.stat.textContent = '';
+        const ic = h('span', { class: kind === 'offok' ? 'dlmark' : 'trk-lock', 'aria-hidden': 'true' });
+        if (kind === 'offok') ic.dataset.s = 'full';
+        ic.innerHTML = kind === 'offok' ? DLM_FULL : TRK_LOCK;   // DLM_FULL: the shared download mark (120)
+        r.stat.append(ic, h('span', {}, kind === 'offok' ? 'On device' : 'Needs internet'));
+      }
+      ['role', 'tabindex', 'aria-label', 'title'].forEach(a => r.stat.removeAttribute(a));
+      return;
+    }
     let txt = '', cls = 'ds', pct = 0, icon = false, lab = '';
     if (t.state === 'busy') {
       pct = t.total ? t.got / t.total : Math.min(0.98, t.got / ((sec.dur || 1) * 16000));
@@ -441,18 +621,55 @@
     S.secs.forEach((s, i) => {
       const bar = h('i'), tp = h('span', { class: 'tp', hidden: true }, bar), stat = h('span', { class: 'ds' });
       const lbar = h('i'), lp = h('span', { class: 'lp', hidden: true }, lbar), nEl = h('span', { class: 'n' }, String(i + 1));
-      list.append(h('button', { class: 'track', type: 'button', 'aria-current': i === S.sec ? 'true' : false, onclick: () => { closeSheets(); goTrack(i, 0, true); } },
+      const row = h('button', { class: 'track', type: 'button', 'aria-current': i === S.sec ? 'true' : false, onclick: () => {
+        if (OFF.on && !offTrackOn(S.book, i)) { toast('This chapter is not on this device. It needs internet.', 3200); return; }   // the sheet stays open
+        closeSheets(); goTrack(i, 0, true);
+      } },
         nEl,
         h('span', { class: 'tt' }, s.title, showReader && rdName(s) ? h('small', {}, rdName(s)) : null, lp, tp),
-        h('span', { class: 'dcol' }, h('span', { class: 'd' }, fmt(S.durs[i])), stat)));
-      const go = e => { e.stopPropagation(); e.preventDefault(); trackDlToggle(i); };
+        h('span', { class: 'dcol' }, h('span', { class: 'd' }, fmt(S.durs[i])), stat));
+      list.append(row);
+      const go = e => { if (OFF.on) return; e.stopPropagation(); e.preventDefault(); trackDlToggle(i); };   // offline the mark is display only: the tap goes to the row
       stat.addEventListener('click', go);
       stat.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(e); });
-      trackRows[i] = { bar, tp, stat, lbar, lp, n: nEl };
+      trackRows[i] = { bar, tp, stat, lbar, lp, n: nEl, row };
       paintTrack(i); lpPaint(i);
     });
-    paintDl();
+    paintDl(); trkOffPaint();
     trackJumpInit(list);
+  }
+  function trkOffPaint() {   // offline and only some chapters saved: the banner "3 of 10 chapters are on this device. ..." (the Download book box is hidden then)
+    const box = $('#trk-off'), bar = $('#dl-bar'), b = S.book; if (!box) return;
+    const n = b ? b.secs.length : 0, have = b ? b.secs.filter((x, i) => isLocal(b.id, i, x.url)).length : 0;
+    const show = !!(OFF.on && b && have > 0 && have < n);
+    box.hidden = !show; if (bar) bar.hidden = show;
+    if (!show) return;
+    const t = have + ' of ' + n + ' chapters';
+    if (box.firstElementChild.textContent !== t) box.firstElementChild.textContent = t;
+  }
+  /* Offline, next / previous / auto-advance step over chapters that are not on this device. goTrack lives in 150 and is called by the buttons, the end of a
+     track, the lock screen and the chapter list, so it is wrapped once here: a missing next/previous chapter (S.sec +- 1) goes to the nearest saved one in that
+     direction, or stops with a message; any other jump to a missing chapter only shows the message. Online it passes straight through. */
+  function offGoInit() {
+    let g0; try { g0 = goTrack; } catch (e) { return; }
+    if (typeof g0 !== 'function' || g0._offWrap) return;
+    const g1 = function (i, ...rest) {
+      const b = S.book;
+      if (OFF.on && b && b.secs[i] && !offTrackOn(b, i)) {
+        const d = i - S.sec;
+        if (d === 1 || d === -1) {
+          const j = offNearSaved(b, i, d);
+          if (j >= 0) return g0.call(this, j, 0, ...rest.slice(1));
+          toast(d > 0 ? 'That was the last chapter on this device. The rest need internet.' : 'There are no earlier chapters on this device.', 4200);
+          return;
+        }
+        toast('This chapter is not on this device. It needs internet.', 3200);
+        return;
+      }
+      return g0.call(this, i, ...rest);
+    };
+    g1._offWrap = true;
+    try { goTrack = g1; } catch (e) { /* goTrack cannot be reassigned here: skipping stays off */ }
   }
   function trackJumpInit(list) {   // the floating "Current track" button
     const body = $('#sheet-tracks .body'); if (!body) return;

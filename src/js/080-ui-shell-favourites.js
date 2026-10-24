@@ -117,9 +117,10 @@
   }
   let shelfMode = 'saved';
   function applyShelfMode() {
-    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-ra').hidden = shelfMode !== 'ra';
+    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
+    $('#shelf').dataset.mode = shelfMode;
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
-    if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else renderShelf();
+    if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function showTab(t, keep) {
     if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; }

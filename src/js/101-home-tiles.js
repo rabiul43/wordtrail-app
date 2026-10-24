@@ -16,23 +16,22 @@
       dlBadge
     );
     tile._wtId = b.id;
-    tile._wtTileDl = dlBadge; tile._wtTileLvl = lvBadge; tile._wtRate = rateBadge; tile._wtLabel = b.title + (b.authors ? ', ' + b.authors : '');
+    tile._wtCv = cov; tile._wtTileDl = dlBadge; tile._wtTileLvl = lvBadge; tile._wtRate = rateBadge; tile._wtLabel = b.title + (b.authors ? ', ' + b.authors : '');
     if (b.id) paintTileBadge(tile);
     return tile;
   }
 
-  /* Tiles stay quiet: the only badge that earns a place is "Available offline". */
+  /* Tiles stay quiet: the only badge that earns a place is the download mark on the cover (dlMarkPaint in 120). */
   function paintTileBadge(tile) {
     if (!tile._wtTileDl) return;
     offDim(tile);
-    const d = dlBadgeText(tile._wtId);
-    tile._wtTileDl.textContent = d; tile._wtTileDl.classList.toggle('full', /^✓/.test(d));
-    tile._wtTileDl.hidden = !d;
+    dlMarkPaint(tile._wtCv, tile._wtId);   // the text pill is gone: the mark sits on the cover, its words go into the aria-label below
+    const dl = dlLabel(tile._wtId);
     if (tile._wtRate) { const rt = rtChipText(tile._wtId); tile._wtRate.textContent = rt; tile._wtRate.hidden = !rt; }
     const lb = tile._wtTileLvl; if (!lb) return;
     const v = LVL.map.get(String(tile._wtId)), t = v ? (LVL.tiers[v[0]] || '') : '', c = v && LVL.cefr[v[1]];
     lb.textContent = t ? t + (c ? ' \u00b7 ' + c[0] : '') : ''; lb.hidden = !t; lb.dataset.t = t ? v[0] : '';
-    tile.setAttribute('aria-label', tile._wtLabel + (t ? '. Reading level: ' + t + (c ? ', CEFR ' + c[0] : '') : '') + (rtSpeak(tile._wtId) ? '. ' + rtSpeak(tile._wtId) : ''));
+    tile.setAttribute('aria-label', tile._wtLabel + (dl ? '. ' + dl : '') + (t ? '. Reading level: ' + t + (c ? ', CEFR ' + c[0] : '') : '') + (rtSpeak(tile._wtId) ? '. ' + rtSpeak(tile._wtId) : ''));
   }
   function paintTiles() {
     $$('.tile').forEach(t => { if (t._wtId && t._wtTileDl) paintTileBadge(t); });

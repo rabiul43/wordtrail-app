@@ -477,14 +477,99 @@ button, [role="button"], .tile, .card, .synced-row { -webkit-tap-highlight-color
 .hlp button.hlp-x { background: var(--accent); color: var(--accent-ink); }
 @media (prefers-reduced-motion: no-preference) { .hlp:not([hidden]) { animation: pop var(--dur) var(--ease); } }
 
-/* ---------- Offline mode: thin banner, dimmed books that are not on this device ---------- */
-.offbar { position: sticky; top: 0; z-index: 30; box-sizing: border-box; min-height: calc(1.75rem + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) .75rem 0; display: flex; align-items: center; justify-content: center; background: var(--ink); color: var(--bg); font: 600 .78rem/1.2 var(--font-ui); text-align: center; }
+/* ---------- Offline mode: thin strip under the tab bar (like YouTube), dimmed books that are not on this device ---------- */
+/* html[data-off] = offline mode is on (logic). html[data-offbar] = the strip is on screen (layout), also during the 2 s "Back online". */
+.offbar { position: fixed; z-index: 11; left: 0; right: 0; bottom: 0; box-sizing: border-box; min-height: calc(1.9rem + env(safe-area-inset-bottom, 0px)); padding: 0 .75rem env(safe-area-inset-bottom, 0px); display: flex; align-items: center; justify-content: center; gap: .5rem; background: var(--surface-2); color: var(--ink); border-top: 1px solid var(--line); font: 600 .78rem/1.2 var(--font-ui); text-align: center; transform: translateY(100%); transition: transform .22s var(--ease), background-color .22s var(--ease); }
 .offbar[hidden] { display: none; }
-html[data-off] .home { padding-top: .9rem; }
-html[data-off] .topbar { padding-top: .5rem; }
-html[data-off] .player { height: calc(100dvh - var(--offbar-h, 0px)); }
-.tile.off-dim, .card.off-dim { opacity: .45; cursor: not-allowed; }
-.tile.off-dim .tile-cover, .card.off-dim .cover { filter: grayscale(.7); }
+.offbar.show { transform: none; }
+.offbar::before { content: ""; flex: none; width: .45rem; height: .45rem; border-radius: 50%; background: var(--accent); }
+.offbar.back { background: #1D5A43; color: #E1F5EE; border-top-color: transparent; }
+.offbar.back::before { content: none; }
+html[data-offbar] .player { height: calc(100dvh - var(--offbar-h, 0px)); }
+html[data-offbar] .nr { bottom: var(--offbar-h, 0px); }
+html[data-offbar] .tabbar { bottom: var(--offbar-h, 0px); padding-bottom: .35rem; }   /* the strip below takes the safe-area inset */
+html[data-offbar] .home { padding-bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + var(--offbar-h, 0px) + 1.5rem); }
+html[data-offbar] .mini { bottom: calc(var(--tabbar-h, 4.2rem) + var(--offbar-h, 0px) + .4rem); }
+html[data-offbar] .toast { bottom: calc(var(--dock-h, 0px) + var(--offbar-h, 0px) + .8rem + env(safe-area-inset-bottom)); }
+html[data-offbar] body:has(#tabbar:not([hidden])) .toast { bottom: calc(var(--tabbar-h, 4.2rem) + var(--offbar-h, 0px) + .5rem); }
+html[data-offbar] body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(9.5rem + var(--offbar-h, 0px) + env(safe-area-inset-bottom)); }
+html[data-offbar] .trpop { bottom: calc(var(--dock-h, 0px) + var(--offbar-h, 0px) + .8rem + env(safe-area-inset-bottom)); }
+@media (min-width: 46rem) { .offbar { left: 50%; right: auto; width: min(100%, 46rem); transform: translate(-50%, 100%); border-radius: var(--r-card) var(--r-card) 0 0; } .offbar.show { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .offbar { transition: none; } }
+/* Downloads only (Settings > Storage > Offline): gold strip with a Go online button, and the two switches */
+.offbar span { min-width: 0; }
+.offbar.forced { justify-content: space-between; gap: .75rem; min-height: calc(2.6rem + env(safe-area-inset-bottom, 0px)); background: var(--accent); color: var(--accent-ink); font-size: .9rem; border-top-color: transparent; }
+.offbar.forced::before { content: none; }
+.offbar-go { position: relative; flex: none; min-height: 1.9rem; padding: 0 .9rem; border: 1.5px solid currentColor; border-radius: 999px; background: transparent; color: inherit; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.offbar-go::before { content: ""; position: absolute; inset: -.45rem -.3rem; }   /* 44px touch target */
+.offbar-go:focus-visible { outline: var(--focus-w, 2px) solid currentColor; outline-offset: 2px; }
+.off-row { padding: .7rem 0; flex-wrap: nowrap; }
+.off-row + .off-row { border-top: 1px solid var(--line); }
+.off-txt { flex: 1; min-width: 0; }
+.off-t { font-weight: 600; }
+.off-txt small { display: block; margin-top: .15rem; color: var(--muted); }
+.off-sw { position: relative; flex: none; width: 2.9rem; height: 1.6rem; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); cursor: pointer; transition: background-color .18s, border-color .18s; -webkit-tap-highlight-color: transparent; }
+.off-sw::before { content: ""; position: absolute; inset: -.6rem -.3rem; }   /* 44px touch target around the small switch */
+.off-sw::after { content: ""; position: absolute; top: 50%; left: .2rem; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--ink); transform: translateY(-50%); transition: left .18s, background-color .18s; }
+.off-sw[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.off-sw[aria-checked="true"]::after { left: calc(100% - 1.3rem); background: var(--accent-ink); }
+.off-sw:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
+@media (prefers-reduced-motion: reduce) { .off-sw, .off-sw::after { transition: none; } }
+/* Download mark on covers (dlMarkPaint in 120): gold circle with a check = downloaded; dark circle with a ring and an arrow = partly or downloading */
+.dlmark { position: absolute; left: .4rem; bottom: .4rem; z-index: 2; box-sizing: border-box; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: rgba(15, 17, 32, .86); color: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .35); pointer-events: none; }
+.dlmark svg { display: block; width: 100%; height: 100%; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.dlmark .mk { stroke: currentColor; stroke-width: 2.4; }
+.dlmark .rg-bg, .dlmark .rg-fg { stroke-width: 2.4; }
+.dlmark .rg-bg { stroke: rgba(255, 255, 255, .3); }
+.dlmark .rg-fg { stroke: var(--accent-hi, #f0c466); transition: stroke-dasharray .3s; }
+.dlmark[data-s="part"] .rg-fg, .dlmark[data-s="run"] .rg-fg { stroke: #e9b84f; }
+.dlmark svg:has(.rg-bg) { padding: 3px; box-sizing: border-box; overflow: visible; }
+.dlmark[data-s="full"] { background: var(--accent); color: var(--accent-ink); }
+.dlmark[data-s="full"] svg { padding: 3px; box-sizing: border-box; }
+.dlmark[data-s="run"] { animation: dlmark-pulse 1.6s ease-in-out infinite; }
+@keyframes dlmark-pulse { 50% { box-shadow: 0 0 0 3px rgba(233, 184, 79, .35); } }
+@media (prefers-reduced-motion: reduce) { .dlmark[data-s="run"] { animation: none; } .dlmark .rg-fg { transition: none; } }
+.det-cover .dlmark { width: 30px; height: 30px; left: .6rem; bottom: .6rem; }
+.cover .dlmark { left: .3rem; bottom: .3rem; }
+.tile-cover:has(.dlmark) .tile-rate { left: 2.3rem; }
+/* My books > Downloaded */
+.shelf-seg { flex-wrap: wrap; }
+#shelf[data-mode="dl"] > .off-note { display: none; }
+.sd-sum { margin: 0 0 1rem; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--r-card, 16px); background: var(--surface); }
+.sd-k { font-size: .8rem; color: var(--muted); }
+.sd-big { margin: .1rem 0 .55rem; font: 700 2rem/1.1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--accent); }
+.sd-bar { height: .35rem; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.sd-bar[hidden] { display: none; }
+.sd-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.sd-line { display: flex; justify-content: space-between; gap: .75rem; margin-top: .5rem; font-size: .82rem; color: var(--muted); }
+.sd-list { display: flex; flex-direction: column; }
+.sd-row { display: flex; align-items: center; gap: .6rem; padding: .7rem 0; border-top: 1px solid var(--line); }
+.sd-row:first-child { border-top: 0; }
+.sd-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: .85rem; padding: 0; background: transparent; border: 0; text-align: left; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.sd-cover { position: relative; flex: none; width: 56px; height: 80px; border-radius: 10px; overflow: hidden; background: var(--accent-soft); }
+.sd-cover > :first-child { width: 100%; height: 100%; }
+.sd-body { min-width: 0; display: flex; flex-direction: column; gap: .15rem; }
+.sd-t { font: 600 1rem/1.25 var(--font-display); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.sd-a { font-size: .82rem; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.sd-st { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sd-st.full { color: var(--accent); font-weight: 600; }
+.sd-rm { flex: none; min-height: 44px; min-width: 44px; padding: 0 .85rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); font: 600 .85rem var(--font-ui); cursor: pointer; }
+.sd-ic { width: 2.2rem; height: 2.2rem; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.sd-open:focus-visible, .sd-rm:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: 2px; }
+/* Offline home: only what can be played. The online sections stay in the page (their loaders are not touched) and come straight back online. */
+html[data-off] #boot-sk, html[data-off] #home-state, html[data-off] #sec-tod, html[data-off] #sec-botd, html[data-off] #sec-genre, html[data-off] #sec-picks,
+html[data-off] #sec-newweek, html[data-off] #sec-collections, html[data-off] #results, html[data-off] #sfilt, html[data-off] #btn-fpanel, html[data-off] #fchips,
+html[data-off] #rq, html[data-off] #prog { display: none !important; }
+.off-home .home-section-head { align-items: center; }
+.off-count { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.off-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem .8rem; }
+.off-grid[hidden] { display: none; }
+.off-grid .tile { width: auto; min-width: 0; }
+.off-none .ic { width: 2.2rem; height: 2.2rem; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.off-none p { margin: 0; max-width: 20rem; color: var(--muted); }
+.off-hide, .off-empty { display: none !important; }   /* offline: books that are not on this device, and rows and sections left with none */
+.off-note { margin: .2rem 1rem .6rem; font-size: .8rem; color: var(--muted); }
+.off-note[hidden] { display: none; }
 .ht-list { gap: .9rem; }
 .ht-list li { font-size: .95rem; grid-template-columns: 2rem 1fr; }
 .ht-sec { margin: 1rem 0 .5rem; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }

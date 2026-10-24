@@ -61,6 +61,13 @@
     if (VER.carry) saved = verApply(saved, b);
     await Promise.race([loadCuts(), new Promise(r => setTimeout(r, 2500))]);
     await dlReady; // which tracks are saved on this device; the first one's blob URL is made before it is needed
+    if (OFF.on && b.secs.length) {   // offline with chapters missing: start at the first saved one at or after the saved position (else the nearest earlier one)
+      const at = Math.min(Math.max(0, saved.sec || 0), b.secs.length - 1);
+      if (!offTrackOn(b, at)) {
+        let j = offNearSaved(b, at, 1); if (j < 0) j = offNearSaved(b, at, -1);
+        if (j >= 0) { saved = Object.assign({}, saved, { sec: j, time: 0 }); toast('Chapter ' + (at + 1) + ' is not on this device. Starting at chapter ' + (j + 1) + '.', 4500); }
+      }
+    }
     const first = Math.min(Math.max(0, saved.sec || 0), b.secs.length - 1);
     if (isLocal(b.id, first, b.secs[first].url)) await warmUrl(b.id, first);
     OP.home = false; progress(false); setStatus('');
