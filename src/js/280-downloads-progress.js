@@ -332,8 +332,33 @@
     if (forced) { const g = document.createElement('button'); g.type = 'button'; g.className = 'offbar-go'; g.textContent = 'Go online'; bar.append(g); }
     bar.classList.toggle('forced', forced);
   }
+  /* Offline prompt: when the connection is lost while browsing (anywhere except the reader), a card offers "Go to Downloads".
+     "No thanks" keeps it away until the connection has been back and gone again. It is never shown in the player, nor for "Downloads only". */
+  let offPromptSkip = false, offPromptT = 0;
+  function offPromptShow(on) {
+    const sh = $('#offsheet'); if (!sh) return;
+    clearTimeout(offPromptT);
+    if (on) {
+      if (!sh.hidden) return;
+      sh.hidden = false; void sh.offsetWidth; sh.classList.add('show');
+    } else if (!sh.hidden) {
+      sh.classList.remove('show');
+      offPromptT = setTimeout(() => { sh.hidden = true; }, 280);
+    }
+  }
+  function offPromptSync() {
+    if (!OFF.on || offForced()) { offPromptSkip = false; offPromptShow(false); return; }   // online again, or chosen by hand
+    offPromptShow(el.player.hidden && !offPromptSkip);   // el.player.hidden = outside the reader
+  }
+  function offPromptInit() {
+    const sh = $('#offsheet'); if (!sh) return;
+    $('.offsheet-no', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); });
+    $('.offsheet-go', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); shelfMode = 'dl'; showTab('shelf'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sh.hidden && sh.classList.contains('show')) { offPromptSkip = true; offPromptShow(false); } });
+  }
   function offRefresh() {
     const bar = $('#offbar'); if (!bar) return;
+    offPromptSync();
     if (OFF.on) {
       clearTimeout(offBackT);
       const forced = offForced();
@@ -408,7 +433,7 @@
       toast(offMsg(), 3500);
     }, true);
     const bar = $('#offbar'); if (bar) bar.addEventListener('click', e => { if (e.target.closest && e.target.closest('.offbar-go')) offSetForce(false); });
-    offSyncSwitches(); offSearchInit();
+    offSyncSwitches(); offSearchInit(); offPromptInit();
     Promise.resolve(dlReady).then(() => { OFF.ready = true; offRecentsRefresh(); offRefresh(); });
     offSet();   // the page may open while offline
   }

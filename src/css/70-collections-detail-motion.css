@@ -754,3 +754,18 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .fol-new { flex: none; background: var(--accent); color: var(--accent-ink); font: 600 var(--label) var(--font-ui); padding: .15rem .55rem; border-radius: var(--r-pill); }
 .fol-un { flex: none; min-height: 2.75rem; padding: 0 .85rem; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: var(--r-pill); font: 600 var(--small) var(--font-ui); cursor: pointer; }
 .tile-new { position: absolute; top: .4rem; right: .4rem; z-index: 1; background: var(--accent); color: var(--accent-ink); font: 700 .72rem/1.2 var(--font-ui); padding: .12rem .55rem; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); }
+
+/* Offline prompt (like YouTube's "You're offline"): a card above the tab bar, shown outside the reader only. Logic: offPrompt* in 280. */
+.offsheet { position: fixed; z-index: 10; left: 50%; width: min(100%, 46rem); box-sizing: border-box; bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + var(--offbar-h, 0px)); display: flex; gap: .85rem; align-items: flex-start; padding: 1rem 1rem 1.05rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--r-card) var(--r-card) 0 0; box-shadow: 0 -8px 28px rgba(0,0,0,.28); transform: translate(-50%, 140%); opacity: 0; transition: transform .26s var(--ease), opacity .2s var(--ease); }
+.offsheet[hidden] { display: none; }
+.offsheet.show { transform: translate(-50%, 0); opacity: 1; }
+.offsheet-ic { flex: none; width: 2.6rem; height: 2.6rem; padding: .6rem; box-sizing: border-box; border-radius: 50%; background: var(--surface); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.offsheet-body { flex: 1; min-width: 0; }
+.offsheet h2 { margin: .1rem 0 .3rem; font: 700 1.05rem/1.25 var(--font-ui); }
+.offsheet p { margin: 0 0 .8rem; font: 400 .92rem/1.4 var(--font-ui); opacity: .82; }
+.offsheet-acts { display: flex; justify-content: flex-end; gap: .6rem; }
+.offsheet-acts button { position: relative; min-height: 2.5rem; padding: 0 1.1rem; border: 0; border-radius: var(--r-pill); font: 600 .92rem/1 var(--font-ui); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.offsheet-no { background: transparent; color: var(--accent); }
+.offsheet-go { background: var(--accent); color: var(--accent-ink); }
+.offsheet-acts button:focus-visible { outline: var(--focus-w, 2px) solid currentColor; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .offsheet { transition: none; } }

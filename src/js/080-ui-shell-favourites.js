@@ -42,6 +42,7 @@
     if (home) window.scrollTo(0, 0);
     wakeSync();
     miniUpdate(home);
+    try { offPromptSync(); } catch (e) { /* offline code not ready yet */ }
     if (v === 'player') paintPlayerHeart();
     histSoon();
   }
