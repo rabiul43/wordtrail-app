@@ -1,6 +1,8 @@
   /* ---------- music-library.js ----------
      Music: music.json (manifest), the clip queue, which clip is next (energy, not repeating), fetching and caching clips. */
-  /* Fetch and cache music.json from the GitHub data repo. `force` skips the 24 hour saved copy (used before an offline download).
+  /* Where music.json and the clips live: Cloudflare Pages (the files are too big for GitHub). Change this one line to move them. */
+  const MUS_HOST = 'https://wordtrail-music.pages.dev/';
+  /* Fetch and cache music.json from MUS_HOST. `force` skips the 24 hour saved copy (used before an offline download).
      When the network fails, an older saved copy is used whatever its age, so music that is already on the device still plays offline. */
   async function musFetchManifest(force) {
     if (MUS_LOCAL) {
@@ -22,7 +24,7 @@
       if (!force && cached && cached.d && Date.now() - cached.t < 24 * 3600e3) {
         MUS.manifest = cached.d; MUS.mfT = cached.t; return;
       }
-      const base = 'https://raw.githubusercontent.com/' + ghCfg().repo + '/main/';
+      const base = MUS_HOST;
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
       const r = await fetch(base + 'music.json', { signal: ctl.signal }); clearTimeout(to);
       if (r.ok) {
@@ -98,7 +100,7 @@
 
   /* Resolve a clip path to an absolute raw GitHub URL. */
   function musClipUrl(f) {
-    return (MUS.base || ('https://raw.githubusercontent.com/' + ghCfg().repo + '/main/')) + 'music/' + f;
+    return (MUS.base || MUS_HOST) + 'music/' + f;
   }
 
   /* Fetch a clip, cache it in the Cache API, decode it. Returns AudioBuffer or null. */
