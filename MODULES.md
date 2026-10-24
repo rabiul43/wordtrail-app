@@ -45,7 +45,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
 | `133-open-progress-saved-state.js` | 226 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
-| `135-ratings.js` | 487 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
+| `135-ratings.js` | 492 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
 | `140-open-book.js` | 720 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries |
 | `150-player-reader.js` | 721 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
 | `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
@@ -62,7 +62,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 487 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 333 | Backup and restore, sync dashboard |
-| `295-account-sync.js` | 480 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
+| `295-account-sync.js` | 485 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 48 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
 | `300-wiring.js` | 741 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
@@ -78,8 +78,8 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
 | `sound/music-bus.js` | 64 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
 | `sound/music-library.js` | 121 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
-| `sound/music-playback.js` | 268 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
-| `sound/music-offline.js` | 131 | Music: "Download music for offline" |
+| `sound/music-playback.js` | 271 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
+| `sound/music-offline.js` | 136 | Music: "Download music for offline" |
 | `sound/music-wiring.js` | 78 | Music: engine health, the Music switch, first-time hint, quick controls, `musicInit` |
 | `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |
 | `sound/ambient-scenes.js` | 77 | Ambient: `AMB` state, `AMB_SOUNDS` (the list of sounds), groups, scenes and rules from `amb-map.json`, book suggestion, scene cards |
@@ -96,10 +96,10 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/story-engine.js` | 66 | Story sounds: categories, finding trigger words, playing them on the audio's own clock |
 | `sound/story-transitions.js` | 65 | Story sounds: door, gate and footstep sounds when the place changes |
 | `sound/ambient-intensity.js` | 32 | Ambient: intensity, the levels really played (`ambLive`), night and time of day |
-| `sound/sound-presets.js` | 62 | Sound screen: hear a sound, quick presets and undo |
-| `sound/sound-core.js` | 24 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
+| `sound/sound-presets.js` | 81 | Sound screen: hear a sound, quick presets and undo |
+| `sound/sound-core.js` | 39 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
-| `sound/sound-screen.js` | 150 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
+| `sound/sound-screen.js` | 164 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
 
 ## CSS files (`src/css/`)

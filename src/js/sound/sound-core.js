@@ -10,17 +10,25 @@
     const o = $('#snd-vpct'); if (o) o.textContent = v + '%';
     const i = $('#snd-vic'); if (i) i.classList.toggle('mute', v === 0);
   }
+  function musVolPaint() {   // music volume: same look as the master volume (filled track, % readout, mute icon)
+    const r = $('#mus-vol'); if (!r) return;
+    const v = Math.max(0, Math.min(100, +r.value || 0));
+    r.style.setProperty('--fill', v + '%');
+    const o = $('#mus-vpct'); if (o) o.textContent = v + '%';
+    const i = $('#mus-vic'); if (i) i.classList.toggle('mute', v === 0);
+  }
   function sndPaint() {   // show the saved settings in the controls that live on the Sound screen
     const set = (id, fn) => { const e = $(id); if (e) fn(e); };
     set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); sndVolPaint(); });
     set('#in-ambon', e => { e.checked = P.ambOn === true; });
     set('#in-muson', e => { e.checked = P.musOn === true; });
-    set('#row-musduck', e => { e.hidden = P.musOn !== true; }); set('#row-musdip', e => { e.hidden = P.musOn !== true; });
     $$('#seg-musdip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (MUS_DIP[P.musDip] ? P.musDip : 'normal'))));
-    set('#mus-vol', e => { e.value = String(P.musVol == null ? 40 : P.musVol); }); set('#in-musduck', e => { e.checked = P.musDuck !== false; });
+    set('#mus-vol', e => { e.value = String(P.musVol == null ? 40 : P.musVol); musVolPaint(); }); set('#in-musduck', e => { e.checked = P.musDuck !== false; });
     set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });
+    set('#snd-duckkids', e => { const on = P.ambDuck !== false || P.musDuck !== false; e.toggleAttribute('data-off', !on); e.querySelectorAll('input,button').forEach(x => { x.disabled = !on && x.id !== 'amb-duck' && x.id !== 'in-musduck' ? true : false; }); });
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
     set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); });
+    set('#amb-dev', e => { e.hidden = P.sndDev !== true; });
     sndNowPaint(); sndTabsPaint(); musOffPaint();
   }
   function sndApplyAll() {   // after the master switch, the master volume or a preset: make every layer follow the saved settings

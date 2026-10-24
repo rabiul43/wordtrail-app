@@ -25,6 +25,7 @@
       const est = $('#mus-off-est'), have = $('#mus-off-have'), go = $('#mus-off-go'), cancel = $('#mus-off-cancel'), clr = $('#mus-off-clear'), when = $('#mus-off-when');
       cancel.hidden = !MUS.dl; go.disabled = !!MUS.dl;
       if (!MUS.manifest) {
+        const sm0 = $('#mus-off-sum'); if (sm0 && !again) sm0.textContent = 'Loading\u2026';
         box.textContent = ''; box.dataset.sig = ''; have.textContent = ''; clr.hidden = true; go.disabled = true; when.hidden = true;
         est.textContent = again ? 'The music list could not load. Connect to the internet and try again.' : 'Loading the music list…';
         if (!again && !MUS.offBusy) { MUS.offBusy = true; musFetchManifest().then(() => { MUS.offBusy = false; musOffPaint(true); }); }
@@ -53,6 +54,10 @@
         go.disabled = !!MUS.dl || over || !todo.length;
         have.textContent = k.n ? 'Saved on this device: ' + k.n + ' of ' + k.total + (k.total === 1 ? ' clip' : ' clips') + ' (' + musMB(k.bytes) + ' MB)' : '';
         clr.hidden = !k.n || !!MUS.dl;
+        const sm = $('#mus-off-sum'); if (sm) {   // the one-line status on the Offline music row
+          const keepNow = sndKeepSet(), full = moods.filter(m => { const c = musOffClips([m]); return c.length && c.every(x => keepNow.has(new Request(musClipUrl(x.f)).url)); }).length;
+          sm.textContent = k.n ? full + (full === 1 ? ' mood saved' : ' moods saved') + ' \u00b7 ' + musMB(k.bytes) + ' MB' : 'Not saved yet';
+        }
       }).catch(() => { /* the numbers are a help only */ });
     } catch (err) { /* the offline panel must never break the sound screen */ }
   }

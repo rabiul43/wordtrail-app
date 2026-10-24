@@ -25,35 +25,40 @@
         <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
         <h3 class="amb-h">Choose a scene</h3>
         <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
+        <div id="amb-prev" class="amb-prev" role="status" aria-live="polite" hidden><span class="amb-prev-t"><strong><span>Previewing:</span> <span id="amb-prev-n"></span></strong><small id="amb-prev-s"></small></span><button id="amb-prev-use" class="btn small" type="button">Use this</button></div>
+        <label class="amb-opt"><input type="checkbox" id="amb-auto"> Follow the story</label>
+        <p class="help amb-note" id="amb-auto-st" aria-live="polite">Listening for the next scene. Between scenes your own mix plays.</p>
         <p class="help amb-note">Made on your device, so it works offline.</p>
         <details class="amb-more"><summary>When does it play?</summary><p class="help amb-note">Sounds start when the book plays and fade out when it pauses or the sleep timer ends.</p></details>
       </div>
 
       <div class="snd-panel" id="snd-p-mus" role="tabpanel" aria-labelledby="snd-t-mus" hidden>
-        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-muson">Background music</label><small>Instrumental music that matches the mood of the story</small></div><input type="checkbox" id="in-muson" class="snd-sw" role="switch"></div>
-        <div class="amb-row snd-vrow" id="row-musvol"><label for="mus-vol">Music volume</label><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume"></div>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-muson">Background music</label><small>Matches the mood of the story. Always quiet under the voice.</small></div><input type="checkbox" id="in-muson" class="snd-sw" role="switch"></div>
+        <div class="snd-mv snd-vrow" id="row-musvol"><span class="snd-vic" id="mus-vic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="snd-vw" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="snd-vx" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></span><input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Background music volume"><output id="mus-vpct" for="mus-vol" aria-hidden="true">40%</output></div>
         <p class="help amb-note" id="mus-warn" role="status" aria-live="polite" hidden></p>
-        <p class="help amb-note">The music changes with the mood of the story and crossfades between moods. It always plays quietly under the narrator's voice.</p>
-        <h3 class="amb-h">Offline music</h3>
-        <p class="help amb-note">Save music on this device so it plays without a connection.</p>
-        <details class="amb-more"><summary>Choose moods</summary><div class="amb-sub" id="mus-off-moods" role="group" aria-label="Moods to save"></div></details>
-        <p class="help amb-note" id="mus-off-est"></p>
-        <div class="amb-fixrow"><button id="mus-off-go" class="btn small" type="button">Download music for offline</button><button id="mus-off-cancel" class="btn small ghost" type="button" hidden>Cancel</button><button id="mus-off-clear" class="btn small ghost" type="button" hidden>Remove saved music</button></div>
-        <p class="help amb-note" id="mus-off-msg" role="status" aria-live="polite"></p>
-        <p class="help amb-note" id="mus-off-have"></p>
-        <p class="help amb-note" id="mus-off-when" hidden><span>Music list updated</span> <span id="mus-off-date"></span></p>
+        <details class="snd-offrow" id="mus-off-d">
+          <summary><svg class="ic snd-offic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19h14"/></svg><span class="snd-offtx"><strong>Offline music</strong><small id="mus-off-sum">Not saved yet</small></span><svg class="ic snd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></summary>
+          <div class="snd-offbody">
+            <p class="help amb-note">Save music on this device so it plays without a connection.</p>
+            <details class="amb-more"><summary>Choose moods</summary><div class="amb-sub" id="mus-off-moods" role="group" aria-label="Moods to save"></div></details>
+            <p class="help amb-note" id="mus-off-est"></p>
+            <div class="amb-fixrow"><button id="mus-off-go" class="btn small" type="button">Download music for offline</button><button id="mus-off-cancel" class="btn small ghost" type="button" hidden>Cancel</button><button id="mus-off-clear" class="btn small ghost" type="button" hidden>Remove saved music</button></div>
+            <p class="help amb-note" id="mus-off-msg" role="status" aria-live="polite"></p>
+            <p class="help amb-note" id="mus-off-have"></p>
+            <p class="help amb-note" id="mus-off-when" hidden><span>Music list updated</span> <span id="mus-off-date"></span></p>
+          </div>
+        </details>
       </div>
 
       <div class="snd-panel" id="snd-p-open" role="tabpanel" aria-labelledby="snd-t-open" hidden>
-        <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-open">Intro chime</label><small>A short sound when a book starts from the beginning</small></div><input type="checkbox" id="amb-open" class="snd-sw" role="switch"></div>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-open">Intro chime</label><small>A short sound when a book starts from the beginning</small></div><div class="snd-lctl"><button id="amb-open-hear" class="snd-play" type="button" aria-label="Hear the intro chime"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><input type="checkbox" id="amb-open" class="snd-sw" role="switch"></div></div>
         <div class="amb-row snd-vrow" id="row-openvol"><label for="amb-open-vol">Intro chime volume</label><input id="amb-open-vol" type="range" min="0" max="100" step="1" aria-label="Intro chime volume"></div>
         <p class="help amb-note" id="amb-open-note"></p>
-        <div class="amb-fixrow"><button id="amb-open-hear" class="btn small ghost" type="button">Hear the intro chime</button></div>
       </div>
 
       <div class="snd-panel" id="snd-p-story" role="tabpanel" aria-labelledby="snd-t-story" hidden>
         <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-cues">Story sound effects</label><small>A short sound at a word like thunder, a knock or a bell</small></div><input type="checkbox" id="amb-cues" class="snd-sw" role="switch"></div>
-        <div class="snd-lrow snd-sub"><div class="snd-ltxt"><label for="amb-trans">Transition sounds</label><small>A door, gate or footsteps when the story moves somewhere new. Needs "Ambient follows the story". Off in Calm mode.</small></div><input type="checkbox" id="amb-trans" class="snd-sw" role="switch"></div>
+        <div class="snd-lrow snd-sub"><div class="snd-ltxt"><label for="amb-trans">Transition sounds</label><small>A door or footsteps when the story moves somewhere new. Works when "Follow the story" is on. Off in Calm mode.</small></div><input type="checkbox" id="amb-trans" class="snd-sw" role="switch"></div>
         <div class="amb-row"><label for="amb-cshift" id="amb-cshift-l">Sound timing</label><input id="amb-cshift" type="range" min="-10" max="10" step="1" aria-label="Story sound timing: earlier or later"></div>
         <h3 class="amb-h">Kinds of sounds</h3>
         <div class="amb-sub" id="amb-cats">
@@ -77,14 +82,18 @@
     </details>
 
     <details class="snd-adv snd-opts" id="amb-more"><summary>More options</summary>
+      <h3 class="amb-h">Under the narrator</h3>
+      <label class="amb-opt"><input type="checkbox" id="snd-duck"> Lower sounds when the narrator speaks</label>
+      <div class="snd-duckkids" id="snd-duckkids">
+        <div class="seg" id="seg-musdip" role="group" aria-label="How low the sounds go"><button type="button" data-v="subtle" aria-pressed="false">Subtle</button><button type="button" data-v="normal" aria-pressed="false">Normal</button><button type="button" data-v="strong" aria-pressed="false">Strong</button></div>
+        <label class="amb-opt" id="row-musduck"><input type="checkbox" id="in-musduck"> Music</label>
+        <label class="amb-opt" id="row-ambduck"><input type="checkbox" id="amb-duck"> Background sounds</label>
+        <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt to the scene</label>
+      </div>
       <h3 class="amb-h">Playback</h3>
-      <label class="amb-opt"><input type="checkbox" id="snd-duck"> Dip under the narrator</label>
       <label class="amb-opt"><input type="checkbox" id="amb-tod"> Softer at night</label>
       <label class="amb-opt"><input type="checkbox" id="in-scenelabel"> Show scene label</label>
       <p class="help amb-note">The scene label shows what is playing, like "Now: Saloon", on the mini-player. Tap it to open this screen.</p>
-      <h3 class="amb-h">Ambient</h3>
-      <label class="amb-opt"><input type="checkbox" id="amb-auto"> Ambient follows the story</label>
-      <p class="help amb-note" id="amb-auto-st" aria-live="polite">Listening for the next scene. Between scenes your own mix plays.</p>
       <h3 class="amb-h">This book</h3>
       <div class="amb-fixrow" id="amb-fixrow"><button id="amb-wrong" class="btn small ghost" type="button" aria-expanded="false" aria-controls="amb-wrong-pick">Wrong scene?</button><button id="amb-fix-clear" class="btn small ghost" type="button" hidden>Clear corrections for this book</button></div>
       <div id="amb-wrong-pick" class="amb-wrongpick" hidden><p class="help amb-note">What fits this part of the story?</p><div id="amb-wrong-chips" class="amb-scenes" role="group" aria-label="Pick the right scene for this part of the story"></div></div>
@@ -97,17 +106,14 @@
       <div class="amb-row"><label for="amb-int">Calm to full</label><input id="amb-int" type="range" min="0" max="100" step="1" aria-label="Ambient intensity"></div>
       <p class="help amb-note">One slider for the whole scene. Turn it up and the extra details (thunder, creaks, a bell) join the steady sounds.</p>
       <div id="amb-rows" class="amb-rows"></div>
-      <h3 class="amb-h">Dipping</h3>
-      <label class="amb-opt"><input type="checkbox" id="amb-duck"> Dip ambient sounds under the narrator</label>
-      <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt the dip to the scene</label>
-    <div class="row" id="row-musduck" hidden><label for="in-musduck" style="flex:1">Dip music under the narrator<small class="spd-s">Lowers the music while the narrator speaks and lets it back up in the pauses</small></label><input id="in-musduck" type="checkbox"></div>
-    <div class="row" id="row-musdip" hidden style="flex-wrap:wrap"><label style="flex:1 1 8rem">How low it dips under the narrator<small class="spd-s">Applies when the music dips</small></label><div class="seg" id="seg-musdip" role="group" aria-label="How low the music dips"><button type="button" data-v="subtle" aria-pressed="false">Subtle</button><button type="button" data-v="normal" aria-pressed="false">Normal</button><button type="button" data-v="strong" aria-pressed="false">Strong</button></div></div>
       <h3 class="amb-h">Sound source</h3>
     <div class="row" style="flex-wrap:wrap"><label style="flex:1 1 8rem">Sound source<small class="spd-s" id="amb-src-note"></small></label><div class="seg" id="seg-ambsrc"><button data-v="gen">Generated</button><button data-v="hybrid">Hybrid</button><button data-v="rec">Recordings</button></div></div>
+      <div id="amb-dev" hidden>
       <h3 class="amb-h">Developer</h3>
     <div class="row" style="flex-wrap:wrap;gap:.5rem"><label for="amb-rec-k" style="flex:1 1 8rem">Try a real recording<small class="spd-s">Pick a sound, then choose an audio file or paste a link, and the mixer opens so you can hear it</small></label><select id="amb-rec-k" class="num" style="width:auto"></select>
       <div style="flex-basis:100%;display:flex;gap:.5rem;flex-wrap:wrap"><button id="amb-rec-pick" class="btn small ghost" type="button">Choose file</button><button id="amb-rec-url" class="btn small ghost" type="button">Use a link</button><button id="amb-rec-reset" class="btn small ghost" type="button">Remove</button></div>
       <input id="amb-rec-file" type="file" accept="audio/*" hidden><small class="spd-s" id="amb-rec-st" style="flex-basis:100%"></small></div>
+      </div>
       <h3 class="amb-h">Storage</h3>
     <div class="row" style="flex-wrap:wrap;gap:.5rem"><label style="flex:1 1 8rem">Saved sound files<small class="spd-s">Music and opening clips kept on this device. The oldest are removed above 150 MB.</small></label><span class="spd-s" id="snd-cache-size"></span>
       <div style="flex-basis:100%"><button id="snd-cache-clear" class="btn small ghost" type="button">Clear sound cache</button></div></div>

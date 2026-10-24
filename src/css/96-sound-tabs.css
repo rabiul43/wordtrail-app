@@ -78,3 +78,37 @@
 /* Quick controls: four tiles in the top row (Speed, Sleep timer, Sound, Music) */
 .qk-tiles.qk-t4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .qk-t4 .qk-tile { font-size: .8rem; padding-left: .15rem; padding-right: .15rem; }
+
+/* Under the narrator: the dip level and the two layer switches sit under one main switch */
+.snd-duckkids { display: grid; gap: .5rem; padding-left: .8rem; border-left: 2px solid var(--line); margin: .3rem 0 .5rem; }
+.snd-duckkids[data-off] { opacity: .5; }
+.snd-duckkids .seg { justify-self: start; }
+
+/* Music tab: volume row in the master-volume style, and one tappable Offline music row */
+#mus-vic.mute .snd-vx { display: inline; }
+#mus-vic .snd-vx, #mus-vic.mute .snd-vw { display: none; }
+#mus-vic.mute .snd-vx { display: inline; }
+.snd-offrow { border: 1px solid var(--line); border-radius: var(--r-ctl, 12px); background: var(--surface); }
+.snd-offrow > summary { list-style: none; display: flex; align-items: center; gap: .8rem; min-height: 3.4rem; padding: .5rem .8rem; cursor: pointer; }
+.snd-offrow > summary::-webkit-details-marker { display: none; }
+.snd-offrow .ic { flex: none; width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.snd-offtx { flex: 1; min-width: 0; }
+.snd-offtx strong { display: block; font-size: 1rem; }
+.snd-offtx small { display: block; color: var(--muted); font-size: .82rem; }
+.snd-chev { color: var(--muted); transition: transform .15s; }
+.snd-offrow[open] .snd-chev { transform: rotate(90deg); }
+.snd-offbody { display: grid; gap: .6rem; padding: 0 .8rem .8rem; }
+.snd-offrow > summary:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); border-radius: var(--r-ctl, 12px); }
+
+/* Scene preview strip and the round play button beside the Intro chime switch */
+.amb-prev { display: flex; align-items: center; gap: .7rem; padding: .55rem .8rem; border: 1px solid var(--accent); border-radius: var(--r-ctl, 12px); background: var(--accent-soft); }
+.amb-prev[hidden] { display: none; }
+.amb-prev-t { flex: 1; min-width: 0; }
+.amb-prev-t strong { display: block; font-size: .95rem; }
+.amb-prev-t small { display: block; color: var(--muted); font-size: .82rem; }
+.snd-lctl { display: flex; align-items: center; gap: .7rem; flex: none; }
+.snd-play { flex: none; width: 2.4rem; height: 2.4rem; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.snd-play .ic { width: 1.1rem; height: 1.1rem; fill: currentColor; stroke: none; }
+.snd-play:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
+/* four tab labels: at most two lines, even on a 360px phone and in Bengali */
+.snd-tab span { display: block; max-width: 100%; text-align: center; font-size: .78rem; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }

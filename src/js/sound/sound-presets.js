@@ -60,3 +60,22 @@
     AMB.auto = null; AMB.autoId = null; AMB.preset = ''; AMB.undo = null;
     ambSaveMix(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint();
   }
+
+  /* Scene preview: a tap on a scene plays it for about 5 seconds and shows "Use this". Without a confirm the old mix comes back. */
+  function ambScenePaintPrev(sec) { const n = AMB_SCENES.find(x => x.k === AMB.prevK); $('#amb-prev-n').textContent = n ? n.n : ''; $('#amb-prev-s').textContent = 'Playing ' + sec + ' s\u2026'; }
+  function ambScenePreview(k) {
+    if (!AMB_SCENES.some(x => x.k === k)) return;
+    if (!AMB.prevSnap) AMB.prevSnap = { amb: P.amb ? JSON.parse(JSON.stringify(P.amb)) : null, on: P.ambOn };
+    clearInterval(AMB.prevIv); AMB.prevK = k; let left = 5;
+    ambUseScene(k); $('#amb-prev').hidden = false; ambScenePaintPrev(left);
+    AMB.prevIv = setInterval(() => { left--; if (left <= 0) ambSceneRevert(); else ambScenePaintPrev(left); }, 1000);
+  }
+  function ambSceneEnd() { clearInterval(AMB.prevIv); AMB.prevIv = 0; AMB.prevSnap = null; AMB.prevK = ''; const b = $('#amb-prev'); if (b) b.hidden = true; }
+  function ambSceneKeep() { if (!AMB.prevSnap) return; ambSceneEnd(); toast('Scene saved.'); }
+  function ambSceneRevert() {   // the time is up (or the screen closed) and nobody tapped "Use this": put the old mix back
+    const sn = AMB.prevSnap; ambSceneEnd(); if (!sn) return;
+    if (sn.amb) P.amb = sn.amb; else delete P.amb;
+    P.ambOn = sn.on; const c = $('#in-ambon'); if (c) c.checked = P.ambOn === true;
+    savePrefs(); const L = ambLevels(); AMB_SOUNDS.forEach(([n]) => { const e = $('#amb-' + n); if (e) e.value = String(L[n] || 0); });
+    ambSaveMix(); ambApply(0.9); ambSync(); ambMatchScene(); sndPaint();
+  }
