@@ -74,9 +74,9 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/sound-cache.js` | 59 | 15 | 9 | 2 |
 | `sound/sound-screen.js` | 164 | 13 | 5 | 72 |
 | `sound/sound-tabs.js` | 47 | 4 | 3 | 1 |
-| `246-controls-search.js` | 45 | 4 | 0 | 3 |
+| `246-controls-search.js` | 69 | 4 | 0 | 4 |
 | `250-characters.js` | 501 | 37 | 7 | 13 |
-| `260-audio-effects.js` | 370 | 41 | 9 | 46 |
+| `260-audio-effects.js` | 367 | 41 | 9 | 46 |
 | `270-sheets-nextup-back.js` | 276 | 31 | 11 | 42 |
 | `280-downloads-progress.js` | 487 | 52 | 18 | 33 |
 | `290-backup-maintenance.js` | 337 | 34 | 13 | 33 |
@@ -90,7 +90,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `090-synced-stats-book-search.js` (`stDirty`, `stLoad`, `stSave`, `stSummary`); `102-home-sections.js` (`plural`); `120-search-recommendations.js` (`paintCards`); `140-open-book.js` (`updateHeader`); `150-player-reader.js` (`loadAudio`, `pre`); `280-downloads-progress.js` (`dqClear`, `dqGet`, `fmtMB`, `paintDl`, `renderTracks`); `300-wiring.js` (`init`)
 
-**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (280), `PROXY` (133, 280), `adb` (280), `buzz` (9 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090), `dmMB` (090, 280), `dmRender` (290), `dmSize` (090), `dmUsedPct` (280), `fmt` (150, 260, 280, 300), `fmtLong` (7 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offHave` (280), `reduceMotion` (090, 150, 246), `savePrefs` (18 files), `srcSeq` (150), `store` (34 files), `storeHook` (295), `warmUrl` (050, 140, 150)
+**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (280), `PROXY` (133, 280), `adb` (280), `buzz` (10 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090), `dmMB` (090, 280), `dmRender` (290), `dmSize` (090), `dmUsedPct` (280), `fmt` (150, 260, 280, 300), `fmtLong` (7 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offHave` (280), `reduceMotion` (090, 150, 246), `savePrefs` (18 files), `srcSeq` (150), `store` (34 files), `storeHook` (295), `warmUrl` (050, 140, 150)
 
 ### `040-worker-newreader.js`
 
@@ -460,7 +460,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `246-controls-search.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`reduceMotion`); `150-player-reader.js` (`focusOf`, `scrollGlide`)
+**Needs:** `030-helpers-offline-audio.js` (`buzz`, `reduceMotion`); `150-player-reader.js` (`focusOf`, `scrollGlide`)
 
 **Shared:** nothing; every name here is private to the file.
 

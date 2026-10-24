@@ -20,6 +20,12 @@
     <input id="qk-q" type="search" placeholder="Search controls: sleep, font, translate" autocomplete="off" enterkeyhint="search">
     <button id="qk-q-clear" class="ib" type="button" aria-label="Clear search" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div></div>
+  <nav class="qk-nav" id="qk-nav" aria-label="Controls sections">
+    <button type="button" class="qk-nb" data-g="qg-listen" aria-current="true">Listen</button>
+    <button type="button" class="qk-nb" data-g="qg-read">Read</button>
+    <button type="button" class="qk-nb" data-g="qg-book">Book</button>
+    <button type="button" class="qk-nb" data-g="qg-fix">Fix</button>
+  </nav>
   <div class="body">
     <p id="qk-nomatch" class="help" role="status" aria-live="polite" hidden>No control matches that. Try &ldquo;speed&rdquo; or &ldquo;font&rdquo;.</p>
     <section class="qk-grp" aria-labelledby="qg-listen">
@@ -37,7 +43,7 @@
         <div class="slp-end" id="spd-end"></div>
         <div class="slp-ctl"><button id="spd-dec" class="slp-step" type="button" aria-label="Slower">&minus;</button><input id="qk-range" class="slp-range" type="range" min="0" max="50" step="1" value="10" aria-label="Playback speed"><button id="spd-inc" class="slp-step" type="button" aria-label="Faster">+</button></div>
         <div class="slp-ends spd-ends"><span data-idx="0" role="button" tabindex="0">0.5x</span><span data-idx="10" role="button" tabindex="0">1x</span><span data-idx="20" role="button" tabindex="0">1.5x</span><span data-idx="30" role="button" tabindex="0">2x</span><span data-idx="50" role="button" tabindex="0">3x</span></div>
-        <button id="qk-speed-go" class="btn slp-go" type="button">Apply</button>
+        <button id="qk-speed-go" class="btn ghost slp-go" type="button">Done</button>
       </div>
     </div>
     <div id="qk-o-sleep" class="qk-opt" data-for="sleep" hidden>
@@ -60,7 +66,6 @@
       <label class="amb-opt"><input type="checkbox" id="qk-mus-on"> Music on</label>
       <input id="qk-mus-vol" class="spd-range" type="range" min="0" max="100" step="1" aria-label="Music volume">
     </div>
-    <button id="qk-hint" class="qk-hint" type="button" aria-controls="qg-read">&#8597; Swipe up for Read &middot; Book &middot; Fix</button>
     </section>
     <section class="qk-grp" aria-labelledby="qg-read">
       <h3 id="qg-read">Read</h3>
@@ -89,6 +94,7 @@
         <button id="b-chars" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="mr-main"><span class="mr-t">Characters</span><span class="mr-d" id="b-chars-d">Who is who, with where each one first appears</span></span></button>
         <button id="b-hl" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="mr-main"><span class="mr-t">Highlights and notes</span><span class="mr-d" id="b-hl-d">Saved sentences, your notes, quote cards</span></span></button>
         <button id="b-clips" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Audio clips</span><span class="mr-d" id="b-clips-d">Save short moments, replay them, export as a file</span></span></button>
+        <button id="qk-clip" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Clip</span><span class="mr-d">Save a short audio snippet to share</span></span></button>
         <button id="btn-nr" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-expand"/></svg></span><span class="mr-main"><span class="mr-t">Focus page</span><span class="mr-d">Classic: every tool. Focus: just the text and the essentials.</span></span></button>
         <button id="btn-howto" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-info"/></svg></span><span class="mr-main"><span class="mr-t">How to use</span><span class="mr-d">Double-tap, press and hold, swipe</span></span></button>
       </div>
@@ -100,7 +106,6 @@
       </div>
       <div class="more-list">
         <button id="b-textsync" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="mr-main"><span class="mr-t">Fix highlight sync</span><span class="mr-d">Pick the text, line it up with the audio</span></span></button>
-        <button id="qk-clip" class="mrow" type="button"><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="mr-main"><span class="mr-t">Clip</span><span class="mr-d">Save a short audio snippet to share</span></span></button>
         <button id="b-cal" class="mrow" aria-pressed="false" hidden><span class="mr-i" aria-hidden="true"><svg class="ic"><use href="#i-m-target"/></svg></span><span class="mr-main"><span class="mr-t">Tap to align</span></span></button>
       </div>
     </section>

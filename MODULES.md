@@ -57,9 +57,9 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
-| `246-controls-search.js` | 45 | Controls sheet search box, swipe-up hint, keep highlighted line in view |
+| `246-controls-search.js` | 69 | Controls sheet search box (Enter opens the one match), section nav that follows the scroll, keep highlighted line in view |
 | `250-characters.js` | 501 | characters |
-| `260-audio-effects.js` | 370 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
+| `260-audio-effects.js` | 367 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 487 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 337 | Backup and restore, sync dashboard |
@@ -118,6 +118,7 @@ CSS is a layered cascade (later rules win), so the order is fixed. Later "Phase"
 | `70-collections-detail-motion.css` | collections, version picker, book detail, motion, touch targets |
 | `80-progress-v10.css` | whole-book progress, v10 fixes |
 | `90-reader-sheet.css` | Focus-page player sheet: grip, speed, back/forward 15, play, next track, one segmented bar for the whole book |
+| `97-controls-sheet.css` | Controls sheet polish: section nav, panel arrows over the 4-tile row, 3-column Read and Book tiles, bigger slider buttons and tick labels |
 
 ## HTML, data and developer files
 

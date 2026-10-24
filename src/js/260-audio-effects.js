@@ -155,31 +155,28 @@
       $('#spd-mood').textContent = spdMood(v);
       spdIn.style.setProperty('--fill', (i / SPD_IDX_MAX * 100) + '%');
       spdIn.setAttribute('aria-valuetext', fmt);
-      $('#qk-speed-go').textContent = v === P.speed ? 'No change' : v < P.speed ? 'Slow down' : 'Speed up';
       if (i !== spdLast) { if (spdLast >= 0) buzz('tick'); spdLast = i; }
       return v;
     };
     const spdCardSync = () => { spdIn.value = String(spdValToIdx(P.speed)); spdLast = -1; spdCardPaintFull(); };
-    const spdNudge = d => { spdIn.value = String(Math.max(0, Math.min(SPD_IDX_MAX, (+spdIn.value || 0) + d))); spdCardPaintFull(); };
+    const spdNudge = d => { spdIn.value = String(Math.max(0, Math.min(SPD_IDX_MAX, (+spdIn.value || 0) + d))); spdCardPaintFull(); spdLive(); };
     const spdMarkActive = () => {
       const i = +spdIn.value || 0;
       $$('#qk-speed-c .slp-ends span').forEach(s => s.setAttribute('aria-pressed', String(+s.dataset.idx === i)));
     };
     const spdCardPaintFull = () => { spdCardPaint(); spdMarkActive(); };
-    spdIn.addEventListener('input', spdCardPaintFull);
+    const spdLive = () => { const v = spdIdxToVal(Math.max(0, Math.min(SPD_IDX_MAX, +spdIn.value || 0))); if (v !== P.speed) setSpeed(v); };   // the narrator changes speed as the slider moves, so there is nothing to apply
+    spdIn.addEventListener('input', () => { spdCardPaintFull(); spdLive(); });
     $('#qk-speed-c .slp-ends').addEventListener('click', e => {
       const t = e.target.closest('[data-idx]'); if (!t) return;
-      spdIn.value = t.dataset.idx; spdCardPaintFull(); buzz('tick');
+      spdIn.value = t.dataset.idx; spdCardPaintFull(); spdLive(); buzz('tick');
     });
     $('#qk-speed-c .slp-ends').addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const t = e.target.closest('[data-idx]'); if (t) { spdIn.value = t.dataset.idx; spdCardPaintFull(); buzz('tick'); } }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const t = e.target.closest('[data-idx]'); if (t) { spdIn.value = t.dataset.idx; spdCardPaintFull(); spdLive(); buzz('tick'); } }
     });
     $('#spd-dec').addEventListener('click', () => spdNudge(-1));
     $('#spd-inc').addEventListener('click', () => spdNudge(1));
-    $('#qk-speed-go').addEventListener('click', () => {
-      const v = spdCardPaint(); setSpeed(v); closeSheets();
-      toast('Speed: ' + spdFmt(v), 1800);
-    });
+    $('#qk-speed-go').addEventListener('click', () => { spdLive(); closeSheets(); });
     $('#qk-t-speed').addEventListener('click', () => { if (!$('#qk-o-speed').hidden) spdCardSync(); });
     /* One slider holds every sleep choice: Off, then 5 minutes up to 4 hours (fine steps for short times, wider ones further out), then "End of track" */
     const slIn = $('#qk-sleep-min');

@@ -32,6 +32,7 @@ PARTS = [
     ('file', 'src/css/90-reader-sheet.css'),
     ('file', 'src/css/95-live-translate.css'),
     ('file', 'src/css/96-sound-tabs.css'),
+    ('file', 'src/css/97-controls-sheet.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

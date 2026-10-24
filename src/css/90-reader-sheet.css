@@ -184,15 +184,13 @@
 #b-timing .mi-ic { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; }
 
 /* Controls sheet, half height and see-through, with a search box (task 6).
-   Only Listen shows at first; Read, Book and Fix are one swipe (or one tap on the hint) away. */
+   Only Listen shows at first; Read, Book and Fix are one swipe (or one tap on the section nav) away. */
 #sheet-quick { max-height: 50dvh; }
 #sheet-quick:has(.qk-opt:not([hidden])) { max-height: 72dvh; }
 #sheet-quick { background: color-mix(in srgb, var(--surface) 94%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 #sheet-quick .qk-searchbar { padding: .6rem 1.2rem 0; }
 #sheet-quick .qk-searchbar .sh-search { margin-bottom: 0; min-height: 2.75rem; }
 #sheet-quick .qk-nomatch, #sheet-quick .qk-empty { display: none; }
-#sheet-quick.qk-searching .qk-opt, #sheet-quick.qk-searching .qk-hint { display: none; }
-.qk-hint { justify-self: center; min-height: 2.75rem; padding: 0 .9rem; background: none; border: 0; font: inherit; font-size: var(--small, .88rem); color: var(--muted); }
-.qk-hint:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .6rem; }
+#sheet-quick.qk-searching .qk-opt { display: none; }
 /* room under the last line so the highlighted sentence can be scrolled above the sheet */
 body:has(#sheet-quick:not([hidden])) #reader { padding-bottom: 50dvh; }
