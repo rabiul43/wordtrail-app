@@ -97,9 +97,7 @@
         td.addEventListener('click', e => { e.stopPropagation(); if (!$('#sheet-quick').hidden) { closeSheets(); open(); return; } if (el.syncbar.classList.contains('pop')) close(); else open(); });
         document.addEventListener('click', e => { if (!S.calibrate && !e.target.closest('#syncbar, #b-timing')) close(); });
       } }
-    /* Player top bar: the \u22ef button opens the one Controls sheet (Listen, Read, Book, Fix; Settings is the gear in its header). */
-    { const mb = $('#btn-topmore');
-      if (mb) mb.addEventListener('click', () => { buzz('tick'); if (S.book) VER.dotSeen.add(String(S.book.id)); verChip(); qkOpt(''); qkPaint(); openSheet('sheet-quick'); }); }
+    /* Player top bar: the \u22ef button opens the player menu (247-player-menu.js); "All controls" there opens the Controls sheet. */
     el.cal.addEventListener('click', () => {
       S.calibrate = !S.calibrate; syncCalUI();
       if (S.calibrate && !(S.plan[S.sec] && S.plan[S.sec].ids.length)) { S.calibrate = false; syncCalUI(); toast('This track has no text to sync.'); }

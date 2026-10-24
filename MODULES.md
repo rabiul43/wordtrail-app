@@ -58,6 +58,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
 | `246-controls-search.js` | 69 | Controls sheet search box (Enter opens the one match), section nav that follows the scroll, keep highlighted line in view |
+| `247-player-menu.js` | 73 | Player menu: the three-dot button opens a dropdown (Timing, Text and reading, Live translation, Tracks, Settings, then "More" that opens Listen / Book / Fix rows in place, and "All controls" for the Controls sheet). Rows pass their tap to the existing buttons (markup `#dmenu` in `30-sheets-settings.html`, styles at the end of `97-controls-sheet.css`) |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 367 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
@@ -65,7 +66,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `290-backup-maintenance.js` | 337 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 485 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 48 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 715 | wiring |
+| `300-wiring.js` | 713 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

@@ -120,6 +120,7 @@ PARTS = [
     ('file', 'src/js/sound/sound-screen.js'),
     ('file', 'src/js/sound/sound-tabs.js'),
     ('file', 'src/js/246-controls-search.js'),
+    ('file', 'src/js/247-player-menu.js'),
     ('file', 'src/js/250-characters.js'),
     ('file', 'src/js/260-audio-effects.js'),
     ('file', 'src/js/270-sheets-nextup-back.js'),

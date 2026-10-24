@@ -31,3 +31,34 @@
 #sheet-quick .slp-ends span { padding: .6rem .45rem; }
 #sheet-quick .slp-ends span[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
 #sheet-quick .slp-ends span:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Player menu (the three-dot button): a dropdown with five rows and a "More" row that opens the rest in place */
+.dmenu { position: fixed; z-index: 30; width: min(17.5rem, calc(100vw - 1rem)); overflow-y: auto; overscroll-behavior: contain; padding: .3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); transform-origin: top right; animation: dmIn .14s ease-out; }
+@keyframes dmIn { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dmenu { animation: none; } }
+.dm-it { display: flex; align-items: center; gap: .8rem; width: 100%; min-height: 2.9rem; padding: .4rem .7rem; background: none; border: 0; border-radius: 12px; font: inherit; font-size: .97rem; color: var(--ink); text-align: start; }
+.dm-it[hidden] { display: none; }
+.dm-it:hover { background: var(--surface-2); }
+.dm-it:active { background: var(--accent-soft); }
+.dm-it:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.dm-i { flex: none; display: grid; place-items: center; width: 1.5rem; color: var(--muted); }
+.dm-i .ic { width: 1.3rem; height: 1.3rem; }
+.dm-i .qk-aa { font-size: 1.15rem; line-height: 1.3rem; }
+.dm-t { flex: 1; min-width: 0; }
+.dm-v { flex: none; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dm-dot::before { content: ""; display: block; box-sizing: border-box; width: .7rem; height: .7rem; border-radius: 50%; background: var(--accent); }
+#dm-timing[data-state="estimated"] .dm-dot::before { background: transparent; border: 2px dashed var(--muted); }
+#dm-timing[data-state="preparing"] .dm-dot::before { background: transparent; border: 2px dashed var(--accent); animation: shimmer 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { #dm-timing[data-state="preparing"] .dm-dot::before { animation: none; } }
+.dm-morerow { margin-top: .2rem; border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; padding-top: .55rem; }
+.dm-morerow .dm-t { color: var(--accent); font-weight: 650; }
+.dm-chev { flex: none; width: 1.2rem; height: 1.2rem; color: var(--accent); transition: transform .18s ease; }
+.dm-morerow[aria-expanded="true"] .dm-chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .dm-chev { transition: none; } }
+.dm-sub { margin: .2rem 0; padding: 0 0 .3rem; border-radius: 12px; background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.dm-sub[hidden] { display: none; }
+.dm-sub .dm-it { min-height: 2.75rem; font-size: .93rem; }
+.dm-h { padding: .6rem .8rem .15rem; font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.dm-all { margin-top: .2rem; }
+.dm-all .dm-t { color: var(--muted); }
+.topbar #btn-topmore[aria-expanded="true"] { background: var(--surface-2); }

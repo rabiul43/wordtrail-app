@@ -75,6 +75,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/sound-screen.js` | 164 | 13 | 5 | 72 |
 | `sound/sound-tabs.js` | 47 | 4 | 3 | 1 |
 | `246-controls-search.js` | 69 | 4 | 0 | 4 |
+| `247-player-menu.js` | 73 | 0 | 0 | 9 |
 | `250-characters.js` | 501 | 37 | 7 | 13 |
 | `260-audio-effects.js` | 367 | 41 | 9 | 46 |
 | `270-sheets-nextup-back.js` | 276 | 31 | 11 | 42 |
@@ -82,7 +83,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `290-backup-maintenance.js` | 337 | 34 | 13 | 33 |
 | `295-account-sync.js` | 485 | 67 | 11 | 3 |
 | `298-pwa.js` | 48 | 2 | 1 | 2 |
-| `300-wiring.js` | 715 | 6 | 2 | 141 |
+| `300-wiring.js` | 713 | 6 | 2 | 141 |
 
 ## Per file
 
@@ -90,7 +91,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `090-synced-stats-book-search.js` (`stDirty`, `stLoad`, `stSave`, `stSummary`); `102-home-sections.js` (`plural`); `120-search-recommendations.js` (`paintCards`); `140-open-book.js` (`updateHeader`); `150-player-reader.js` (`loadAudio`, `pre`); `280-downloads-progress.js` (`dqClear`, `dqGet`, `fmtMB`, `paintDl`, `renderTracks`); `300-wiring.js` (`init`)
 
-**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (280), `PROXY` (133, 280), `adb` (280), `buzz` (10 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090), `dmMB` (090, 280), `dmRender` (290), `dmSize` (090), `dmUsedPct` (280), `fmt` (150, 260, 280, 300), `fmtLong` (7 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offHave` (280), `reduceMotion` (090, 150, 246), `savePrefs` (18 files), `srcSeq` (150), `store` (34 files), `storeHook` (295), `warmUrl` (050, 140, 150)
+**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (280), `PROXY` (133, 280), `adb` (280), `buzz` (11 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090), `dmMB` (090, 280), `dmRender` (290), `dmSize` (090), `dmUsedPct` (280), `fmt` (150, 260, 280, 300), `fmtLong` (7 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offHave` (280), `reduceMotion` (090, 150, 246, 247), `savePrefs` (18 files), `srcSeq` (150), `store` (34 files), `storeHook` (295), `warmUrl` (050, 140, 150)
 
 ### `040-worker-newreader.js`
 
@@ -114,7 +115,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`decode`, `idb`, `store`); `120-search-recommendations.js` (`paintCards`); `133-open-progress-saved-state.js` (`bundleText`, `bundles`); `134-version-picker.js` (`verChip`); `140-open-book.js` (`sig`); `180-sync-alignment.js` (`ghCfg`, `toks`); `298-pwa.js` (`splashRemember`)
 
-**Shared:** `CAT` (16 files), `LVL` (7 files), `MOODS` (103, 120), `PKI` (090, 120, 190), `SIM` (120, 131, 150, 270), `SX_STOP` (120), `VER` (10 files), `catLoad` (8 files), `catPurge` (300), `catQuery` (120), `fetchText` (160), `fetchVia` (133), `findGutenbergFor` (140), `getGutenberg` (140, 290), `gutendex` (290), `jsonLoader` (120), `lvGet` (7 files), `lvlText` (120, 270), `normBook` (133, 300), `searchBooks` (102, 120), `sxDist` (120), `sxNorm` (120), `sxSearch` (104), `timedFetch` (190)
+**Shared:** `CAT` (16 files), `LVL` (7 files), `MOODS` (103, 120), `PKI` (090, 120, 190), `SIM` (120, 131, 150, 270), `SX_STOP` (120), `VER` (11 files), `catLoad` (8 files), `catPurge` (300), `catQuery` (120), `fetchText` (160), `fetchVia` (133), `findGutenbergFor` (140), `getGutenberg` (140, 290), `gutendex` (290), `jsonLoader` (120), `lvGet` (7 files), `lvlText` (120, 270), `normBook` (133, 300), `searchBooks` (102, 120), `sxDist` (120), `sxNorm` (120), `sxSearch` (104), `timedFetch` (190)
 
 ### `080-ui-shell-favourites.js`
 
@@ -210,7 +211,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`fmtLong`, `idb`, `store`); `040-worker-newreader.js` (`audio`); `070-network-data.js` (`CAT`, `VER`, `lvGet`); `080-ui-shell-favourites.js` (`toast`); `133-open-progress-saved-state.js` (`persist`); `140-open-book.js` (`openBook`); `150-player-reader.js` (`pre`); `270-sheets-nextup-back.js` (`closeSheets`)
 
-**Shared:** `renderVersions` (270), `verApply` (140), `verChip` (070, 140, 300)
+**Shared:** `renderVersions` (270), `verApply` (140), `verChip` (070, 140, 247, 300)
 
 ### `135-ratings.js`
 
@@ -270,7 +271,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`buzz`, `guideDoc`, `savePrefs`, `store`); `040-worker-newreader.js` (`audio`, `nrSleep`, `sleepLabel`, `sleepShort`); `060-position-bookmarks.js` (`trAdd`); `080-ui-shell-favourites.js` (`toast`); `102-home-sections.js` (`plural`); `150-player-reader.js` (`nowT`, `pre`, `seekAudio`); `180-sync-alignment.js` (`bgAllowed`, `job`); `190-sync-finish-retry.js` (`autoAlign`, `trackDone`); `260-audio-effects.js` (`spdClamp`, `spdFmt`); `sound/ambient-scenes.js` (`AMB`); `sound/music-state.js` (`MUS`); `sound/sound-core.js` (`sndOn`)
 
-**Shared:** `FADE_SECS` (150), `I18N_SUG` (300), `SLEEPS` (060, 300), `fadeCurve` (150), `fixSync` (300), `hlAll` (250), `hlCount` (260), `hlFind` (160), `hlSave` (250), `hlToggle` (160), `hlpSeek` (150), `hlpTapped` (300), `i18nInit` (300), `i18nSuggest` (300), `posPlayback` (150), `posState` (150), `qkOpt` (sound/music, 260, 290, 300), `qkPaint` (7 files), `setSleep` (060, 150, 260, 300), `setUiLang` (300), `setVol` (150), `shakeArm` (260, 300), `syncCalUI` (140, 300), `syncInfo` (170), `trSid` (160, 300), `updateSyncUI` (140, 150, 190), `userSeek` (060, 300), `wakeSync` (080, 300)
+**Shared:** `FADE_SECS` (150), `I18N_SUG` (300), `SLEEPS` (060, 300), `fadeCurve` (150), `fixSync` (300), `hlAll` (250), `hlCount` (260), `hlFind` (160), `hlSave` (250), `hlToggle` (160), `hlpSeek` (150), `hlpTapped` (300), `i18nInit` (300), `i18nSuggest` (300), `posPlayback` (150), `posState` (150), `qkOpt` (sound/music, 247, 260, 290, 300), `qkPaint` (8 files), `setSleep` (060, 150, 260, 300), `setUiLang` (300), `setVol` (150), `shakeArm` (260, 300), `syncCalUI` (140, 300), `syncInfo` (170), `trSid` (160, 300), `updateSyncUI` (140, 150, 190), `userSeek` (060, 300), `wakeSync` (080, 300)
 
 ### `sound/music-state.js`
 
@@ -450,7 +451,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`savePrefs`); `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `160-learning-tools.js` (`togglePlay`); `200-player-controls.js` (`qkPaint`); `232-scene-test.js` (`ambFixAdd`, `ambFixChips`, `ambFixClear`, `sctInit`); `233-scene-chapters-label.js` (`ambAutoHold`, `ambAutoPaint`, `miniScenePaint`); `270-sheets-nextup-back.js` (`closeSheets`, `openSheet`); `sound/ambient-ducking.js` (`ambDuckSet`, `ambDuckTick`); `sound/ambient-engine.js` (`ambBuild`, `audioSuspendSoon`); `sound/ambient-events.js` (`ambClink`, `ambEvents`); `sound/ambient-intensity.js` (`ambLive`, `ambTod`); `sound/ambient-mix.js` (`ambApply`, `ambBookCheck`, `ambGain`, `ambMaster`, `ambSaveMix`, `ambSpaceReset`, `ambVol`); `sound/ambient-recordings.js` (`ambRecInit`, `ambRecManifest`); `sound/ambient-scenes.js` (`AMB`, `AMB_GROUPS`, `AMB_SOUNDS`, `ambLevels`, `ambLoadRemote`, `ambMatchScene`, `ambPaintScenes`, `ambUseScene`); `sound/music-bus.js` (`musBusApply`); `sound/music-playback.js` (`musicAttach`, `musicPause`, `musicPlay`, `musicVolChange`, `sndNowPaint`); `sound/music-state.js` (`MUS`); `sound/music-wiring.js` (`musicInit`); `sound/opening-sound.js` (`osInit`); `sound/sound-cache.js` (`sndCacheClear`, `sndCachePrune`); `sound/sound-core.js` (`musVolPaint`, `sndApplyAll`, `sndOn`, `sndPaint`, `sndVolPaint`); `sound/sound-presets.js` (`ambAudition`, `ambBuildPresets`, `ambPresetClear`, `ambPresetPaint`, `ambPresetUndo`, `ambPresetUse`, `ambRefresh`, `ambSceneEnd`, `ambSceneKeep`, `ambScenePreview`, `ambSceneRevert`); `sound/sound-tabs.js` (`sndTabsInit`); `sound/story-engine.js` (`CUE_CATS`, `CUE_NAMES`, `ambCueClear`, `ambStory`); `sound/story-sounds.js` (`CUE_SOUND`)
 
-**Shared:** `ambGroups` (sound/ambient, sound/sound), `ambInit` (300), `ambOpen` (sound/music, sound/ambient, 260, 290), `ambPlaying` (sound/ambient, sound/ambient, sound/story), `ambSync` (sound/ambient, sound/sound, sound/sound, 260, 270, 290)
+**Shared:** `ambGroups` (sound/ambient, sound/sound), `ambInit` (300), `ambOpen` (sound/music, sound/ambient, 247, 260, 290), `ambPlaying` (sound/ambient, sound/ambient, sound/story), `ambSync` (sound/ambient, sound/sound, sound/sound, 260, 270, 290)
 
 ### `sound/sound-tabs.js`
 
@@ -461,6 +462,12 @@ The app is one closure, so every top-level name is visible to every file. This p
 ### `246-controls-search.js`
 
 **Needs:** `030-helpers-offline-audio.js` (`buzz`, `reduceMotion`); `150-player-reader.js` (`focusOf`, `scrollGlide`)
+
+**Shared:** nothing; every name here is private to the file.
+
+### `247-player-menu.js`
+
+**Needs:** `030-helpers-offline-audio.js` (`buzz`, `reduceMotion`); `070-network-data.js` (`VER`); `134-version-picker.js` (`verChip`); `200-player-controls.js` (`qkOpt`, `qkPaint`); `270-sheets-nextup-back.js` (`openSheet`); `290-backup-maintenance.js` (`openSettingsHome`); `sound/sound-screen.js` (`ambOpen`)
 
 **Shared:** nothing; every name here is private to the file.
 
@@ -480,7 +487,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`fmtLong`, `guideDoc`, `store`); `050-audio-clips.js` (`clEdCleanup`); `060-position-bookmarks.js` (`nrClose`); `070-network-data.js` (`CAT`, `LVL`, `SIM`, `VER`, `catLoad`, `lvGet`, `lvlText`); `080-ui-shell-favourites.js` (`DET`, `curTab`, `seeOpen`, `showTab`, `toast`); `100-home-covers.js` (`GENRES`); `101-home-tiles.js` (`fillRow`); `104-see-all-suggestions.js` (`closeSeeAll`); `110-collections.js` (`COL`, `clearSearch`, `renderCollections`); `120-search-recommendations.js` (`bookCard`, `listenedList`, `recoFor`); `130-book-detail.js` (`closeDetail`); `134-version-picker.js` (`renderVersions`); `140-open-book.js` (`openBook`, `shCleanup`); `160-learning-tools.js` (`ghHide`); `180-sync-alignment.js` (`ghCfg`, `toks`); `280-downloads-progress.js` (`renderTracks`); `290-backup-maintenance.js` (`SMH`, `fillSettings`, `renderTextSheet`, `sheetBack`, `smBackSync`, `smHomeOpen`); `sound/ambient-scenes.js` (`AMB`); `sound/sound-screen.js` (`ambSync`)
 
-**Shared:** `LANG_CODES` (sound/music), `closeSheets` (16 files), `histInit` (300), `histSoon` (060, 080, 103, 110), `nextOpen` (150, 300), `nxPub` (120, 130, 132, 150), `nxScore` (090), `openSheet` (14 files), `psInit` (300), `setReaderLang` (140), `sheetOpen` (101, 150, 300)
+**Shared:** `LANG_CODES` (sound/music), `closeSheets` (16 files), `histInit` (300), `histSoon` (060, 080, 103, 110), `nextOpen` (150, 300), `nxPub` (120, 130, 132, 150), `nxScore` (090), `openSheet` (15 files), `psInit` (300), `setReaderLang` (140), `sheetOpen` (101, 150, 300)
 
 ### `280-downloads-progress.js`
 
@@ -492,7 +499,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`dmRender`, `guideDoc`, `idb`, `store`); `070-network-data.js` (`getGutenberg`, `gutendex`); `080-ui-shell-favourites.js` (`toast`); `090-synced-stats-book-search.js` (`applyLite`, `applyTheme`, `applyTidy`, `stSave`); `100-home-covers.js` (`covSegSync`); `105-home-loaders.js` (`homeCustPaint`); `110-collections.js` (`svgIcon`); `131-book-stats-share.js` (`STATS_API`); `133-open-progress-saved-state.js` (`persist`); `140-open-book.js` (`applyText`, `loadParsed`, `parsedKey`, `replan`); `180-sync-alignment.js` (`ghCfg`, `toks`); `190-sync-finish-retry.js` (`autoAlign`, `countAnchors`); `200-player-controls.js` (`qkOpt`, `qkPaint`); `260-audio-effects.js` (`spdPaint`); `270-sheets-nextup-back.js` (`closeSheets`, `openSheet`); `300-wiring.js` (`devStartup`); `sound/ambient-scenes.js` (`AMB`); `sound/sound-screen.js` (`ambOpen`, `ambSync`)
 
-**Shared:** `MAINT` (300), `SMH` (270), `bkDownload` (300), `bkRestore` (300), `fillSettings` (270), `loadHealth` (300), `openSettingsHome` (090, 260), `pushMaint` (300), `renderTextSheet` (190, 270), `sheetBack` (270, 300), `smBackSync` (270), `smHomeOpen` (270), `smWire` (300)
+**Shared:** `MAINT` (300), `SMH` (270), `bkDownload` (300), `bkRestore` (300), `fillSettings` (270), `loadHealth` (300), `openSettingsHome` (090, 247, 260), `pushMaint` (300), `renderTextSheet` (190, 270), `sheetBack` (270, 300), `smBackSync` (270), `smHomeOpen` (270), `smWire` (300)
 
 ### `295-account-sync.js`
 
