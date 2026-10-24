@@ -272,7 +272,7 @@
     if (audio.paused || S.refining || S.aligning || S.calibrate || job.running || (info && info.sure) || S.sentSec[id] !== sec) return;
     setAnchor(id, { at: res.t, extras: res.extras, fromAudio: true, quiet: true });
     const d = res.drift;
-    toast('Highlight moved ' + Math.abs(d).toFixed(1) + ' s ' + (d > 0 ? 'later' : 'earlier') + ' to match the narrator.', 6000, ['Undo', () => { undoAnchor(); drift.off.add(sec); }]);
+    // silent: the highlight follows the narrator by itself
   }
   async function resyncSentence(id) {
     const sec = S.sec, p = S.plan[sec];

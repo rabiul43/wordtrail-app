@@ -282,7 +282,7 @@
       const m = dlMeta.get(String(id)); if (!m) return;
       if (DL.running && DL.id === String(id)) return;
       const size = dmSize(m);
-      if (await dmDrop(id)) { toast('Finished. The downloaded audio was removed (' + dmMB(size) + ' freed).', 5000); paintCards(); paintDl(); }
+      if (await dmDrop(id)) { paintCards(); paintDl(); }
     } catch (e) { /* keep the download */ }
   }
   audio.addEventListener('timeupdate', stSample);

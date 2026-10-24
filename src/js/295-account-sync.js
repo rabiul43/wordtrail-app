@@ -317,6 +317,7 @@
   function acFlush() {
     clearTimeout(acFlushT); acFlushT = 0;
     if (!acPending || acPlaying()) return;
+    if (acPending.quiet && document.visibilityState !== 'hidden') return;   // a background sync never reloads the screen in front of the person: it waits until the app is hidden (the next flush call)
     if (acBusy) { acFlushT = setTimeout(acFlush, 3000); return; }
     const p = acPending; acPending = null;
     const meta = acMeta(), keys = Object.keys(p.items).filter(k => (meta[k] || 0) <= p.at);
@@ -324,7 +325,8 @@
     window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
     keys.forEach(k => { const it = p.items[k]; try { localStorage.setItem(k, it.v); meta[k] = it.t; if (it.up) acDirty.add(k); } catch (e) { /* storage full: skip */ } });
     acSaveMeta(meta); acDirtySave();
-    toast('Synced from your account. Reloading…', 2500); setTimeout(() => location.reload(), 900);
+    if (!p.quiet) toast('Synced from your account. Reloading…', 2500);
+    setTimeout(() => location.reload(), p.quiet ? 50 : 900);
   }
   try {
     audio.addEventListener('pause', acFlushSoon); audio.addEventListener('ended', acFlushSoon);
@@ -390,9 +392,10 @@
         else if (r.t < lt) up.add(k);
       });
       if (doFull) acLocalKeys().forEach(k => { if (!remote[k] && !unreadable.has(k)) up.add(k); }); // items the cloud has never seen
-      const pulled = Object.keys(items), deferred = pulled.length > 0 && acPlaying();
+      const pulled = Object.keys(items), quiet = !manual && !first;   // quiet = the automatic sync after opening the app: never reload the screen in front of the person
+      const deferred = pulled.length > 0 && (acPlaying() || quiet);
       if (deferred) {
-        acPending = { at: syncT, items }; // the newest pull replaces an older one: it was worked out from the same unchanged local state
+        acPending = { at: syncT, items, quiet }; // the newest pull replaces an older one: it was worked out from the same unchanged local state
       } else if (pulled.length) {
         window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
         pulled.forEach(k => { try { localStorage.setItem(k, items[k].v); meta[k] = items[k].t; if (items[k].up) up.add(k); } catch (e) { /* storage full: skip */ } });
@@ -402,8 +405,8 @@
       let skipped = 0;
       try { skipped = await acPushKeys(up, false); } catch (e) { if (!reload) throw e; /* merged items are newer here, so the next sync uploads them */ }
       if (deferred) { // keep the sync point where it was, so the waiting items are downloaded again if the page closes first
-        acMsg = 'Newer data from your account is ready. It loads when you pause.';
-        toast('Newer data from your account is ready. It will load when you pause.', 4000);
+        if (quiet) acMsg = '';   // silent: applied (and the page refreshed) while the app is in the background
+        else { acMsg = 'Newer data from your account is ready. It loads when you pause.'; toast('Newer data from your account is ready. It will load when you pause.', 4000); }
       } else {
         info.first = false; info.last = Date.now(); info.lastT = syncT;
         if (doFull) info.lastFull = Date.now();

@@ -90,7 +90,7 @@
         if (S.book === b && shape(pub) && pub.ar === 2 && (!S.model || pub.sig === bookSig())
             && Object.keys(pub.tracks).length > (S.merged ? Object.keys(S.merged.tracks).length : 0)) {
           S.merged = pub; idb.set('m:' + b.id, pub);
-          if (S.model && applyTimings()) toast('Precise timing loaded from the library check.', 3500);
+          if (S.model) applyTimings();
         }
       }
     } catch (e) { /* no published check for this book */ }
@@ -120,7 +120,7 @@
         const g = await fetch(api + '?ref=main', { headers: hd, cache: 'no-store' });
         if (g.ok) r = await put((await g.json()).sha);
       }
-      if (r.ok) { store.set('wt:pub:' + b.id, sig); toast('Shared this book\'s sync, so other devices can skip the wait.', 4500); }
+      if (r.ok) { store.set('wt:pub:' + b.id, sig); }
       else if (!S.shareWarned && (r.status === 401 || r.status === 403 || r.status === 404)) {
         S.shareWarned = true;
         toast('Could not share the finished sync. The GitHub token needs read and write access to the sync repository\'s contents.', 7000);
@@ -257,12 +257,12 @@
       const missing = () => { const m = []; for (let i = 0; i < n; i++) if (!tracks[i] && !trackDone(i)) m.push(i); return m; };
       let miss = got ? missing() : [];
       if (miss.length && S.book === b) {
-        toast(miss.length === 1 ? 'Track ' + (miss[0] + 1) + ' is not timed yet. Using estimated highlight; it updates itself when ready.' : miss.length + ' tracks are not timed yet. Using estimated highlight; they update when ready.', 6000);
+        // silent: estimated highlight is used until the precise timing arrives
         for (let tries = 0; tries < 12 && miss.length && S.book === b; tries++) {
           await new Promise(r => setTimeout(r, 5 * 60e3));
           if (S.book !== b) return;
           const pk2 = await grabPack(b, n, true);
-          if (pk2) { Object.assign(tracks, pk2); if (S.model && applyTimings()) toast('Precise timing arrived for the missing tracks.', 3500); }
+          if (pk2) { Object.assign(tracks, pk2); if (S.model) applyTimings(); }
           miss = missing();
         }
       }
@@ -276,7 +276,7 @@
         started = true;
         if (!trackDone(S.sec)) {
           got = tracks[S.sec] ? true : await grab(S.sec);
-          if (!got) { const m = await requestSync(b, false); if (m) { toast(m, 6000); if (/^Sync requested/.test(m)) { S.syncWatch = b.id; S.syncStart = Date.now(); } } }
+          if (!got) { const m = await requestSync(b, false); if (m) { if (/^Sync requested/.test(m)) { S.syncWatch = b.id; S.syncStart = Date.now(); } } }
         }
       }
       const watching = S.syncWatch === b.id;
@@ -284,7 +284,7 @@
         const i = (S.sec + k) % n;
         if (!tracks[i] && !trackDone(i) && await grab(i)) got = true;
       }
-      if (got && S.model) { got = false; if (applyTimings()) { toast('Precise timing is ready.', 3500); if (!store.get('wt:hint:tap', 0)) { store.set('wt:hint:tap', 1); setTimeout(() => toast('Tip: tap any sentence to jump there. Double-tap it if the highlight is off.', 6500), 4500); } } }
+      if (got && S.model) { got = false; if (applyTimings()) { if (!store.get('wt:hint:tap', 0)) { store.set('wt:hint:tap', 1); setTimeout(() => toast('Tip: tap any sentence to jump there. Double-tap it if the highlight is off.', 6500), 4500); } } }
       if (watching && S.book === b) { S.syncStatus = await grabStatus(b); reportSync(b, Math.max(Object.keys(tracks).length, aligned()), 'Sync requested.'); }
       if (Object.keys(tracks).length >= n) { if (S.syncWatch === b.id) { S.syncWatch = null; S.syncText = ''; updateHeader(); notifyDone(b); } return; }
       await new Promise(r => setTimeout(r, watching ? 6000 : 30000));

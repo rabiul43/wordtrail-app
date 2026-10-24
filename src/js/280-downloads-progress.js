@@ -146,8 +146,8 @@
       if (!b.secs.some((s, i) => !isLocal(b.id, i, s.url))) { dqClear(); return; }
       if (DL.running) return;
       const name = b.title || q.title || 'your book';
-      if (force || apNetOk()) { toast('Continuing the download of "' + name + '"…', 4000); await dlStart(b); }
-      else toast('The download of "' + name + '" was interrupted.', 12000, ['Resume', () => { dlResumePending(true); }]);
+      if (force || apNetOk()) await dlStart(b);   // silent: it carries on by itself, and again when the connection or Wi-Fi is back
+      // else: held back (mobile data); it resumes by itself on Wi-Fi, or from Settings > Downloads
     } finally { dqBusy = false; }
   }
   function dlCancel() { if (!DL.running || !DL.ctl) return; DL.cancelling = true; DL.ctl.abort(); paintDl(); }
@@ -463,7 +463,6 @@
     if (!b) return;
     const t = audio.currentTime || S.pendingSeek || 0, was = !audio.paused;
     dlDropTrack(b.id, i);
-    toast('The saved copy of this track could not be read. Playing it online instead.', 4500);
     if (S.book === b && S.sec === i) loadAudio(i, t, was);
   }
 

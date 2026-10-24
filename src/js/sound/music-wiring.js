@@ -50,7 +50,6 @@
         if (P.musHint === true || P.musOn === true || !sndOn() || !S.book || audio.paused || el.player.hidden) return;
         if ((g && !g.hidden) || !el.toast.hidden) return;   // another hint is up: try again at the next play
         P.musHint = true; savePrefs();
-        toast('Add quiet music that follows the story.', 9000, ['Try music', () => musOnSet(true)]);
       } catch (e) { /* a hint is never worth an error */ }
     }, 25000);
   }

@@ -193,7 +193,6 @@
     if (keep) { S.mode = saved.mode; S.map = saved.map; S.span = Array.isArray(saved.span) && saved.span.length === S.secs.length ? saved.span : saved.map.slice(); }
     else {
       S.mode = dm.mode; S.map = dm.map; S.span = dm.span; S.anchors = {}; S.ranges = {}; S.autoSrc = {}; S.skip = {}; S.edge = {};
-      if (dm.approx) toast('Track titles do not name chapters, so the text is divided between tracks by length. Sync will tighten it.', 6000);
     }
     replan(true); updateHeader(); persist();
     /* The last-read page is on screen now. Fitting the saved or shared sync to it can take a moment,

@@ -29,7 +29,7 @@
     navigator.serviceWorker.addEventListener('message', e => {
       if (told || !e.data || e.data.type !== 'wt-update') return;
       told = true;
-      try { toast('A new version is ready.', 15000, ['Reload', () => location.reload()]); } catch (x) { /* cosmetic only */ }
+      /* silent: the newer page is already saved and opens the next time the app starts */
     });
   }
 
