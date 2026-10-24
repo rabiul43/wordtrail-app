@@ -15,6 +15,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/html/                 page structure and pop-up sheets
     src/css/                  styles, in cascade order (do not reorder)
     src/js/                   the app, one slice per feature
+    src/js/sound/             all sound code, one feature per file: music-*, ambient-*, opening-*, story-*, sound-* (see MODULES.md)
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
     MUSIC-GUIDE.md            how to add or change music (steps to follow when you forget)
@@ -29,6 +30,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
 
 1. Tell Claude which feature to change, and upload ONLY that file from `src/js/` (or `src/css/`) plus `MODULES.md`.
    Example: "change the Characters screen" -> upload `250-characters.js` + `MODULES.md`.
+   Sound examples: new story trigger word -> `sound/story-rules.js`; new music mood word -> `sound/music-moods.js`; Sound screen -> `sound/sound-screen.js`.
 2. Claude sends back the changed file(s). Put them in the same folder, run `python build.py`, test `dist/index.html`.
 3. Commit and push. GitHub builds and publishes the app.
 
@@ -37,7 +39,7 @@ If a change needs a name from another file, say so or upload that file too. Shar
 ## Rules that keep it safe
 
 - All of `src/js/020` ... `src/js/999` are slices of ONE function. They share names; do not add `import` / `export`.
-- A new file needs one new line in `build.py`, at the right place.
+- A new file needs one new line in `build.py`, at the right place (a file may sit in a subfolder such as `src/js/sound/`; `tools/deps.py` reads the paths from `build.py`).
 - After you change anything in `src/js/`, run `python tools/deps.py`. It refreshes `DEPENDENCIES.md` (who uses which shared name) and the line counts in `MODULES.md`. `python build.py` stops if two files declare the same name, and CI runs `python tools/deps.py --check`.
 - To see who uses a name before you change it: `python tools/deps.py --who toast`.
 - CSS order matters: later rules win.

@@ -53,14 +53,10 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
 | `200-player-controls.js` | 489 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
-| `210-sound-mixer.js` | 690 | background sound mixer, real recordings |
-| `220-story-sounds.js` | 406 | story sounds |
 | `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
-| `240-sound-presets.js` | 289 | hear a sound; quick presets |
-| `245-sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when that layer is on, and the dimmed look while Sound is off (`sndTabsPaint`, `sndTabsInit`; styles in `src/css/96-sound-tabs.css`) |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 371 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
@@ -70,6 +66,41 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `298-pwa.js` | 48 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
 | `300-wiring.js` | 741 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
+
+## Sound files (`src/js/sound/`)
+
+All sound code lives in one folder, **one feature per file**, named by feature (`music-`, `ambient-`, `opening-`, `story-`, `sound-`). They are slices of the same closure as everything else; the order is set in `build.py`. The first group loads right after `200-player-controls.js`, then the scene files (`230`-`233`), then the last five (`sound-presets` to `sound-tabs`) before `250-characters.js`.
+Which file to open: add a **music mood word** -> `music-moods`; add a **story trigger word** -> `story-rules` (and its sound in `story-sounds`); add an **ambient sound** -> `ambient-scenes` (list) + `ambient-layers` or `ambient-synth` (how it is made); change the **Sound screen** -> `sound-screen`, `sound-presets`, `sound-tabs` and `src/html/28-sheet-sound.html`.
+
+| File | Lines | What is inside |
+|---|---|---|
+| `sound/music-state.js` | 48 | Music: the `MUS` state object, local test mode |
+| `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
+| `sound/music-bus.js` | 64 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
+| `sound/music-library.js` | 121 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
+| `sound/music-playback.js` | 268 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
+| `sound/music-offline.js` | 131 | Music: "Download music for offline" |
+| `sound/music-wiring.js` | 78 | Music: engine health, the Music switch, first-time hint, quick controls, `musicInit` |
+| `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |
+| `sound/ambient-scenes.js` | 77 | Ambient: `AMB` state, `AMB_SOUNDS` (the list of sounds), groups, scenes and rules from `amb-map.json`, book suggestion, scene cards |
+| `sound/ambient-synth.js` | 72 | Ambient: sounds made on the device: noise, reverb, raindrops, rain, rolling thunder, room mix |
+| `sound/ambient-engine.js` | 68 | Ambient: indoor/outdoor detection, `audioCtx` (the ONE AudioContext of the app), `ambBuild` |
+| `sound/ambient-layers.js` | 106 | Ambient: how each sound layer is made (`AMB_LAYER`), layer on/off |
+| `sound/ambient-recordings.js` | 119 | Ambient: real recordings instead of generated sound |
+| `sound/ambient-mix.js` | 45 | Ambient: apply the mix, volume, master, save the mix, reset on a new book |
+| `sound/ambient-ducking.js` | 85 | Ambient: dip under the narrator's voice |
+| `sound/ambient-events.js` | 132 | Ambient: slow movement, random one-off sounds (birds, creaks, bell, crackle, thunder) |
+| `sound/opening-sound.js` | 155 | Opening (intro chime): mood of a book, clips, synth fallback, play on start |
+| `sound/story-rules.js` | 74 | Story sounds: which word triggers which sound (`CUE_RULES`). Edit here to add a trigger word |
+| `sound/story-sounds.js` | 177 | Story sounds: how each sound is made (`CUE_SOUND`) |
+| `sound/story-engine.js` | 66 | Story sounds: categories, finding trigger words, playing them on the audio's own clock |
+| `sound/story-transitions.js` | 65 | Story sounds: door, gate and footstep sounds when the place changes |
+| `sound/ambient-intensity.js` | 32 | Ambient: intensity, the levels really played (`ambLive`), night and time of day |
+| `sound/sound-presets.js` | 62 | Sound screen: hear a sound, quick presets and undo |
+| `sound/sound-core.js` | 24 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
+| `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
+| `sound/sound-screen.js` | 150 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
+| `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
 
 ## CSS files (`src/css/`)
 
@@ -98,4 +129,5 @@ CSS is a layered cascade (later rules win), so the order is fixed. Later "Phase"
 | `src/html/40-onboarding.html` | toast, audio element, first-run onboarding |
 | `src/html/90-end.html` | closing tags |
 | `src/data/amb-map.json` | map of ambience sounds (used by the sound mixer) |
+| `src/html/28-sheet-sound.html` | The Sound sheet (`#sheet-amb`: tabs Ambient, Music, Intro chime, Sound effects). Loaded just before `30-sheets-settings.html` |
 | `src/dev/scene-tests.txt`, `scene-baseline.html` | Developer scene tests only. Left out of the public build; `python build.py --dev` includes them |

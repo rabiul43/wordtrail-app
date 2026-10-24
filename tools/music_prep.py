@@ -36,7 +36,7 @@ Requirements
     pip install requests mutagen
     ffmpeg must be on your PATH (https://ffmpeg.org)
 
-Mood buckets (must match MUS_MOOD_MAP in 205-music-player.js):
+Mood buckets (must match MUS_MOOD_MAP in sound/music-moods.js):
     peace, dread, danger, sorrow, merry, neutral
 
 Output layout in your data repo
@@ -68,7 +68,7 @@ except ImportError:
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "wordtrail-data"
 
 # Mastering loudness for all clips (LUFS). Files stay at -18 for headroom and a consistent library; the app
-# attenuates each clip to its playback target (-27 LUFS, MUS_TARGET_LUFS in 205-music-player.js) using the
+# attenuates each clip to its playback target (-27 LUFS, MUS_TARGET_LUFS in sound/music-bus.js) using the
 # `lufs` value written below, so do not change this to match the app.
 TARGET_LUFS = -18.0
 

@@ -18,9 +18,9 @@ What it reports
 """
 import argparse, json, os, sys
 
-# Must match MUS_MOOD_MAP in src/js/205-music-player.js and OS_MOODS / OS_CALM in src/js/215-opening-sound.js.
+# Must match MUS_MOOD_MAP in src/js/sound/music-moods.js and OS_MOODS / OS_CALM in src/js/sound/opening-sound.js.
 MUSIC_MOODS = ["neutral", "peace", "dread", "danger", "sorrow", "merry"]
-# Finer moods, optional: with no clips the app plays the nearest mood instead (see MUS_FALLBACK in 205-music-player.js).
+# Finer moods, optional: with no clips the app plays the nearest mood instead (see MUS_FALLBACK in sound/music-moods.js).
 FINE_MOODS = {"tension": "dread", "wonder": "peace", "romance": "peace", "chase": "danger"}
 OPENING_MOODS = ["gothic", "mystery", "romance", "adventure", "fantasy", "children", "scifi", "drama", "calm"]
 MIN_DUR, MAX_DUR = 30, 240      # seconds: a clip shorter than the crossfade runway repeats too fast; very long ones use a lot of memory

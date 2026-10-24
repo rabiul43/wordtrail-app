@@ -29,7 +29,7 @@ def closure_files():
     """The JS files inside the closure, in build order, read from build.py (the single source of truth)."""
     text = open(os.path.join(ROOT, "build.py"), encoding="utf-8").read()
     paths = re.findall(r"\('file', '(src/js/[^']+)'\)", text)
-    names = [os.path.basename(p) for p in paths]
+    names = [p[len('src/js/'):] for p in paths]   # relative to src/js, e.g. sound/music-moods.js
     return [n for n in names[names.index(OPEN) + 1: names.index(CLOSE)]]
 
 
@@ -220,7 +220,7 @@ def render(files, code, decls, raw_lines):
     return "\n".join(L).rstrip("\n") + "\n"
 
 
-ROW = re.compile(r"^(\| `(\d{3}-[\w-]+\.js)` \| )(\d+)( \|)")
+ROW = re.compile(r"^(\| `((?:[\w-]+/)?[\w-]+\.js)` \| )(\d+)( \|)")
 
 
 def refresh_modules(raw_lines):

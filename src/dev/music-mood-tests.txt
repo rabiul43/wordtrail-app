@@ -1,0 +1,75 @@
+## Fine music mood tests. Run them with:   node tools/music_mood_check.js
+## Format:
+##   === id                          starts a case
+##   # lang=en base=dread fine=tension     the book's language code, the scene mood the paragraph sits in, and the expected result
+##   Paragraph text (a blank line ends it).
+## lang  = en, bn ... (the book's language code; the paragraph's own script can override it, see musPickLang)
+## base  = neutral dread danger peace sorrow merry (the scene mood from scene detection)
+## fine  = tension wonder romance chase, or none (no fine mood: the music follows the scene mood)
+## A fine mood needs two or more word hits, and only refines the scene moods listed in MUS_FINE_BASE.
+## The check also runs every case a second time with the letters taken apart (NFD), as some keyboards and files store Bengali; the result must not change.
+## Bengali cases were written by a developer, not a native editor: please have them read over (see BN-REVIEW.md).
+
+=== en-tension
+# lang=en base=dread fine=tension
+The corridor was silent. She waited, listening for footsteps, and a shadow moved under the door.
+
+=== en-wonder
+# lang=en base=peace fine=wonder
+The vast hall was magnificent, its gleaming ceiling dazzling the astonished children.
+
+=== en-romance
+# lang=en base=peace fine=romance
+He kissed her hand. My darling, he whispered, I love you with all my heart.
+
+=== en-chase
+# lang=en base=danger fine=chase
+The hounds were after them; they fled and galloped along the road, pursued until dark.
+
+=== en-plain
+# lang=en base=neutral fine=none
+The farmer sold his wheat at the market and went home for supper.
+
+=== en-one-hit-is-not-enough
+# lang=en base=neutral fine=none
+She waited for the bus.
+
+=== en-romance-not-in-danger
+# lang=en base=danger fine=none
+He kissed her. My darling, I love you.
+
+=== en-empty-language-counts-as-english
+# lang= base=dread fine=tension
+The corridor was silent. She waited, listening for footsteps, and a shadow moved under the door.
+
+=== fr-no-list-no-fine-mood
+# lang=fr base=dread fine=none
+The corridor was silent. She waited, listening for footsteps, and a shadow moved under the door.
+
+=== bn-tension
+# lang=bn base=dread fine=tension
+চারদিক নিস্তব্ধ। সে অপেক্ষা করল, ফিসফিস শব্দ শুনল, আর দরজার নিচে একটা ছায়া নড়ল।
+
+=== bn-wonder
+# lang=bn base=peace fine=wonder
+সামনে এক বিশাল অপূর্ব প্রাসাদ ঝলমল করছিল, আর ছেলেমেয়েরা অবাক হয়ে তাকিয়ে রইল।
+
+=== bn-romance
+# lang=bn base=peace fine=romance
+সে তার হাতে চুমু খেল। প্রিয়তমা, আমি তোমাকে ভালোবাসি, সারা হৃদয় দিয়ে।
+
+=== bn-chase
+# lang=bn base=danger fine=chase
+শিকারি কুকুরগুলো তাদের পিছু নিল; তারা ছুটে পালিয়ে গেল, ঘোড়া ছুটিয়ে।
+
+=== bn-plain
+# lang=bn base=neutral fine=none
+কৃষক বাজারে গম বিক্রি করে সন্ধ্যায় বাড়ি ফিরল।
+
+=== bn-text-wins-over-a-wrong-book-tag
+# lang=en base=dread fine=tension
+চারদিক নিস্তব্ধ। সে অপেক্ষা করল, ফিসফিস শব্দ শুনল, আর দরজার নিচে একটা ছায়া নড়ল।
+
+=== bn-romance-not-in-danger
+# lang=bn base=danger fine=none
+সে তার হাতে চুমু খেল। প্রিয়তমা, আমি তোমাকে ভালোবাসি, সারা হৃদয় দিয়ে।
