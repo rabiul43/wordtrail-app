@@ -141,11 +141,15 @@
        off:      gain 1 (narrator not playing, or P.musDuck switched off)
      Fast attack (0.08 s), slow release (0.9 s), so the music dips before the word and breathes back in the gaps. */
   const MUS_DUCK = { s: { v: [0.28, -4, -2], tc: 0.08 }, p: { v: [0.7, 0, 0], tc: 0.9 }, u: { v: [0.5, -2, -1], tc: 0.4 }, o: { v: [1, 0, 0], tc: 0.5 } };
+  /* How low the music dips while the narrator speaks (P.musDip). Normal is the table above (about -11 dB). Subtle is about -7 dB,
+     Strong about -16 dB; the voice-band carve scales with it. Only the speaking state changes; pauses and unknown stay as they are. */
+  const MUS_DIP = { subtle: { g: 0.45, c: 0.5 }, normal: { g: 0.28, c: 1 }, strong: { g: 0.16, c: 1.5 } };
   function musDuckSet(st) {
     if (!MUS.duck || !MUS.ctx) return;
-    const r = MUS_DUCK[st] || MUS_DUCK.o, t = MUS.ctx.currentTime;
-    MUS.duck.gain.setTargetAtTime(r.v[0], t, r.tc);
-    if (MUS.ca) { MUS.ca.gain.setTargetAtTime(r.v[1], t, r.tc); MUS.cb.gain.setTargetAtTime(r.v[2], t, r.tc); }
+    const r = MUS_DUCK[st] || MUS_DUCK.o, t = MUS.ctx.currentTime, dip = MUS_DIP[P.musDip] || MUS_DIP.normal;
+    const v = st === 's' ? [dip.g, r.v[1] * dip.c, r.v[2] * dip.c] : r.v;
+    MUS.duck.gain.setTargetAtTime(v[0], t, r.tc);
+    if (MUS.ca) { MUS.ca.gain.setTargetAtTime(v[1], t, r.tc); MUS.cb.gain.setTargetAtTime(v[2], t, r.tc); }
   }
   /* Scene detection (and so the music's mood) is stepped by the ambient tick (ambDuckTick) only while the ambient engine is on
      and "Scene sounds" is on. Music is independent of both, so when that tick is not running it, the music steps it itself.
@@ -710,10 +714,49 @@
     audio.addEventListener('playing', musCtxHeal);
   }
 
+  /* ---------- Quick controls tile, dip choice and the one-time hint ---------- */
+  function musOnSet(on) {   // the Music tile's switch: the same effect as the switch in the Music panel
+    if (on && !sndOn()) { P.sndOn = true; sndApplyAll(); }
+    P.musOn = on; P.musHint = true; const c = $('#in-muson'); if (c) c.checked = on;
+    savePrefs(); sndPaint();
+    if (on) { musicAttach(); musicPlay(); } else musicPause();
+    try { qkPaint(); } catch (e) { /* the tile is optional */ }
+  }
+  const MUS_HINT = { t: 0 };
+  function musHintMaybe() {   // once ever: a small note that music exists. Never while a book is not playing, Sound is off or another card is showing.
+    clearTimeout(MUS_HINT.t);
+    if (P.musHint === true || !S.book) return;
+    if (P.musOn === true) { P.musHint = true; savePrefs(); return; }   // already found it
+    if (!sndOn()) return;
+    MUS_HINT.t = setTimeout(() => {
+      try {
+        const g = $('#gesture-hint');
+        if (P.musHint === true || P.musOn === true || !sndOn() || !S.book || audio.paused || el.player.hidden) return;
+        if ((g && !g.hidden) || !el.toast.hidden) return;   // another hint is up: try again at the next play
+        P.musHint = true; savePrefs();
+        toast('Add quiet music that follows the story.', 9000, ['Try music', () => musOnSet(true)]);
+      } catch (e) { /* a hint is never worth an error */ }
+    }, 25000);
+  }
+  function musQuickInit() {
+    const t = $('#qk-t-mus'); if (!t) return;
+    t.addEventListener('click', () => { buzz('tick'); if ($('#qk-o-mus').hidden && P.musOn !== true) musOnSet(true); qkOpt('mus'); });   // first tap turns music on and opens its panel, like Sound
+    $('#qk-mus-on').addEventListener('change', e => musOnSet(e.target.checked));
+    $('#qk-mus-vol').addEventListener('input', e => { musicVolChange(+e.target.value); const v = $('#mus-vol'); if (v) v.value = String(P.musVol); try { qkPaint(); } catch (err) { /* optional */ } });
+    $('#qk-mus-mix').addEventListener('click', () => { closeSheets(); ambOpen(); try { sndTabSelect('mus'); } catch (e) { /* the sheet still opens */ } });
+    $$('#seg-musdip button').forEach(b => b.addEventListener('click', () => {
+      P.musDip = b.dataset.v; savePrefs(); MUS.duckS = '';   // re-apply the dip at once
+      $$('#seg-musdip button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+    audio.addEventListener('playing', musHintMaybe);
+    audio.addEventListener('pause', () => clearTimeout(MUS_HINT.t));
+  }
+
   /* Called once at startup to pre-fetch the manifest in the background. */
   async function musicInit() {
     try { musOffInit(); } catch (e) { console.warn('offline music', e); }
     try { musHealInit(); } catch (e) { console.warn('music wake-up', e); }
+    try { musQuickInit(); } catch (e) { console.warn('music tile', e); }
     if (!MUS.manifest) musFetchManifest();   // fire and forget; the bus is built on the first play
   }
 

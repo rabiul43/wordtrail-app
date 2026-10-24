@@ -45,3 +45,7 @@
 .amb-more summary { cursor: pointer; color: var(--muted); font-size: .82rem; padding: .3rem 0; }
 .amb-more[open] summary { margin-bottom: .2rem; }
 @media (prefers-reduced-motion: reduce) { .snd-sw, .snd-sw::after, .snd-tab { transition: none; } }
+
+/* Quick controls: four tiles in the top row (Speed, Sleep timer, Sound, Music) */
+.qk-tiles.qk-t4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.qk-t4 .qk-tile { font-size: .8rem; padding-left: .15rem; padding-right: .15rem; }

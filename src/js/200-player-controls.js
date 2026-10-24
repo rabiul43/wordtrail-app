@@ -135,7 +135,7 @@
   const SLEEPS = [0, 15, 30, 45, 60, 'chapter'];
   /* Quick controls panel (the three-dot button): shows what is on, and a dot on the button when something is. */
   function qkOpt(which) {
-    ['speed', 'sleep', 'amb'].forEach(k => {
+    ['speed', 'sleep', 'amb', 'mus'].forEach(k => {
       const open = k === which && $('#qk-o-' + k).hidden;
       $('#qk-o-' + k).hidden = !open; $('#qk-t-' + k).setAttribute('aria-expanded', String(open));
     });
@@ -155,11 +155,13 @@
     if (rg) { const ri = Math.round((spdClamp(P.speed) - 0.5) / 0.05); if (+rg.value !== ri) rg.value = String(ri); rg.style.setProperty('--fill', (ri / 50 * 100) + '%'); if ($('#spd-big')) { $('#spd-big').textContent = spdFmt(P.speed); $('#spd-mood').textContent = (P.speed < 0.8 ? 'Taking it slow' : P.speed < 0.95 ? 'Slightly slower' : P.speed === 1 ? 'Normal speed' : P.speed <= 1.3 ? 'Slightly faster' : P.speed <= 1.6 ? 'Crisp pace' : P.speed <= 2 ? 'Quick listen' : 'Full speed ahead'); $('#qk-speed-go').textContent = 'No change'; } }
     const av = $('#qk-v-amb'), on = P.ambOn === true && sndOn();
     if (av) { av.textContent = on ? (P.ambVol == null ? 70 : P.ambVol) + '%' : 'Off'; $('#qk-t-amb').dataset.on = String(on); const c = $('#qk-amb-on'), r = $('#qk-amb-vol'); if (c) c.checked = on; if (r) { r.value = String(P.ambVol == null ? 70 : P.ambVol); r.style.setProperty('--fill', r.value + '%'); } }
+    const mv = $('#qk-v-mus'), mon = P.musOn === true && sndOn();
+    if (mv) { const vol = P.musVol == null ? 40 : P.musVol; mv.textContent = mon ? vol + '%' : 'Off'; $('#qk-t-mus').dataset.on = String(mon); const c = $('#qk-mus-on'), r = $('#qk-mus-vol'); if (c) c.checked = mon; if (r) { r.value = String(vol); r.style.setProperty('--fill', vol + '%'); } }
     /* Text only is on while the player is hidden; More shows a dot when something needs a look */
     const ro = !!(el.player && el.player.classList.contains('ro')), moreBtn = $('#b-more'), rt = $('#qk-read'), mt = $('#qk-more');
     if (rt) { rt.dataset.on = String(ro); rt.setAttribute('aria-label', 'Text only, ' + (ro ? 'active' : 'not active')); }
     if (mt) mt.classList.toggle('has-dot', !!(moreBtn && moreBtn.classList.contains('has-dot')));
-    [['speed', 'Speed'], ['sleep', 'Sleep timer'], ['amb', 'Sound']].forEach(([k, nm]) => {
+    [['speed', 'Speed'], ['sleep', 'Sleep timer'], ['amb', 'Sound'], ['mus', 'Music']].forEach(([k, nm]) => {
       const t = $('#qk-t-' + k), v = $('#qk-v-' + k); if (t && v) t.setAttribute('aria-label', nm + ', ' + v.textContent + (t.dataset.on === 'true' ? ', active' : ', not active'));
     });
     const more = $('#b-more'), dot = P.speed !== 1 || !!S.sleep || !!(more && more.classList.contains('has-dot'));

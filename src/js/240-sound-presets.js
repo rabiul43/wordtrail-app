@@ -19,7 +19,7 @@
   /* The preset row is Off, the three above, and Custom. Off is the master switch (settings are kept); Custom is what shows once
      anything has been moved by hand. */
   const AMB_OFF_PRESET = ['off', 'Off', 'Everything is silent. Your settings are kept; turn Sound back on to hear them again.'];
-  const AMB_PRESET_KEYS = ['ambInt', 'ambVol', 'ambCues', 'ambTrans', 'ambAuto', 'ambDuck', 'ambSmart', 'ambTod', 'musOn', 'musVol', 'musDuck', 'openOn', 'openVol'];
+  const AMB_PRESET_KEYS = ['ambInt', 'ambVol', 'ambCues', 'ambTrans', 'ambAuto', 'ambDuck', 'ambSmart', 'ambTod', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol'];
   function ambBuildPresets() {
     const box = $('#amb-presets'); box.textContent = '';
     [AMB_OFF_PRESET].concat(AMB_PRESETS, [['custom', 'Custom']]).forEach(([k, n]) => box.append(h('button', { class: 'chip', type: 'button', 'data-k': k, 'aria-pressed': 'false' }, n)));
@@ -68,7 +68,8 @@
     set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); });
     set('#in-ambon', e => { e.checked = P.ambOn === true; });
     set('#in-muson', e => { e.checked = P.musOn === true; });
-    set('#row-musvol', e => { e.hidden = P.musOn !== true; }); set('#row-musduck', e => { e.hidden = P.musOn !== true; });
+    set('#row-musvol', e => { e.hidden = P.musOn !== true; }); set('#row-musduck', e => { e.hidden = P.musOn !== true; }); set('#row-musdip', e => { e.hidden = P.musOn !== true; });
+    $$('#seg-musdip button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (MUS_DIP[P.musDip] ? P.musDip : 'normal'))));
     set('#mus-vol', e => { e.value = String(P.musVol == null ? 40 : P.musVol); }); set('#in-musduck', e => { e.checked = P.musDuck !== false; });
     set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
@@ -138,7 +139,7 @@
     } catch (e) { /* ignore */ }
     sndCacheSizePaint(); musOffPaint(); toast('Saved sound files removed.');
   }
-  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'ambBook', 'ambG', 'musSeen'];
+  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'ambBook', 'ambG', 'musSeen'];
   function sndResetAll() {
     if (!confirm('Put all sound settings back to normal? Your saved mixes for each book are cleared too.')) return;
     SND_RESET_KEYS.forEach(x => { delete P[x]; });
@@ -277,7 +278,7 @@
     $('#snd-cache-clear').addEventListener('click', sndCacheClear); setTimeout(() => sndCachePrune(true), 20000);   // trim an oversized cache shortly after start
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
     $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
-    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); });
+    $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); $('#row-musvol').hidden = !e.target.checked; $('#row-musduck').hidden = !e.target.checked; $('#row-musdip').hidden = !e.target.checked; if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); try { qkPaint(); } catch (err) { /* the tile is optional */ } });
     $('#mus-vol').addEventListener('input', e => musicVolChange(+e.target.value));
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; });   // re-apply the dip at once
     sndPaint(); ambPresetPaint();

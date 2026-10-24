@@ -52,14 +52,14 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
-| `200-player-controls.js` | 487 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
+| `200-player-controls.js` | 489 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
 | `210-sound-mixer.js` | 690 | background sound mixer, real recordings |
 | `220-story-sounds.js` | 406 | story sounds |
 | `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
-| `240-sound-presets.js` | 288 | hear a sound; quick presets |
+| `240-sound-presets.js` | 289 | hear a sound; quick presets |
 | `245-sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when that layer is on, and the dimmed look while Sound is off (`sndTabsPaint`, `sndTabsInit`; styles in `src/css/96-sound-tabs.css`) |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 371 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
