@@ -50,7 +50,22 @@
     try { const an = ctx.createAnalyser(); an.fftSize = 1024; an.smoothingTimeConstant = 0; node.connect(an); SMX.tap[k] = { node, an }; return an; } catch (e) { return null; }
   }
   function smxApply(tc) { try { musBusApply(tc); ambMaster(tc); } catch (e) { /* the buses may not exist yet */ } }
+  /* Smart mix on = it decides the volumes by itself: the music and ambient volume sliders are set to their reference positions and
+     locked. The old slider values are kept (P.smxSaved) and come back when Smart mix is switched off. */
+  const SMX_SLIDERS = ['#mus-vol', '#amb-vol', '#qk-mus-vol', '#qk-amb-vol'];
+  function smxLock() {
+    const on = smxOn();
+    if (on && !P.smxSaved) { P.smxSaved = { m: P.musVol == null ? null : P.musVol, a: P.ambVol == null ? null : P.ambVol }; P.musVol = SMX_REF.mus * 100; P.ambVol = SMX_REF.amb * 100; savePrefs(); }
+    else if (!on && P.smxSaved) { const o = P.smxSaved; delete P.smxSaved; if (o.m == null) delete P.musVol; else P.musVol = o.m; if (o.a == null) delete P.ambVol; else P.ambVol = o.a; savePrefs(); }
+    else if (on) { /* already locked */ }
+    else { SMX_SLIDERS.forEach(q => { const e = $(q); if (e && e.disabled) e.disabled = false; }); return; }
+    SMX_SLIDERS.forEach(q => { const e = $(q); if (!e) return; e.disabled = on; e.value = String(q.includes('mus') ? (P.musVol == null ? 40 : P.musVol) : (P.ambVol == null ? 70 : P.ambVol)); e.style.opacity = on ? '0.45' : ''; });
+    try { musVolPaint(); } catch (e) { /* optional */ }
+    try { qkPaint(); } catch (e) { /* optional */ }
+    try { musBusApply(0.1); ambMaster(0.1); } catch (e) { /* the buses may not exist yet */ }
+  }
   function smxPaint() {
+    try { smxLock(); } catch (e) { /* optional */ }
     const f = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(Math.round(v)) + ' dB';
     const tx = !smxOn() ? '' : !SMX.live ? 'Starts when the book plays and the narrator is heard.' : 'Adjusting by itself: music ' + f(SMX.t.mus) + ', sounds ' + f(SMX.t.amb) + '.';
     $$('.smx-st').forEach(el => { el.textContent = tx; });
@@ -68,7 +83,7 @@
   }
   function smxTick() {
     try {
-      smxBook();
+      smxBook(); if (!!P.smxSaved !== smxOn()) smxLock();
       const live = smxOn() && !!S.book && !!vgraph;
       if (live !== SMX.live) { SMX.live = live; smxPaint(); }
       if (!live || document.hidden || audio.paused || audio.seeking || S.loadingAudio) return;
@@ -103,3 +118,4 @@
     SMX.live = false; try { sndBalSync(); } catch (err) { /* optional */ }
     smxApply(1); smxPaint();
   }));
+  setTimeout(() => { try { smxLock(); } catch (e) { /* optional */ } }, 0);
