@@ -24,9 +24,10 @@
      other nodes (MUS.duck, AMB.duck and the carve filters), so the two never fight. The saved sliders are never changed. It follows the
      switches, not the playback state, so a pause and play does not make the music swell. The state is AMB.bal; it ramps slowly (tc 1.5 s). */
   const SND_BAL_MUS = 0.6, SND_BAL_AMB = 0.85;
-  function sndBalMus() { return AMB.bal ? SND_BAL_MUS : 1; }   // functions, so they exist whenever the bus code asks
-  function sndBalAmb() { return AMB.bal ? SND_BAL_AMB : 1; }
+  function sndBalMus() { return AMB.bal ? SND_BAL_MUS : (smxLive() ? SMX.lin.mus : 1); }   // functions, so they exist whenever the bus code asks. The fixed balance and the smart mix (smart-mix.js) never work together
+  function sndBalAmb() { return AMB.bal ? SND_BAL_AMB : (smxLive() ? SMX.lin.amb : 1); }
   function sndBalWant() {
+    if (smxLive()) return false;   // the smart mix measures and balances by itself
     if (P.sndBalance === false || !sndOn() || P.musOn !== true || P.ambOn !== true || musVol() <= 0 || ambVol() <= 0) return false;
     if (P.ambAuto !== false) return true;   // following the story: the scene sounds are expected
     const L = ambLive(); return AMB_SOUNDS.some(([k]) => L[k] > 0);
@@ -48,6 +49,7 @@
     set('#snd-duckkids', e => { const on = P.ambDuck !== false || P.musDuck !== false; e.toggleAttribute('data-off', !on); e.querySelectorAll('input,button').forEach(x => { x.disabled = !on && x.id !== 'amb-duck' && x.id !== 'in-musduck' ? true : false; }); });
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
     set('#snd-balance', e => { e.checked = P.sndBalance !== false; });
+    try { smxPaint(); } catch (e) { /* optional */ }
     set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); });
     set('#amb-dev', e => { e.hidden = P.sndDev !== true; });
     sndNowPaint(); sndTabsPaint(); musOffPaint();
