@@ -82,7 +82,8 @@
   }
   function ambCustomInit() {
     const sel = $('#amb-cw-k'), msg = $('#amb-cw-msg'), note = msg.textContent;
-    Object.keys(CUE_SOUND).sort((x, y) => (CUE_NAMES[x] || x).localeCompare(CUE_NAMES[y] || y)).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = CUE_NAMES[k] || k; sel.append(o); });
+    const cueCol = new Intl.Collator();   // one collator is much faster than localeCompare on every pair, same order
+    Object.keys(CUE_SOUND).sort((x, y) => cueCol.compare(CUE_NAMES[x] || x, CUE_NAMES[y] || y)).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = CUE_NAMES[k] || k; sel.append(o); });
     const add = () => {
       const inp = $('#amb-cw-w'), w = inp.value.trim().toLowerCase().replace(/\u2019/g, "'"), k = sel.value, list = Array.isArray(P.ambCueCustom) ? P.ambCueCustom : [];
       if (!/^[a-z0-9]+(?:'[a-z]+)?$/.test(w)) { msg.textContent = 'Type one word, using the letters a to z or digits.'; return; }

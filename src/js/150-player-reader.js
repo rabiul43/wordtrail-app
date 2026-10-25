@@ -612,7 +612,7 @@
     }, true));
     document.addEventListener('visibilitychange', () => { if (!document.hidden && vgraph && vctx.state !== 'running') vctx.resume().catch(() => {}); });
     if (window.ResizeObserver) new ResizeObserver(() => { vizSize(); if (audio.paused) vizIdle(); }).observe(vz);
-    vizIdle();
+    (window.requestIdleCallback || setTimeout)(vizIdle);   // first idle drawing waits until the browser is free, so it does not slow the start
   }
 
   function setPlayIcon(playing) {

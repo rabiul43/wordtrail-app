@@ -75,7 +75,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/sound-core.js` | 63 | 12 | 9 | 22 |
 | `sound/smart-mix.js` | 121 | 17 | 3 | 15 |
 | `sound/sound-cache.js` | 59 | 15 | 9 | 2 |
-| `sound/sound-screen.js` | 183 | 13 | 5 | 73 |
+| `sound/sound-screen.js` | 184 | 13 | 5 | 73 |
 | `sound/sound-tabs.js` | 47 | 4 | 3 | 1 |
 | `246-controls-search.js` | 69 | 4 | 0 | 4 |
 | `247-player-menu.js` | 112 | 0 | 0 | 12 |
