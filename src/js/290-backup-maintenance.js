@@ -8,6 +8,42 @@
   const BK_PREFIX = ['wt:book:', 'wt:bm:', 'wt:clips:', 'wt:lp:', 'wt:lev:'];
   const BK_IDB = /^(s|f):/;
   const bkWanted = k => BK_KEYS.indexOf(k) >= 0 || BK_PREFIX.some(p => k.indexOf(p) === 0);
+  /* Safety checks for a restore. A backup is only trusted for what each item is known to hold, so a damaged or
+     hand-edited file cannot leave the app with data it cannot read. Bad items are skipped, never the whole file,
+     so backups from other versions still restore. */
+  const BK_MAX_FILE = 200 * 1024 * 1024;   // refuse files bigger than this before reading them
+  const BK_MAX_IDB = 5000;                 // most text/sync entries one backup may carry
+  const BK_LISTS = ['wt:favs', 'wt:words', 'wt:listens', 'wt:recent-q', 'wt:finlv'];   // these hold a list, every other item holds an object
+  const bkIsObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+  const bkIsList = k => BK_LISTS.indexOf(k) >= 0 || k.indexOf('wt:clips:') === 0;
+  const bkShapeOk = (k, v) => bkIsList(k) ? Array.isArray(v) : bkIsObj(v);
+  function bkCleanPrefs(v) {   // keep a setting only when it has the same kind of value the app already uses for it
+    const out = {};
+    Object.keys(v).forEach(k => {
+      if (k === '__proto__' || k === 'constructor' || k === 'prototype') return;
+      const cur = P[k], x = v[k];
+      if (cur !== undefined && cur !== null && (typeof cur !== typeof x || Array.isArray(cur) !== Array.isArray(x))) return;
+      out[k] = x;
+    });
+    return out;
+  }
+  function bkCheck(d) {   // -> { ls: {key: value}, idb: {key: value}, skipped: n }
+    const ls = {}, idb = {};
+    let skipped = 0;
+    Object.keys(d.ls).forEach(k => {
+      if (!bkWanted(k)) return;                       // not something a backup carries: ignored, not counted
+      let v = d.ls[k];
+      if (!bkShapeOk(k, v)) { skipped++; return; }
+      if (k === 'wt:prefs') v = bkCleanPrefs(v);
+      ls[k] = v;
+    });
+    const src = bkIsObj(d.idb) ? d.idb : {};
+    Object.keys(src).filter(k => BK_IDB.test(k)).slice(0, BK_MAX_IDB).forEach(k => {
+      const v = src[k];
+      if (k.charAt(0) === 'f' ? typeof v === 'string' : bkIsObj(v)) idb[k] = v; else skipped++;   // f: = book text, s: = sync state
+    });
+    return { ls, idb, skipped };
+  }
   function bkIdbAll() {
     return new Promise(res => {
       try {
@@ -66,18 +102,30 @@
     finally { btn.disabled = false; }
   }
   async function bkRestore(file) {
+    if (!file) return;
+    if (file.size > BK_MAX_FILE) { toast('That file is too big to be a Wordtrail backup.', 4500); return; }
     let d = null;
     try { d = JSON.parse(await file.text()); } catch (e) { d = null; }
-    if (!d || d.app !== 'wordtrail' || d.kind !== 'backup' || d.v !== 1 || !d.ls || typeof d.ls !== 'object') { toast('That is not a Wordtrail backup file.', 4500); return; }
-    const n = Object.keys(d.ls).filter(bkWanted).length;
-    if (!confirm('Restore ' + n + ' saved items from the backup of ' + (String(d.created || '').slice(0, 10) || 'unknown date') + '? Matching data on this device will be replaced.')) return;
+    if (!d || d.app !== 'wordtrail' || d.kind !== 'backup' || d.v !== 1 || !bkIsObj(d.ls)) { toast('That is not a Wordtrail backup file.', 4500); return; }
+    const ok = bkCheck(d), keys = Object.keys(ok.ls), n = keys.length + Object.keys(ok.idb).length;
+    if (!n) { toast('That backup has nothing this app can restore.', 4500); return; }
+    if (!confirm('Restore ' + n + ' saved items from the backup of ' + (String(d.created || '').slice(0, 10) || 'unknown date') + '?' + (ok.skipped ? ' ' + ok.skipped + ' damaged items will be skipped.' : '') + ' Matching data on this device will be replaced.')) return;
     window.__wtRestoring = true;
+    const before = {};   // what was here, so a failed restore can be undone
     try {
-      Object.keys(d.ls).forEach(k => { if (bkWanted(k)) { try { localStorage.setItem(k, JSON.stringify(d.ls[k])); } catch (e) { /* storage full: skip */ } } });
-      await bkIdbPut(d.idb && typeof d.idb === 'object' ? d.idb : {});
-      toast('Backup restored. Reloading…', 2500);
+      keys.forEach(k => { before[k] = localStorage.getItem(k); });
+      keys.forEach(k => localStorage.setItem(k, JSON.stringify(ok.ls[k])));   // throws if storage fills up
+      await bkIdbPut(ok.idb);
+      toast('Backup restored' + (ok.skipped ? ' (' + ok.skipped + ' damaged items skipped)' : '') + '. Reloading…', 2500);
       setTimeout(() => location.reload(), 900);
-    } catch (e) { window.__wtRestoring = false; toast('Restore failed. Nothing else was changed.', 4500); }
+    } catch (e) {
+      keys.slice().reverse().forEach(k => {
+        if (!(k in before)) return;
+        try { if (before[k] === null) localStorage.removeItem(k); else localStorage.setItem(k, before[k]); } catch (e2) { /* could not put it back */ }
+      });
+      window.__wtRestoring = false;
+      toast('Restore failed (is storage full?). Your data on this device was left as it was.', 5000);
+    }
   }
 
   async function useRaw(raw, src) {
