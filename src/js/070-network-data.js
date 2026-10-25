@@ -464,16 +464,22 @@
     `https://www.gutenberg.org/ebooks/${id}.txt.utf-8`,
     `https://www.gutenberg.org/files/${id}/${id}-0.txt`
   ];
-  // Project Gutenberg does not reliably allow direct browser requests, so the same
-  // file is requested through several routes at once and the first valid text wins.
+  // Project Gutenberg does not reliably allow direct browser requests, so the same file can be asked for through several routes.
+  // The route that worked last time goes first and is asked alone; the next route is added only if it fails, or if nothing has
+  // answered within TEXT_STAGGER ms. This keeps a normal download to one source and still covers a blocked route.
   const TEXT_ROUTES = [
     { name: 'direct', f: u => u },
     { name: 'allorigins', f: u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
-    { name: 'allorigins-json', f: u => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u), json: true },
     { name: 'codetabs', f: u => 'https://api.codetabs.com/v1/proxy/?quest=' + encodeURIComponent(u) },
     { name: 'jina', f: u => 'https://r.jina.ai/' + u, jina: true },
     { name: 'corsproxy', f: u => 'https://corsproxy.io/?' + encodeURIComponent(u) }
   ];
+  const TEXT_ROUTE_KEY = 'wt:textRoute', TEXT_STAGGER = 1500;
+  function textRouteOrder() {   // the remembered route first, the others in their usual order (kept on this device only: it depends on the network)
+    let best = ''; try { best = localStorage.getItem(TEXT_ROUTE_KEY) || ''; } catch (e) { /* storage unavailable */ }
+    const hit = TEXT_ROUTES.find(r => r.name === best);
+    return hit ? [hit].concat(TEXT_ROUTES.filter(r => r !== hit)) : TEXT_ROUTES.slice();
+  }
   async function readBody(resp, onBytes) {
     if (!onBytes || !resp.body || !resp.body.getReader) return resp.text();
     const total = +resp.headers.get('content-length') || 0;
@@ -486,32 +492,47 @@
     }
     return out + dec.decode();
   }
-  async function fetchTextRace(url, ms = 30000, cb) {
-    let best = 0, bestTotal = 0;
+  function fetchTextRace(url, ms = 30000, cb) {
+    const order = textRouteOrder();
+    let best = 0, bestTotal = 0, alive = false;
     const onBytes = cb ? (n, total) => { if (total) bestTotal = Math.max(bestTotal, total); if (n > best) { best = n; cb({ type: 'bytes', n: best, total: bestTotal }); } } : null;
-    const ctrls = TEXT_ROUTES.map(() => new AbortController());
-    const attempts = TEXT_ROUTES.map(async (r, i) => {
+    const ctrls = order.map(() => new AbortController());
+    const attempt = async (r, i) => {
       const to = setTimeout(() => ctrls[i].abort(), ms);
       try {
         const resp = await fetch(r.f(url), { signal: ctrls[i].signal });
         if (!resp.ok) throw new Error(r.name + ' HTTP ' + resp.status);
-        let t = r.json ? (await resp.json()).contents : await readBody(resp, onBytes);
+        alive = true;                                    // this route answered: no more routes are added just because it is slow
+        let t = await readBody(resp, onBytes);
         if (r.jina && typeof t === 'string') t = t.replace(/^[\s\S]{0,2000}?Markdown Content:\n/, '');
         if (typeof t !== 'string' || t.length < 4000 || /^\s*<(!doctype|html)/i.test(t)) throw new Error(r.name + ' returned no text');
         return t;
       } catch (e) {
         throw new Error(e.name === 'AbortError' ? r.name + ' timed out' : (e.message === 'Failed to fetch' ? r.name + ' blocked' : e.message));
       } finally { clearTimeout(to); }
+    };
+    return new Promise((resolve, reject) => {
+      const errs = []; let started = 0, failed = 0, done = false, timer = 0;
+      const launch = () => {
+        clearTimeout(timer);
+        if (done || started >= order.length) return;
+        const i = started++;
+        timer = setTimeout(() => { if (!alive) launch(); }, TEXT_STAGGER);
+        attempt(order[i], i).then(t => {
+          if (done) return;
+          done = true; clearTimeout(timer); ctrls.forEach(c => c.abort());
+          try { if (localStorage.getItem(TEXT_ROUTE_KEY) !== order[i].name) localStorage.setItem(TEXT_ROUTE_KEY, order[i].name); } catch (e) { /* storage unavailable */ }
+          resolve(t);
+        }, e => {
+          if (done) return;
+          errs.push(e.message); failed++;
+          if (failed < started) return;                  // another route is still working
+          if (started < order.length) launch();          // every route so far failed: add the next one at once
+          else { done = true; clearTimeout(timer); const err = new Error('Download failed (' + errs.join(', ') + ')'); err.download = true; reject(err); }
+        });
+      };
+      launch();
     });
-    try {
-      const text = await Promise.any(attempts);
-      ctrls.forEach(c => c.abort());
-      return text;
-    } catch (e) {
-      const err = new Error('Download failed (' + (e.errors || []).map(x => x.message).join(', ') + ')');
-      err.download = true;
-      throw err;
-    }
   }
   const gutInflight = new Map();
   function getGutenberg(id, cb) {
@@ -526,12 +547,34 @@
     if (cb) f.cbs.push(cb);
     return f.p;
   }
+  const BOOK_TEXT_REPO = 'rabiul43/Book_Text';
+  /* Our own copy of the book text on Hugging Face: texts/<id / 1000>/<id>.txt.gz in BOOK_TEXT_REPO (filled by the Kaggle notebook wordtrail_book_text_kaggle.ipynb, or by tools/prep_texts.py).
+     One small gzip file from one source, so it is asked before the public proxies. null = not there (yet) or not usable: the usual routes follow. */
+  async function getHfText(id, cb) {
+    if (typeof DecompressionStream === 'undefined' || !/^\d+$/.test(String(id))) return null;
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+    try {
+      const r = await fetch('https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(+id / 1000) + '/' + id + '.txt.gz', { signal: ctl.signal });
+      if (!r.ok) return null;
+      const total = +r.headers.get('content-length') || 0, chunks = [];
+      let n = 0;
+      if (r.body && r.body.getReader) {
+        const rd = r.body.getReader();
+        for (;;) { const { done, value } = await rd.read(); if (done) break; chunks.push(value); n += value.length; if (cb) cb({ type: 'bytes', n, total }); }
+      } else chunks.push(new Uint8Array(await r.arrayBuffer()));
+      const buf = new Uint8Array(await new Blob(chunks).arrayBuffer());
+      const t = buf[0] === 0x1f && buf[1] === 0x8b ? await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text() : new TextDecoder().decode(buf);
+      return t.length >= 4000 && !/^\s*<(!doctype|html)/i.test(t) ? t : null;
+    } catch (e) { return null; } finally { clearTimeout(to); }
+  }
   async function getGutenberg0(id, cb) {
     const key = 'g:' + id;
     const cached = await idb.get(key);
     if (cached) { if (cb) cb({ type: 'cached' }); return cached; }
     const bt = bundleText.get(String(id));
     if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bt; if (t) return t; } // null: the combined request failed, use the usual routes
+    const own = await getHfText(id, cb);          // our own small copy first
+    if (own) { idb.set(key, own); return own; }
     let last;
     const urls = gutUrls(id);
     for (let i = 0; i < urls.length; i++) {
