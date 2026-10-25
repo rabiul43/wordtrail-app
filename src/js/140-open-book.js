@@ -167,20 +167,26 @@
     }
     if (token !== S.textToken) return;
     setOpen(0.88, 'prep', parsed ? 'from the saved copy' : '', true);
-    if (!parsed) { await new Promise(r => setTimeout(r, 40)); if (token !== S.textToken) return; } // lets the progress bar paint before a long parse
+    let fresh = null;
+    if (!parsed) {   // the parse runs in the background worker (same Core code); if the worker is off or fails, BG.call runs it here as before
+      await new Promise(r => setTimeout(r, 40));   // lets the progress bar paint first
+      if (token !== S.textToken) return;
+      try { fresh = await BG.call('parseBook', [raw]); } catch (e) { fresh = null; }
+      if (token !== S.textToken) return;
+    }
     try {
-      applyText(raw, src, saved || {}, parsed);
+      applyText(raw, src, saved || {}, parsed, fresh);
       endOpen();
     } catch (e) {
       console.error('Wordtrail: text processing failed', e);
       note('The text downloaded but could not be processed.', [['Use my own text', () => openSheet('sheet-text')]], e && e.message);
     }
   }
-  function applyText(raw, src, saved, parsed) {
+  function applyText(raw, src, saved, parsed, fresh) {   // fresh: a model already parsed in the worker
     S.textSrc = src;
     if (parsed) S.model = parsed;
     else {
-      S.model = Core.parseBook(raw);
+      S.model = fresh || Core.parseBook(raw);
       const key = parsedKey(src, raw);
       if (key) idb.set(key, { v: PARSE_V, sents: S.model.sents, chapters: S.model.chapters });
     }

@@ -327,7 +327,7 @@
     $('#in-skipcuts').addEventListener('change', e => { P.skipCuts = e.target.checked; savePrefs(); if (S.model) replan(false); toast(P.skipCuts ? 'Intro and outro will be skipped' : 'Intro and outro skipping is off'); });
     $('#in-bcol').addEventListener('change', e => { P.bookColors = e.target.checked; savePrefs(); if (e.target.checked && S.book && !el.player.hidden) bookAccent(S.book); else clearAccent(); });
     $('#in-langs').addEventListener('change', e => { P.otherLangs = e.target.checked; savePrefs(); catPurge(); refreshHome(); toast(P.otherLangs ? 'Showing all languages' : 'Showing English only'); });
-    $('#in-worker').addEventListener('change', e => { P.bgWorker = e.target.checked; savePrefs(); BG.reset(); });
+    $('#in-worker').addEventListener('change', e => { P.bgWorker = e.target.checked; savePrefs(); BG.reset(); SCP.reset(); });
     $('#in-layout').addEventListener('change', e => { P.layoutBatch = e.target.checked; savePrefs(); });
     $('#in-idle').addEventListener('change', e => { P.idleWork = e.target.checked; savePrefs(); hbSync(); });
     $('#in-net').addEventListener('change', e => { P.fastNet = e.target.checked; savePrefs(); });

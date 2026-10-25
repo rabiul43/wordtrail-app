@@ -34,8 +34,8 @@ def minify_html(data):
             return m.group(0)
         if tag == b"script":
             t = re.search(rb'type\s*=\s*["\']?([^"\'\s>]+)', attrs)
-            if t and t.group(1).lower() not in (b"text/javascript", b"application/javascript"):
-                return m.group(0)          # JSON / text data blocks stay as they are
+            if t and t.group(1).lower() not in (b"text/javascript", b"application/javascript") and b'id="scene-worker-src"' not in attrs:
+                return m.group(0)          # (the scene worker's code is plain text but is still JavaScript, so it is minified)          # JSON / text data blocks stay as they are
             out = run(body, "js").replace(b"</script", b"<\\/script")
         else:
             out = run(body, "css").replace(b"</style", b"<\\/style")

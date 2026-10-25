@@ -242,7 +242,7 @@
       if (box._tok !== tok) return;                       // style changed or box redrawn meanwhile
       const srcs = seList.map(o => o.url).concat(real);
       let i = 0, tried = false;
-      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', referrerpolicy: 'no-referrer' });
+      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', width: '200', height: '300', referrerpolicy: 'no-referrer' });   // width/height = the 2:3 shape (the CSS box already fixes the real size; the colour behind is the placeholder)
       const isSe = () => img.dataset.se === '1';
       const good = () => isSe() || st !== 'auto' || (img.naturalWidth >= 300 && img.naturalHeight >= img.naturalWidth * 1.25 && img.naturalHeight <= img.naturalWidth * 1.9);
       const next = () => {

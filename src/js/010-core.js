@@ -729,7 +729,56 @@ const makeCore = () => {
     return out.map(x => +x.toFixed(2));
   }
 
-  return { fillWordTimes, stripGutenberg, toParagraphs, isHeading, splitSentences, syllables, spokenCost, parseBook, defaultMap, buildPlan, introCost, envelope, speechSegments, alignSentences, alignStart, alignWindow, snapBoundary, mp3Header, id3End, findMp3Sync, walkFrames, sectionTimes, locate, parseNum, parseRange, namedKey, formatTime };
+  /* ---------- Search inside books (runs in the background worker; see 090) ----------
+     The normalised text of every searched book is kept here (fdLoad), so a search only sends the words in and gets sentence numbers back.
+     Plain words must all appear in one sentence; "quoted words" in that order; the last plain word also matches as a start. */
+  const fdCh = new Map();
+  function fdChar(c) {
+    let r = fdCh.get(c);
+    if (r === undefined) {
+      if (c === '’' || c === '‘' || c === '`' || c === 'ʼ') r = "'";
+      else { const d = c.normalize('NFD').charAt(0).toLowerCase(); r = d === "'" || (d.length === 1 && /[\p{L}\p{N}]/u.test(d)) ? d : ' '; }
+      fdCh.set(c, r);
+    }
+    return r;
+  }
+  function fdNorm(t) { let o = ''; for (let i = 0; i < t.length; i++) o += fdChar(t[i]); return o; }
+  const fdEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function fdParse(q) {
+    const parts = [], re = /"([^"]+)"|(\S+)/g; let mm;
+    const raw = [];
+    while ((mm = re.exec(q))) raw.push(mm[1] != null ? { t: mm[1], quoted: true } : { t: mm[2], quoted: false });
+    raw.forEach((x, i) => {
+      const toks = fdNorm(x.t).split(/\s+/).filter(Boolean);
+      if (!toks.length) return;
+      const last = i === raw.length - 1 && !x.quoted;
+      const body = toks.map(fdEsc).join('\\s+');
+      parts.push({ probe: toks[0], rx: new RegExp('(^|[^\\p{L}\\p{N}])(' + body + ')' + (last ? '' : "(?![\\p{L}\\p{N}])"), 'gu') });
+    });
+    return parts;
+  }
+  function fdMatch(parts, n) {
+    for (const p of parts) if (n.indexOf(p.probe) < 0) return false;
+    for (const p of parts) { p.rx.lastIndex = 0; if (!p.rx.test(n)) return false; }
+    return true;
+  }
+  const fdIdx = new Map();   // book key -> { N: normalised sentences, HD: 1 where the sentence is a heading }
+  function fdLoad(key, T, HD) { const N = new Array(T.length); for (let i = 0; i < T.length; i++) N[i] = fdNorm(T[i]); fdIdx.set(key, { N, HD }); return T.length; }
+  function fdKeep(keys) { const ok = new Set(keys); for (const k of [...fdIdx.keys()]) if (!ok.has(k)) fdIdx.delete(k); return fdIdx.size; }
+  /* keys not loaded here (the worker was restarted) come back in `miss`; the caller loads them and asks again. */
+  function fdFind(keys, q, cap) {
+    const parts = fdParse(q), found = [], miss = [];
+    for (const key of keys) {
+      const ix = fdIdx.get(key);
+      if (!ix) { miss.push(key); continue; }
+      const hits = [];
+      for (let i = 0; i < ix.N.length; i++) { if (!ix.HD[i] && fdMatch(parts, ix.N[i])) { hits.push(i); if (hits.length >= cap) break; } }
+      if (hits.length) found.push([key, hits]);
+    }
+    return { found, miss };
+  }
+
+  return { fdNorm, fdParse, fdMatch, fdLoad, fdKeep, fdFind, fillWordTimes, stripGutenberg, toParagraphs, isHeading, splitSentences, syllables, spokenCost, parseBook, defaultMap, buildPlan, introCost, envelope, speechSegments, alignSentences, alignStart, alignWindow, snapBoundary, mp3Header, id3End, findMp3Sync, walkFrames, sectionTimes, locate, parseNum, parseRange, namedKey, formatTime };
 };
 const Core = makeCore();
 

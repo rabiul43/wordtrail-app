@@ -47,6 +47,7 @@
     try {
       const m = S.model, id = S.curId; if (!m || !m.sents || id == null || id < 0 || !m.sents[id]) return;
       const ix = ambSceneIdx(m), pi = ix.pi[id];
+      scenePrescore(m, ix, pi);   // (234) the worker scores the paragraphs ahead
       const A = AMB.auto || (AMB.auto = { place: '', wx: '', time: '', mood: '', L: null, hold: false, holdSig: '', pi: -9, model: null, memo: {}, sig: '' });
       if (pi != null && ix.sents[id].ch != null) ambChapScan(ix, ix.sents[id].ch);   // (does nothing once the chapter has been scanned)
       const look = pi != null && A.model === m && A.pi === pi && !A.refix && A.look !== pi && P.ambLook !== false && ix.pa[pi].b === id && !!ix.pa[pi + 1];   // the last sentence of a paragraph: look at the next one

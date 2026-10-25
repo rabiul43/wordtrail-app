@@ -46,3 +46,24 @@ Build: `python3 build.py` -> dist/index.html
 - src/js/200-player-controls.js -> i18nFont() skips the Google request when the page has class fonts-local
 - DEPLOY: commit src/fonts/ after running the fetch tool, then build as usual
 
+
+## 9. Long lists are virtualized
+- src/js/031-virtual-list.js (new) -> vlist(): only rows near the screen are in the page
+- src/js/120-search-recommendations.js -> search results use vlist (40+ results)
+- src/js/080-ui-shell-favourites.js -> My books shelf uses vlist (40+ books)
+- src/js/090-synced-stats-book-search.js -> Synced list uses vlist (60+ books)
+- build.py -> one new line for 031
+- The reader text is not changed: it already draws one track at a time with content-visibility
+
+## 10. Cover images
+- Already in place: loading=lazy, CSS-sized cover boxes with a colour placeholder and a fade-in (100-home-covers.js, 20/40 css)
+- src/js/100-home-covers.js -> cover img gets width/height (2:3)
+- src/js/090-synced-stats-book-search.js -> Synced row cover gets width/height, decoding async, no-referrer
+
+## 11. Heavy work in the background worker
+- src/js/010-core.js -> Core gets the in-book search (fdNorm, fdParse, fdMatch, fdLoad, fdKeep, fdFind); the worker already runs Core
+- src/js/140-open-book.js, 290-backup-maintenance.js -> the text is parsed with BG.call('parseBook') (falls back to the main thread)
+- src/js/090-synced-stats-book-search.js -> search index is built and searched in the worker (if the worker was restarted, the books are sent again once)
+- src/js/234-scene-prescore.js (new) + 233 (one call) + 300 (SCP.reset on the worker switch) -> scene scores are made in a second worker
+- build.py -> new part kind 'copy' and the #scene-worker-src block; tools/minify.py minifies that block too
+- Same Settings switch as before (background work): off = everything runs as it did

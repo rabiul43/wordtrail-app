@@ -10,7 +10,8 @@ The app is ONE closure: every file in `src/js/` (from `020` to `999`) is a slice
 | `storeHook` | called after every `store.set` (used by account sync) | `030-helpers-offline-audio.js` |
 | `P` | saved preferences (Settings) | `030-helpers-offline-audio.js` |
 | `store` | safe localStorage wrapper | `030-helpers-offline-audio.js` |
-| `el` | the main screen elements | `040-worker-newreader.js` |
+| `el` | the main screen elements | `031-virtual-list.js` | 0 | `vlist(host, items, make, opts)`: keeps only the rows near the screen in the page (padding stands in for the rest, heights are measured). Used by search results (`120`), My books (`080`) and the Synced list (`090`); lists shorter than `opts.min` are drawn in full |
+| `040-worker-newreader.js` |
 | `S` | state of the book that is open | `060-position-bookmarks.js` |
 | `LVL`, `LF` | reading-level data and the home filters | `070-network-data.js`, `103-browse-filters.js` |
 | `toast` | small message at the bottom | `080-ui-shell-favourites.js` |
@@ -30,8 +31,8 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
 | `070-network-data.js` | 556 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
-| `080-ui-shell-favourites.js` | 234 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
-| `090-synced-stats-book-search.js` | 701 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
+| `080-ui-shell-favourites.js` | 236 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
+| `090-synced-stats-book-search.js` | 679 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 280 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
@@ -39,14 +40,14 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `104-see-all-suggestions.js` | 137 | "See all" button and page, empty/error states, recent searches, live suggestions while typing |
 | `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
 | `110-collections.js` | 238 | Collections tab |
-| `120-search-recommendations.js` | 568 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
+| `120-search-recommendations.js` | 569 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 193 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 151 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
 | `133-open-progress-saved-state.js` | 226 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
 | `135-ratings.js` | 492 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
-| `140-open-book.js` | 726 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries |
+| `140-open-book.js` | 732 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries |
 | `150-player-reader.js` | 721 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
 | `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
@@ -56,14 +57,15 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
 | `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
-| `233-scene-chapters-label.js` | 111 | chapter titles and look-ahead, scene label on the mini-player |
+| `233-scene-chapters-label.js` | 112 | chapter titles and look-ahead, scene label on the mini-player |
+| `234-scene-prescore.js` | 68 | `SCP`: a second background worker that scores the paragraphs of the open book ahead of the reader (`ambSceneScore`) and stores the answers in `ix.pa[j].sc`. Built from the page copy of `230-scene-words.js` + `231-scene-scoring.js` (`#scene-worker-src`, written by `build.py` with the `copy` kind). Falls back to the main thread when the worker is off or fails |
 | `246-controls-search.js` | 69 | Controls sheet search box (Enter opens the one match), section nav that follows the scroll, keep highlighted line in view |
 | `247-player-menu.js` | 112 | Player menu: the three-dot button opens a dropdown (Timing, Text and reading, Live translation, Tracks, Settings, then "More" that opens Listen / Book / Fix rows in place, and "All controls" for the Controls sheet). Rows pass their tap to the existing buttons (markup `#dmenu` in `30-sheets-settings.html`, styles at the end of `97-controls-sheet.css`) |
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 367 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 728 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
-| `290-backup-maintenance.js` | 337 | Backup and restore, sync dashboard |
+| `290-backup-maintenance.js` | 338 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 488 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
 | `300-wiring.js` | 715 | wiring |

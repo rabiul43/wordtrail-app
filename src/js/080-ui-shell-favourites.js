@@ -226,9 +226,11 @@
     list.textContent = '';
     $('#shelf-empty').hidden = favs.length > 0;
     $('#shelf-sub').textContent = favs.length ? plural(favs.length, 'book') + ' saved' : '';
-    const cards = favs.map(f => bookCard(f, () => { pendingBack = { tab: 'shelf', see: false }; showTab('library'); resumeRecent(f); }));
-    cards.forEach((c, i) => { if (favs[i] && favs[i].id) c.append(bmChipRow(favs[i])); });
-    list.append(...cards);
-    checkReady(cards);
+    vlist(list, favs, f => {
+      const c = bookCard(f, () => { pendingBack = { tab: 'shelf', see: false }; showTab('library'); resumeRecent(f); });
+      if (f && f.id) c.append(bmChipRow(f));
+      return c;
+    }, { min: 40, est: 128 });
+    checkReady(list._vl.nodes || [...list.children]);
   }
   guideDoc('mybooks', 'Synced books', "Books with timing published for everyone. Use the filters (Recently synced, Current book, Incomplete, Saved, A\u2013Z) to find one, then tap it to open.");

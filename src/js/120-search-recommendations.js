@@ -162,9 +162,10 @@
       el.results.classList.remove('loading'); el.results.hidden = false;
       return;
     }
-    const cards = shown.map(b => bookCard(b, () => openDetail(b)));
-    el.resultList.append(...cards); checkReady(cards);
     el.results.classList.remove('loading'); el.results.hidden = false;
+    /* Long result lists keep only the rows near the screen in the page (vlist, 031). */
+    vlist(el.resultList, shown, b => bookCard(b, () => openDetail(b)), { min: 40, est: 128 });
+    checkReady(el.resultList._vl.nodes || [...el.resultList.children]);
   }
   function initSearchFilters() {
     const sb = $('#searchbar');

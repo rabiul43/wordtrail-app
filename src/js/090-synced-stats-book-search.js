@@ -103,7 +103,7 @@
     function syncRow(id) {
       const meta = metaFor(id);
       const coverEl = meta.cover
-        ? h('img', { class: 'synced-row-cover', src: meta.cover, alt: '', loading: 'lazy' })
+        ? h('img', { class: 'synced-row-cover', src: meta.cover, alt: '', loading: 'lazy', decoding: 'async', width: '48', height: '64', referrerpolicy: 'no-referrer' })
         : h('span', { class: 'synced-row-cover', 'aria-hidden': 'true' });
       return h('div', { class: 'synced-row', role: 'button', tabindex: '0',
         onclick: () => {
@@ -167,7 +167,9 @@
         return;
       }
       list.append(h('p', { class: 'synced-section-label' }, f[1] + ' (' + arr.length + ')'));
-      arr.forEach(id => {
+      const rowsHost = h('div', { class: 'synced-list' });
+      list.append(rowsHost);
+      vlist(rowsHost, arr, id => {
         const row = syncRow(id);
         const info = row.querySelector('.synced-row-info');
         if (dates[id] && info) info.append(h('div', { class: 'synced-row-sub2' }, 'Synced ' + ago(dates[id])));
@@ -177,8 +179,8 @@
           const bd = row.querySelector('.synced-row-badge');
           if (bd) { bd.textContent = '▶ Current'; bd.classList.add('synced-row-badge-now'); }
         }
-        list.append(row);
-      });
+        return row;
+      }, { min: 60, est: 76 });
     }
     draw();
   }
@@ -429,18 +431,7 @@
      Tapping a result opens the book and jumps the audio to that sentence, using the sentence timing the app
      already has for the book (precise word-pack sync when it was loaded, the estimate otherwise). */
   const FD = { books: new Map(), building: null, seq: 0, shown: new Map(), timer: 0 };
-  const fdCh = new Map();
-  function fdChar(c) {
-    let r = fdCh.get(c);
-    if (r === undefined) {
-      if (c === '\u2019' || c === '\u2018' || c === '`' || c === '\u02bc') r = "'";
-      else { const d = c.normalize('NFD').charAt(0).toLowerCase(); r = d === "'" || (d.length === 1 && /[\p{L}\p{N}]/u.test(d)) ? d : ' '; }
-      fdCh.set(c, r);
-    }
-    return r;
-  }
-  function fdNorm(t) { let o = ''; for (let i = 0; i < t.length; i++) o += fdChar(t[i]); return o; }
-  const fdEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const fdNorm = Core.fdNorm, fdParse = Core.fdParse;   // the matching itself lives in Core (010) so the background worker can run it
 
   async function fdCollect() { // every book with a saved text, newest listening first
     const meta = new Map();
@@ -476,9 +467,10 @@
         if (!bk) {
           const c = await readParsed(key);
           if (!c) continue;
-          const T = new Array(c.sents.length), N = new Array(c.sents.length), CH = new Int32Array(c.sents.length), HD = new Uint8Array(c.sents.length);
-          for (let i = 0; i < c.sents.length; i++) { const x = c.sents[i]; T[i] = x.t; N[i] = fdNorm(x.t); CH[i] = x.ch; HD[i] = x.h ? 1 : 0; }
-          bk = { key, T, N, CH, HD, chapters: c.chapters.map(x => x.title || '') };
+          const T = new Array(c.sents.length), CH = new Int32Array(c.sents.length), HD = new Uint8Array(c.sents.length);
+          for (let i = 0; i < c.sents.length; i++) { const x = c.sents[i]; T[i] = x.t; CH[i] = x.ch; HD[i] = x.h ? 1 : 0; }
+          bk = { key, T, CH, HD, chapters: c.chapters.map(x => x.title || '') };
+          await BG.call('fdLoad', [key, T, HD]);   // the normalised copy is made and kept in the worker
           if (onStep) onStep(keep.size + 1);
           await new Promise(r => setTimeout(r, 0));
         }
@@ -490,34 +482,18 @@
         const key = 'open:' + S.book.id;
         let bk = FD.books.get(key);
         if (!bk || bk.src !== S.model) {
-          const sn = S.model.sents, n = sn.length, T = new Array(n), N = new Array(n), CH = new Int32Array(n), HD = new Uint8Array(n);
-          for (let i = 0; i < n; i++) { const x = sn[i]; T[i] = x.t; N[i] = fdNorm(x.t); CH[i] = x.ch || 0; HD[i] = x.h ? 1 : 0; }
-          bk = { key, src: S.model, T, N, CH, HD, chapters: (S.model.chapters || []).map(x => x.title || '') };
+          const sn = S.model.sents, n = sn.length, T = new Array(n), CH = new Int32Array(n), HD = new Uint8Array(n);
+          for (let i = 0; i < n; i++) { const x = sn[i]; T[i] = x.t; CH[i] = x.ch || 0; HD[i] = x.h ? 1 : 0; }
+          bk = { key, src: S.model, T, CH, HD, chapters: (S.model.chapters || []).map(x => x.title || '') };
+          await BG.call('fdLoad', [key, T, HD]);
         }
         bk.m = { id: String(S.book.id), title: S.book.title || 'Open book', authors: S.book.authors || '', cover: S.book.cover || '', ia: S.book.ia || '' };
         keep.set(key, bk);
       }
       FD.books = keep;
+      BG.call('fdKeep', [[...keep.keys()]]).catch(() => {});   // the worker forgets books that are no longer searched
     })();
     try { await FD.building; } finally { FD.building = null; }
-  }
-  function fdParse(q) {
-    const parts = [], re = /"([^"]+)"|(\S+)/g; let mm;
-    const raw = [];
-    while ((mm = re.exec(q))) raw.push(mm[1] != null ? { t: mm[1], quoted: true } : { t: mm[2], quoted: false });
-    raw.forEach((x, i) => {
-      const toks = fdNorm(x.t).split(/\s+/).filter(Boolean);
-      if (!toks.length) return;
-      const last = i === raw.length - 1 && !x.quoted;
-      const body = toks.map(fdEsc).join('\\s+');
-      parts.push({ probe: toks[0], rx: new RegExp('(^|[^\\p{L}\\p{N}])(' + body + ')' + (last ? '' : "(?![\\p{L}\\p{N}])"), 'gu') });
-    });
-    return parts;
-  }
-  function fdMatch(parts, n) {
-    for (const p of parts) if (n.indexOf(p.probe) < 0) return false;
-    for (const p of parts) { p.rx.lastIndex = 0; if (!p.rx.test(n)) return false; }
-    return true;
   }
   function fdMarks(parts, n) {
     const r = [];
@@ -562,14 +538,16 @@
     if (!parts.length || fdNorm(q).replace(/\s/g, '').length < 2) { note.textContent = 'Searches the text of ' + plural(FD.books.size, 'book') + ' saved on this device. Nothing leaves your phone.'; return; }
     const au = $('#fd-author').value, curKey = S.book ? String(S.book.id) : '';
     const books = [...FD.books.values()].filter(b => !au || (au === '\u0001cur' ? String(b.m.id) === curKey : ((b.m.authors || 'Unknown author').trim() || 'Unknown author') === au));
-    const groups = []; let total = 0, capped = false;
-    for (const b of books) {
-      const hits = [];
-      for (let i = 0; i < b.N.length; i++) { if (!b.HD[i] && fdMatch(parts, b.N[i])) { hits.push(i); if (hits.length >= 400) break; } }
-      if (hits.length) { groups.push({ b, hits }); total += hits.length; }
-      await new Promise(r => setTimeout(r, 0));
-      if (my !== FD.seq) return; // a newer search replaced this one
+    const keys = books.map(b => b.key);
+    let res = await BG.call('fdFind', [keys, q, 400]);   // the matching runs in the background worker; the screen stays free
+    if (my !== FD.seq) return; // a newer search replaced this one
+    if (res.miss.length) {   // the worker was restarted since the books were loaded: send them again, then ask once more
+      for (const k of res.miss) { const b = FD.books.get(k); if (b) await BG.call('fdLoad', [k, b.T, b.HD]); if (my !== FD.seq) return; }
+      res = await BG.call('fdFind', [keys, q, 400]);
+      if (my !== FD.seq) return;
     }
+    const byKey = new Map(res.found), groups = []; let total = 0;
+    for (const b of books) { const hits = byKey.get(b.key); if (hits) { groups.push({ b, hits }); total += hits.length; } }
     if (!groups.length) { note.textContent = ''; out.append(h('p', { class: 'fd-empty' }, 'No sentence has all of that in ' + plural(books.length, 'book') + '. Try fewer words, or put exact wording in quotes.')); return; }
     groups.sort((a, b) => b.hits.length - a.hits.length);
     note.textContent = plural(total, 'sentence') + (total >= 400 ? '+' : '') + ' in ' + plural(groups.length, 'book') + '. Tap one to listen from there.';
@@ -581,7 +559,7 @@
     box.append(h('div', { class: 'fd-head' }, h('strong', {}, b.m.title), h('small', {}, plural(g.hits.length, 'match') .replace('matchs', 'matches'))));
     if (b.m.authors) box.append(h('p', { class: 'fd-by' }, b.m.authors));
     const one = i => {
-      const marks = fdMarks(parts, b.N[i]);
+      const marks = fdMarks(parts, fdNorm(b.T[i]));
       const ch = b.chapters[b.CH[i]];
       return h('button', { class: 'fd-hit', type: 'button', onclick: () => fdOpen(b, i) }, h('span', {}, fdSnippet(b.T[i], marks)), ch && !/^front matter$/i.test(ch) ? h('small', {}, ch) : null);
     };

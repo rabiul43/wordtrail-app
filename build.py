@@ -41,6 +41,10 @@ PARTS = [
     ('file', 'src/dev/scene-tests.txt'),
     ('devlit', '</script>\n'),
     ('file', 'src/dev/scene-baseline.html'),
+    ('lit', '<script type="text/plain" id="scene-worker-src">\n'),
+    ('copy', 'src/js/230-scene-words.js'),
+    ('copy', 'src/js/231-scene-scoring.js'),
+    ('lit', '\n</script>\n'),
     ('lit', '<script type="application/json" id="amb-map">\n'),
     ('file', 'src/data/amb-map.json'),
     ('lit', '</script>\n'),
@@ -57,6 +61,7 @@ PARTS = [
     ('file', 'src/js/010-core.js'),
     ('file', 'src/js/020-app-open.js'),
     ('file', 'src/js/030-helpers-offline-audio.js'),
+    ('file', 'src/js/031-virtual-list.js'),
     ('file', 'src/js/040-worker-newreader.js'),
     ('file', 'src/js/050-audio-clips.js'),
     ('file', 'src/js/060-position-bookmarks.js'),
@@ -115,6 +120,7 @@ PARTS = [
     ('file', 'src/js/231-scene-scoring.js'),
     ('file', 'src/js/232-scene-test.js'),
     ('file', 'src/js/233-scene-chapters-label.js'),
+    ('file', 'src/js/234-scene-prescore.js'),
     ('file', 'src/js/sound/sound-presets.js'),
     ('file', 'src/js/sound/sound-core.js'),
     ('file', 'src/js/sound/sound-cache.js'),
@@ -149,6 +155,10 @@ def build(include_dev=False):
                 out.append(value.encode("utf-8"))
         elif kind == "lit":
             out.append(value.encode("utf-8"))
+        elif kind == "copy":
+            # the same file a second time, as plain text (the scene worker is built from it; it is not part of the closure)
+            with open(os.path.join(ROOT, value), "rb") as f:
+                out.append(f.read())
         elif kind == "i18n":
             # one JSON file per language in src/i18n/ -> one JSON object {code: {...}} (the code is the file name)
             # A big language (over LAZY_BYTES) is not put in the page: the page only keeps its name, direction, order, first-run offer

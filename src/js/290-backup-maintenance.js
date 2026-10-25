@@ -83,7 +83,8 @@
   async function useRaw(raw, src) {
     if (src.kind === 'file') await idb.set('f:' + S.book.id, raw);
     S.anchors = {}; S.ranges = {}; S.skip = {}; S.edge = {};
-    applyText(raw, src, {}, await loadParsed(parsedKey(src, raw)));
+    const cached = await loadParsed(parsedKey(src, raw));
+    applyText(raw, src, {}, cached, cached ? null : await BG.call('parseBook', [raw]));
     closeSheets();
     toast('Text loaded.');
   }
