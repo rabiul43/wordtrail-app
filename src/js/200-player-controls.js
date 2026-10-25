@@ -355,17 +355,32 @@
      tried only when there is no exact key. To add a language: add src/i18n/xx.json (and `python build.py`). Missing words stay English.
      Run `python tools/i18n_check.py xx` to list what a language still lacks. */
   const I18N = {}, I18N_RX = {}, I18N_SUG = {}, I18N_UNITS = {}, I18N_KEEP = {}, I18N_DIG = {}, I18N_LANGS = [['en', 'English', 'ltr']];
+  const I18N_LAZY = {};   // code -> true while that language's words (i18n-<code>.json) have not been fetched yet
+  function i18nAdd(c, d) {   // register one language (called for the inline ones now, and for a big one when its file arrives)
+    I18N[c] = d.dict || {}; I18N_RX[c] = (d.rx || []).map(r => [new RegExp(r[0]), r[1]]);
+    I18N_UNITS[c] = (d.units || []).map(r => [new RegExp(r[0], 'g'), r[1]]);
+    I18N_KEEP[c] = new RegExp(d.keep || '(?!)', 'g');
+    if (d.digits) I18N_DIG[c] = d.digits;   // { map: "০১২…", label, hint }
+    if (d.suggest) I18N_SUG[c] = d.suggest;   // { q, yes, no, also }: the first-run offer, worded in that language
+  }
   try {
     const D = JSON.parse(document.getElementById('i18n-data').textContent);
     Object.keys(D).sort((x, y) => D[x].order - D[y].order).forEach(c => {
-      I18N[c] = D[c].dict || {}; I18N_RX[c] = (D[c].rx || []).map(r => [new RegExp(r[0]), r[1]]);
       I18N_LANGS.push([c, D[c].name, D[c].dir || 'ltr']);
-      I18N_UNITS[c] = (D[c].units || []).map(r => [new RegExp(r[0], 'g'), r[1]]);
-      I18N_KEEP[c] = new RegExp(D[c].keep || '(?!)', 'g');
-      if (D[c].digits) I18N_DIG[c] = D[c].digits;   // { map: "০১২…", label, hint }
-      if (D[c].suggest) I18N_SUG[c] = D[c].suggest;   // { q, yes, no, also }: the first-run offer, worded in that language
+      i18nAdd(c, D[c]);
+      if (D[c].lazy) I18N_LAZY[c] = true;
     });
   } catch (e) { /* no translations: the app stays in English */ }
+  /* A big language is a separate file next to the page. It is fetched once, the first time it is needed; if it cannot be fetched
+     (offline the first time, file not uploaded) the app simply stays in English and tries again next time. */
+  const I18N_LOADING = {};
+  function i18nLoad(c) {
+    if (!I18N_LAZY[c]) return Promise.resolve(false);
+    if (!I18N_LOADING[c]) I18N_LOADING[c] = fetch('./i18n-' + c + '.json').then(r => { if (!r.ok) throw new Error('i18n ' + r.status); try { if (window.caches) { const cp = r.clone(); caches.open('wt-lang-v1').then(ch => ch.put('./i18n-' + c + '.json', cp)).catch(() => {}); } } catch (e) { /* saving for offline is optional */ } return r.json(); })
+      .then(d => { i18nAdd(c, d); delete I18N_LAZY[c]; return true; })
+      .catch(() => false).then(ok => { delete I18N_LOADING[c]; return ok; });
+    return I18N_LOADING[c];
+  }
   const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results, #ob-q-hd, #ob-q-opts';   // book text and the placement-test questions are English on purpose
   const I18N_REC = new WeakMap();   // text node -> { o: original text, tr: text we put there }
   let i18nObs = null;
@@ -419,9 +434,10 @@
     root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e => i18nAttr(e, dict));
   }
   /* Bengali font: loaded only the first time Bengali is chosen (the service worker then keeps it for offline use).
+     When the fonts are self-hosted (class 'fonts-local' on <html>) nothing is added here: the @font-face rule is already in the page and the file downloads only when Bengali text is shown.
      The CSS that puts it in the font stack and loosens line height is at the end of 90-reader-sheet.css (:root:lang(bn)). */
   function i18nFont(lang) {
-    if (lang !== 'bn' || document.getElementById('wt-bn-font')) return;
+    if (lang !== 'bn' || document.getElementById('wt-bn-font') || document.documentElement.classList.contains('fonts-local')) return; // 'fonts-local': Noto Sans Bengali is already in the page's own @font-face rules (build.py, tools/fetch_fonts.py)
     const l = document.createElement('link');
     l.id = 'wt-bn-font'; l.rel = 'stylesheet';
     l.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap';
@@ -437,6 +453,7 @@
     const lang = P.uiLang || 'en', meta = I18N_LANGS.find(x => x[0] === lang) || I18N_LANGS[0], dict = I18N[meta[0]] || null;
     document.documentElement.lang = meta[0]; document.documentElement.dir = meta[2];
     i18nFont(meta[0]);
+    if (I18N_LAZY[meta[0]]) i18nLoad(meta[0]).then(ok => { if (ok && (P.uiLang || 'en') === meta[0]) i18nApply(); });   // words still on the way: translate again when they arrive
     i18nWalk(document.body, dict); i18nAttrWalk(document.body, dict);
     if (i18nObs) { i18nObs.disconnect(); i18nObs = null; }
     if (dict) {

@@ -19,8 +19,9 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
     MUSIC-GUIDE.md            how to add or change music (steps to follow when you forget)
-    tools/                    helper scripts (i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md)
+    tools/                    helper scripts (fetch_fonts.py downloads the fonts once; i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md)
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
+    src/fonts/                self-hosted fonts (WOFF2 + fonts.css), made by `python tools/fetch_fonts.py`; not in the project until you run it
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/
     firebase/                 firestore.rules (paste into the Firebase console) and rules.test.js; not part of the app
     tests/                    Playwright browser tests + the Firestore rules test runner, with their own package.json (the app has no dependencies). See tests/README.md
@@ -56,7 +57,18 @@ Reports are kept in Firestore at `ratings/{bookId}/votes/{reviewerUid}/reports/{
 The build puts `manifest.json`, `sw.js` and `icons/` next to `index.html`, so the app can be installed (Android/desktop
 Chrome and Edge: the install button in the address bar; iPhone/iPad: Share > Add to Home Screen) and opens without a
 connection. `sw.js` only does two things: it keeps the app page (opened from the saved copy at once for a fast start; the newest page is fetched in the
-background and a "New version ready - Reload" message appears when it differs; only the very first visit waits for the network) and it keeps the Google Fonts files.
+background and a "New version ready - Reload" message appears when it differs; only the very first visit waits for the network) and it keeps the font files (our own `fonts/*.woff2`, or Google's while the fonts are not self-hosted yet).
 Audio, books, sign-in and sync are not touched by it. To change the icons, replace the PNGs in `src/pwa/icons/`.
 When you change `sw.js` itself, the browser installs the new one on the next visit by itself. If you ever need every
 device to drop its saved page, change `SHELL = 'wt-shell-v1'` to `v2` in `sw.js`.
+
+## Fonts (self-hosted)
+
+By default the page still loads its fonts from Google. To serve them yourself (one fewer connection before the first paint, and no third party):
+
+    python tools/fetch_fonts.py     # once, with internet: fills src/fonts/
+    python build.py
+
+`build.py` then puts the `@font-face` rules into the page, preloads the three first-screen files, drops the Google `<link>`s and copies the files to `dist/fonts/`.
+Commit `src/fonts/` so the GitHub build has it. `src/pwa/_headers` gives `/fonts/*` a one-year cache (the file names carry a hash, so they never change).
+Change families or weights in `FAMILIES` at the top of `tools/fetch_fonts.py` and run it again. Lexend, Atkinson and OpenDyslexic (picked in Settings > Reading) are still loaded from their CDNs on demand.

@@ -25,3 +25,24 @@ Build: `python3 build.py` -> dist/index.html
 - src/html/30-sheets-settings.html -> #wt-ver / #wt-upd at the bottom of Settings home
 - src/css/97-controls-sheet.css -> .upd-bar, .wt-ver
 - build.py -> stamps the build id (date + hash) into the page
+
+## 6. Minified build
+- tools/minify.py (new) -> runs esbuild over the inline <script>/<style> blocks (JSON data blocks untouched)
+- build.py              -> calls it for the public build; `--no-min` gives the readable page, `--dev` is never minified
+- Needs esbuild once: `npm install -g esbuild` (if missing the build still works, unminified, with a warning)
+
+## 7. Bengali words load on demand
+- build.py                      -> a language file over 20 KB (bn.json) is written to dist/i18n-bn.json; the page keeps only a small stub
+- src/js/200-player-controls.js -> i18nAdd(), i18nLoad(); i18nApply() fetches the words the first time the language is used
+- src/pwa/sw.js                 -> keeps i18n-*.json for offline use
+- DEPLOY: upload dist/i18n-bn.json next to index.html (without it Bengali stays English)
+
+## 8. Self-hosted fonts (ready, switched on by one command)
+- tools/fetch_fonts.py (new)     -> downloads the WOFF2 files + fonts.css into src/fonts/ (run once, needs internet)
+- build.py                      -> apply_fonts(): if src/fonts/fonts.css exists, inlines the rules, preloads Inter/Fraunces/Newsreader (latin), removes the Google links, copies dist/fonts/. Without src/fonts/ the output is byte-identical to before.
+- src/html/00-head.html         -> the Google Fonts preconnects and stylesheet links are wrapped in WT-FONTS markers so build.py can swap them
+- src/pwa/sw.js                 -> ownFont(): fonts/*.woff2 are cache-first
+- src/pwa/_headers (new)        -> /fonts/* cached for a year (Cloudflare assets)
+- src/js/200-player-controls.js -> i18nFont() skips the Google request when the page has class fonts-local
+- DEPLOY: commit src/fonts/ after running the fetch tool, then build as usual
+

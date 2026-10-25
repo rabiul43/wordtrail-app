@@ -3,7 +3,9 @@
  *  1. The app page (one file) is fetched from the network first (up to 3 s) so a new version shows up at once. If the
  *     network is slow or offline, the saved copy opens instead and the newest page is saved in the background; the open
  *     page then gets a 'wt-update' message and offers "Reload". The very first visit (nothing saved yet) uses the network.
- *  2. The Google Fonts files are kept, so text keeps its look offline.
+ *  2. Big language files (i18n-bn.json) are kept, so that language works offline.
+ *  3. The font files are kept, so text keeps its look offline: our own fonts/*.woff2 (cache first: their names carry a hash,
+ *     so a file never changes) and, for the few fonts still loaded from elsewhere, the Google Fonts files.
  *
  * It does NOT touch audio, book texts, LibriVox / Archive.org requests, sign-in, or sync: those requests are left
  * alone and go straight to the network, as they did before there was a service worker. Offline audio stays in
@@ -11,7 +13,7 @@
  */
 'use strict';
 
-const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', NET_WAIT = 3000;
+const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', NET_WAIT = 3000;
 const ROOT = new URL('./', self.registration.scope).href; // the page, whatever it is called (query strings are ignored)
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
@@ -24,8 +26,8 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     // Remove only our own older caches. Anything else (for example 'wt-amb-rec') is left exactly as it is.
-    const keep = [SHELL, FONTS];
-    for (const k of await caches.keys()) if ((k.startsWith('wt-shell-') || k.startsWith('wt-fonts-')) && !keep.includes(k)) await caches.delete(k);
+    const keep = [SHELL, FONTS, LANG];
+    for (const k of await caches.keys()) if ((k.startsWith('wt-shell-') || k.startsWith('wt-fonts-') || k.startsWith('wt-lang-')) && !keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
   })());
 });
@@ -70,10 +72,27 @@ async function shell(event) {
   return Promise.race([fast, slow]);
 }
 
+// Our own fonts (fonts/<name>-<hash>.woff2): a saved file is final, so it is served without asking the network again.
+async function ownFont(event) {
+  const cache = await caches.open(FONTS), cached = await cache.match(event.request);
+  if (cached) return cached;
+  const r = await fetch(event.request);
+  if (r && r.ok) event.waitUntil(cache.put(event.request, r.clone()));
+  return r;
+}
+
 async function font(event) {
   const cache = await caches.open(FONTS), cached = await cache.match(event.request);
   const net = fetch(event.request).then(r => { if (r && (r.ok || r.type === 'opaque')) cache.put(event.request, r.clone()); return r; });
   if (cached) { event.waitUntil(net.catch(() => {})); return cached; } // saved copy now, refreshed in the background
+  return net;
+}
+
+// A big language file (i18n-bn.json): the saved copy opens at once and is refreshed in the background, so the language also works offline.
+async function lang(event) {
+  const cache = await caches.open(LANG), cached = await cache.match(event.request, { ignoreSearch: true });
+  const net = fetch(event.request).then(r => { if (r && r.ok) cache.put(event.request, r.clone()); return r; });
+  if (cached) { event.waitUntil(net.catch(() => {})); return cached; }
   return net;
 }
 
@@ -82,6 +101,8 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;                          // sign-in posts, uploads: not ours
   const url = new URL(req.url);
   if (req.mode === 'navigate' && url.origin === self.location.origin && url.href.startsWith(ROOT)) { event.respondWith(shell(event)); return; }
+  if (url.origin === self.location.origin && /\/i18n-[a-z-]+\.json$/.test(url.pathname)) { event.respondWith(lang(event)); return; }
+  if (url.origin === self.location.origin && url.href.startsWith(ROOT + 'fonts/') && url.pathname.endsWith('.woff2')) { event.respondWith(ownFont(event)); return; }
   if (FONT_HOSTS.includes(url.hostname)) { event.respondWith(font(event)); return; }
   // everything else: not handled, the browser does what it always did
 });

@@ -16,9 +16,9 @@
 <link rel="preconnect" href="https://librivox.org" crossorigin>
 <link rel="dns-prefetch" href="https://archive.org">
 <title>Wordtrail</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<!--WT-FONTS-PRECONNECT--><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<style>html.resuming #home, html.resuming #tabbar, html.resuming #mini { visibility: hidden; }</style>
+<!--/WT-FONTS-PRECONNECT--><style>html.resuming #home, html.resuming #tabbar, html.resuming #mini { visibility: hidden; }</style>
 <style>
 /* Boot skeleton: static placeholders painted before the main script runs; removed by initHomeSections(). */
 .boot-sk { display: grid; gap: 1.1rem; margin-top: 1rem; pointer-events: none; animation: bootsk-out 0s 12s forwards; }
@@ -67,14 +67,14 @@ html.resuming .boot-sk { display: none; }
 </style>
 <noscript><style>.boot-sk { display: none; }</style></noscript>
 <script>try { var __o = JSON.parse(localStorage.getItem('wt:open') || 'null'); if (__o && __o.id && localStorage.getItem('wt:onboarded')) { document.documentElement.classList.add('resuming'); setTimeout(function () { document.documentElement.classList.remove('resuming'); }, 8000); } } catch (e) {}</script>
-<script>
+<!--WT-FONTS-LINKS--><script>
 /* Fonts: with "Faster loading" on, the Google Fonts stylesheet no longer blocks the first paint (text shows in the system font, then swaps). Off = the old blocking <link>. */
 (function(){var on=true;try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}');on=!p||p.fastLoad!==false;}catch(e){}
 var u="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Literata:opsz,wght@7..72,600&family=Outfit:wght@300;400;500;600&display=swap";
 document.write(on?'<link rel="stylesheet" href="'+u+'" media="print" onload="this.media=\'all\'">':'<link rel="stylesheet" href="'+u+'">');})();
 </script>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Literata:opsz,wght@7..72,600&family=Outfit:wght@300;400;500;600&display=swap"></noscript>
-<script>
+<!--/WT-FONTS-LINKS--><script>
 /* Diagnostics: error + slow-moment log, kept in memory only (last 50). Starts before the app so early errors are caught. */
 (function(){
 var D=window.__wtDiag={log:[],on:false,po:[],drop:0,lt:typeof PerformanceObserver!=='undefined',t0:Date.now()};

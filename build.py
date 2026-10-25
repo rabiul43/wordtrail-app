@@ -5,6 +5,7 @@ and copies src/pwa/ (manifest, service worker, icons) next to it.
     python build.py               public app: no developer test data (this is what the website serves)
     python build.py --dev         developer build: also includes the scene-test sample cases and baseline
                                   (Settings > Developer > Scene tests), for use on your own computer
+    python build.py --no-min      skip minifying (readable page, for debugging; the public build is minified with esbuild)
     python build.py --verify X    also check the result is byte-for-byte equal to file X
                                   (the original single-file app included the developer data, so use --dev --verify X)
 
@@ -12,7 +13,7 @@ The order below is the order of the final file. It matters: CSS is a layered cas
 and the script is one closure, so a piece may only use names declared above it.
 To add a piece: create the file in src/ and add one line here, at the right place.
 """
-import hashlib, json, os, shutil, sys
+import hashlib, json, os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -136,6 +137,8 @@ PARTS = [
 # Pieces that exist only for developers (Settings > Developer scene tests).
 # The public build leaves them out. The app still works without them: the scene-test panel then
 # starts with an empty case box and no shipped baseline (the code checks for both).
+LAZY_BYTES = 20000   # a language file bigger than this is loaded on demand
+LAZY = {}            # code -> JSON bytes, filled by build() and written next to index.html
 DEV_PARTS = {"src/dev/scene-tests.txt", "src/dev/scene-baseline.html"}
 
 def build(include_dev=False):
@@ -148,11 +151,18 @@ def build(include_dev=False):
             out.append(value.encode("utf-8"))
         elif kind == "i18n":
             # one JSON file per language in src/i18n/ -> one JSON object {code: {...}} (the code is the file name)
-            langs = {}
+            # A big language (over LAZY_BYTES) is not put in the page: the page only keeps its name, direction, order, first-run offer
+            # and digits switch, plus "lazy": 1, and the words go to dist/i18n-<code>.json, which the app fetches the first time that
+            # language is used (and the service worker keeps for offline). Small languages stay inline.
+            langs = {}; LAZY.clear()
             for name in sorted(os.listdir(os.path.join(ROOT, value))):
                 if name.endswith(".json"):
                     with open(os.path.join(ROOT, value, name), "r", encoding="utf-8") as f:
-                        langs[name[:-5]] = json.load(f)
+                        d = json.load(f)
+                    if os.path.getsize(os.path.join(ROOT, value, name)) > LAZY_BYTES:
+                        LAZY[name[:-5]] = json.dumps(d, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                        d = {k: d[k] for k in ("name", "dir", "order", "suggest", "digits") if k in d}; d["lazy"] = 1
+                    langs[name[:-5]] = d
             out.append(json.dumps(langs, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/").encode("utf-8"))
         else:
             if value in DEV_PARTS and not include_dev:
@@ -160,6 +170,34 @@ def build(include_dev=False):
             with open(os.path.join(ROOT, value), "rb") as f:
                 out.append(f.read())
     return b"".join(out)
+
+FONTS_DIR = os.path.join(ROOT, "src", "fonts")
+
+def apply_fonts(data):
+    """Self-hosted fonts. If src/fonts/fonts.css exists (made by tools/fetch_fonts.py), the page gets those @font-face rules,
+    <link rel=preload> for the first-screen files, and the Google Fonts preconnects + stylesheet links are removed.
+    If it does not exist, the Google Fonts links stay exactly as they are. The marker comments in 00-head.html are removed either way."""
+    css_path = os.path.join(FONTS_DIR, "fonts.css")
+    pre_re = re.compile(rb"<!--WT-FONTS-PRECONNECT-->.*?<!--/WT-FONTS-PRECONNECT-->", re.S)
+    link_re = re.compile(rb"<!--WT-FONTS-LINKS-->.*?<!--/WT-FONTS-LINKS-->", re.S)
+    if not os.path.exists(css_path):
+        print("fonts: src/fonts/ not found, keeping Google Fonts (run tools/fetch_fonts.py to self-host)")
+        data = pre_re.sub(lambda m: m.group(0)[len(b"<!--WT-FONTS-PRECONNECT-->"):-len(b"<!--/WT-FONTS-PRECONNECT-->")], data)
+        return link_re.sub(lambda m: m.group(0).replace(b"<!--WT-FONTS-LINKS-->", b"").replace(b"<!--/WT-FONTS-LINKS-->", b""), data)
+    with open(css_path, "rb") as f:
+        css = f.read().strip()
+    files = {n for n in os.listdir(FONTS_DIR) if n.endswith(".woff2")}
+    for n in re.findall(rb"url\(fonts/([^)]+)\)", css):
+        if n.decode() not in files:
+            sys.exit("BUILD STOPPED: src/fonts/fonts.css uses %s but the file is missing (run tools/fetch_fonts.py)" % n.decode())
+    pre = b""
+    pre_path = os.path.join(FONTS_DIR, "preload.txt")
+    if os.path.exists(pre_path):
+        for n in open(pre_path, encoding="utf-8").read().split():
+            pre += b'<link rel="preload" href="fonts/%s" as="font" type="font/woff2" crossorigin>\n' % n.encode()
+    block = pre + b"<style>\n" + css + b"\n</style>\n<script>document.documentElement.classList.add('fonts-local')</script>\n"
+    data = pre_re.sub(b"", data)
+    return link_re.sub(lambda m: block, data)
 
 def check_names():
     """Stop the build if two files declare the same top-level name (see tools/deps.py)."""
@@ -177,6 +215,11 @@ if __name__ == "__main__":
     check_names()
     dev = "--dev" in sys.argv
     data = build(include_dev=dev)
+    data = apply_fonts(data)
+    if "--no-min" not in sys.argv and not dev:
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import minify
+        data = minify.minify_html(data)
     import datetime
     stamp = datetime.date.today().isoformat() + '-' + hashlib.sha256(data).hexdigest()[:6]   # e.g. 2026-10-25-a1b2c3
     data = data.replace(b'__WT_BUILD__', stamp.encode())
@@ -184,9 +227,20 @@ if __name__ == "__main__":
     os.makedirs(dist, exist_ok=True)
     with open(os.path.join(dist, "index.html"), "wb") as f:
         f.write(data)
+    for code, blob in LAZY.items():
+        with open(os.path.join(dist, "i18n-%s.json" % code), "wb") as f:
+            f.write(blob)
     # install/offline files (manifest, service worker, icons) go next to index.html, as they are
     pwa = os.path.join(ROOT, "src", "pwa")
     shutil.copytree(pwa, dist, dirs_exist_ok=True)
+    # self-hosted fonts (only when tools/fetch_fonts.py has been run); a stale dist/fonts from an older build is replaced
+    fonts_out = os.path.join(dist, "fonts")
+    shutil.rmtree(fonts_out, ignore_errors=True)
+    if os.path.exists(os.path.join(FONTS_DIR, "fonts.css")):
+        os.makedirs(fonts_out)
+        for n in os.listdir(FONTS_DIR):
+            if n.endswith(".woff2"):
+                shutil.copy2(os.path.join(FONTS_DIR, n), os.path.join(fonts_out, n))
     print("dist/index.html  %d bytes  sha256 %s  (%s)" % (len(data), hashlib.sha256(data).hexdigest()[:16], "developer build" if dev else "public build"))
     if "--verify" in sys.argv:
         other = open(sys.argv[sys.argv.index("--verify") + 1], "rb").read()
