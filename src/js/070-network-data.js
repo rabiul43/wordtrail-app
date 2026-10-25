@@ -547,25 +547,26 @@
     if (cb) f.cbs.push(cb);
     return f.p;
   }
+  /* Our own copy of the Gutenberg texts (filled by wordtrail_book_text_kaggle.ipynb): texts/<id / 1000>/<id>.txt.gz, the bytes exactly as
+     Gutenberg serves them, gzip-compressed. Asked through the existing Hugging Face Worker (see the fetch wrapper in 030). A book that is
+     not there (404), a slow answer or anything odd returns null, and the usual routes run as before. */
   const BOOK_TEXT_REPO = 'rabiul43/Book_Text';
-  /* Our own copy of the book text on Hugging Face: texts/<id / 1000>/<id>.txt.gz in BOOK_TEXT_REPO (filled by the Kaggle notebook wordtrail_book_text_kaggle.ipynb, or by tools/prep_texts.py).
-     One small gzip file from one source, so it is asked before the public proxies. null = not there (yet) or not usable: the usual routes follow. */
-  async function getHfText(id, cb) {
-    if (typeof DecompressionStream === 'undefined' || !/^\d+$/.test(String(id))) return null;
-    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+  async function getHfText(id) {
+    const n = parseInt(id, 10);
+    if (!(n > 0)) return null;
+    const c = new AbortController(), to = setTimeout(() => c.abort(), 15000);
     try {
-      const r = await fetch('https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(+id / 1000) + '/' + id + '.txt.gz', { signal: ctl.signal });
+      const r = await fetch('https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(n / 1000) + '/' + n + '.txt.gz', { signal: c.signal });
       if (!r.ok) return null;
-      const total = +r.headers.get('content-length') || 0, chunks = [];
-      let n = 0;
-      if (r.body && r.body.getReader) {
-        const rd = r.body.getReader();
-        for (;;) { const { done, value } = await rd.read(); if (done) break; chunks.push(value); n += value.length; if (cb) cb({ type: 'bytes', n, total }); }
-      } else chunks.push(new Uint8Array(await r.arrayBuffer()));
-      const buf = new Uint8Array(await new Blob(chunks).arrayBuffer());
-      const t = buf[0] === 0x1f && buf[1] === 0x8b ? await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text() : new TextDecoder().decode(buf);
+      const buf = new Uint8Array(await r.arrayBuffer());
+      let t;
+      if (buf[0] === 0x1f && buf[1] === 0x8b) {          // still gzip: unpack it here
+        if (typeof DecompressionStream === 'undefined') return null;
+        t = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+      } else t = new TextDecoder('utf-8').decode(buf);   // the host already unpacked it
       return t.length >= 4000 && !/^\s*<(!doctype|html)/i.test(t) ? t : null;
-    } catch (e) { return null; } finally { clearTimeout(to); }
+    } catch (e) { return null; }
+    finally { clearTimeout(to); }
   }
   async function getGutenberg0(id, cb) {
     const key = 'g:' + id;
@@ -573,7 +574,8 @@
     if (cached) { if (cb) cb({ type: 'cached' }); return cached; }
     const bt = bundleText.get(String(id));
     if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bt; if (t) return t; } // null: the combined request failed, use the usual routes
-    const own = await getHfText(id, cb);          // our own small copy first
+    if (cb) cb({ type: 'try', i: 0, N: 1 });
+    const own = await getHfText(id);
     if (own) { idb.set(key, own); return own; }
     let last;
     const urls = gutUrls(id);
