@@ -82,7 +82,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
 | `sound/music-bus.js` | 64 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
 | `sound/music-library.js` | 123 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
-| `sound/music-playback.js` | 271 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
+| `sound/music-playback.js` | 274 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
 | `sound/music-offline.js` | 136 | Music: "Download music for offline" |
 | `sound/music-wiring.js` | 77 | Music: engine health, the Music switch, first-time hint, quick controls, `musicInit` |
 | `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |
@@ -101,9 +101,9 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/story-transitions.js` | 65 | Story sounds: door, gate and footstep sounds when the place changes |
 | `sound/ambient-intensity.js` | 32 | Ambient: intensity, the levels really played (`ambLive`), night and time of day |
 | `sound/sound-presets.js` | 81 | Sound screen: hear a sound, quick presets and undo |
-| `sound/sound-core.js` | 39 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
+| `sound/sound-core.js` | 61 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
-| `sound/sound-screen.js` | 164 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
+| `sound/sound-screen.js` | 183 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
 
 ## CSS files (`src/css/`)

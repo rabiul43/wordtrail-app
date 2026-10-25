@@ -19,8 +19,8 @@
     ambMoodApply(tc);
   }
   const ambVol = () => (P.ambVol == null ? 70 : P.ambVol) / 100;
-  const ambGain = () => ambVol() * sndMul();   // what the engine really plays at: the ambient volume times the Sound master (0 when Sound is off)
-  function ambMaster() { if (AMB.built && AMB.on) AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, 0.1); }
+  const ambGain = () => ambVol() * sndMul() * sndBalAmb();   // what the engine really plays at: the ambient volume times the Sound master (0 when Sound is off) times the automatic balance (sound-core.js)
+  function ambMaster(tc) { if (AMB.built && AMB.on) AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, tc == null ? 0.1 : tc); }
   /* Remember the mix per book, and per kind of book (the last mix used on a gothic book starts the next gothic book). */
   function ambSaveMix() {
     if (!S.book) return;

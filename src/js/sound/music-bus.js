@@ -11,7 +11,7 @@
   const musVol = () => (P.musVol == null ? 40 : Math.max(0, Math.min(100, P.musVol))) / 100;
 
   /* The music bus level: user volume (0 when music is switched off). Clips carry only their LUFS gain. */
-  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0) * sndMul();   // user volume x the Sound master
+  const musBusLevel = () => musVol() * (P.musOn !== false ? 1 : 0) * sndMul() * sndBalMus();   // user volume x the Sound master x the automatic balance (sound-core.js; 1 unless Music and Background sounds are both on)
   function musBusApply(tc) {
     if (!MUS.master || !MUS.ctx) return;
     MUS.master.gain.setTargetAtTime(musBusLevel(), MUS.ctx.currentTime, tc == null ? 0.1 : tc);

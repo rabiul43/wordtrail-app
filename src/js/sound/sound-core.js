@@ -17,6 +17,26 @@
     const o = $('#mus-vpct'); if (o) o.textContent = v + '%';
     const i = $('#mus-vic'); if (i) i.classList.toggle('mute', v === 0);
   }
+  /* ---------- Balance music and sounds ----------
+     While Music and Background sounds are both on (and P.sndBalance is not off), the music bus sits at x0.6 (about -4.4 dB) and the
+     ambient master at x0.85 (about -1.4 dB): the music gives way a lot, the room sounds a little, because ambient noise is what hides
+     consonants. It is a multiplier inside musBusLevel() and ambGain(), which feed MUS.master and AMB.master. The narrator dip lives on
+     other nodes (MUS.duck, AMB.duck and the carve filters), so the two never fight. The saved sliders are never changed. It follows the
+     switches, not the playback state, so a pause and play does not make the music swell. The state is AMB.bal; it ramps slowly (tc 1.5 s). */
+  const SND_BAL_MUS = 0.6, SND_BAL_AMB = 0.85;
+  function sndBalMus() { return AMB.bal ? SND_BAL_MUS : 1; }   // functions, so they exist whenever the bus code asks
+  function sndBalAmb() { return AMB.bal ? SND_BAL_AMB : 1; }
+  function sndBalWant() {
+    if (P.sndBalance === false || !sndOn() || P.musOn !== true || P.ambOn !== true || musVol() <= 0 || ambVol() <= 0) return false;
+    if (P.ambAuto !== false) return true;   // following the story: the scene sounds are expected
+    const L = ambLive(); return AMB_SOUNDS.some(([k]) => L[k] > 0);
+  }
+  function sndBalSync(now) {   // called by a light timer and by the Sound screen's controls; does work only when the state flips
+    const on = sndBalWant(); if (on === !!AMB.bal) return;
+    AMB.bal = on;
+    const tc = now === true ? 0.02 : 1.5; musBusApply(tc); ambMaster(tc);
+    const n = $('#mus-bal-note'); if (n) n.hidden = !on;   // the line under the music slider says why it sits lower
+  }
   function sndPaint() {   // show the saved settings in the controls that live on the Sound screen
     const set = (id, fn) => { const e = $(id); if (e) fn(e); };
     set('#snd-on', e => { e.checked = sndOn(); }); set('#snd-vol', e => { e.value = String(P.sndVol == null ? 100 : P.sndVol); sndVolPaint(); });
@@ -27,9 +47,11 @@
     set('#amb-duck', e => { e.checked = P.ambDuck !== false; }); set('#snd-duck', e => { e.checked = P.ambDuck !== false || P.musDuck !== false; });
     set('#snd-duckkids', e => { const on = P.ambDuck !== false || P.musDuck !== false; e.toggleAttribute('data-off', !on); e.querySelectorAll('input,button').forEach(x => { x.disabled = !on && x.id !== 'amb-duck' && x.id !== 'in-musduck' ? true : false; }); });
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
+    set('#snd-balance', e => { e.checked = P.sndBalance !== false; });
     set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); });
     set('#amb-dev', e => { e.hidden = P.sndDev !== true; });
     sndNowPaint(); sndTabsPaint(); musOffPaint();
+    try { sndBalSync(); } catch (e) { /* the balance is a help */ }
   }
   function sndApplyAll() {   // after the master switch, the master volume or a preset: make every layer follow the saved settings
     ambMaster(); ambSync(); musBusApply(0.2);

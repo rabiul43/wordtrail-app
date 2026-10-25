@@ -102,11 +102,11 @@
     miniScenePaint(null);
   }
 
-  /* Scene label on the mini-player: shown only when P.sceneLabel is true and a scene is active. */
+  /* Scene label on the mini-player: shown only when P.sceneLabel is true, Sound is on and a scene is known. It reads "Now: ..." while Background sounds play, "Scene: ..." when they are off. */
   function miniScenePaint(label) {
-    AMB.lbl = label ? String(label).replace(/^Now: /, '') : ''; sndNowPaint();
+    AMB.lbl = label ? String(label).replace(/^Now: /, '') : ''; AMB.lblBook = AMB.lbl && S.book ? String(S.book.id) : ''; sndNowPaint();
     const btn = $('#mini-scene'); if (!btn) return;
-    const show = P.sceneLabel === true && !!label && P.ambOn === true && AMB.on;
+    const show = P.sceneLabel === true && !!label && sndOn();
     btn.hidden = !show;
-    if (show) btn.textContent = label;
+    if (show) btn.textContent = P.ambOn === true && AMB.on ? label : 'Scene: ' + AMB.lbl;
   }

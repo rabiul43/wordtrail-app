@@ -1,6 +1,6 @@
   /* ---------- sound-screen.js ----------
      Sound screen: reset, the mixer rows, My own words, ambSync and ambInit. */
-  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'ambBook', 'ambG', 'musSeen', 'sndDev'];
+  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'sndBalance', 'ambBook', 'ambG', 'musSeen', 'sndDev'];
   function sndResetAll() {
     if (!confirm('Put all sound settings back to normal? Your saved mixes for each book are cleared too.')) return;
     SND_RESET_KEYS.forEach(x => { delete P[x]; });
@@ -152,7 +152,26 @@
     $('#snd-book-reset').addEventListener('click', sndBookReset); $('#snd-reset-all').addEventListener('click', sndResetAll);
     $('#snd-cache-clear').addEventListener('click', sndCacheClear); setTimeout(() => sndCachePrune(true), 20000);   // trim an oversized cache shortly after start
     $('#b-amb-set').addEventListener('click', () => { closeSheets(); ambOpen(); });
-    $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); miniScenePaint(null); });
+    $('#in-ambon').addEventListener('change', e => { P.ambOn = e.target.checked; savePrefs(); ambSync(); ambAutoPaint(); });   // the scene stays on show; only its "Turn on sounds" button comes and goes
+    /* "Turn on sounds" (the Sound strip and the Background sounds tab): the same as the switch in that tab, plus the scene already read applies at once */
+    const scenesOn = () => {
+      if (!sndOn()) return;
+      P.ambOn = true; const c = $('#in-ambon'); if (c) c.checked = true;
+      savePrefs(); ambSync();
+      if (P.ambAuto !== false) { try { ambAutoStep(); } catch (e) { /* optional */ } ambApply(1.5); }
+      ambAutoPaint(); sndPaint(); try { qkPaint(); } catch (e) { /* the player tile is optional */ }
+    };
+    $('#snd-now-amb').addEventListener('click', scenesOn); $('#amb-scene-off-go').addEventListener('click', scenesOn);
+    /* The scene is read while neither Music nor Background sounds is on only when someone can see it (the Sound sheet is open or
+       the mini-player label is on). One check a second; ambAutoStep itself does work only when the paragraph changes. */
+    setInterval(() => {
+      if (document.hidden || !S.book || !sndOn() || AMB.on || MUS.on || P.ambAuto === false) return;
+      if (P.sceneLabel !== true && $('#sheet-amb').hidden) return;
+      if (S.curId === AMB.autoId && S.sec === AMB.autoSec) return;   // same sentence as last time
+      try { ambAutoStep(); } catch (e) { /* the label is a help, never a reason to stop anything */ }
+    }, 1000);
+    $('#snd-balance').addEventListener('change', e => { P.sndBalance = e.target.checked; savePrefs(); sndBalSync(); });   // on (the default) or off: the music and sounds glide to their new levels
+    setInterval(sndBalSync, 500); sndBalSync(true);   // follows the Music, Background sounds, volume and Sound switches wherever they are changed; cheap checks, work only when the state flips
     $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); try { qkPaint(); } catch (err) { /* the tile is optional */ } });
     $('#mus-vol').addEventListener('input', e => { musicVolChange(+e.target.value); musVolPaint(); });
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; sndPaint(); });   // re-apply the dip at once

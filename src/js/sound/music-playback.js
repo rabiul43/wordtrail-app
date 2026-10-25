@@ -185,7 +185,10 @@
         else if (MUS.live) rows.push(['Music', 'loading']);
         else rows.push(['Music', 'not playing yet']);
       }
-      if (sndOn() && P.ambOn === true && AMB.on && AMB.lbl) rows.push(['Scene', AMB.lbl]);
+      const sc = sndOn() && !!AMB.lbl && !!S.book && AMB.lblBook === String(S.book.id), scOff = sc && P.ambOn !== true;   // the scene shows whenever Sound is on and a scene is known; with Background sounds off it comes with a "Turn on sounds" button
+      if (sc) rows.push(['Scene', AMB.lbl]);
+      const b1 = $('#snd-now-amb'); if (b1) b1.hidden = !scOff;
+      const b2 = $('#amb-scene-off'); if (b2) { b2.hidden = !scOff; const n = $('#amb-scene-off-n'); if (n) n.textContent = scOff ? AMB.lbl : ''; }
       if (OSND.nodes) rows.push(['Opening', OSND.buf[OSND.mood] ? 'recorded clip' : 'made on the device']);
       box.textContent = ''; box.hidden = !rows.length;
       const bar = $('#snd-nowbar'); if (bar) bar.hidden = !rows.length;   // the pinned strip follows the status text
