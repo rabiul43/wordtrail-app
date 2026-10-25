@@ -185,3 +185,10 @@
 .mrow:hover { background: var(--surface-2); }
 .mrow[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
 
+
+/* ---- Developer tab: performance readout table (task 12) ---- */
+#dev-perf { margin: 0 0 .2rem; }
+.dev-perf-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.dev-perf-table tr + tr td { border-top: 1px solid var(--line); }
+.dev-perf-k { padding: .35rem 0 .35rem .1rem; color: var(--muted); width: 58%; }
+.dev-perf-v { padding: .35rem .1rem .35rem 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }

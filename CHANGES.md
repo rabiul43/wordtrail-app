@@ -67,3 +67,6 @@ Build: `python3 build.py` -> dist/index.html
 - src/js/234-scene-prescore.js (new) + 233 (one call) + 300 (SCP.reset on the worker switch) -> scene scores are made in a second worker
 - build.py -> new part kind 'copy' and the #scene-worker-src block; tools/minify.py minifies that block too
 - Same Settings switch as before (background work): off = everything runs as it did
+
+- src/pwa/sw.js                 -> catalog.json (network first, saved copy as fallback) and book covers (cache first, max 600, CORS answers only) are kept for offline
+- src/js/070-network-data.js    -> a catalogue served from the saved copy (header x-wt-stale) is not stamped as freshly downloaded

@@ -453,6 +453,17 @@ button, [role="button"], .tile, .card, .synced-row { -webkit-tap-highlight-color
   .ib:active, .heart:active, .mini-play:active, .play:active { transform: none; }
   .sheet, .synced-list > *, #shelf-list > *, #recent-list > *, #acct-history-list > *, .tab[aria-current="page"] .tab-ic svg { animation: none; }
 }
+/* Lite mode: same animation kills as prefers-reduced-motion, applied via data-lite attribute set automatically on weak devices */
+html[data-lite] .btn:active, html[data-lite] .chip:active, html[data-lite] .fchip:active, html[data-lite] .genre-chip:active,
+html[data-lite] .tile:active, html[data-lite] .tile-more:active, html[data-lite] .acct-link:active, html[data-lite] .tab:active, html[data-lite] .mrow:active,
+html[data-lite] .card:active, html[data-lite] .synced-row:active, html[data-lite] .col-card:active, html[data-lite] .col-hero:active,
+html[data-lite] .col-tile:active, html[data-lite] .botd-hero:active, html[data-lite] .det-btn:active, html[data-lite] .resume:active,
+html[data-lite] .ib:active, html[data-lite] .heart:active, html[data-lite] .mini-play:active, html[data-lite] .play:active { transform: none; }
+html[data-lite] .sheet,
+html[data-lite] .synced-list > *, html[data-lite] #shelf-list > *, html[data-lite] #recent-list > *, html[data-lite] #acct-history-list > *,
+html[data-lite] .tab[aria-current="page"] .tab-ic svg { animation: none; }
+/* Lite mode: stop skeleton shimmer animations */
+html[data-lite] .col-sk, html[data-lite] .vp-sk { animation: none; }
 
 
 /* ---------- Gesture hint card + How to use sheet ---------- */

@@ -1,7 +1,7 @@
   /* ---------- Sound screen: tabs, layer dots and the "off" look ----------
      The four layer tabs (Ambient, Music, Opening, Story) show one panel at a time. A dot on a tab means that layer is on.
      While Sound is off the panel is dimmed and cannot be used (the saved settings are kept); flip the main switch first. */
-  const SND_TABS = [['amb', 'Background sounds'], ['mus', 'Music'], ['open', 'Intro chime'], ['story', 'Sound effects']];
+  const SND_TABS = [['amb', 'Ambient sound'], ['mus', 'Music'], ['open', 'Intro chime'], ['story', 'Sound effects']];
   function sndTabSelect(k, focus) {
     SND_TABS.forEach(([x]) => {
       const t = $('#snd-t-' + x), p = $('#snd-p-' + x), on = x === k;

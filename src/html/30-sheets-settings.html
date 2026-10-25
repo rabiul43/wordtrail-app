@@ -279,7 +279,7 @@
     <div class="row"><label for="in-skipbtn"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>Skip intro button</h3><small style="color:var(--muted)">Shows for the first 30 seconds of a track, to jump past the spoken LibriVox notice</small></label><input id="in-skipbtn" type="checkbox"></div>
     <div class="row"><label for="in-smartrw"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Smart rewind</h3><small style="color:var(--muted)">After a pause, or when you come back to a book, go back a few seconds (more after a longer break) so you don't lose the thread</small></label><input id="in-smartrw" type="checkbox"></div>
     <div class="row"><label for="in-autonext"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Download ahead</h3><small style="color:var(--muted)">Saves the next tracks while you listen, on Wi-Fi only, so a weak connection never stops the book. Remove them in Settings &gt; Storage</small></label><select id="in-autonext" class="num" style="width:auto"><option value="0">Off</option><option value="2">Next 2 tracks</option><option value="3">Next 3 tracks</option></select></div>
-    <div class="row"><label style="flex:1"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Sound</h3><small style="color:var(--muted)">Background sounds, story sounds, music and the opening sound, all in one place. Presets, volume and a master switch are there too</small></label><button id="b-amb-set" class="btn small ghost" type="button" >Open sound mixer</button></div>
+    <div class="row"><label style="flex:1"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Sound</h3><small style="color:var(--muted)">Ambient sound, story sounds, music and the opening sound, all in one place. Presets, volume and a master switch are there too</small></label><button id="b-amb-set" class="btn small ghost" type="button" >Open sound mixer</button></div>
     <div class="row"><label for="in-lockseek"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Lock-screen buttons</h3><small style="color:var(--muted)">Skip back and forward 15 seconds. Turn off to get previous and next track instead</small></label><input id="in-lockseek" type="checkbox"></div>
     <div class="row"><label for="in-autodel"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Auto-delete finished downloads</h3><small style="color:var(--muted)">When you reach the end of a book, its downloaded audio is removed from this device to free space. Your position, stats and favourites are kept</small></label><input id="in-autodel" type="checkbox"></div>
     <div class="row" id="row-sharestats"><label for="in-sharestats"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-headphones"/></svg>Share anonymous listen counts</h3><small style="color:var(--muted)">Counts a book once after you have listened for a minute, and once when you finish it, so others can see how popular it is. Sends a random number made on this device. Never your name, your history or what you read</small></label><input id="in-sharestats" type="checkbox"></div>
@@ -373,7 +373,15 @@
       <pre id="sct-out" class="help" aria-live="polite" style="white-space:pre-wrap;word-break:break-word;margin-top:.6rem"></pre>
     </div>
     <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-zap"/></svg>Sync and performance</h3>
-      <p id="dev-startup" class="help">Startup time: measuring…</p>
+      <div id="dev-perf">
+        <table class="dev-perf-table" aria-label="Performance readout">
+          <tbody id="dev-perf-rows"><tr><td class="dev-perf-k">Startup time</td><td class="dev-perf-v">measuring…</td></tr></tbody>
+        </table>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem">
+          <button id="b-perfrefresh" class="btn small" type="button">Refresh</button>
+          <button id="b-perfcopy"    class="btn small ghost" type="button">Copy</button>
+        </div>
+      </div>
       <details class="adv" open>
         <summary>Advanced</summary>
         <div class="row" style="margin-top:.6rem"><label for="in-worker">Background processing (Web Worker)</label><input id="in-worker" type="checkbox"></div>

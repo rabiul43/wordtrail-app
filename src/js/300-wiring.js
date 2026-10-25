@@ -374,6 +374,14 @@
         }
         diagShow();
       }); }
+    // --- performance panel buttons (task 12) ---
+    { const br = $('#b-perfrefresh'); if (br) br.addEventListener('click', devStartup); }
+    { const bc = $('#b-perfcopy'); if (bc) bc.addEventListener('click', async () => {
+      const text = (document.getElementById('dev-perf') || {}).dataset.plain || '';
+      try { await navigator.clipboard.writeText(text); toast('Copied.', 1800); return; } catch (e) { /* fall through */ }
+      try { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'; document.body.append(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); toast(ok ? 'Copied.' : 'Could not copy.', 2200); }
+      catch (e) { toast('Could not copy.', 2200); }
+    }); }
     $('#in-lite').addEventListener('change', e => { P.liteGfx = e.target.checked; savePrefs(); applyLite(); });
     $('#in-liteforce').addEventListener('change', e => { P.liteForce = e.target.checked; savePrefs(); applyLite(); });
     $('#in-tidy').addEventListener('change', e => { P.tidyPlayer = e.target.checked; savePrefs(); applyTidy(); paintBookProg(); });
@@ -416,9 +424,56 @@
   const STARTUP = { ready: Math.round(performance.now()), fcp: 0 };
   try { new PerformanceObserver(l => { l.getEntries().forEach(e => { if (e.name === 'first-contentful-paint') STARTUP.fcp = Math.round(e.startTime); }); }).observe({ type: 'paint', buffered: true }); } catch (e) { /* not supported */ }
   function devStartup() {
-    const n = document.getElementById('dev-startup'); if (!n) return;
-    let kb = 0; try { kb = Math.round(document.documentElement.outerHTML.length / 1024); } catch (e) { /* ignore */ }
-    n.textContent = 'Startup: first content at ' + (STARTUP.fcp ? STARTUP.fcp + ' ms' : 'n/a') + ', ready to use at ' + STARTUP.ready + ' ms. Page size about ' + kb + ' KB.';
+    const tbody = document.getElementById('dev-perf-rows'); if (!tbody) return;
+    const rows = [];
+
+    // --- Startup timing ---
+    rows.push(['FCP (first content)', STARTUP.fcp ? STARTUP.fcp + ' ms' : 'n/a']);
+    rows.push(['App ready', STARTUP.ready + ' ms']);
+
+    // --- LCP (Chrome/Edge) ---
+    try {
+      const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
+      if (lcpEntries.length) rows.push(['LCP', Math.round(lcpEntries[lcpEntries.length - 1].startTime) + ' ms']);
+    } catch (e) { /* not supported */ }
+
+    // --- Total transfer size from resource timing ---
+    try {
+      const res = performance.getEntriesByType('resource');
+      if (res.length) {
+        const total = res.reduce((s, r) => s + (r.transferSize || 0), 0);
+        if (total > 0) rows.push(['Transferred (resources)', Math.round(total / 1024) + ' KB']);
+      }
+    } catch (e) { /* not supported */ }
+
+    // --- DOM HTML size ---
+    try {
+      rows.push(['Page HTML size', Math.round(document.documentElement.outerHTML.length / 1024) + ' KB']);
+    } catch (e) { /* ignore */ }
+
+    // --- JS heap memory (Chrome / Samsung only) ---
+    try {
+      const m = performance.memory;
+      if (m) {
+        rows.push(['JS heap used',  Math.round(m.usedJSHeapSize  / 1048576) + ' MB']);
+        rows.push(['JS heap limit', Math.round(m.jsHeapSizeLimit / 1048576) + ' MB']);
+      }
+    } catch (e) { /* not supported */ }
+
+    // --- Device signals (same ones liteWeak reads) ---
+    try { const mem = navigator.deviceMemory;       if (mem  != null) rows.push(['Device RAM',  mem  + ' GB']); } catch (e) { /* not supported */ }
+    try { const cores = navigator.hardwareConcurrency; if (cores != null) rows.push(['CPU cores', String(cores)]); } catch (e) { /* not supported */ }
+
+    // --- Lite mode status ---
+    rows.push(['Lite mode active', document.documentElement.hasAttribute('data-lite') ? 'yes' : 'no']);
+
+    // --- Render to table ---
+    tbody.innerHTML = rows.map(([k, v]) =>
+      '<tr><td class="dev-perf-k">' + k + '</td><td class="dev-perf-v">' + v + '</td></tr>'
+    ).join('');
+
+    // stash plain text for Copy button
+    tbody.closest('#dev-perf').dataset.plain = rows.map(([k, v]) => k + ': ' + v).join('\n');
   }
   init();
   uiInit();

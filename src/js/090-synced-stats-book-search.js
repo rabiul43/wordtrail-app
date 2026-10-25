@@ -643,6 +643,7 @@
     const on = P.liteForce === true || (P.liteGfx !== false && liteWeak());
     document.documentElement.toggleAttribute('data-lite', on);
   }
+  applyLite(); // auto-apply on load: weak devices get lite mode before the settings panel is ever opened
   function applyQuick() {   // the Controls sheet is the only player menu, so the old bottom chips (Text only, More) stay hidden
     document.documentElement.setAttribute('data-quick', '');
   }

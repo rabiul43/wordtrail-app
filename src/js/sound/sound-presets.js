@@ -67,10 +67,11 @@
     if (!AMB_SCENES.some(x => x.k === k)) return;
     if (!AMB.prevSnap) AMB.prevSnap = { amb: P.amb ? JSON.parse(JSON.stringify(P.amb)) : null, on: P.ambOn };
     clearInterval(AMB.prevIv); AMB.prevK = k; let left = 5;
+    AMB.preview = true;   // this tap is the preview: it is the only thing that makes the mix audible while the book is paused
     ambUseScene(k); $('#amb-prev').hidden = false; ambScenePaintPrev(left);
     AMB.prevIv = setInterval(() => { left--; if (left <= 0) ambSceneRevert(); else ambScenePaintPrev(left); }, 1000);
   }
-  function ambSceneEnd() { clearInterval(AMB.prevIv); AMB.prevIv = 0; AMB.prevSnap = null; AMB.prevK = ''; const b = $('#amb-prev'); if (b) b.hidden = true; }
+  function ambSceneEnd() { clearInterval(AMB.prevIv); AMB.prevIv = 0; AMB.prevSnap = null; AMB.prevK = ''; const b = $('#amb-prev'); if (b) b.hidden = true; AMB.preview = false; ambSync(); }   // the preview is over (kept or not): silent again unless the book is playing with sounds on
   function ambSceneKeep() { if (!AMB.prevSnap) return; ambSceneEnd(); toast('Scene saved.'); }
   function ambSceneRevert() {   // the time is up (or the screen closed) and nobody tapped "Use this": put the old mix back
     const sn = AMB.prevSnap; ambSceneEnd(); if (!sn) return;

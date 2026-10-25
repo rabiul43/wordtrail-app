@@ -103,7 +103,7 @@
         const r = await fetch(catUrl(), P.fastNet !== false ? { signal: ctl.signal, cache: 'no-cache' } : { signal: ctl.signal }); clearTimeout(to);   // no-cache = the browser sends If-None-Match itself; an unchanged file comes back as 304 (not downloaded again)
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
-        if (d && Array.isArray(d.b) && d.b.length) { d.fetched = Date.now(); idb.set('catalog', d); CAT.books = catInflate(d); }
+        if (d && Array.isArray(d.b) && d.b.length) { d.fetched = r.headers.get('x-wt-stale') ? 0 : Date.now(); idb.set('catalog', d); CAT.books = catInflate(d); }
       } catch (e) { /* keep older catalog if any; otherwise lvGet falls back to the live API */ }
     })().then(() => { try { splashRemember(); } catch (e) { /* splash list is optional */ } });
     return CAT.p;

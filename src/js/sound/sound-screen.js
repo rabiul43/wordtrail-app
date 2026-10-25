@@ -29,7 +29,7 @@
   function ambSync() {
     ambBookCheck();
     const L = ambLive(), any = AMB_SOUNDS.some(([k]) => L[k] > 0);
-    const want = sndOn() && (any || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || (P.ambOn === true && ambPlaying()));
+    const want = sndOn() && (any || AMB.aud || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || AMB.aud || (P.ambOn === true && ambPlaying()));   // opening the screen plays nothing: sound comes only from a tap on a scene or a sound name (preview / audition), or from the book itself
     clearTimeout(AMB.timer);
     if (want) {
       if (!ambBuild()) return;
@@ -51,7 +51,7 @@
     ambGroups(); $('#amb-vol').value = String(Math.round(ambVol() * 100)); $('#amb-duck').checked = P.ambDuck !== false; $('#amb-smart').checked = P.ambSmart !== false; $('#amb-cues').checked = P.ambCues !== false; $('#amb-trans').checked = P.ambTrans !== false; Object.keys(CUE_CATS).forEach(c => { $('#amb-cat-' + c).checked = (P.ambCats || {})[c] !== false; }); ambCustomPaint(); ambShiftLabel(); $('#amb-int').value = String(P.ambInt == null ? 100 : P.ambInt); $('#amb-tod').checked = P.ambTod !== false;
     $('#amb-auto').checked = P.ambAuto !== false; ambAutoPaint(); AMB.preset = ''; AMB.undo = null; ambPresetPaint();
     ambPaintScenes(); ambMatchScene(); sndPaint();
-    AMB.preview = true; openSheet('sheet-amb'); ambSync();
+    AMB.preview = false; openSheet('sheet-amb'); ambSync();   // silent on open: a preview starts only when a scene or a sound name is tapped
   }
   function ambBuildRows() {   // the sliders are generated from AMB_SOUNDS, in collapsible groups
     const box = $('#amb-rows'); box.textContent = '';
@@ -132,7 +132,7 @@
     $('#amb-scenes').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) ambScenePreview(c.dataset.k); });   // tap = hear it for 5 s, then "Use this" keeps it
     $('#amb-prev-use').addEventListener('click', ambSceneKeep);
     new MutationObserver(() => { if ($('#sheet-amb').hidden) ambSceneRevert(); }).observe($('#sheet-amb'), { attributes: true, attributeFilter: ['hidden'] });
-    $('#amb-sug-go').addEventListener('click', () => { ambSceneEnd(); ambUseScene($('#amb-sug').dataset.k); });
+    $('#amb-sug-go').addEventListener('click', () => { ambSceneEnd(); ambUseScene($('#amb-sug').dataset.k); toast('Scene set. It plays with the book.'); });
     $('#snd-now-pp').addEventListener('click', () => { togglePlay(); setTimeout(sndNowPaint, 120); });   // the pinned strip's play/pause drives the narrator
     $('#snd-offbar-on').addEventListener('click', () => { const c = $('#snd-on'); if (c && !c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } });   // the banner's one-tap fix
     $('#snd-body').addEventListener('click', e => {   // a tap on the locked panel does nothing, so point at the banner instead

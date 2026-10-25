@@ -12,7 +12,7 @@
     <div class="snd-offbar" id="snd-offbar" role="status"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span>Sound is off. Your settings are saved but locked.</span><button id="snd-offbar-on" class="btn small" type="button">Turn on</button></div>
 
     <div class="snd-tabs" role="tablist" aria-label="Sound types">
-      <button type="button" role="tab" id="snd-t-amb" class="snd-tab" aria-selected="true" aria-controls="snd-p-amb" data-p="amb"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-m-rain"/></svg><span>Background sounds</span><i class="snd-dot" id="snd-d-amb" hidden></i></button>
+      <button type="button" role="tab" id="snd-t-amb" class="snd-tab" aria-selected="true" aria-controls="snd-p-amb" data-p="amb"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-m-rain"/></svg><span>Ambient sound</span><i class="snd-dot" id="snd-d-amb" hidden></i></button>
       <button type="button" role="tab" id="snd-t-mus" class="snd-tab" aria-selected="false" aria-controls="snd-p-mus" data-p="mus" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg><span>Music</span><i class="snd-dot" id="snd-d-mus" hidden></i></button>
       <button type="button" role="tab" id="snd-t-open" class="snd-tab" aria-selected="false" aria-controls="snd-p-open" data-p="open" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4a1 1 0 011-1h7a1 1 0 011 1v17M4 21h14M12 12h.01M19 4v4M17 6h4"/></svg><span>Intro chime</span><i class="snd-dot" id="snd-d-open" hidden></i></button>
       <button type="button" role="tab" id="snd-t-story" class="snd-tab" aria-selected="false" aria-controls="snd-p-story" data-p="story" tabindex="-1"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16v-5a6 6 0 10-12 0v5l-2 2h16l-2-2zM10 21h4"/></svg><span>Sound effects</span><i class="snd-dot" id="snd-d-story" hidden></i></button>
@@ -22,10 +22,10 @@
 
     <div class="snd-panels" id="snd-panels">
       <div class="snd-panel" id="snd-p-amb" role="tabpanel" aria-labelledby="snd-t-amb">
-        <p class="help amb-note snd-intro">Plays the sounds of the place in the story, like rain, wind, a café or the sea. It changes when the story moves to a new place.</p>
-        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-ambon">Background sounds</label><small>Rain, wind, café, waves under the narrator</small></div><input type="checkbox" id="in-ambon" class="snd-sw" role="switch"></div>
+        <p class="help amb-note snd-intro">Plays the sounds of the place in the story, like rain, wind, a café or the sea. It changes when the story moves to a new place. Nothing plays when you open this screen: tap a scene or a sound name to hear it for a few seconds.</p>
+        <div class="snd-lrow"><div class="snd-ltxt"><label for="in-ambon">Ambient sound</label><small>Rain, wind, café, waves under the narrator</small></div><input type="checkbox" id="in-ambon" class="snd-sw" role="switch"></div>
         <div id="amb-scene-off" class="amb-sug" hidden><div><small>Scene</small><strong id="amb-scene-off-n"></strong></div><button id="amb-scene-off-go" class="btn small" type="button">Turn on sounds</button></div>
-        <div class="amb-row snd-vrow" id="row-ambvol"><label for="amb-vol">Background sounds volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Background sounds volume"></div>
+        <div class="amb-row snd-vrow" id="row-ambvol"><label for="amb-vol">Ambient sound volume</label><input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Ambient sound volume"></div>
         <div id="amb-sug" class="amb-sug" hidden><div><small id="amb-sug-for">Suggested for this book</small><strong id="amb-sug-n"></strong></div><button id="amb-sug-go" class="btn small" type="button">Use scene</button></div>
         <h3 class="amb-h">Choose a scene</h3>
         <div id="amb-scenes" class="amb-scenes" role="group" aria-label="Sound scenes"></div>
@@ -94,7 +94,7 @@
       <div class="snd-duckkids" id="snd-duckkids">
         <div class="seg" id="seg-musdip" role="group" aria-label="How low the sounds go"><button type="button" data-v="subtle" aria-pressed="false">Subtle</button><button type="button" data-v="normal" aria-pressed="false">Normal</button><button type="button" data-v="strong" aria-pressed="false">Strong</button></div>
         <label class="amb-opt" id="row-musduck"><input type="checkbox" id="in-musduck"> Music</label>
-        <label class="amb-opt" id="row-ambduck"><input type="checkbox" id="amb-duck"> Background sounds</label>
+        <label class="amb-opt" id="row-ambduck"><input type="checkbox" id="amb-duck"> Ambient sound</label>
         <label class="amb-opt"><input type="checkbox" id="amb-smart"> Adapt to the scene</label>
       </div>
       <h3 class="amb-h">Playback</h3>
