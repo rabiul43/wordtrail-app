@@ -88,8 +88,8 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |
 | `sound/ambient-scenes.js` | 77 | Ambient: `AMB` state, `AMB_SOUNDS` (the list of sounds), groups, scenes and rules from `amb-map.json`, book suggestion, scene cards |
 | `sound/ambient-synth.js` | 72 | Ambient: sounds made on the device: noise, reverb, raindrops, rain, rolling thunder, room mix |
-| `sound/ambient-engine.js` | 68 | Ambient: indoor/outdoor detection, `audioCtx` (the ONE AudioContext of the app), `ambBuild` |
-| `sound/ambient-layers.js` | 106 | Ambient: how each sound layer is made (`AMB_LAYER`), layer on/off |
+| `sound/ambient-engine.js` | 70 | Ambient: indoor/outdoor detection, `audioCtx` (the ONE AudioContext of the app), `ambBuild` |
+| `sound/ambient-layers.js` | 108 | Ambient: how each sound layer is made (`AMB_LAYER`), layer on/off |
 | `sound/ambient-recordings.js` | 119 | Ambient: real recordings instead of generated sound |
 | `sound/ambient-mix.js` | 45 | Ambient: apply the mix, volume, master, save the mix, reset on a new book |
 | `sound/ambient-ducking.js` | 85 | Ambient: dip under the narrator's voice |

@@ -81,8 +81,10 @@
     if (P.ambSrc === 'rec' && AMB_REC_KEYS.has(k)) { AMB.live[k] = { nodes: [], lfos: [], off: 0 }; return; }   // recordings only: stay quiet until the recording is ready
     const ctx = AMB.ctx, nodes = [], lfos = [];
     const H = {
-      ctx, pink: AMB.pink, brown: AMB.brown, white: AMB.white,
-      src: (buf, out) => {   // two copies of the noise loop, a hair apart in speed: they only line up again after about an hour, so the loop is never heard
+      ctx, pink: 'pink', brown: 'brown', white: 'white',   // names, not buffers: src() fetches the loop only for the noise this layer really uses
+      src: (buf, out) => {
+        if (typeof buf === 'string') buf = AMB[buf];
+        /* two copies of the noise loop, a hair apart in speed: they only line up again after about an hour, so the loop is never heard */
         const m = ctx.createGain(); m.gain.value = 0.7071; m.connect(out);
         [1, 1.0037].forEach(rt => { const n = ctx.createBufferSource(); n.buffer = buf; n.loop = true; n.playbackRate.value = rt; n.connect(m); n.start(0, Math.random() * Math.max(1, buf.duration - 1)); nodes.push(n); });
       },

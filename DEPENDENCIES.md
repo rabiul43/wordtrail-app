@@ -54,8 +54,8 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/music-credits.js` | 47 | 7 | 2 | 2 |
 | `sound/ambient-scenes.js` | 77 | 13 | 11 | 11 |
 | `sound/ambient-synth.js` | 72 | 7 | 7 | 4 |
-| `sound/ambient-engine.js` | 68 | 5 | 5 | 7 |
-| `sound/ambient-layers.js` | 106 | 3 | 3 | 4 |
+| `sound/ambient-engine.js` | 70 | 5 | 5 | 7 |
+| `sound/ambient-layers.js` | 108 | 3 | 3 | 4 |
 | `sound/ambient-recordings.js` | 119 | 13 | 6 | 14 |
 | `sound/ambient-mix.js` | 45 | 7 | 7 | 17 |
 | `sound/ambient-ducking.js` | 85 | 6 | 3 | 9 |

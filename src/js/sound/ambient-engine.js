@@ -62,7 +62,9 @@
       rRoom.buffer = ambIR(ctx, 0.7); rHall.buffer = ambIR(ctx, 2.2); sR.gain.value = 0; sH.gain.value = 0; cs.gain.value = 0.22;
       cb.connect(sR); sR.connect(rRoom); rRoom.connect(wf); cb.connect(sH); sH.connect(rHall); rHall.connect(wf); cue.connect(cs); cs.connect(rHall); AMB.sR = sR; AMB.sH = sH;
     } catch (e) { /* no reverb here: the sounds simply stay dry */ }   // story sounds skip the voice dip: they land on a spoken word
-    AMB.pink = ambNoise(ctx, 'pink'); AMB.brown = ambNoise(ctx, 'brown'); AMB.white = ambNoise(ctx, 'white'); AMB.drops = ambMakeDrops(ctx);
+    const nz = {};   // each noise loop (about 4 MB) is made the first time a sound asks for it, so a sound that never uses brown noise never pays for it
+    ['pink', 'brown', 'white'].forEach(k => Object.defineProperty(AMB, k, { configurable: true, enumerable: true, get() { return nz[k] || (nz[k] = ambNoise(ctx, k)); } }));
+    AMB.drops = ambMakeDrops(ctx);
     ['thunder', 'birds', 'creaks', 'bell', 'clock', 'heartbeat', 'drips', 'steps', 'hooves', 'clang', 'cannon'].forEach(n => { const g = ctx.createGain(); g.gain.value = 0; g.connect(duck); AMB.g[n] = g; });   // one-off event sounds: no running source, so no cost
     AMB.built = true; return true;
   }
