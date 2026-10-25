@@ -395,7 +395,8 @@
   }
   async function lvGetOnce(params, o = {}) {
     const base = LV + '?' + new URLSearchParams(Object.assign(o.light ? { coverart: 1 } : { extended: 1, coverart: 1 }, params)).toString();
-    const norm = d => (d && Array.isArray(d.books)) ? d.books.map(normBook) : [];
+    /* One book that cannot be read is skipped; the other books in the answer still show. */
+    const norm = d => (d && Array.isArray(d.books)) ? d.books.map(b => { try { return normBook(b); } catch (e) { return null; } }).filter(Boolean) : [];
     const routes = {
       direct: async sig => { const r = await timedFetch(base + '&format=json', 15000, sig); if (r.status === 404) return []; if (!r.ok) throw new Error('HTTP ' + r.status); return norm(await r.json()); },
       jsonp: async sig => norm(await jsonp(base, sig)),
@@ -415,12 +416,14 @@
       throw new Error('LibriVox unreachable');
     }
   }
+  /* A broken entry inside a book (an empty author or track in the list) is left out; the rest of the book is kept. */
   function normBook(b) {
-    const as = b.authors || [];
+    b = b || {};
+    const as = (Array.isArray(b.authors) ? b.authors : []).filter(a => a && typeof a === 'object');
     const authors = as.map(a => [a.first_name, a.last_name].filter(Boolean).join(' ')).filter(Boolean).join(', ') || 'Unknown author';
     const ia = String(b.url_iarchive || '').match(/details\/([^/?#]+)/);
     const cover = String(b.coverart_thumbnail || b.coverart_jpg || b.coverart_jpeg || (ia ? 'https://archive.org/services/img/' + ia[1] : '')).replace(/^http:/, 'https:');
-    const secs = (b.sections || []).slice()
+    const secs = (Array.isArray(b.sections) ? b.sections : []).filter(x => x && typeof x === 'object')
       .sort((x, y) => (+x.section_number || 0) - (+y.section_number || 0))
       .map(s => ({ id: s.id, title: decode(s.title) || 'Track ' + s.section_number, url: String(s.listen_url || '').replace(/^http:/, 'https:'), dur: +s.playtime || 0, reader: decode(((s.readers || [])[0] || {}).display_name) }))
       .filter(s => s.url);

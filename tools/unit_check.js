@@ -26,15 +26,23 @@ function grab(src, name) {
 let Core, T, H;
 try {
   const sync = read('170-sync-points-drift.js'), align = read('180-sync-alignment.js'), tap = read('060-position-bookmarks.js');
+  const open = read('133-open-progress-saved-state.js'), net = read('070-network-data.js');
   /* 1. Core: a self-contained factory (it also runs inside a web worker), so the whole file loads as is. */
   const cctx = vm.createContext({});
   vm.runInContext(read('010-core.js') + '\nthis.Core = Core;', cctx);
   Core = cctx.Core;
   /* 2. Pure helpers pulled out one by one. */
-  const ctx = vm.createContext({});
+  const ctx = vm.createContext({ setTimeout, clearTimeout, AbortController, TextDecoder, Error });
   vm.runInContext([
     grab(tap, 'TAP_DELAY'), grab(sync, 'resyncTime'), grab(align, 'toks'), grab(align, 'alignTokens'),
-    'this.T = { toks, alignTokens, resyncTime, TAP_DELAY };'
+    grab(open, 'takeJsonLines'),
+    'const bundles = new Map(), bundleText = new Map(), saved = {}; let PROXY = "https://p.test", FETCH;',
+    'const idb = { set: async (k, v) => { saved[k] = v; } };',
+    'const fetch = (...a) => FETCH(...a);',
+    grab(open, 'fetchBundle'),
+    'const decode = x => String(x || "");',                                   // the app's decode() needs a page; same result for plain text
+    grab(net, 'normBook'),
+    'this.T = { toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch: f => { FETCH = f; } };'
   ].join('\n'), ctx);
   T = ctx.T;
   /* 3. The tap / undo rules, run against a small fake of the app state (S, P, audio, toast ...). */
@@ -56,7 +64,7 @@ try {
     return a;
   };
 } catch (e) { console.error('Cannot load the code under test: ' + e.message + '\nA function was probably renamed or moved; update tools/unit_check.js.'); process.exit(2); }
-const { toks, alignTokens, resyncTime, TAP_DELAY } = T;
+const { toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch } = T;
 
 let failed = 0, total = 0;
 const test = (name, fn) => { total++; try { fn(); console.log('ok    ' + name); } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n').slice(0, 4).join('\n      ')); } };
@@ -250,5 +258,86 @@ test('setAnchor keepUndo: a snap right after a tap does not overwrite the undo o
   assert.deepStrictEqual(plain(a.S.undo), u);
 });
 
-console.log('\n' + (failed ? failed + ' of ' + total + ' failed' : 'all ' + total + ' passed'));
-process.exit(failed ? 1 : 0);
+/* ---------- book loading: one bad piece must not stop the rest ---------- */
+test('takeJsonLines: complete lines are returned, the unfinished part waits for the next chunk', () => {
+  const a = takeJsonLines('{"a":1}\n{"b":2}\n{"c"');
+  assert.deepStrictEqual(plain(a.out), [{ a: 1 }, { b: 2 }]); assert.strictEqual(a.buf, '{"c"');
+  const b = takeJsonLines(a.buf + ':3}\n');
+  assert.deepStrictEqual(plain(b.out), [{ c: 3 }]); assert.strictEqual(b.buf, '');
+});
+test('takeJsonLines: a broken line is skipped and the lines after it still arrive', () => {
+  const r = takeJsonLines('{"lv":{"id":1}}\n{this is not json\n{"gut":{"id":5}}\n{"text":"hello"}\n');
+  assert.deepStrictEqual(plain(r.out).map(o => Object.keys(o)[0]), ['lv', 'gut', 'text']);
+});
+test('takeJsonLines: lines that are valid JSON but not objects (null, numbers, text) are skipped', () => {
+  assert.deepStrictEqual(plain(takeJsonLines('null\n42\n"hi"\ntrue\n{"ok":1}\n').out), [{ ok: 1 }]);
+});
+test('takeJsonLines: blank lines and Windows line ends are fine', () => {
+  assert.deepStrictEqual(plain(takeJsonLines('\n\r\n{"a":1}\r\n   \n').out), [{ a: 1 }]);
+});
+test('takeJsonLines: a stream cut into odd pieces gives the same lines as one piece', () => {
+  const whole = '{"lv":{"id":7}}\nBROKEN\n{"gut":{"id":9}}\n{"text":"' + 'x'.repeat(50) + '"}\n';
+  let buf = '', got = [];
+  for (let i = 0; i < whole.length; i += 7) { const t = takeJsonLines(buf + whole.slice(i, i + 7)); buf = t.buf; got = got.concat(plain(t.out)); }
+  assert.deepStrictEqual(got, plain(takeJsonLines(whole).out)); assert.strictEqual(got.length, 3);
+});
+const LV = { id: 12, title: 'Tale &amp; Co', authors: [{ first_name: 'Jane', last_name: 'Austen' }], totaltimesecs: '600',
+  sections: [{ id: 2, section_number: '2', title: 'Two', listen_url: 'http://x/2.mp3', playtime: '300', readers: [{ display_name: 'Ann' }] },
+             { id: 1, section_number: '1', title: 'One', listen_url: 'http://x/1.mp3', playtime: '300', readers: [{ display_name: 'Ann' }] }] };
+test('normBook: a normal book comes out sorted by track number with https links', () => {
+  const b = plain(normBook(LV));
+  assert.deepStrictEqual(b.secs.map(x => x.id), [1, 2]);
+  assert.ok(b.secs.every(x => x.url.startsWith('https://')));
+  assert.strictEqual(b.authors, 'Jane Austen'); assert.strictEqual(b.n, 2);
+});
+test('normBook: an empty entry in the track list or author list is left out, the rest is kept', () => {
+  const bad = Object.assign({}, LV, { sections: [null, LV.sections[0], 'oops', LV.sections[1]], authors: [null, LV.authors[0]] });
+  const b = plain(normBook(bad));
+  assert.deepStrictEqual(b.secs.map(x => x.id), [1, 2]); assert.strictEqual(b.authors, 'Jane Austen');
+});
+test('normBook: tracks or authors that are not lists, or a missing book, do not throw', () => {
+  assert.doesNotThrow(() => normBook(Object.assign({}, LV, { sections: 'none', authors: 5 })));
+  assert.deepStrictEqual(plain(normBook(Object.assign({}, LV, { sections: {} }))).secs, []);
+  assert.doesNotThrow(() => normBook(null));
+});
+test('normBook: tracks without a link are dropped', () => {
+  const b = plain(normBook(Object.assign({}, LV, { sections: [{ id: 9, section_number: '9', title: 'A' }, LV.sections[1]] })));
+  assert.deepStrictEqual(b.secs.map(x => x.id), [1]);
+});
+
+/* The real fetchBundle, fed a pretend /book stream (pieces cut at awkward places). */
+const streamOf = (text, piece) => () => Promise.resolve({ ok: true, body: new ReadableStream({ start(c) { const e = new TextEncoder(); for (let i = 0; i < text.length; i += piece) c.enqueue(e.encode(text.slice(i, i + piece))); c.close(); } }) });
+const TEXT = 'Once upon a time. '.repeat(400);
+const lines = (...l) => l.join('\n') + '\n';
+const asyncTest = (name, fn) => { total++; return fn().then(() => console.log('ok    ' + name), e => { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n').slice(0, 3).join('\n      ')); }); };
+const settle = p => Promise.race([p.then(v => ({ v }), e => ({ e })), new Promise(r => setTimeout(() => r({ hung: true }), 2000))]);
+const queue = [];
+queue.push(() => asyncTest('fetchBundle: a broken line in the middle of the stream does not stop the tracks or the text', async () => {
+  for (const key of Object.keys(saved)) delete saved[key];
+  setFetch(streamOf(lines(JSON.stringify({ lv: LV }), '{oops not json', 'null', JSON.stringify({ gut: { id: 77, label: 'PG 77' } }), JSON.stringify({ text: TEXT })), 13));
+  const r = await settle(fetchBundle('12', { text: true }));
+  assert.ok(r.v, 'book should load: ' + JSON.stringify(r)); assert.strictEqual(plain(r.v).secs.length, 2);
+  await new Promise(r => setTimeout(r, 50));
+  assert.strictEqual(saved['g:77'], TEXT, 'the text after the bad lines must still be saved');
+}));
+queue.push(() => asyncTest('fetchBundle: a broken line BEFORE the track list does not fail the whole request', async () => {
+  setFetch(streamOf(lines('}{ garbage', JSON.stringify({ lv: LV })), 9));
+  const r = await settle(fetchBundle('12', { text: false }));
+  assert.ok(r.v && plain(r.v).secs.length === 2, 'tracks should still load: ' + JSON.stringify(r));
+}));
+queue.push(() => asyncTest('fetchBundle: a stream with no usable track list ends with "empty" and does not hang', async () => {
+  setFetch(streamOf(lines('nonsense', 'null', JSON.stringify({ gut: null })), 9));
+  const r = await settle(fetchBundle('12', { text: false }));
+  assert.ok(!r.hung, 'must not hang'); assert.ok(r.e && r.e.message === 'empty', JSON.stringify(r));
+}));
+queue.push(() => asyncTest('fetchBundle: a book whose track list is broken everywhere is reported empty, not a crash', async () => {
+  setFetch(streamOf(lines(JSON.stringify({ lv: { id: 3, sections: [null, 'x'] } })), 9));
+  const r = await settle(fetchBundle('3', { text: false }));
+  assert.ok(r.e && r.e.message === 'empty', JSON.stringify(r));
+}));
+
+(async () => {
+  for (const q of queue) await q();
+  console.log('\n' + (failed ? failed + ' of ' + total + ' failed' : 'all ' + total + ' passed'));
+  process.exit(failed ? 1 : 0);
+})();

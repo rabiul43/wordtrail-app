@@ -64,6 +64,17 @@
      text follows. The text is saved under g:<id>, exactly where the usual download would put it. If the Worker
      has no /book route or fails, the older routes below run as before. */
   const bundles = new Map(), bundleText = new Map();
+  /* Takes the complete lines out of what has arrived so far. Returns the usable objects and the unfinished rest.
+     A line that is not valid JSON, or is not an object (null, a number ...), is skipped. */
+  function takeJsonLines(buf) {
+    const out = []; let nl;
+    while ((nl = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+      if (!line) continue;
+      try { const d = JSON.parse(line); if (d && typeof d === 'object') out.push(d); } catch (e) { /* skip this line */ }
+    }
+    return { out, buf };
+  }
   function fetchBundle(id, o) {
     const gidHint = o && o.gid ? String(o.gid) : '', wantText = !!(o && o.text);
     let gutRes, textRes;
@@ -88,16 +99,18 @@
           const r = await fetch(PROXY + '/book?id=' + encodeURIComponent(id) + (gidHint ? '&gid=' + gidHint : '') + (wantText ? '' : '&text=0'), { signal: c.signal });
           if (!r.ok) throw new Error('HTTP ' + r.status);
           let buf = '';
+          /* One broken line, or one line that cannot be used (e.g. the device is out of space), is skipped:
+             the lines after it still arrive, so the tracks and the text can still load. */
           const feed = async chunk => {
-            buf += chunk;
-            let nl;
-            while ((nl = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1); if (line) await onLine(JSON.parse(line)); }
+            const t = takeJsonLines(buf + chunk); buf = t.buf;
+            for (const d of t.out) { try { await onLine(d); } catch (e) { /* skip this line, keep reading */ } }
           };
           if (r.body && r.body.getReader) {
             const rd = r.body.getReader(), dec = new TextDecoder();
             for (;;) { const { done, value } = await rd.read(); if (done) break; await feed(dec.decode(value, { stream: true })); }
             await feed(dec.decode() + '\n');
           } else await feed((await r.text()) + '\n');
+          if (!first) reject(new Error('empty'));   // the stream ended without a usable track list: let the other routes answer
         } catch (e) { if (!first) reject(e); }
         finally { clearTimeout(to); gutRes(null); textRes(null); if (gid && bundleText.get(gid) === text) bundleText.delete(gid); }
       })();
