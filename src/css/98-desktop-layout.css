@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Desktop / tablet layout (audit item P0-A)
+   --------------------------------------------------------------------------
+   Everything here lives inside min-width media queries, so the phone layout
+   (below 700px) is exactly what it was before. Nothing from the earlier files
+   is removed; this file loads last and overrides on purpose.
+
+     >= 700px   icon rail on the left (replaces the bottom tab bar), wider pages
+     >= 900px   bigger book tiles, result lists in two columns
+     >= 1100px  player: cover + tracks on the left, reading text on the right,
+                dock laid out in three columns
+     >= 1200px  the rail grows into a full sidebar (icon + label) on every screen
+                except the player, where it stays a rail to leave room for the text
+
+   Uses logical properties (inline-start / inline-end) so right-to-left
+   languages mirror correctly.
+   ========================================================================== */
+
+/* the sidebar logo exists in the markup but only shows on desktop */
+.tb-brand { display: none; }
+
+@media (min-width: 700px) {
+  :root { --nav-w: 4.75rem; --nav-pad: .4rem; --page-pad: 2rem; --tabbar-h: 0px !important; }   /* no bottom bar any more, so nothing needs to clear it */
+  body { padding-inline-start: var(--nav-w); }
+
+  /* ---------- navigation: the existing #tabbar becomes a left rail ---------- */
+  .tabbar, .tabbar[hidden] {
+    display: flex !important; flex-direction: column; align-items: stretch; gap: .3rem;
+    position: fixed; inset-block: 0; inset-inline-start: 0; inset-inline-end: auto; transform: none;
+    width: var(--nav-w); height: 100dvh; padding: 1rem var(--nav-pad);
+    background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none;
+    border-radius: 0; border-top: 0; border-inline-end: 1px solid var(--line); box-shadow: none;
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+  }
+  .tabbar::-webkit-scrollbar { display: none; }
+  .tb-brand { display: flex; align-items: center; justify-content: center; gap: .6rem; padding: .2rem 0 1rem; color: var(--accent); }
+  .tb-brand svg { width: 2rem; height: 2rem; flex: none; }
+  .tb-brand span { display: none; font: 600 1.35rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
+
+  .tab { padding: .5rem 0; gap: .15rem; font-size: .66rem; border-radius: var(--r-ctl); cursor: pointer; }
+  .tab::before { top: .55rem; bottom: .55rem; left: auto; inset-inline-start: calc(-1 * var(--nav-pad)); width: 3px; height: auto; border-radius: 0 3px 3px 0; transform: scaleY(0); }
+  [dir="rtl"] .tab::before { border-radius: 3px 0 0 3px; }
+  .tab[aria-current="page"]::before { transform: scaleY(1); }
+  @media (hover: hover) { .tab:hover { background: var(--surface); } .tab[aria-current="page"]:hover { background: transparent; } }
+  .tab:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: -2px; }
+
+  /* the immersive "Text only" mode hides everything else, so it hides the rail too */
+  body:has(#player.ro:not([hidden])) { padding-inline-start: 0; }
+  body:has(#player.ro:not([hidden])) .tabbar { display: none !important; }
+
+  /* ---------- pages ---------- */
+  .home { max-width: 82rem; padding-inline: var(--page-pad); }
+  .brand { display: none; }                                 /* the logo now lives in the rail / sidebar */
+  .searchbar { margin-inline: calc(-1 * var(--page-pad)); padding-inline: var(--page-pad); }
+  .searchbar .rq { inset-inline: var(--page-pad); }
+  .searchbar #search-form, .searchbar .sfilt { max-width: 46rem; }
+  #detail, #account { max-width: 54rem; }                    /* text-heavy pages stay readable */
+
+  /* ---------- floating things that were centred on the whole screen: centre them on the content ---------- */
+  .toast, .offsheet { left: calc(var(--nav-w) + (100% - var(--nav-w)) / 2); }
+  .offsheet { width: min(calc(100% - var(--nav-w)), 46rem); }
+
+  /* ---------- mini player: a bar along the bottom of the content area ---------- */
+  .mini {
+    left: auto; transform: none; inset-inline-start: var(--nav-w); inset-inline-end: 0; bottom: 0; width: auto;
+    border-radius: 0; box-shadow: 0 -1px 0 var(--line), var(--shadow-up); padding: .6rem var(--page-pad) .75rem; gap: 1rem;
+  }
+  .mini-open { max-width: 26rem; }
+  .mini-play { margin-inline-start: auto; }
+
+  /* ---------- player (single column, still full height) ---------- */
+  .page { max-width: 44rem; }
+  .dock > * { max-width: 40rem; }
+  .dock > .skipintro { right: max(1rem, calc(50% - 20rem)); }
+}
+
+/* ---------- tablet landscape / small desktop ---------- */
+@media (min-width: 900px) {
+  :root { --page-pad: 2.25rem; }
+  .tile, .tile-wrap { width: 8.4rem; }
+  .tile-more { width: 7rem; }
+  .hrow { gap: .35rem; }
+  .list { grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr)); column-gap: 2.5rem; }
+  .list:has(> .card, > .card-wrap) { gap: 0 2.5rem; }
+}
+
+/* ---------- player: cover + tracks on the left, text on the right ---------- */
+@media (min-width: 1100px) {
+  .player > .reader {
+    display: grid; grid-template-columns: 22rem minmax(0, 1fr); grid-auto-rows: min-content; align-content: start;
+    border-top: 0;
+  }
+  .player > .reader > .pcover { grid-column: 1; grid-row: 1; height: 20rem; margin-bottom: 0; }   /* no overlap here: the title sits under the cover */
+  .player > .reader > .ptitle { grid-column: 1; grid-row: 2; align-self: start; max-width: none; margin-top: 1rem; padding-inline: 1.5rem; }
+  .player > .reader > .calbar { grid-column: 2; grid-row: 1; align-self: start; }
+  .player > .reader > .page {
+    grid-column: 2; grid-row: 1 / span 3; width: 100%; max-width: 46rem; justify-self: center; margin: 0;
+    padding: 2.2rem 2.25rem 4rem;
+  }
+  .player > .reader::before { content: ""; grid-column: 1; grid-row: 1 / span 3; border-inline-end: 1px solid var(--line); pointer-events: none; }
+
+  /* the dock becomes a floating card across the reading area, three columns: tools | transport | chips */
+  .dock { margin: 0 var(--page-pad) 1.1rem; border-radius: var(--r-xl); border: 1px solid var(--line); box-shadow: var(--shadow-sm); padding: .9rem 1.6rem 1rem; background: var(--surface); }
+  .dock > * { max-width: none; }
+  .dock:not(.slim) {
+    grid-template-columns: minmax(0, 1fr) 21rem minmax(0, 1fr); column-gap: 1.5rem; align-items: center;
+    grid-template-areas: "viz viz viz" "seek seek seek" "uc ctl chips" "bp bp bp";
+  }
+  .dock:not(.slim) > .viz { grid-area: viz; }
+  .dock:not(.slim) > .seek { grid-area: seek; }
+  .dock:not(.slim) > .uc { grid-area: uc; max-width: 24rem; margin: 0; justify-self: start; }
+  .dock:not(.slim) > .ctl { grid-area: ctl; width: 100%; }
+  .dock:not(.slim) > .dchips { grid-area: chips; max-width: 17rem; margin: 0; justify-self: end; }
+  .dock:not(.slim) > #book-prog { grid-area: bp; }
+  .dock > .skipintro { right: 1.5rem; }
+}
+
+/* ---------- full sidebar (every screen except the player) ---------- */
+@media (min-width: 1200px) {
+  :root { --nav-w: 14rem; --nav-pad: .75rem; --page-pad: 2.75rem; }
+  body:has(#player:not([hidden])) { --nav-w: 4.75rem; --nav-pad: .4rem; }
+
+  body:not(:has(#player:not([hidden]))) .tabbar { padding-top: 1.4rem; }
+  body:not(:has(#player:not([hidden]))) .tb-brand { justify-content: flex-start; padding: .2rem .9rem 1.4rem; }
+  body:not(:has(#player:not([hidden]))) .tb-brand span { display: inline; }
+  body:not(:has(#player:not([hidden]))) .tab { flex-direction: row; justify-content: flex-start; gap: .8rem; padding: .62rem .9rem; font-size: .92rem; }
+  body:not(:has(#player:not([hidden]))) .tab-ic { width: auto; height: auto; background: transparent !important; }
+  body:not(:has(#player:not([hidden]))) .tab[aria-current="page"] { background: var(--accent-soft); }
+  body:not(:has(#player:not([hidden]))) .tab svg { width: 1.35rem; height: 1.35rem; }
+
+  .tile, .tile-wrap { width: 9.2rem; }
+  .list { grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr)); }
+}
+
+@media (min-width: 1600px) {
+  .home { max-width: 92rem; }
+  .tile, .tile-wrap { width: 10rem; }
+}

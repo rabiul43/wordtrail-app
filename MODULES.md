@@ -122,6 +122,7 @@ CSS is a layered cascade (later rules win), so the order is fixed. Later "Phase"
 | `80-progress-v10.css` | whole-book progress, v10 fixes |
 | `90-reader-sheet.css` | Focus-page player sheet: grip, speed, back/forward 15, play, next track, one segmented bar for the whole book |
 | `97-controls-sheet.css` | Controls sheet polish: section nav, panel arrows over the 4-tile row, 3-column Read and Book tiles, bigger slider buttons and tick labels |
+| `98-desktop-layout.css` | Desktop and tablet layout (audit P0-A). Only `min-width` media queries, so phones are untouched: icon rail from 700px (the existing `#tabbar`, restyled), full sidebar from 1200px, bigger tiles and two-column lists from 900px, player with cover on the left and text on the right from 1100px (the rail stays slim in the player). Overrides earlier files on purpose; it must stay last |
 
 ## HTML, data and developer files
 

@@ -20,7 +20,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
     MUSIC-GUIDE.md            how to add or change music (steps to follow when you forget)
-    tools/                    helper scripts (fetch_fonts.py downloads the fonts once; i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md; unit_check.js tests the inner calculations: `node tools/unit_check.js`, run it after touching sync, plan or alignment code)
+    tools/                    helper scripts (fetch_fonts.py downloads the fonts once; i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md; unit_check.js tests the inner calculations; tangle_check.py stops the files getting more tangled; startup_check.js checks the built page still starts)
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
     src/fonts/                self-hosted fonts (WOFF2 + fonts.css), made by `python tools/fetch_fonts.py`; not in the project until you run it
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/
@@ -49,6 +49,8 @@ Edit `hosts.json` only, then run `python build.py`. The build checks every addre
 - After you change anything in `src/js/`, run `python tools/deps.py`. It refreshes `DEPENDENCIES.md` (who uses which shared name) and the line counts in `MODULES.md`. `python build.py` stops if two files declare the same name, and CI runs `python tools/deps.py --check`.
 - To see who uses a name before you change it: `python tools/deps.py --who toast`.
 - CSS order matters: later rules win.
+- Before you push, run `python tools/tangle_check.py`. It fails when a change makes one file depend on another in a NEW way (it names the shared names), or when a file in `src/js/` is not used by `build.py`. If the new dependency is really what you want, run `python tools/tangle_check.py --accept` and commit `tools/tangle_baseline.json`: the diff shows the reviewer exactly what you coupled. Plan for reducing the tangle: `UNTANGLING.md`.
+- After moving files or changing their order in `build.py`: `python build.py --no-min` then `node tools/startup_check.js`. It starts the page's code in Node and fails if a name is used before its file has loaded, or no longer exists.
 
 ## Checking reports (reviews)
 Reports are kept in Firestore at `ratings/{bookId}/votes/{reviewerUid}/reports/{reporterUid}` (`k` = spam, offensive, spoiler or other). The app cannot read them; you do, in the Firebase console > Firestore Database.

@@ -17,9 +17,15 @@ jobs:
           node-version: '20'
       - name: Shared names and docs are up to date
         run: python tools/deps.py --check
-      - name: Inner calculations (sync, plan, alignment, tap and undo)
+      - name: No new couplings between files, no leftover files
+        run: python tools/tangle_check.py
+      - name: Inner calculations (sync, plan, alignment, tap and undo, book loading)
         run: node tools/unit_check.js
       - name: Music mood word lists
         run: node tools/music_mood_check.js
       - name: The app builds
         run: python build.py
+      - name: The app starts (catches mistakes in the file order)
+        run: |
+          python build.py --no-min
+          node tools/startup_check.js
