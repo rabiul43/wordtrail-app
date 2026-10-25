@@ -469,8 +469,9 @@
     rows.push(['Lite mode active', document.documentElement.hasAttribute('data-lite') ? 'yes' : 'no']);
 
     // --- Render to table ---
+    const escH = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     tbody.innerHTML = rows.map(([k, v]) =>
-      '<tr><td class="dev-perf-k">' + k + '</td><td class="dev-perf-v">' + v + '</td></tr>'
+      '<tr><td class="dev-perf-k">' + escH(k) + '</td><td class="dev-perf-v">' + escH(v) + '</td></tr>'
     ).join('');
 
     // stash plain text for Copy button
