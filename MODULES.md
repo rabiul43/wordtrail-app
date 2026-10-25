@@ -30,9 +30,9 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `040-worker-newreader.js` | 149 | background worker, new reader |
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
-| `070-network-data.js` | 556 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
+| `070-network-data.js` | 560 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 236 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
-| `090-synced-stats-book-search.js` | 679 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
+| `090-synced-stats-book-search.js` | 680 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 280 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
@@ -68,7 +68,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `290-backup-maintenance.js` | 338 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 488 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 715 | wiring |
+| `300-wiring.js` | 770 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)
@@ -100,8 +100,8 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/story-engine.js` | 66 | Story sounds: categories, finding trigger words, playing them on the audio's own clock |
 | `sound/story-transitions.js` | 65 | Story sounds: door, gate and footstep sounds when the place changes |
 | `sound/ambient-intensity.js` | 32 | Ambient: intensity, the levels really played (`ambLive`), night and time of day |
-| `sound/sound-presets.js` | 81 | Sound screen: hear a sound, quick presets and undo |
-| `sound/sound-core.js` | 61 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
+| `sound/sound-presets.js` | 82 | Sound screen: hear a sound, quick presets and undo |
+| `sound/sound-core.js` | 63 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
 | `sound/sound-screen.js` | 183 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |

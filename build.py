@@ -123,6 +123,7 @@ PARTS = [
     ('file', 'src/js/234-scene-prescore.js'),
     ('file', 'src/js/sound/sound-presets.js'),
     ('file', 'src/js/sound/sound-core.js'),
+    ('file', 'src/js/sound/smart-mix.js'),
     ('file', 'src/js/sound/sound-cache.js'),
     ('file', 'src/js/sound/sound-screen.js'),
     ('file', 'src/js/sound/sound-tabs.js'),

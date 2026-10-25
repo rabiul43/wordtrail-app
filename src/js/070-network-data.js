@@ -97,14 +97,18 @@
     if (CAT.p) return CAT.p;
     CAT.p = (async () => {
       const cached = await idb.get('catalog');
-      if (cached && cached.b) { CAT.books = catInflate(cached); if (Date.now() - (cached.fetched || 0) < 3 * 24 * 3600e3) return; }
-      try {
+      let fresh = false;
+      if (cached && cached.b) { CAT.books = catInflate(cached); fresh = Date.now() - (cached.fetched || 0) < 3 * 24 * 3600e3; }
+      if (fresh) return;
+      const refresh = async () => { try {
         const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), CAT.books ? 8000 : 25000);
         const r = await fetch(catUrl(), P.fastNet !== false ? { signal: ctl.signal, cache: 'no-cache' } : { signal: ctl.signal }); clearTimeout(to);   // no-cache = the browser sends If-None-Match itself; an unchanged file comes back as 304 (not downloaded again)
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json();
         if (d && Array.isArray(d.b) && d.b.length) { d.fetched = r.headers.get('x-wt-stale') ? 0 : Date.now(); idb.set('catalog', d); CAT.books = catInflate(d); }
-      } catch (e) { /* keep older catalog if any; otherwise lvGet falls back to the live API */ }
+      } catch (e) { /* keep older catalog if any; otherwise lvGet falls back to the live API */ } };
+      if (CAT.books) { refresh(); return; }   // an older saved catalog shows books at once; the new one is fetched quietly
+      await refresh();
     })().then(() => { try { splashRemember(); } catch (e) { /* splash list is optional */ } });
     return CAT.p;
   }
