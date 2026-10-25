@@ -121,8 +121,10 @@
   <button id="dm-more" type="button" class="dm-it dm-morerow" role="menuitem" aria-expanded="false" aria-controls="dm-sub"><span class="dm-t">More</span><svg class="ic dm-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
   <div id="dm-sub" class="dm-sub" role="group" aria-label="More controls" hidden>
     <div class="dm-h" role="presentation">Listen</div>
-    <button type="button" class="dm-it" role="menuitem" data-go="speed"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4.5-5"/></svg></span><span class="dm-t">Speed</span><span class="dm-v"></span></button>
-    <button type="button" class="dm-it" role="menuitem" data-go="sleep"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><use href="#n-moon"/></svg></span><span class="dm-t">Sleep timer</span><span class="dm-v"></span></button>
+    <button type="button" class="dm-it" role="menuitem" aria-expanded="false" aria-controls="dm-x-speed" data-go="speed"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4.5-5"/></svg></span><span class="dm-t">Speed</span><span class="dm-v"></span></button>
+    <div id="dm-x-speed" class="dm-x" data-x="speed" role="group" aria-label="Playback speed" hidden></div>
+    <button type="button" class="dm-it" role="menuitem" aria-expanded="false" aria-controls="dm-x-sleep" data-go="sleep"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><use href="#n-moon"/></svg></span><span class="dm-t">Sleep timer</span><span class="dm-v"></span></button>
+    <div id="dm-x-sleep" class="dm-x" data-x="sleep" role="group" aria-label="Sleep timer" hidden></div>
     <button type="button" class="dm-it" role="menuitem" data-go="sound"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-rain"/></svg></span><span class="dm-t">Sound and music</span><span class="dm-v"></span></button>
     <div class="dm-h" role="presentation">Book</div>
     <button type="button" class="dm-it" role="menuitem" data-go="bm"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="dm-t">Bookmark and note</span></button>
@@ -131,7 +133,7 @@
     <button type="button" class="dm-it" role="menuitem" data-go="clips"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="dm-t">Audio clips</span></button>
     <div class="dm-h" role="presentation">Fix</div>
     <button type="button" class="dm-it" role="menuitem" data-go="textsync"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="dm-t">Fix highlight sync</span></button>
-    <button type="button" class="dm-it dm-all" role="menuitem" data-go="all"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">All controls</span></button>
+    <button type="button" class="dm-it dm-all" role="menuitem" data-go="tools"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">More tools</span><span class="dm-v">&#8250;</span></button>
   </div>
 </div>
 
@@ -150,6 +152,10 @@
     <div class="flt-g"><h3>Read-along ready</h3><button id="flt-ready" class="fp-switch" type="button" role="switch" aria-checked="false" title="Books with sentence timing ready, so the text follows the narrator"><span><b>Read-along ready only</b><small>Text follows the narrator</small></span><i class="fp-tg" aria-hidden="true"></i></button></div>
   </div>
   <footer class="fp-foot"><button id="fp-clear" class="btn ghost" type="button">Clear all</button><button id="fp-done" class="btn" type="button">Done</button></footer>
+</section>
+<section id="sheet-tools" class="sheet sheet-tools" hidden role="dialog" aria-modal="true" aria-labelledby="h-tools">
+  <header><h2 id="h-tools">More tools</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body" id="tools-body"></div>
 </section>
 <section id="sheet-next" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-next">
   <header><h2 id="h-next">Next up</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>

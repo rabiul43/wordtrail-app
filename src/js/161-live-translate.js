@@ -50,6 +50,8 @@
       ltOnDevice('Hello', sel.value, true).catch(() => {}).then(() => ltUpdate());   // the tap lets the browser download an on-device language pack
     });
     x.addEventListener('click', () => ltSet(false));
+    if (window.ResizeObserver) new ResizeObserver(() => ltFit()).observe(root);
+    root.addEventListener('scroll', () => ltFit(), { passive: true });
     return (LT.box = { root, prev, cur, src, next, sel });
   }
   function ltVisible() { return !!(S.book && S.model && ((NR.on && !nrEl.root.hidden) || !el.player.hidden)); }
@@ -58,11 +60,25 @@
     const side = !NR.on && window.matchMedia('(min-width: 1200px)').matches;
     b.root.classList.toggle('side', side);
     document.documentElement.classList.toggle('lt-strip', !b.root.hidden && !side);
+    ltFit();
+  }
+  /* The strip grows with the sentence (up to a cap in CSS). The reader's bottom margin follows its real height, and the
+     sentence being read is kept in view when the reader above it gets shorter. */
+  function ltFit() {
+    const b = LT.box; if (!b) return;
+    const r = b.root, strip = !r.hidden && !r.classList.contains('side');
+    if (!strip) { document.documentElement.style.removeProperty('--lt-h'); r.classList.remove('more'); return; }
+    const h0 = Math.ceil(r.getBoundingClientRect().height);
+    r.classList.toggle('more', r.scrollHeight - r.scrollTop - r.clientHeight > 4);
+    if (h0 !== LT.h) {
+      LT.h = h0; document.documentElement.style.setProperty('--lt-h', h0 + 'px');
+      if (S.follow) requestAnimationFrame(() => { const sp = S.spans && S.spans.get(S.curId); if (sp && typeof ensureVisible === 'function') ensureVisible(sp); });
+    }
   }
   function ltHide() {
     if (LT.box) LT.box.root.hidden = true;
     clearTimeout(LT.tm); LT.tok++;
-    document.documentElement.classList.remove('lt-strip');
+    document.documentElement.classList.remove('lt-strip'); document.documentElement.style.removeProperty('--lt-h'); LT.h = 0;
   }
   function ltRow(row, text, cls) {
     row.textContent = text || '';

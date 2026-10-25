@@ -16,10 +16,13 @@
 /* wide screens: the empty space left of the text column (the page is 40rem wide and centred) */
 .livetr.side { left: 1rem; top: 5.5rem; width: calc((100vw - 40rem) / 2 - 2.5rem); max-height: calc(100dvh - 5.5rem - var(--dock-h, 0px) - 1.5rem); overflow: auto; }
 /* narrow screens and the Focus page: a strip of fixed height above the player controls; the reader makes room for it */
-.livetr:not(.side) { left: 50%; transform: translateX(-50%); width: min(calc(100% - 1rem), 40rem); height: 6.4rem; bottom: calc(var(--dock-h, 0px) + .4rem); padding-top: .3rem; overflow: auto; }
+.livetr:not(.side) { left: 50%; transform: translateX(-50%); width: min(calc(100% - 1rem), 40rem); height: auto; min-height: 4.6rem; max-height: min(40dvh, 18rem); bottom: calc(var(--dock-h, 0px) + .4rem); padding-top: .3rem; overflow: auto; }
 .livetr:not(.side) .lt-top strong, .livetr:not(.side) .lt-prev, .livetr:not(.side) .lt-next, .livetr:not(.side) .lt-src { display: none; }
 .livetr:not(.side) .lt-top { position: absolute; top: .2rem; right: .2rem; z-index: 1; }
 .livetr:not(.side) .lt-top select { display: none; }
 .livetr:not(.side) .lt-cur { margin-right: 2.2rem; font-size: 1.02rem; }
-html.lt-strip #reader { margin-bottom: 6.9rem; }
+html.lt-strip #reader { margin-bottom: calc(var(--lt-h, 6.4rem) + .5rem); }
+/* a long translation can still pass the cap: fade the bottom edge while there is more to scroll to */
+.livetr:not(.side).more::after { content: ""; position: sticky; bottom: -.7rem; display: block; flex: none; height: 1.4rem; margin: -1.4rem 0 0; background: linear-gradient(transparent, var(--surface)); pointer-events: none; }
+.livetr:not(.side) .lt-cur { overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .livetr .lt-cur { transition: none; } }

@@ -10,9 +10,47 @@
       const press = id => () => { const b = $('#' + id); if (b) b.click(); };
       const GO = {
         timing: press('b-timing'), text: press('btn-aa'), live: press('btn-live'), tracks: press('btn-tracks'), settings: () => openSettingsHome(),
-        speed: viaSheet('qk-t-speed'), sleep: viaSheet('qk-t-sleep'), sound: () => ambOpen(),
+        sound: () => ambOpen(),
         bm: press('b-bm'), chars: press('b-chars'), hl: press('b-hl'), clips: press('b-clips'), textsync: press('b-textsync'),
-        all: () => { qkOpt(''); qkPaint(); openSheet('sheet-quick'); }
+        tools: () => toolsOpen()
+      };
+      /* Speed and Sleep timer open in place under their row (chips + a stepper), using the same setters as the Controls sheet. */
+      const XS = {
+        speed: { vals: [0.75, 1, 1.25, 1.5, 2, 3], lab: v => v + 'x', cur: () => +P.speed || 1, set: v => setSpeed(v), step: d => { const a = [0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1, 1.1, 1.2, 1.25, 1.3, 1.4, 1.5, 1.6, 1.75, 1.8, 2, 2.25, 2.5, 3]; const c = +P.speed || 1; let i = a.findIndex(x => x >= c - 1e-6); if (i < 0) i = a.length - 1; setSpeed(a[Math.max(0, Math.min(a.length - 1, i + d))]); } },
+        sleep: { vals: [0, 15, 30, 45, 60, 'chapter'], lab: v => v === 0 ? 'Off' : v === 'chapter' ? 'End of track' : v === 60 ? '1 h' : v + ' min', cur: () => S.sleep || 0, set: v => setSleep(v), step: d => { const c = typeof S.sleep === 'number' ? S.sleep : 0; setSleep(Math.max(0, Math.min(240, c + d * 5))); } }
+      };
+      const xPaint = k => {
+        const x = XS[k], box = $('#dm-x-' + k, mn); if (!x || !box) return;
+        const cur = x.cur(); box.textContent = '';
+        const chips = h('div', { class: 'dm-chips' });
+        x.vals.forEach(v => chips.append(h('button', { type: 'button', class: 'dm-chip', 'aria-pressed': String(cur === v), onclick: e => { e.stopPropagation(); buzz('tick'); x.set(v); fill(); xPaint(k); } }, x.lab(v))));
+        const odd = !x.vals.includes(cur);
+        const nudge = d => h('button', { type: 'button', class: 'dm-step', 'aria-label': d < 0 ? (k === 'speed' ? 'Slower' : 'Shorter') : (k === 'speed' ? 'Faster' : 'Longer'), onclick: e => { e.stopPropagation(); buzz('tick'); x.step(d); fill(); xPaint(k); } }, d < 0 ? '\u2212' : '+');
+        box.append(chips, h('div', { class: 'dm-fine' }, nudge(-1), h('span', { class: 'dm-now', 'aria-live': 'polite' }, odd ? (k === 'speed' ? cur + 'x' : cur + ' min') : (k === 'speed' ? 'Custom speed' : 'Custom timer') + ': ' + x.lab(cur)), nudge(1)));
+      };
+      const xToggle = (k, on) => {
+        $$('.dm-x', mn).forEach(b => { const open = b.dataset.x === k && on; b.hidden = !open; const r = $('[data-go="' + b.dataset.x + '"]', mn); if (r) r.setAttribute('aria-expanded', String(open)); });
+        if (on) { xPaint(k); const r = $('[data-go="' + k + '"]', mn); if (r) requestAnimationFrame(() => r.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' })); }
+      };
+      /* "More tools": a small list (name + one line each) for everything the menu does not show; each row passes its tap to the button that already does the job. */
+      const TOOLS = [
+        ['qk-read', 'Hide player', 'Hide the player and just read'], ['b-words', 'Words', 'Look up words and review the ones you saved'],
+        ['b-next', 'Next up', 'Similar books, and what to listen to next'], ['b-find', 'Search this book', 'Find a word or quote and jump to it'],
+        ['b-trail', 'Where was I?', 'Go back after a seek, or to where you fell asleep'], ['b-ver', 'Reader', 'Choose who reads this book'],
+        ['b-shadow', 'Shadow reading', 'Say a sentence after the narrator and compare'], ['b-quiz', 'Quick quiz', 'Test yourself on the chapter you are in'],
+        ['qk-clip', 'Clip', 'Save a short audio snippet to share'], ['b-cal', 'Tap to align', 'Line up the highlight by tapping'],
+        ['btn-nr', 'Focus page', 'Just the text and the essentials'], ['btn-howto', 'How to use', 'Double-tap, press and hold, swipe']
+      ];
+      const toolsOpen = () => {
+        const host = $('#tools-body'); if (!host) return;
+        host.textContent = '';
+        const list = h('div', { class: 'tl-list' });
+        TOOLS.forEach(([id, t, d]) => {
+          const src = $('#' + id); if (!src || src.hidden) return;
+          list.append(h('button', { type: 'button', class: 'tl-row', onclick: () => { buzz('tick'); closeSheets(); setTimeout(() => src.click(), 60); } },
+            h('span', { class: 'tl-t' }, t), h('span', { class: 'tl-d' }, d)));
+        });
+        host.append(list); openSheet('sheet-tools');
       };
       const SRC = { timing: 'b-timing', text: 'btn-aa', live: 'btn-live', tracks: 'btn-tracks', bm: 'b-bm', chars: 'b-chars', hl: 'b-hl', clips: 'b-clips', textsync: 'b-textsync' };
       const fill = () => {   // current values on the rows, and hide a row whose button is not available right now
@@ -42,7 +80,7 @@
       };
       const open = byKey => {
         if (S.book) VER.dotSeen.add(String(S.book.id)); verChip();
-        fill(); setMore(moreOpen, false); mn.hidden = false; place(); mn.scrollTop = 0;
+        fill(); xToggle('', false); setMore(moreOpen, false); mn.hidden = false; place(); mn.scrollTop = 0;
         btn.setAttribute('aria-expanded', 'true');
         if (byKey) { const f = items()[0]; if (f) f.focus(); }
       };
@@ -52,6 +90,7 @@
         e.stopPropagation();   // the app closes other pop-ups on any outside tap; this tap is on purpose
         buzz('tick');
         if (b === more) { setMore(!moreOpen, true); return; }
+        if (XS[b.dataset.go]) { const k = b.dataset.go, box = $('#dm-x-' + k, mn); xToggle(k, box.hidden); return; }
         const go = GO[b.dataset.go]; if (!go) return;
         close(false); go();
       });

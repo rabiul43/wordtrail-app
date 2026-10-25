@@ -62,3 +62,35 @@
 .dm-all { margin-top: .2rem; }
 .dm-all .dm-t { color: var(--muted); }
 .topbar #btn-topmore[aria-expanded="true"] { background: var(--surface-2); }
+
+/* Finish card: grid tracks must not grow to fit the scroll rows (they pushed the card, review box and book cards off the right edge) */
+.fin-card { grid-template-columns: minmax(0, 1fr); width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden; }
+.fin-card > *, .fin-body, .fin-body > *, .nx-pick, .nx-pick > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.fin-body { grid-template-columns: minmax(0, 1fr); }
+.fin-card .hrow { max-width: none; }
+.fin-card .rt-prompt, .fin-card .rt-mine { width: 100%; align-items: stretch; }
+.fin-card .rt-text, .fin-card .rt-row { width: 100%; max-width: 100%; box-sizing: border-box; }
+.fin-card .rt-pick { justify-content: space-between; max-width: 20rem; }
+.fin-card .nx-tag { flex-wrap: wrap; }
+.fin-card .tile-wrap, .fin-card .hrow .tile { flex: none; }
+
+/* Player menu: Speed and Sleep timer expand in place */
+.dm-x { margin: 0 .35rem .35rem; padding: .6rem; border-radius: 14px; background: var(--bg, var(--surface-2)); }
+.dm-x[hidden] { display: none; }
+.dm-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.dm-chip { min-height: 2.4rem; padding: .35rem .85rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: .9rem; cursor: pointer; }
+.dm-chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.dm-fine { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .6rem; }
+.dm-step { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 0; background: var(--surface); color: var(--ink); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.dm-now { flex: 1; text-align: center; font-size: .82rem; color: var(--muted); }
+.dm-it[aria-expanded="true"][data-go] { background: var(--surface-2); }
+
+/* More tools: compact list sheet (name + one line) */
+.sheet-tools .body { padding-top: .2rem; }
+.tl-list { display: grid; }
+.tl-row { display: grid; gap: .15rem; width: 100%; padding: .85rem .3rem; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); font: inherit; color: var(--ink); cursor: pointer; }
+.tl-row:last-child { border-bottom: 0; }
+.tl-row:active { background: var(--accent-soft); }
+.tl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tl-t { font-size: 1rem; font-weight: 600; }
+.tl-d { font-size: var(--label); color: var(--muted); line-height: 1.35; }
