@@ -11,6 +11,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
 ## Folder
 
     build.py                  joins everything (the ORDER of the pieces is listed here)
+    hosts.json                the web addresses the app depends on (the Workers, the music site). Change one here and run build.py: the app and dist/_headers both follow
     MODULES.md                what is inside each file (read this first)
     src/html/                 page structure and pop-up sheets
     src/css/                  styles, in cascade order (do not reorder)
@@ -36,6 +37,10 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
 3. Commit and push. GitHub builds and publishes the app.
 
 If a change needs a name from another file, say so or upload that file too. Shared names are listed in `MODULES.md`.
+
+## Moving to a new web address
+
+Edit `hosts.json` only, then run `python build.py`. The build checks every address (it must be https://, and `proxy` and `music` cannot be empty; `hf_proxy` and `stats` may be left empty to switch that feature off), puts them into the app, and makes sure `dist/_headers` allows them. It stops with a plain message if one is wrong or if a `__WT_HOST_...` placeholder is left unfilled. Do not type an address into `src/js/` again: those files hold placeholders.
 
 ## Rules that keep it safe
 

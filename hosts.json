@@ -1,0 +1,7 @@
+{
+  "_about": "The web addresses the app depends on. Change an address here, run build.py, and the app and the security headers both follow. No other file needs editing.",
+  "proxy": "https://wordtrail-proxy.test-rabiulclaud-1.workers.dev",
+  "hf_proxy": "https://wordtrail-hf.test-rabiulclaud-1.workers.dev",
+  "stats": "https://wordtrail-stats.test-rabiulclaud-1.workers.dev",
+  "music": "https://wordtrail-music.pages.dev/"
+}

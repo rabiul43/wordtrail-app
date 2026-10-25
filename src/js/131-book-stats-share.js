@@ -4,7 +4,7 @@
        2. Wordtrail's own anonymous counts from a small Cloudflare Worker (STATS_API). Shown only once a book has
           STATS_MIN listeners, so a new book never says "2 listeners".
      Calm mode hides the row (see CSS), so nothing here turns listening into a score. */
-  const STATS_API = 'https://wordtrail-stats.test-rabiulclaud-1.workers.dev';            // your Worker, e.g. 'https://wordtrail-stats.YOURNAME.workers.dev'. Empty = own counts off.
+  const STATS_API = '__WT_HOST_STATS__';   // set in hosts.json. Empty = own counts off.
   const STATS_MIN = 10, STATS_TTL = 6 * 3600e3, OWN_TTL = 15 * 60e3;
   const fmtCount = n => n >= 1e6 ? (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e4 ? Math.round(n / 1e3) + 'K' : n >= 1e3 ? (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K' : String(n);
   guideDoc('home', 'Book stats', "A book's page shows how many times it has been listened to and how many this week. Once enough people have listened on Wordtrail it also shows how many, and how many finish it. Calm mode hides these numbers. Settings > Audio > Share anonymous listen counts controls whether your own listening is counted.", '2026-10-17');

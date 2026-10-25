@@ -12,8 +12,12 @@ and copies src/pwa/ (manifest, service worker, icons) next to it.
 The order below is the order of the final file. It matters: CSS is a layered cascade
 and the script is one closure, so a piece may only use names declared above it.
 To add a piece: create the file in src/ and add one line here, at the right place.
+
+Web addresses (the Workers and the music site) live in hosts.json, nowhere else. The source files hold placeholders such as
+__WT_HOST_PROXY__; every build fills them in, and fills the same addresses into dist/_headers (the security rules).
 """
 import hashlib, json, os, re, shutil, sys
+import urllib.parse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -210,6 +214,90 @@ def apply_fonts(data):
     data = pre_re.sub(b"", data)
     return link_re.sub(lambda m: block, data)
 
+HOSTS_FILE = os.path.join(ROOT, "hosts.json")
+# hosts.json name -> (placeholder in the source files, may be left empty, must end with "/")
+HOST_SLOTS = {
+    "proxy":    (b"__WT_HOST_PROXY__",    False, False),
+    "hf_proxy": (b"__WT_HOST_HF_PROXY__", True,  False),
+    "stats":    (b"__WT_HOST_STATS__",    True,  False),
+    "music":    (b"__WT_HOST_MUSIC__",    False, True),
+}
+
+def load_hosts():
+    """Read hosts.json and check it. Stops the build with a plain message if an address is missing or malformed.
+    The trailing slash is tidied (the app adds its own after the proxies, and expects one after the music address)."""
+    try:
+        with open(HOSTS_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+    except FileNotFoundError:
+        sys.exit("BUILD STOPPED: hosts.json is missing (it holds the web addresses the app uses)")
+    except ValueError as e:
+        sys.exit("BUILD STOPPED: hosts.json is not valid JSON (%s)" % e)
+    out = {}
+    for key, (_ph, may_be_empty, slash) in HOST_SLOTS.items():
+        v = d.get(key)
+        if not isinstance(v, str):
+            sys.exit('BUILD STOPPED: hosts.json needs a "%s" address (text in quotes)' % key)
+        v = v.strip()
+        if v == "" and may_be_empty:
+            out[key] = ""          # empty = that feature is off, as the app already allows
+            continue
+        if not re.fullmatch(r"https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._~/-]*)?", v):
+            sys.exit('BUILD STOPPED: hosts.json "%s" must be an https:// address (letters, digits, dots and dashes only), got: %s' % (key, v))
+        out[key] = v.rstrip("/") + ("/" if slash else "")
+    return out
+
+def host_origin(url):
+    p = urllib.parse.urlsplit(url)
+    return p.scheme + "://" + p.netloc
+
+def apply_hosts(data, hosts):
+    """Fill the addresses from hosts.json into the page."""
+    for key, (ph, _e, _s) in HOST_SLOTS.items():
+        data = data.replace(ph, hosts[key].encode("utf-8"))
+    return data
+
+def csp_covers(sources, origin):
+    """True when one of the CSP sources already allows this origin (exact match, https:, or a *.domain wildcard)."""
+    p = urllib.parse.urlsplit(origin)
+    for s in sources:
+        if s in ("https:", "*", origin):
+            return True
+        if not p.port and s.startswith("https://*.") and p.hostname.endswith("." + s[len("https://*."):]):
+            return True
+    return False
+
+def apply_hosts_headers(text, hosts):
+    """dist/_headers: the proxy's address goes into script-src (the app loads a script from it), and every configured address
+    is made sure to be allowed in connect-src. With today's addresses the wildcards there already cover them, so nothing is added;
+    after a move to a new domain the new address is added for you."""
+    text = text.replace("__WT_HOST_PROXY__", host_origin(hosts["proxy"]))
+    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "music") if hosts[k]]
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if not line.lstrip().startswith("Content-Security-Policy-Report-Only:"):
+            continue
+        m = re.search(r"connect-src([^;]*)", line)
+        if not m:
+            continue
+        have = m.group(1).split()
+        missing = []
+        for o in origins:
+            if not csp_covers(have + missing, o):
+                missing.append(o)
+        if missing:
+            lines[i] = line[:m.end()].rstrip() + " " + " ".join(missing) + line[m.end():]
+    return "\n".join(lines)
+
+def check_no_placeholders(dist):
+    """Stop the build if a __WT_HOST_ placeholder was left unfilled anywhere in the output."""
+    for root, _dirs, files in os.walk(dist):
+        for n in files:
+            if n.endswith((".html", ".json", ".js")) or n == "_headers":
+                with open(os.path.join(root, n), "rb") as f:
+                    if b"__WT_HOST_" in f.read():
+                        sys.exit("BUILD STOPPED: %s still contains a __WT_HOST_ placeholder (add it to HOST_SLOTS in build.py)" % os.path.join(root, n))
+
 def check_names():
     """Stop the build if two files declare the same top-level name (see tools/deps.py)."""
     sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -227,6 +315,8 @@ if __name__ == "__main__":
     dev = "--dev" in sys.argv
     data = build(include_dev=dev)
     data = apply_fonts(data)
+    hosts = load_hosts()
+    data = apply_hosts(data, hosts)
     if "--no-min" not in sys.argv and not dev:
         sys.path.insert(0, os.path.join(ROOT, "tools"))
         import minify
@@ -244,6 +334,14 @@ if __name__ == "__main__":
     # install/offline files (manifest, service worker, icons) go next to index.html, as they are
     pwa = os.path.join(ROOT, "src", "pwa")
     shutil.copytree(pwa, dist, dirs_exist_ok=True)
+    hp = os.path.join(dist, "_headers")
+    if os.path.exists(hp):
+        with open(hp, "r", encoding="utf-8", newline="") as f:
+            ht = f.read()
+        with open(hp, "w", encoding="utf-8", newline="") as f:
+            f.write(apply_hosts_headers(ht, hosts))
+    check_no_placeholders(dist)
+    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "music")))
     # self-hosted fonts (only when tools/fetch_fonts.py has been run); a stale dist/fonts from an older build is replaced
     fonts_out = os.path.join(dist, "fonts")
     shutil.rmtree(fonts_out, ignore_errors=True)

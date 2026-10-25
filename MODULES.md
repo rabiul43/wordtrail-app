@@ -65,10 +65,10 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `260-audio-effects.js` | 367 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 728 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
-| `290-backup-maintenance.js` | 338 | Backup and restore, sync dashboard |
+| `290-backup-maintenance.js` | 386 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 488 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 771 | wiring |
+| `300-wiring.js` | 772 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

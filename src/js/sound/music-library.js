@@ -1,7 +1,7 @@
   /* ---------- music-library.js ----------
      Music: music.json (manifest), the clip queue, which clip is next (energy, not repeating), fetching and caching clips. */
   /* Where music.json and the clips live: Cloudflare Pages (the files are too big for GitHub). Change this one line to move them. */
-  const MUS_HOST = 'https://wordtrail-music.pages.dev/';
+  const MUS_HOST = '__WT_HOST_MUSIC__';   // set in hosts.json
   /* Fetch and cache music.json from MUS_HOST. `force` skips the 24 hour saved copy (used before an offline download).
      When the network fails, an older saved copy is used whatever its age, so music that is already on the device still plays offline. */
   async function musFetchManifest(force) {

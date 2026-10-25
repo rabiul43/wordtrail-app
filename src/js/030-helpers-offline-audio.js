@@ -44,7 +44,7 @@
   const guideDoc = (sec, title, desc, since) => { GUIDE_REG.push({ sec, title, desc, since: since || '' }); };
 
   /* Cloudflare Worker go-between, for networks that cannot reach LibriVox / Internet Archive / Gutenberg directly. */
-  const PROXY = 'https://wordtrail-proxy.test-rabiulclaud-1.workers.dev';
+  const PROXY = '__WT_HOST_PROXY__';   // set in hosts.json
   const PX_HOSTS = /(^|\.)(librivox\.org|archive\.org|gutenberg\.org|gutendex\.com)$/;
   const px = u => {
     try { const t = new URL(u, location.href); return PROXY && /^https?:$/.test(t.protocol) && PX_HOSTS.test(t.hostname) ? PROXY + '/?url=' + encodeURIComponent(t.href) : u; } catch (e) { return u; }
@@ -52,7 +52,7 @@
   /* Hugging Face refuses browser requests that come from some web addresses (the app's workers.dev address is one),
      so those requests go through the wordtrail-hf Worker. If that Worker is down or unreachable the app asks
      Hugging Face directly, exactly as before. Empty string = always ask directly. */
-  const HF_PROXY = 'https://wordtrail-hf.test-rabiulclaud-1.workers.dev';
+  const HF_PROXY = '__WT_HOST_HF_PROXY__';   // set in hosts.json
   { const f0 = window.fetch.bind(window);
     window.fetch = (input, init) => {
       if (HF_PROXY && typeof input === 'string') {
