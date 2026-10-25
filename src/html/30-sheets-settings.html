@@ -410,6 +410,8 @@
         <div class="row" style="margin-top:.5rem"><label for="in-tim">Load a timing file (.json)</label><input id="in-tim" type="file" accept=".json,application/json" style="max-width:11rem"></div>
         <div class="row" style="margin-top:.5rem"><label for="b-booklist">Library check: book list for the computer</label><button id="b-booklist" class="btn" type="button">Export book list</button></div>
         <p class="help" style="margin-top:.3rem">Saves books.csv with every synced book (book id, Gutenberg id, title). Put it next to wt_sync_check.js on your computer. Books you have not opened on this device have no Gutenberg id yet: fill it in by hand, or open the book once and export again.</p>
+        <div class="row" style="margin-top:.8rem"><label for="b-textsrc">Where book texts came from (this device only)</label><button id="b-textsrc" class="btn" type="button">Show</button></div>
+        <p id="textsrc-out" class="help" style="margin-top:.3rem;white-space:pre-line" aria-live="polite">Press Show. Counted on this phone only; nothing is sent anywhere.</p>
       </details>
     </div>
     <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Timing</h3>

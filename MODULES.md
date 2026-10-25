@@ -30,7 +30,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `040-worker-newreader.js` | 149 | background worker, new reader |
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
-| `070-network-data.js` | 605 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
+| `070-network-data.js` | 629 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 236 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 680 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 280 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
@@ -68,7 +68,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `290-backup-maintenance.js` | 338 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 488 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 770 | wiring |
+| `300-wiring.js` | 771 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

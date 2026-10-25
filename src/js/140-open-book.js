@@ -188,7 +188,7 @@
     else {
       S.model = fresh || Core.parseBook(raw);
       const key = parsedKey(src, raw);
-      if (key) idb.set(key, { v: PARSE_V, sents: S.model.sents, chapters: S.model.chapters });
+      if (key && !(src && src.kind === 'gutenberg' && textUnverified.has(String(src.id)))) idb.set(key, { v: PARSE_V, sents: S.model.sents, chapters: S.model.chapters });   // a text that did not look like a Gutenberg book is not kept
     }
     driftReset(); S.note = null; S.autoTried = new Set(); S.alignFailed = new Set(); job.q = [];
     const dm = Core.defaultMap(S.model.chapters, S.secs);

@@ -492,8 +492,24 @@
     }
     return out + dec.decode();
   }
-  function fetchTextRace(url, ms = 30000, cb) {
+  /* A text that came through a middleman must look like a Project Gutenberg book (its header or licence mentions the name) before it is kept.
+     Only the first and last 20,000 characters are searched, so this costs almost nothing. */
+  const looksGutenberg = t => /project gutenberg/i.test(t.slice(0, 20000)) || /project gutenberg/i.test(t.slice(-20000));
+  /* Where each downloaded book text came from, counted on this device only (never sent, never synced): Settings > Developer. */
+  const TEXT_SRC_KEY = 'wt:textSrc';
+  const textUnverified = new Set();   // Gutenberg ids whose text this session came from a middleman and did not look like a Gutenberg book: never saved, not even as a parsed copy
+  function textSrcCount(kind) {
+    try { const o = JSON.parse(localStorage.getItem(TEXT_SRC_KEY) || '{}') || {}; o[kind] = (o[kind] | 0) + 1; localStorage.setItem(TEXT_SRC_KEY, JSON.stringify(o)); } catch (e) { /* counting is optional */ }
+  }
+  function textSrcReport() {
+    let o = {}; try { o = JSON.parse(localStorage.getItem(TEXT_SRC_KEY) || '{}') || {}; } catch (e) { o = {}; }
+    const n = k => o[k] | 0, tot = n('bundle') + n('own') + n('direct') + n('proxy');
+    if (!tot) return 'No book text has been downloaded on this device yet (texts already saved on the phone are not counted).';
+    return 'Your own copy (Hugging Face): ' + n('own') + '\nYour worker bundle: ' + n('bundle') + '\nDirect from gutenberg.org: ' + n('direct') + '\nFree middlemen: ' + n('proxy') + ' (' + n('unverified') + ' of them did not look like a Gutenberg book and were not saved)\nTotal downloads counted: ' + tot;
+  }
+  function fetchTextRace(url, ms = 30000, cb, meta) {
     const order = textRouteOrder();
+    let unv = null;   // the first middleman text that did not look like a Gutenberg book: used only if every route fails
     let best = 0, bestTotal = 0, alive = false;
     const onBytes = cb ? (n, total) => { if (total) bestTotal = Math.max(bestTotal, total); if (n > best) { best = n; cb({ type: 'bytes', n: best, total: bestTotal }); } } : null;
     const ctrls = order.map(() => new AbortController());
@@ -506,6 +522,7 @@
         let t = await readBody(resp, onBytes);
         if (r.jina && typeof t === 'string') t = t.replace(/^[\s\S]{0,2000}?Markdown Content:\n/, '');
         if (typeof t !== 'string' || t.length < 4000 || /^\s*<(!doctype|html)/i.test(t)) throw new Error(r.name + ' returned no text');
+        if (r.name !== 'direct' && !looksGutenberg(t)) { if (!unv) unv = { t, name: r.name }; throw new Error(r.name + ' returned text that is not a Gutenberg book'); }
         return t;
       } catch (e) {
         throw new Error(e.name === 'AbortError' ? r.name + ' timed out' : (e.message === 'Failed to fetch' ? r.name + ' blocked' : e.message));
@@ -522,12 +539,14 @@
           if (done) return;
           done = true; clearTimeout(timer); ctrls.forEach(c => c.abort());
           try { if (localStorage.getItem(TEXT_ROUTE_KEY) !== order[i].name) localStorage.setItem(TEXT_ROUTE_KEY, order[i].name); } catch (e) { /* storage unavailable */ }
+          if (meta) meta.route = order[i].name;
           resolve(t);
         }, e => {
           if (done) return;
           errs.push(e.message); failed++;
           if (failed < started) return;                  // another route is still working
           if (started < order.length) launch();          // every route so far failed: add the next one at once
+          else if (unv) { done = true; clearTimeout(timer); if (meta) { meta.unverified = true; meta.route = unv.name; } resolve(unv.t); }   // nothing better answered: use it for now, but do not keep it
           else { done = true; clearTimeout(timer); const err = new Error('Download failed (' + errs.join(', ') + ')'); err.download = true; reject(err); }
         });
       };
@@ -573,15 +592,20 @@
     const cached = await idb.get(key);
     if (cached) { if (cb) cb({ type: 'cached' }); return cached; }
     const bt = bundleText.get(String(id));
-    if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bt; if (t) return t; } // null: the combined request failed, use the usual routes
+    if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bt; if (t) { textSrcCount('bundle'); return t; } } // null: the combined request failed, use the usual routes
     if (cb) cb({ type: 'try', i: 0, N: 1 });
     const own = await getHfText(id);
-    if (own) { idb.set(key, own); return own; }
+    if (own) { idb.set(key, own); textSrcCount('own'); return own; }
     let last;
     const urls = gutUrls(id);
     for (let i = 0; i < urls.length; i++) {
       if (cb) cb({ type: 'try', i, N: urls.length });
-      try { const t = await fetchTextRace(urls[i], 20000, cb); idb.set(key, t); return t; } catch (e) { last = e; }
+      try {
+        const meta = {}, t = await fetchTextRace(urls[i], 20000, cb, meta);
+        if (!meta.unverified) { idb.set(key, t); textUnverified.delete(String(id)); }   // a text that did not look like a Gutenberg book is shown this time but not kept
+        else { textUnverified.add(String(id)); textSrcCount('unverified'); }
+        textSrcCount(meta.route === 'direct' ? 'direct' : 'proxy'); return t;
+      } catch (e) { last = e; }
     }
     throw last || new Error('Text not found');
   }

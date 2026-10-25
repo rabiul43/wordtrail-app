@@ -355,6 +355,7 @@
     $('#in-shakemin').addEventListener('change', e => { P.shakeMin = parseInt(e.target.value, 10) || 10; savePrefs(); });
     $('#in-lowpower').addEventListener('change', e => { P.lowPower = e.target.checked; savePrefs(); wakeSync(); });
     $('#in-diag').addEventListener('change', e => { P.diag = e.target.checked; savePrefs(); if (window.__wtDiag) window.__wtDiag.set(P.diag); diagShow(); });
+    $('#b-textsrc').addEventListener('click', () => { $('#textsrc-out').textContent = textSrcReport(); });
     const diagShow = () => { const D = window.__wtDiag; $('#diag-out').textContent = D ? D.text() : 'Diagnostics are not available.'; };
     /* Lazy: Diagnostics buttons are wired the first time the Advanced panel is opened. */
     { const dt = $('#diag-out').closest('details'); let wired = false;
