@@ -29,7 +29,20 @@
     navigator.serviceWorker.addEventListener('message', e => {
       if (told || !e.data || e.data.type !== 'wt-update') return;
       told = true;
-      /* silent: the newer page is already saved and opens the next time the app starts */
+      const bar = h('div', { class: 'upd-bar', role: 'status' }, h('span', {}, 'New version ready'),
+        h('button', { type: 'button', class: 'btn small', onclick: () => location.reload() }, 'Reload'),
+        h('button', { type: 'button', class: 'upd-x', 'aria-label': 'Later', onclick: () => bar.remove() }, '\u2715'));
+      document.body.append(bar);   // the newer page is already saved: Reload opens it and keeps the open book
+    });
+  }
+  /* Settings shows which build this device runs, with a button that drops the saved page and reloads from the network. */
+  { const WT_BUILD = '__WT_BUILD__';
+    const v = $('#wt-ver'), u = $('#wt-upd');
+    if (v) v.textContent = 'Version ' + WT_BUILD;
+    if (u) u.addEventListener('click', async () => {
+      u.disabled = true; u.textContent = 'Updating\u2026';
+      try { if (window.caches) await caches.delete('wt-shell-v1'); const r = await navigator.serviceWorker.getRegistration(); if (r) await r.update(); } catch (e) { /* reload anyway */ }
+      location.reload();
     });
   }
 

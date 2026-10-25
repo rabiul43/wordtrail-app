@@ -18,3 +18,10 @@
 - src/js/161-live-translate.js     -> ltFit(), ResizeObserver, scroll listener
 
 Build: `python3 build.py` -> dist/index.html
+
+## 5. App updates itself
+- src/pwa/sw.js -> network first (3 s), saved page only as fallback
+- src/js/298-pwa.js -> "New version ready · Reload" bar, version label, "Update now"
+- src/html/30-sheets-settings.html -> #wt-ver / #wt-upd at the bottom of Settings home
+- src/css/97-controls-sheet.css -> .upd-bar, .wt-ver
+- build.py -> stamps the build id (date + hash) into the page

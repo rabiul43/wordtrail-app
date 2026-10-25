@@ -82,7 +82,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `280-downloads-progress.js` | 728 | 79 | 23 | 50 |
 | `290-backup-maintenance.js` | 337 | 34 | 13 | 34 |
 | `295-account-sync.js` | 488 | 67 | 11 | 3 |
-| `298-pwa.js` | 48 | 2 | 1 | 1 |
+| `298-pwa.js` | 61 | 2 | 1 | 1 |
 | `300-wiring.js` | 715 | 6 | 2 | 143 |
 
 ## Per file

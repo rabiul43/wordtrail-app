@@ -94,3 +94,9 @@
 .tl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .tl-t { font-size: 1rem; font-weight: 600; }
 .tl-d { font-size: var(--label); color: var(--muted); line-height: 1.35; }
+
+/* Update bar and build label */
+.upd-bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem); z-index: 60; display: flex; align-items: center; gap: .7rem; max-width: calc(100vw - 1.5rem); padding: .5rem .6rem .5rem 1rem; background: var(--surface); color: var(--ink); border: 1px solid var(--accent); border-radius: 999px; box-shadow: var(--shadow-pop); font-family: var(--font-ui); font-size: .92rem; }
+.upd-x { min-width: 2.4rem; min-height: 2.4rem; border: 0; background: transparent; color: var(--muted); border-radius: 50%; cursor: pointer; }
+.wt-ver { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1.2rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.wt-ver .help { margin: 0; }

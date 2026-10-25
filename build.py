@@ -177,6 +177,9 @@ if __name__ == "__main__":
     check_names()
     dev = "--dev" in sys.argv
     data = build(include_dev=dev)
+    import datetime
+    stamp = datetime.date.today().isoformat() + '-' + hashlib.sha256(data).hexdigest()[:6]   # e.g. 2026-10-25-a1b2c3
+    data = data.replace(b'__WT_BUILD__', stamp.encode())
     dist = os.path.join(ROOT, "dist")
     os.makedirs(dist, exist_ok=True)
     with open(os.path.join(dist, "index.html"), "wb") as f:

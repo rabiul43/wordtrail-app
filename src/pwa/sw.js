@@ -1,8 +1,8 @@
 /* Wordtrail service worker. It does two small things and nothing else:
  *
- *  1. The app page (one file) is kept on the device and opened from there at once (fast start). In the background
- *     the newest page is fetched and saved; when it differs from the one that was just opened, the open page gets a
- *     'wt-update' message and offers "Reload". The very first visit (nothing saved yet) uses the network.
+ *  1. The app page (one file) is fetched from the network first (up to 3 s) so a new version shows up at once. If the
+ *     network is slow or offline, the saved copy opens instead and the newest page is saved in the background; the open
+ *     page then gets a 'wt-update' message and offers "Reload". The very first visit (nothing saved yet) uses the network.
  *  2. The Google Fonts files are kept, so text keeps its look offline.
  *
  * It does NOT touch audio, book texts, LibriVox / Archive.org requests, sign-in, or sync: those requests are left
@@ -11,7 +11,7 @@
  */
 'use strict';
 
-const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1';
+const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', NET_WAIT = 3000;
 const ROOT = new URL('./', self.registration.scope).href; // the page, whatever it is called (query strings are ignored)
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
@@ -48,6 +48,7 @@ async function tellPages() {
 
 async function shell(event) {
   const cache = await caches.open(SHELL), cached = await cache.match(ROOT);
+  let usedCached = false;                                   // true once the saved (maybe older) page was handed to the app
   const net = fetch(ROOT, { cache: 'no-cache' }).then(async r => {
     if (!r || !r.ok) throw new Error('bad response');       // an error page never replaces the saved copy
     const ok = plain(r);
@@ -57,12 +58,16 @@ async function shell(event) {
       if (old) changed = !(await sameBody(await old.arrayBuffer(), await ok.clone().arrayBuffer()));
     } catch (e) { changed = false; }
     await cache.put(ROOT, ok.clone());
-    if (changed) tellPages();
+    if (changed && usedCached) tellPages();                  // the app is showing the older page: offer the reload
     return ok;
   });
-  if (!cached) return net.catch(() => fetch(event.request));   // first visit: just the network
-  event.waitUntil(net.catch(() => {}));                         // refresh the saved copy in the background
-  return cached;                                                // saved page now: the app opens without waiting for the network
+  if (!cached) return net.catch(() => fetch(event.request)); // first visit: just the network
+  event.waitUntil(net.catch(() => {}));
+  /* Network first: the newest page opens whenever the network answers within NET_WAIT. If it is slow or offline, the saved
+     page opens at once and the newest one keeps downloading (then the app offers "Reload"). */
+  const slow = new Promise(res => setTimeout(() => { usedCached = true; res(cached); }, NET_WAIT));
+  const fast = net.catch(() => { usedCached = true; return cached; });
+  return Promise.race([fast, slow]);
 }
 
 async function font(event) {
