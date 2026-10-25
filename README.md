@@ -20,7 +20,7 @@ One app, many small files. `build.py` joins them into a single `dist/index.html`
     src/data/                 data the app needs inside the page (amb-map.json)
     src/i18n/                 one JSON file per app language (ar.json, bn.json ...), joined into the page by build.py
     MUSIC-GUIDE.md            how to add or change music (steps to follow when you forget)
-    tools/                    helper scripts (fetch_fonts.py downloads the fonts once; i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md)
+    tools/                    helper scripts (fetch_fonts.py downloads the fonts once; i18n_check.py lists missing words in a language; deps.py checks names and writes DEPENDENCIES.md; unit_check.js tests the inner calculations: `node tools/unit_check.js`, run it after touching sync, plan or alignment code)
     src/dev/                  Developer scene tests only (left out of the public build, included by --dev)
     src/fonts/                self-hosted fonts (WOFF2 + fonts.css), made by `python tools/fetch_fonts.py`; not in the project until you run it
     src/pwa/                  Install + offline files copied next to index.html: manifest.json, sw.js (service worker), icons/

@@ -1,0 +1,25 @@
+# Runs the automatic checks on every push and pull request. It does not publish anything:
+# your existing build-and-publish workflow is untouched. A red cross here means "do not trust this change yet".
+name: checks
+on:
+  push:
+  pull_request:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Shared names and docs are up to date
+        run: python tools/deps.py --check
+      - name: Inner calculations (sync, plan, alignment, tap and undo)
+        run: node tools/unit_check.js
+      - name: Music mood word lists
+        run: node tools/music_mood_check.js
+      - name: The app builds
+        run: python build.py
