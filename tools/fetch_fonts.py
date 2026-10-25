@@ -26,7 +26,7 @@ OUT = os.path.join(ROOT, "src", "fonts")
 # Same families, weights and axes as the old Google Fonts link in 00-head.html.
 # family -> (css2 spec, subsets to keep). Subsets not listed are never downloaded.
 FAMILIES = {
-    "Fraunces":          ("Fraunces:opsz,wght@9..144;500;600;700",                 {"latin", "latin-ext"}),
+    "Fraunces":          ("Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700",                 {"latin", "latin-ext"}),
     "Inter":             ("Inter:wght@400;500;600;700",                            {"latin", "latin-ext"}),
     "Newsreader":        ("Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400", {"latin", "latin-ext"}),
     "Literata":          ("Literata:opsz,wght@7..72,600",                          {"latin", "latin-ext"}),
