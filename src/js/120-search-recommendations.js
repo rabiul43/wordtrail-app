@@ -537,18 +537,22 @@
     const hero = inProgress[0] || recs[0]; // fall back to most-recent if all done
     el.recentList.append(resumeHero(hero));
     if (Math.round((hero.pct || 0) * 100) >= 100) el.recentList.append(finishCard(hero, { compact: true }));
-    /* More books in progress: show up to (want - 1) additional unfinished books as mini cards. */
+    /* More books in progress: show up to (want - 1) additional unfinished books as mini cards.
+       They go in a side stack: on wide screens it sits to the right of the hero (see .rc-side in 20-home-library.css). */
     const more = inProgress.filter(r => r !== hero).slice(0, want - 1);
+    const side = h('div', { class: 'rc-side' });
     if (more.length) {
-      el.recentList.append(h('div', { class: 'resume-more-k' }, 'Also in progress'));
-      more.forEach(r => el.recentList.append(resumeMini(r)));
+      side.append(h('div', { class: 'resume-more-k' }, 'Also in progress'));
+      more.forEach(r => side.append(resumeMini(r)));
     }
     /* Recently finished: show as a compact row under the in-progress ones, at most 2. */
     const recentDone = finished.filter(r => r !== hero).slice(0, 2);
     if (recentDone.length && more.length) {
-      el.recentList.append(h('div', { class: 'resume-more-k' }, 'Finished'));
-      recentDone.forEach(r => el.recentList.append(resumeMini(r)));
+      side.append(h('div', { class: 'resume-more-k' }, 'Finished'));
+      recentDone.forEach(r => side.append(resumeMini(r)));
     }
+    el.recentList.classList.toggle('rc-solo', !side.children.length);
+    if (side.children.length) el.recentList.append(side);
   }
   function resumeMini(r) {
     const pct = Math.max(0, Math.min(100, Math.round((r.pct || 0) * 100)));

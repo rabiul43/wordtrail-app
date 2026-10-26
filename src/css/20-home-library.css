@@ -191,6 +191,21 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
 .rm-bar > span.rm-track { flex: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
 .rm-bar > span.rm-track > i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
 
+/* Wide screens: the hero on the left, the "Also in progress" stack on the right */
+#recent-list > .rc-side { display: contents; }
+@media (min-width: 900px) {
+  #recent-list:not(.rc-solo) { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 0 1.9rem; align-items: stretch; }
+  #recent-list:not(.rc-solo) > .resume { grid-column: 1; }
+  #recent-list:not(.rc-solo) > .rc-side { grid-column: 2; display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+  #recent-list .rc-side .resume-more-k { margin: .35rem .1rem 0; }
+  .resume { grid-template-columns: 9rem minmax(0, 1fr); grid-template-rows: auto 1fr auto auto; column-gap: 1.5rem; padding: 1.5rem; }
+  .resume-cover .cover { width: 9rem; height: 9rem; font-size: 2.2rem; }
+  .resume-t { font-size: 1.75rem; line-height: 1.15; }
+  .resume-a { margin-top: .3rem; }
+  .resume-bar { align-self: end; margin-top: 1.25rem; }
+  .resume-pct { font-size: .875rem; }
+}
+
 /* ---------- Phase 6: hearts, My books, tab bar ---------- */
 .home { padding-bottom: calc(var(--tabbar-h, calc(4.2rem + env(safe-area-inset-bottom))) + var(--mini-h, 0px) + 1.5rem); padding-top: max(.9rem, env(safe-area-inset-top)); gap: 1.25rem; }
 .tile-wrap, .card-wrap { position: relative; }
