@@ -84,3 +84,17 @@
 @media (min-width: 1920px) {
   .seg, .acct-card, .acct-link { max-width: 46rem; }
 }
+
+/* ---------- side rail: icon-only when collapsed, names only when the bar is expanded (>= 700px) ----------
+   The label is visually hidden, not display:none, so screen readers still announce each tab.
+   The expanded sidebar (html[data-nav="open"]) shows the names again, except while the player is open:
+   the player always keeps the narrow rail, so it stays icon-only there too. Phones are untouched. */
+@media (min-width: 700px) {
+  .tab > span:not(.tab-ic) {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab > span:not(.tab-ic) {
+    position: static; width: auto; height: auto; overflow: visible; clip-path: none;
+  }
+  .tab { min-height: 3rem; }
+}
