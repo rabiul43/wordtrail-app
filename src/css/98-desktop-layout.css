@@ -283,7 +283,7 @@
   #detail .det-hero .det-prog-w { order: 7; width: 22rem; max-width: 100%; margin-top: .4rem; }
   #detail .det-hero .det-btn { flex: none; min-width: 13rem; min-height: 2.9rem; padding-inline: 2rem; border-radius: .6rem; }
   #detail .det-hero .heart.on-detail, #detail .det-hero .det-share {
-    position: static; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: 50%;
+    position: relative; inset: auto; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: 50%;
     border: 1px solid var(--line); background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); padding: 0; cursor: pointer;
   }
   #detail .det-hero .heart.on-detail[aria-pressed="true"] { color: var(--accent); }
