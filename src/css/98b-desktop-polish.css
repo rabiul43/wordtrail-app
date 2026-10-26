@@ -39,7 +39,10 @@
 .acct-main, .acct-side { display: contents; }
 
 @media (min-width: 1100px) {
-  #account:has(> .acct-main) {
+  /* The ID selector below is stronger than `.view[hidden] { display: none }`, so without these two lines the Account
+     page (stats, goals, milestones) stayed on screen under the player and every other tab once it had been opened. */
+  #account[hidden] { display: none; }
+  #account:not([hidden]):has(> .acct-main) {
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
     grid-template-rows: auto auto 1fr; column-gap: 2.5rem; align-items: start;
   }
