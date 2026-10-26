@@ -39,6 +39,14 @@ touch the real internet and give the same result every time:
 Anything not listed is refused (as if offline) and recorded in `net.log.unmocked`; `02-search` asserts that list is empty.
 If the app starts calling a new address, add it to `answer()` in `mock-network.js`.
 
+### Why the service worker is blocked (and where it is not)
+
+The mock cannot see what a service worker fetches by itself, and `sw.js` fetches `catalog.json` itself once it has taken over the page.
+Which came first, the page's own request (answered by the mock) or the worker's (answered by the real internet), was a race:
+search then sometimes ran on the real catalog and found none of the test books. So `playwright.config.js` sets
+`serviceWorkers: 'block'`. Only `06-offline` needs the worker: it makes its own browser context with `serviceWorkers: 'allow'`,
+and holds the worker back until the mocked catalog has been saved (see the comment in that spec).
+
 ## Adding a test
 
 Import `test` and `expect` from `../helpers/test` (not from `@playwright/test`) so the mock is always on, and reuse the

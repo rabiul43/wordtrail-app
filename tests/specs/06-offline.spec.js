@@ -8,10 +8,29 @@ test('the page reloads with no connection', async ({ browser }) => {
   const app = await server.start();                         // own copy of the app on a free port
   const context = await browser.newContext({ serviceWorkers: 'allow', baseURL: app.url, viewport: { width: 412, height: 800 } });
   const mock = await mockNetwork(context);
+  // Playwright's fake network cannot see what a service worker fetches itself, and sw.js fetches catalog.json itself. So the worker
+  // is held back (page.evaluate sets window.__allowSW below) until the app has fetched the catalog through the fake network and saved
+  // it: then the saved catalog is the test one every time, not whichever answer happened to arrive first.
+  await context.addInitScript(() => {
+    const sw = navigator.serviceWorker;
+    if (!sw || !sw.register) return;
+    const real = sw.register.bind(sw);
+    sw.register = async (...args) => {
+      if (await sw.getRegistration()) return real(...args);                  // already installed (after a reload): nothing to hold back
+      for (let i = 0; i < 600 && !window.__allowSW; i++) await new Promise(r => setTimeout(r, 50));
+      return real(...args);
+    };
+  });
   const page = await context.newPage();
   try {
-    // 1. online first visit: the service worker installs and keeps the page
+    // 1. online first visit: the catalog is saved first, then the service worker installs and keeps the page
     await startApp(page);
+    await expect.poll(() => page.evaluate(() => new Promise(res => {
+      const open = indexedDB.open('wordtrail', 1);
+      open.onerror = () => res(false);
+      open.onsuccess = () => { const q = open.result.transaction('texts').objectStore('texts').get('catalog'); q.onsuccess = () => res(!!(q.result && q.result.b && q.result.b.length)); q.onerror = () => res(false); };
+    })), { message: 'the catalog should be saved on the device before the service worker starts' }).toBe(true);
+    await page.evaluate(() => { window.__allowSW = true; });
     await page.evaluate(() => navigator.serviceWorker.ready);
     await expect.poll(() => page.evaluate(async () => {
       const keys = await caches.keys();

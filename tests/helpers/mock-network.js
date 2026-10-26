@@ -78,6 +78,9 @@ function answer(route, request, mocks, log) {
   // data files that are optional: the app copes with "not found"
   if (host === 'raw.githubusercontent.com' || host.endsWith('huggingface.co') || host.endsWith('.workers.dev')) return route.fulfill({ status: 404, body: 'not found' });
 
+  // music.json lives on Cloudflare Pages (hosts.json). The app asks for it at every start-up and copes with "not published".
+  if (host.endsWith('.pages.dev')) return route.fulfill({ status: 404, body: 'not found' });
+
   log.unmocked.push(request.method() + ' ' + raw.slice(0, 140));
   return route.abort();
 }
