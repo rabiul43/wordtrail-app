@@ -39,6 +39,7 @@ PARTS = [
     ('file', 'src/css/96-sound-tabs.css'),
     ('file', 'src/css/97-controls-sheet.css'),
     ('file', 'src/css/98-desktop-layout.css'),
+    ('file', 'src/css/98b-desktop-polish.css'),
     ('file', 'src/css/99-home-header.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),

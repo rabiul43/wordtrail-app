@@ -325,9 +325,12 @@
 <template id="tpl-account">
   <div class="tab-head"><h1>Account</h1><p>Your library, settings and progress. Sign in to sync them across devices.</p></div>
   <section id="acct-sync" aria-label="Sign in and sync"></section>
+  <div class="acct-main">
   <section id="acct-fol" class="acct-rt" aria-label="Authors you follow" hidden></section>
   <section id="acct-rt" class="acct-rt" aria-label="Your ratings" hidden></section>
   <section id="ls" class="ls" aria-labelledby="ls-h"></section>
+  </div>
+  <div class="acct-side">
   <div class="acct-card">
     <div class="acct-row"><span>Saved books</span><strong id="acct-favs">0</strong></div>
     <div class="acct-row"><span>Recently listened</span><strong id="acct-recents">0</strong></div>
@@ -363,6 +366,7 @@
     <h2 id="about-h">About</h2>
     <p>Audio comes from LibriVox and the text from Project Gutenberg, both public domain. LibriVox does not publish sentence times, so Wordtrail estimates them in your browser. If the highlight drifts, double-tap the sentence you are hearing. You can also turn on Sync and tap it. Either way, the sentences around it are re-timed too.</p>
   </section>
+  </div>
 </template>
 
 <div id="mini" class="mini" hidden role="region" aria-label="Now playing">

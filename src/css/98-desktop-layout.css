@@ -25,6 +25,13 @@
 .mini-ib, .mini-sk { display: none; }
 .dt-tracks { display: none; }
 
+/* phones: the bottom bar is a 4-column grid (20-home-library.css), so only the four main tabs belong in it.
+   Account is the avatar in the header (its click handler triggers this tab) and Settings is a row inside Account.
+   Both tabs only show in the side rail from 700px up. */
+@media (max-width: 699.98px) {
+  .tab[data-tab="account"], .tab[data-tab="settings"] { display: none; }
+}
+
 @media (min-width: 700px) {
   :root { --nav-w: 4.75rem; --nav-pad: .4rem; --page-pad: 2rem; --bar-h: 5.75rem; --tabbar-h: 0px !important; }   /* no bottom tab bar any more, so nothing needs to clear it */
   body { padding-inline-start: var(--nav-w); }

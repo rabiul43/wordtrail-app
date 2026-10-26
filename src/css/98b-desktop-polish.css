@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Desktop polish  (drop in AFTER 98-desktop-layout.css, BEFORE 99-home-header.css
+   or last; nothing here touches phones: everything is inside min-width queries)
+
+   Fixes found by rendering the build at 1280 / 1440 / 1920 / 2560:
+     1. Page headings sat flush against the top edge on every non-Library tab
+     2. Account was a lone 54rem column (864px) floating in dead space,
+        while Collections / My books used the full 82-92rem container
+     3. Sheets (Settings etc.) were still bottom-anchored mobile sheets with a
+        drag-grip, and Settings was one long single-column scroll
+     4. Centred content jumped sideways when a tab gained a scrollbar
+   ========================================================================== */
+
+/* ---------- 0. one container width for every top-level page ---------- */
+:root { --content-max: 82rem; }
+@media (min-width: 1600px) { :root { --content-max: 92rem; } }
+
+@media (min-width: 700px) {
+  html { scrollbar-gutter: stable; }               /* (4) no sideways jump between short and long tabs */
+
+  /* (1) page titles need air above them; on phones the status bar provides it */
+  .tab-head { padding-block: 2rem 1.25rem; }
+  .tab-head h1 { font-size: clamp(1.75rem, 1.3rem + .9vw, 2.25rem); }
+
+  /* (2) Account joins the same container as its siblings (was 54rem) */
+  #account { max-width: var(--content-max); }
+}
+
+/* ---------- Account: stats on the left, utilities on the right (>= 1100px) ----------
+   Needs two wrapper <div>s in <template id="tpl-account"> (every id stays, so no JS change).
+   The wrappers are transparent on phones, so the phone order is exactly as before:
+     <div class="tab-head">…</div>
+     <section id="acct-sync">…</section>                  (stays a direct child)
+     <div class="acct-main">  #acct-fol  #acct-rt  #ls  </div>
+     <div class="acct-side">  .acct-card  #acct-settings  .acct-help  #acct-history  .about </div>
+   Desktop grid:   [ tab-head          tab-head ]
+                   [ main              sync     ]
+                   [ main              side     ]   (main spans rows 2-3)            */
+.acct-main, .acct-side { display: contents; }
+
+@media (min-width: 1100px) {
+  #account:has(> .acct-main) {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
+    grid-template-rows: auto auto 1fr; column-gap: 2.5rem; align-items: start;
+  }
+  #account:has(> .acct-main) > .tab-head   { grid-column: 1 / -1; grid-row: 1; }
+  #account:has(> .acct-main) > #acct-sync  { grid-column: 2; grid-row: 2; margin: 0 0 1rem; }
+  #account:has(> .acct-main) > .acct-main  { display: block; grid-column: 1; grid-row: 2 / span 2; min-width: 0; }
+  #account:has(> .acct-main) > .acct-side  { display: grid; grid-column: 2; grid-row: 3; gap: 1rem; align-content: start; min-width: 0; }
+  #account:has(> .acct-main) > .acct-side > * { margin: 0; }
+}
+
+/* ---------- Sheets become centred dialogs on desktop (>= 900px) ----------
+   inset-block:0 + margin-block:auto + fit-content centres a fixed box without
+   touching `transform`, so the existing sheetIn animation keeps working.        */
+@media (min-width: 900px) {
+  .sheet {
+    top: 0; bottom: 0; margin-block: auto;
+    height: fit-content; max-height: min(52rem, 88dvh);
+    width: min(44rem, calc(100% - 4rem));
+  }
+  .sheet header::before { display: none; }          /* drag grip is a touch affordance */
+}
+
+/* ---------- Settings: vertical section nav + one pane (>= 900px) ---------- */
+@media (min-width: 900px) {
+  #sheet-settings { width: min(58rem, calc(100% - 4rem)); height: min(44rem, 88dvh); }
+  #sheet-settings .body { grid-template-columns: 12.5rem minmax(0, 1fr); column-gap: 2rem; align-content: start; }
+  #sheet-settings .body > * { grid-column: 2; min-width: 0; }
+
+  #sheet-settings .sp-tabs {
+    grid-column: 1; grid-row: 1 / span 6; position: sticky; top: 0; align-self: start;
+    flex-direction: column; gap: .15rem; padding: 0; border: 0; background: transparent;
+  }
+  #sheet-settings .sp-tabs button {
+    flex-direction: row; justify-content: flex-start; gap: .7rem;
+    padding: .65rem .8rem; font-size: .92rem; text-align: start; border-radius: var(--r-ctl);
+  }
+  @media (hover: hover) { #sheet-settings .sp-tabs button:hover:not([aria-selected="true"]) { background: var(--surface-2); } }
+  #sheet-settings .sp-tabs .ic.ti { flex: none; }
+}
+
+/* ---------- optional: don't let giant monitors stretch reading UI ---------- */
+@media (min-width: 1920px) {
+  .seg, .acct-card, .acct-link { max-width: 46rem; }
+}
