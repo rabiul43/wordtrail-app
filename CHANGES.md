@@ -39,3 +39,8 @@
 - Home header is now one row: logo + Wordtrail, search field (filters + search icons on the right), round account button (photo / first letter / person icon; tap opens Account).
 - Tablets and computers (700px and wider) always use it. Phones show the logo only and can switch back to the classic header in Settings > Appearance > "New Home header" (`P.hdrNew`, default on).
 - Files: `src/css/99-home-header.css` (new, listed in `build.py`), `10-body-views.html` (`.sb-brand`, `#btn-go-q`, `#sb-avatar`), `00-head.html` (early `data-hdr`), `090` (`applyHdr`), `290`, `295` (`acAvatar`), `300`, `30-sheets-settings.html` (`#in-hdr`).
+
+## Side rail (tablet / computer)
+- From 700px wide the left bar is a narrow rail by default (icon over label, open page filled with an accent bar on its left edge, Account at the bottom). The menu button at the top opens it into a sidebar with the logo and name; the choice is remembered (`P.navOpen`, `<html data-nav="rail|open">`, `applyNav()` in `090`, click in `300`, early attribute in `00-head.html`).
+- The player always keeps the narrow rail. Phones keep the bottom tab bar.
+- Styles: end of `src/css/99-home-header.css`. The old "full sidebar from 1200px" rules in `98-desktop-layout.css` and the `.tb-brand` logo block were replaced (`#nav-toggle` in `10-body-views.html`).

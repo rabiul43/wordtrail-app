@@ -651,6 +651,13 @@
   /* Home header: 'new' = logo, search and account button in one row (always on tablets and computers, from 700px);
      'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */
   function applyHdr() { document.documentElement.setAttribute('data-hdr', (P.hdrNew === false && !matchMedia('(min-width: 700px)').matches) ? 'classic' : 'new'); }
+  /* Side rail (from 700px wide): narrow by default, the menu button at its top opens it into a sidebar. Saved as P.navOpen. */
+  function applyNav() {
+    const open = P.navOpen === true;
+    document.documentElement.setAttribute('data-nav', open ? 'open' : 'rail');
+    const b = document.getElementById('nav-toggle');
+    if (b) { b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', open ? 'Collapse the side bar' : 'Expand the side bar'); }
+  }
   function applyTheme() {
     const r = document.documentElement;
     if (P.theme === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', P.theme);

@@ -93,8 +93,43 @@ html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
   html[data-hdr="new"] .searchbar #search-form .field { min-height: 3rem; }
   html[data-hdr="new"] .searchbar .sfilt { max-width: 46rem; }
   .sb-avatar { width: 2.4rem; height: 2.4rem; }
-  /* the name is in the header now, so the rail / sidebar logo is hidden while Home is open (kept in place so the tabs do not jump) */
-  body:has(#home:not([hidden])) .tb-brand { visibility: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) { html[data-hdr="new"] #search-form .field { transition: none; } }
+
+/* ==========================================================================
+   Side rail (tablet and computer, >= 700px)
+   Default: narrow rail, icon over a small label, the open page filled with a bar on its left edge,
+   Account pinned at the bottom. The menu button at the top opens it into a sidebar (icon + label in a row,
+   plus the logo and name): <html data-nav="open">, saved in Settings data as P.navOpen, set by applyNav() (090).
+   The player always keeps the narrow rail (the text needs the room).
+   ========================================================================== */
+@media (min-width: 700px) {
+  .tabbar { transition: width var(--dur) var(--ease); }
+  body { transition: padding-inline-start var(--dur) var(--ease); }
+
+  .tb-brand { display: flex; align-items: center; justify-content: center; gap: .65rem; flex: none; width: 100%; height: 2.9rem; margin-bottom: .9rem; padding: 0; border: 0; border-radius: var(--r-ctl); background: transparent; color: var(--accent); cursor: pointer; }
+  @media (hover: hover) { .tb-brand:hover { background: var(--surface); } }
+  .tb-brand:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: -2px; }
+  .tb-brand .tb-menu { width: 1.45rem; height: 1.45rem; flex: none; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+  .tb-brand .mark, .tb-brand span { display: none; }
+  body:has(#player:not([hidden])) .tb-brand { visibility: hidden; }
+
+  /* narrow rail items: icon over label, filled when open, bar on the left edge */
+  .tab { justify-content: center; gap: .3rem; min-height: 3.6rem; padding: .4rem 0; }
+  .tab-ic, .tab[aria-current="page"] .tab-ic { width: auto; height: auto; background: transparent; }
+  .tab[aria-current="page"] { background: var(--surface-2); }
+  @media (hover: hover) { .tab[aria-current="page"]:hover { background: var(--surface-2); } }
+  .tab[data-tab="account"] { margin-top: auto; }
+
+  /* opened: a sidebar */
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) { --nav-w: 14rem; --nav-pad: .75rem; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand { justify-content: flex-start; padding: 0 .9rem; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand .mark { display: block; width: 1.8rem; height: 1.8rem; flex: none; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand span { display: inline; font: 600 1.3rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab { flex-direction: row; justify-content: flex-start; gap: .85rem; min-height: 2.9rem; padding: 0 .9rem; font-size: .92rem; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab svg { width: 1.35rem; height: 1.35rem; }
+  /* the name is in the sidebar now, so the Home header drops its own */
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .sb-brand { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tabbar, body { transition: none !important; } }

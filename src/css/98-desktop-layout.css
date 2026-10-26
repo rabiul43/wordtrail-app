@@ -11,8 +11,9 @@
      >= 1100px  one player bar along the bottom of the window (Home: mini player
                 with transport + seek; Player: the dock), player split into
                 cover + tracks on the left and the text on the right
-     >= 1200px  the rail grows into a full sidebar (icon + label) on every screen
-                except the player, where it stays a rail to leave room for the text
+     (any width >= 700px) the rail is narrow by default; the menu button at its top opens it into a
+                full sidebar (icon + label side by side) on every screen except the player, which keeps
+                the narrow rail to leave room for the text. The look of both is in 99-home-header.css
 
    Uses logical properties (inline-start / inline-end) so right-to-left
    languages mirror correctly.
@@ -38,9 +39,6 @@
     overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   }
   .tabbar::-webkit-scrollbar { display: none; }
-  .tb-brand { display: flex; align-items: center; justify-content: center; gap: .6rem; padding: .2rem 0 1rem; color: var(--accent); }
-  .tb-brand svg { width: 2rem; height: 2rem; flex: none; }
-  .tb-brand span { display: none; font: 600 1.35rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); }
 
   .tab { padding: .5rem 0; gap: .15rem; font-size: .66rem; border-radius: var(--r-ctl); cursor: pointer; }
   .tab::before { top: .55rem; bottom: .55rem; left: auto; inset-inline-start: calc(-1 * var(--nav-pad)); width: 3px; height: auto; border-radius: 0 3px 3px 0; transform: scaleY(0); }
@@ -184,16 +182,7 @@
 
 /* ---------- full sidebar (every screen except the player) ---------- */
 @media (min-width: 1200px) {
-  :root { --nav-w: 14rem; --nav-pad: .75rem; --page-pad: 2.75rem; }
-  body:has(#player:not([hidden])) { --nav-w: 4.75rem; --nav-pad: .4rem; }
-
-  body:not(:has(#player:not([hidden]))) .tabbar { padding-top: 1.4rem; }
-  body:not(:has(#player:not([hidden]))) .tb-brand { justify-content: flex-start; padding: .2rem .9rem 1.4rem; }
-  body:not(:has(#player:not([hidden]))) .tb-brand span { display: inline; }
-  body:not(:has(#player:not([hidden]))) .tab { flex-direction: row; justify-content: flex-start; gap: .8rem; padding: .62rem .9rem; font-size: .92rem; }
-  body:not(:has(#player:not([hidden]))) .tab-ic { width: auto; height: auto; background: transparent !important; }
-  body:not(:has(#player:not([hidden]))) .tab[aria-current="page"] { background: var(--accent-soft); }
-  body:not(:has(#player:not([hidden]))) .tab svg { width: 1.35rem; height: 1.35rem; }
+  :root { --page-pad: 2.75rem; }
 
   main.view .hrow { grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); }
   .list { grid-template-columns: repeat(auto-fill, minmax(28rem, 1fr)); }
