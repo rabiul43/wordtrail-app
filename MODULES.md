@@ -48,7 +48,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
 | `135-ratings.js` | 492 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
 | `140-open-book.js` | 732 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries |
-| `150-player-reader.js` | 721 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
+| `150-player-reader.js` | 722 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
 | `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
@@ -67,6 +67,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `280-downloads-progress.js` | 728 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 386 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 488 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
+| `296-desktop-bar.js` | 44 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
 | `300-wiring.js` | 772 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |

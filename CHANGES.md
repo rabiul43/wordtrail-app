@@ -1,9 +1,15 @@
 # Changes in this version
 
-## Desktop and tablet layout (audit P0-A)
+## Seek bar touch target (audit P1-B)
+- src/css/50-new-reader-tabbar-settings.css: seek thumb 28px (Firefox 22px), touch row 44px, thumb re-centred (margin-top -.75rem). Track look unchanged.
+
+## Desktop and tablet layout (audit P0-A), second version
+- Book rows on Home / Collections become wrapped cover grids from 900px (two rows, "See all" shows the rest).
+- From 1100px one player bar runs along the bottom: on Home the mini player gets back/forward 15 s, play and a seek bar (NEW src/js/296-desktop-bar.js, registered in build.py; one line added to updateSeekUI in 150-player-reader.js); in the player the dock becomes the same bar. The wave-dots row (`.viz`) is hidden in the bar.
+- Player: a track list under the cover (new `#dt-tracks` in the markup), cover and title stay in view.
 - NEW src/css/98-desktop-layout.css, added at the end of the CSS list in build.py. All rules sit inside min-width media queries; the phone layout is unchanged.
 - src/html/10-body-views.html: a small logo (`.tb-brand`) inside `#tabbar`. Hidden on phones.
-- Left rail from 700px, full sidebar from 1200px (rail inside the player), mini player as a bar along the bottom, player split into cover | text from 1100px.
+- Left rail from 700px, full sidebar from 1200px (rail inside the player), mini player as a bar along the bottom, player split into cover | text from 1100px (cover and title stay in view while the text scrolls).
 
 ## 1. Fonts served from our own site (item 9)
 - tools/fetch_fonts.py -> fixed the Fraunces entry (Google rejected it). Then: python tools/fetch_fonts.py, python build.py, commit src/fonts/.

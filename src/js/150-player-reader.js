@@ -418,6 +418,7 @@
     if (!S.seeking) el.seek.value = t;
     el.seek.style.setProperty('--fill', (d ? Math.min(100, t / d * 100) : 0) + '%');
     nrSeekUI(t, d);
+    try { dtSeekSync(t, d); } catch (e) { /* desktop bar not ready */ }
     lpNote();
     paintBookProg();
   }

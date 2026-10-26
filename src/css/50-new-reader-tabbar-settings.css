@@ -113,12 +113,12 @@
 
 .dock { background: linear-gradient(to bottom, var(--surface), var(--bg)); border-top: 0; box-shadow: var(--shadow-up); border-radius: var(--r-xl) var(--r-xl) 0 0; position: relative; gap: .35rem; padding-top: .7rem; }
 .seek { font-size: .75rem; font-weight: 500; letter-spacing: .02em; grid-template-columns: 3.4rem minmax(0, 1fr) 3.4rem; gap: .5rem; }
-.seek input[type="range"] { height: 1.6rem; }
+.seek input[type="range"] { height: 2.75rem; }   /* 44px touch row (audit P1-B); the visible track stays 4px */
 .seek input[type="range"]::-webkit-slider-runnable-track { border-radius: var(--r-pill); background: linear-gradient(to right, var(--accent) var(--fill, 0%), var(--surface-2) var(--fill, 0%)); height: 4px; }
 .seek input[type="range"]::-moz-range-track { height: 6px; border-radius: var(--r-pill); background: var(--surface-2); }
 .seek input[type="range"]::-moz-range-progress { height: 6px; border-radius: var(--r-pill); background: var(--accent); }
-.seek input[type="range"]::-webkit-slider-thumb { width: 1.1rem; height: 1.1rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); margin-top: -.42rem; }
-.seek input[type="range"]::-moz-range-thumb { width: .8rem; height: .8rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); }
+.seek input[type="range"]::-webkit-slider-thumb { width: 1.75rem; height: 1.75rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); margin-top: -.75rem; }
+.seek input[type="range"]::-moz-range-thumb { width: 1.4rem; height: 1.4rem; background: var(--ink); border: 3px solid var(--accent); box-shadow: 0 1px 6px rgba(0, 0, 0, .35); }
 .seek input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.35); box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 25%, transparent); }
 .seek input[type="range"]:focus-visible { outline-offset: 0; }
 .ctl .ib { width: 3rem; height: 3rem; }

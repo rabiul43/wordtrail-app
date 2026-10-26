@@ -367,7 +367,12 @@
     <span class="mini-txt"><strong id="mini-t"></strong><small id="mini-a"></small></span>
   </button>
   <button id="mini-scene" class="mini-scene" type="button" hidden aria-label="Sound scene — tap to open mixer"></button>
-  <button id="mini-play" class="mini-play" type="button" aria-label="Play"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
+  <div class="mini-ctl">
+    <button id="mini-back" class="mini-ib" type="button" aria-label="Back 15 seconds" title="Back 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-back15"/></svg></button>
+    <button id="mini-play" class="mini-play" type="button" aria-label="Play"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
+    <button id="mini-fwd" class="mini-ib" type="button" aria-label="Forward 15 seconds" title="Forward 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
+  </div>
+  <div class="mini-sk"><span id="mini-cur">0:00</span><input id="mini-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Position in this track"><span id="mini-left">-0:00</span></div>
   <button id="mini-close" class="mini-close" type="button" aria-label="Close player"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
   <span class="mini-bar" aria-hidden="true"><i id="mini-prog"></i></span>
 </div>
@@ -401,6 +406,7 @@
   <div id="reader" class="reader" tabindex="0" aria-label="Book text">
     <div id="pcover" class="pcover" aria-hidden="true"></div>
     <div id="ptitle" class="ptitle" aria-hidden="true"><strong></strong><span></span></div>
+    <div id="dt-tracks" class="dt-tracks" role="group" aria-label="Tracks"><h3>Tracks</h3><div class="dt-list"></div></div>
     <div id="calbar" class="calbar" hidden>Tap the sentence you are hearing right now to line it up.</div>
     <div id="page" class="page"></div>
   </div>

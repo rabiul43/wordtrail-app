@@ -1,10 +1,10 @@
 {
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
-  "files": 75,
-  "dependencies": 640,
-  "pointing_to_a_later_file": 213,
-  "largest_cycle": 69
+  "files": 76,
+  "dependencies": 644,
+  "pointing_to_a_later_file": 214,
+  "largest_cycle": 70
  },
  "dependencies": [
   "030-helpers-offline-audio.js -> 040-worker-newreader.js",
@@ -272,6 +272,7 @@
   "150-player-reader.js -> 260-audio-effects.js",
   "150-player-reader.js -> 270-sheets-nextup-back.js",
   "150-player-reader.js -> 280-downloads-progress.js",
+  "150-player-reader.js -> 296-desktop-bar.js",
   "150-player-reader.js -> sound/ambient-scenes.js",
   "150-player-reader.js -> sound/music-state.js",
   "150-player-reader.js -> sound/story-engine.js",
@@ -432,6 +433,9 @@
   "295-account-sync.js -> 030-helpers-offline-audio.js",
   "295-account-sync.js -> 040-worker-newreader.js",
   "295-account-sync.js -> 080-ui-shell-favourites.js",
+  "296-desktop-bar.js -> 030-helpers-offline-audio.js",
+  "296-desktop-bar.js -> 040-worker-newreader.js",
+  "296-desktop-bar.js -> 150-player-reader.js",
   "298-pwa.js -> 070-network-data.js",
   "300-wiring.js -> 030-helpers-offline-audio.js",
   "300-wiring.js -> 040-worker-newreader.js",
