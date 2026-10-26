@@ -24,7 +24,12 @@
     initHomeSections();
     psInit();
     initClearButton();
-    $$('#tabbar .tab').forEach(b => b.addEventListener('click', () => { pendingBack = null; showTab(b.dataset.tab); }));
+    $$('#tabbar .tab').forEach(b => b.addEventListener('click', () => {
+      const t = b.dataset.tab;
+      if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
+      if (t === 'downloads') { closeSheets(); shelfMode = 'dl'; showTab('shelf'); return; }
+      pendingBack = null; showTab(t);
+    }));
     $('#shelf-browse').addEventListener('click', () => showTab('library'));
     $$('#shelf-seg .chip').forEach(b => b.addEventListener('click', () => { shelfMode = b.dataset.m; applyShelfMode(); }));
     $('#seeall-back').addEventListener('click', closeSeeAll);

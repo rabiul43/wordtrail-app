@@ -278,3 +278,8 @@
   #detail .det-hero .heart.on-detail[aria-pressed="true"] { color: var(--accent); }
   #detail .det-hero .det-share .ic, #detail .det-hero .det-share svg { width: 1.2rem; height: 1.2rem; }
 }
+
+/* ---------- rail: new items added in this session ---------- */
+/* Settings opens a sheet, not a page — never show the active bar on it */
+.tab[data-tab="settings"][aria-current="page"]::before { display: none; }
+.tab[data-tab="settings"][aria-current="page"] { background: transparent; }
