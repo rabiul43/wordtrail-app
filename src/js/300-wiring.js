@@ -342,6 +342,8 @@
     smWire();   // Settings home: search and Developer unlock (290)
     homeCustInit();   // Customise home: apply the saved switches to the Library tab (105-home-loaders.js)
     $('#in-calm').addEventListener('change', e => { P.calm = e.target.checked; applyTheme(); savePrefs(); toast(P.calm ? 'Calm mode is on.' : 'Calm mode is off.', 2000); try { renderStats(); } catch (x) {} });
+    $('#in-hdr').addEventListener('change', e => { P.hdrNew = e.target.checked; savePrefs(); applyHdr(); });
+    try { matchMedia('(min-width: 700px)').addEventListener('change', applyHdr); } catch (e) { /* old browser: the setting applies on the next start */ }
     $('#in-haptics').addEventListener('change', e => { P.haptics = e.target.checked; savePrefs(); if (P.haptics) buzz('medium'); });
     $('#in-shake').addEventListener('change', e => {
       const box = e.target; P.shakeSleep = box.checked; savePrefs(); $('#row-shakemin').hidden = !P.shakeSleep;

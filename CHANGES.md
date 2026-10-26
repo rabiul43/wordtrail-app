@@ -34,3 +34,8 @@
   - An empty or broken entry inside a book's track list or author list is left out; the rest of the book is kept.
   - One book that cannot be read is skipped; the other books in the same answer still show (before, one bad book made the whole route fail).
 - tools/unit_check.js -> 13 new checks, including the real fetchBundle run against a pretend stream with broken lines.
+
+## New Home header
+- Home header is now one row: logo + Wordtrail, search field (filters + search icons on the right), round account button (photo / first letter / person icon; tap opens Account).
+- Tablets and computers (700px and wider) always use it. Phones show the logo only and can switch back to the classic header in Settings > Appearance > "New Home header" (`P.hdrNew`, default on).
+- Files: `src/css/99-home-header.css` (new, listed in `build.py`), `10-body-views.html` (`.sb-brand`, `#btn-go-q`, `#sb-avatar`), `00-head.html` (early `data-hdr`), `090` (`applyHdr`), `290`, `295` (`acAvatar`), `300`, `30-sheets-settings.html` (`#in-hdr`).

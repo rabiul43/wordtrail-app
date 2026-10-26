@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Home header, "new" style: [logo + Wordtrail] [search field: text ... filters, search] [account button]
+   --------------------------------------------------------------------------
+   Same elements as the classic header, laid out in one row inside the sticky #searchbar.
+   <html data-hdr="new"> is set by the script in 00-head.html and by applyHdr() (090):
+     - tablets and computers (>= 700px): always "new"
+     - phones (< 700px): "new" unless Settings > Appearance > "New Home header" is off, then "classic"
+   Classic = nothing in this file applies, the earlier files give the old look unchanged.
+   Phone: logo only (no name), as in the design. From 700px the name is shown.
+   ========================================================================== */
+
+/* the new-only pieces stay invisible unless the new header is on */
+.sb-brand, .sb-avatar, .btn-go { display: none; }
+
+html[data-hdr="new"] .brand { display: none; }            /* the classic logo + title row */
+html[data-hdr="new"] .sb-brand { display: flex; }
+html[data-hdr="new"] .sb-avatar { display: grid; }
+html[data-hdr="new"] .btn-go { display: grid; }
+
+html[data-hdr="new"] .home { padding-top: 0; }
+
+html[data-hdr="new"] .searchbar {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "brand form avatar" "filt filt filt";
+  align-items: center; column-gap: .65rem; row-gap: 0;
+  padding: max(.55rem, env(safe-area-inset-top)) 1.1rem .55rem;
+  border-bottom: 1px solid var(--line);
+}
+html[data-hdr="new"] .searchbar .sb-brand { grid-area: brand; }
+html[data-hdr="new"] .searchbar #search-form { grid-area: form; max-width: none; }
+html[data-hdr="new"] .searchbar .sb-avatar { grid-area: avatar; }
+html[data-hdr="new"] .searchbar .sfilt { grid-area: filt; margin-top: .45rem; }
+html[data-hdr="new"] .searchbar.stuck { box-shadow: var(--shadow-sm); }
+
+/* logo + name */
+.sb-brand { align-items: center; gap: .55rem; color: var(--accent); }
+.sb-brand .mark { width: 2rem; height: 2rem; flex: none; }
+.sb-name { display: none; font: 600 1.15rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+
+/* the search field: text on the left, filters and search on the right */
+html[data-hdr="new"] #search-form .field {
+  min-height: 2.75rem; padding: 0 .3rem 0 .95rem; gap: .25rem;
+  border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface); box-shadow: none;
+}
+html[data-hdr="new"] #search-form .field:focus-within { background: var(--bg); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+html[data-hdr="new"] #search-form .field > .ic { display: none; }              /* the loupe moves to the right (.btn-go) */
+html[data-hdr="new"] #search-form .field input { order: 0; padding: .5rem 0; font-size: 1rem; }
+html[data-hdr="new"] #search-form .field .btn-clear { order: 1; width: 2rem; height: 2rem; flex: none; }
+html[data-hdr="new"] #search-form .field .btn-fpanel { order: 2; width: 2.2rem; height: 2.2rem; }
+html[data-hdr="new"] #search-form .field .btn-go { order: 3; }
+html[data-hdr="new"] #search-form .field .btn-fpanel .ic, .btn-go .ic { width: 1.25rem; height: 1.25rem; }
+
+.btn-go { place-items: center; flex: none; width: 2.2rem; height: 2.2rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+.btn-go:hover, .btn-go:focus-visible { color: var(--ink); }
+html[data-hdr="new"] #search-form .field:focus-within .btn-go { color: var(--accent); }
+.btn-go:focus-visible, .sb-avatar:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+
+/* the account button: photo, else the first letter, else a person icon */
+.sb-avatar {
+  --av: #2f6fd6;
+  position: relative; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; padding: 0; overflow: visible;
+  border: 0; border-radius: 50%; cursor: pointer;
+  background: color-mix(in srgb, var(--av) 20%, var(--bg)); color: color-mix(in srgb, var(--av) 78%, var(--ink));
+  font: 650 .9rem/1 var(--font-ui);
+}
+.sb-avatar::after { content: ""; position: absolute; inset: -.3rem; border-radius: 50%; }   /* 44px touch target */
+.sb-avatar .ic { width: 1.25rem; height: 1.25rem; }
+.sb-avatar .sb-ini[hidden], .sb-avatar .sb-img[hidden] { display: none; }
+.sb-avatar .sb-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+@media (hover: hover) { .sb-avatar:hover { background: color-mix(in srgb, var(--av) 30%, var(--bg)); } }
+:root[data-theme="contrast"] .sb-avatar { background: #000; color: #fff; border: 2px solid #fff; }
+
+/* the "Search" scope row (All / Title / Author / Genre) keeps working under the row */
+html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
+
+/* phones: a little tighter so the whole placeholder fits next to the two icons */
+@media (max-width: 699px) {
+  html[data-hdr="new"] .searchbar { column-gap: .5rem; padding-inline: .9rem; }
+  html[data-hdr="new"] .searchbar .rq { left: .9rem; right: .9rem; }
+  .sb-brand .mark { width: 1.9rem; height: 1.9rem; }
+  html[data-hdr="new"] #search-form .field { padding-left: .75rem; gap: .1rem; padding-right: .2rem; }
+  html[data-hdr="new"] #search-form .field input { font-size: .92rem; text-overflow: ellipsis; }
+  html[data-hdr="new"] #search-form .field .btn-fpanel, .btn-go { width: 2rem; height: 2rem; }
+  html[data-hdr="new"] #search-form .field .btn-clear { width: 1.8rem; height: 1.8rem; }
+}
+
+/* tablets and computers: name next to the logo, and the page margins of 98-desktop-layout.css */
+@media (min-width: 700px) {
+  .sb-name { display: block; }
+  html[data-hdr="new"] .searchbar { column-gap: 1.5rem; padding-inline: var(--page-pad); padding-block: .7rem; }
+  html[data-hdr="new"] .searchbar #search-form { position: relative; }
+  html[data-hdr="new"] .searchbar #search-form .rq, html[data-hdr="new"] .searchbar .rq { inset-inline: 0; left: 0; right: 0; }
+  html[data-hdr="new"] .searchbar #search-form .field { min-height: 3rem; }
+  html[data-hdr="new"] .searchbar .sfilt { max-width: 46rem; }
+  .sb-avatar { width: 2.4rem; height: 2.4rem; }
+  /* the name is in the header now, so the rail / sidebar logo is hidden while Home is open (kept in place so the tabs do not jump) */
+  body:has(#home:not([hidden])) .tb-brand { visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) { html[data-hdr="new"] #search-form .field { transition: none; } }

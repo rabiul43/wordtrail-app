@@ -648,6 +648,9 @@
     document.documentElement.setAttribute('data-quick', '');
   }
   function applyTidy() { document.documentElement.toggleAttribute('data-tidy', P.tidyPlayer !== false); }
+  /* Home header: 'new' = logo, search and account button in one row (always on tablets and computers, from 700px);
+     'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */
+  function applyHdr() { document.documentElement.setAttribute('data-hdr', (P.hdrNew === false && !matchMedia('(min-width: 700px)').matches) ? 'classic' : 'new'); }
   function applyTheme() {
     const r = document.documentElement;
     if (P.theme === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', P.theme);
