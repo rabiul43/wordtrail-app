@@ -40,7 +40,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `104-see-all-suggestions.js` | 137 | "See all" button and page, empty/error states, recent searches, live suggestions while typing |
 | `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
 | `110-collections.js` | 238 | Collections tab |
-| `120-search-recommendations.js` | 569 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
+| `120-search-recommendations.js` | 573 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 193 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 162 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
@@ -69,7 +69,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `295-account-sync.js` | 503 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `296-desktop-bar.js` | 44 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 775 | wiring |
+| `300-wiring.js` | 780 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

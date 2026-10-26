@@ -28,7 +28,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `104-see-all-suggestions.js` | 137 | 18 | 10 | 17 |
 | `105-home-loaders.js` | 209 | 18 | 9 | 21 |
 | `110-collections.js` | 238 | 21 | 11 | 39 |
-| `120-search-recommendations.js` | 569 | 64 | 22 | 61 |
+| `120-search-recommendations.js` | 573 | 64 | 22 | 61 |
 | `130-book-detail.js` | 193 | 30 | 16 | 20 |
 | `131-book-stats-share.js` | 162 | 13 | 4 | 31 |
 | `132-author-page-resume-card.js` | 95 | 6 | 4 | 26 |
@@ -87,7 +87,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `295-account-sync.js` | 503 | 68 | 11 | 3 |
 | `296-desktop-bar.js` | 44 | 5 | 1 | 3 |
 | `298-pwa.js` | 61 | 2 | 1 | 1 |
-| `300-wiring.js` | 775 | 6 | 2 | 147 |
+| `300-wiring.js` | 780 | 6 | 2 | 147 |
 
 ## Per file
 
