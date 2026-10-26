@@ -130,14 +130,23 @@
       if (x.others.length) more.append(sec('Other recordings', h('div', { class: 'list' }, x.others.map(o => bookCard(o, () => openDetail(o))))));
       if (x.author.length) more.append(sec('More by ' + first, row(x.author, 'More by ' + first)));
     })();
+    /* desktop banner: the cover, blurred, fills the back of the hero (hidden on small screens, see 98-desktop-layout.css) */
+    const detCover = coverBox(b, 'tile-cover det-cover'); if (b.id) dlMarkPaint(detCover, b.id);
+    const detBack = h('div', { class: 'det-bg', 'aria-hidden': 'true' });
+    try {
+      const fillBack = () => { const im = detCover.querySelector('img.loaded'); if (!im) return false; detBack.style.backgroundImage = 'url("' + (im.currentSrc || im.src) + '")'; detBack.classList.add('on'); return true; };
+      const mo = new MutationObserver(() => { if (fillBack()) mo.disconnect(); });
+      mo.observe(detCover, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'src'] });
+      setTimeout(() => mo.disconnect(), 15000);
+    } catch (e) { /* no blurred backdrop */ }
     d.append(
       h('div', { class: 'det-top' },
         h('button', { class: 'ib', type: 'button', 'aria-label': 'Back', onclick: closeDetail }, svgIcon('#i-back')),
         h('span', {}, 'Book details'),
         h('div', { class: 'det-tools' }, h('button', { class: 'ib', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
       h('section', { class: 'det-hero', style: '--h:' + colHue(0, (parseInt(b.id, 10) || 0) + 3) },
-        heartNode(b, 'on-detail'),
-        (() => { const c = coverBox(b, 'tile-cover det-cover'); if (b.id) dlMarkPaint(c, b.id); return c; })(),
+        detBack,
+        detCover,
         h('h1', {}, b.title),
         authorLine(b),
         meta ? h('p', { class: 'det-meta' }, meta) : null,
@@ -146,6 +155,8 @@
         stats,
         prog,
         h('div', { class: 'det-actions' },
-          h('button', { class: 'det-btn', type: 'button', onclick: () => openBook(b, { play: true }) }, svgIcon('#i-play'), listenLabel))),
+          h('button', { class: 'det-btn', type: 'button', onclick: () => openBook(b, { play: true }) }, svgIcon('#i-play'), listenLabel),
+          heartNode(b, 'on-detail'),
+          h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
       ratingsSection(b), about, bgrd, more);
   }
