@@ -84,7 +84,6 @@
     if (home) window.scrollTo(0, 0);
     wakeSync();
     miniUpdate(home);
-    try { offPromptSync(); } catch (e) { /* offline code not ready yet */ }
     if (v === 'player') paintPlayerHeart();
     histSoon();
   }
@@ -198,13 +197,16 @@
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
     if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
+  function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
+    const hl = curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (OFF.on && curTab === 'library' ? 'downloads' : curTab);
+    $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  }
   function showTab(t, keep) {
     if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; }
     if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
     curTab = t; seeOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
-    const hl = t === 'shelf' && shelfMode === 'dl' ? 'downloads' : t;   // the Downloads tab lights up on the Downloads page
-    $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    tabHlPaint();
     if (t === 'shelf') applyShelfMode();
     if (t === 'collections') renderCollections();
     if (t === 'account') renderAccount();

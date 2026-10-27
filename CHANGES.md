@@ -92,3 +92,12 @@
 
 ## Book page: "Ratings and reviews" now sits below "About this book"
 - `src/js/131-book-stats-share.js` (drawDetail): order is now About, Ratings and reviews, the Wikipedia background section, then More like this. Same order on every screen size. Nothing else changed.
+
+## Offline screen polish
+- Removed the "You're offline" popup (offsheet); the bottom strip is the one offline indicator.
+- No duplicate top note on the offline home.
+- Downloads tab lights up while the offline home shows.
+- New empty state: headline, short text, Retry connection button.
+- Settings > Storage: the book list no longer widens the tab past the sheet (grid column minmax(0,1fr)); long titles wrap to 2 lines; Remove button is 44px tall.
+- Music now follows what is heard (musNarrating): it waits while a recording loads or stalls, stops when a new recording starts loading, and starts when the voice does.
+- Offline home: the "Showing downloaded books only" line under the status bar is removed (also hidden by CSS as a safeguard).

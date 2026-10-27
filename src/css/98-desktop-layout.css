@@ -67,8 +67,7 @@
   #detail, #account { max-width: 54rem; }                    /* text-heavy pages stay readable */
 
   /* ---------- floating things that were centred on the whole screen: centre them on the content ---------- */
-  .toast, .offsheet { left: calc(var(--nav-w) + (100% - var(--nav-w)) / 2); }
-  .offsheet { width: min(calc(100% - var(--nav-w)), 46rem); }
+  .toast { left: calc(var(--nav-w) + (100% - var(--nav-w)) / 2); }
 
   /* ---------- mini player (700-1099px): a bar along the bottom of the content area ---------- */
   .mini {

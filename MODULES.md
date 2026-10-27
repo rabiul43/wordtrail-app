@@ -31,7 +31,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
 | `070-network-data.js` | 632 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
-| `080-ui-shell-favourites.js` | 272 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
+| `080-ui-shell-favourites.js` | 315 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 686 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 280 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
@@ -65,7 +65,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `260-audio-effects.js` | 369 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
-| `280-downloads-progress.js` | 728 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
+| `280-downloads-progress.js` | 712 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 393 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 540 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `296-desktop-bar.js` | 64 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
@@ -82,7 +82,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 |---|---|---|
 | `sound/music-state.js` | 48 | Music: the `MUS` state object, local test mode |
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
-| `sound/music-bus.js` | 64 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
+| `sound/music-bus.js` | 70 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
 | `sound/music-library.js` | 123 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
 | `sound/music-playback.js` | 274 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
 | `sound/music-offline.js` | 136 | Music: "Download music for offline" |
@@ -105,7 +105,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/sound-presets.js` | 82 | Sound screen: hear a sound, quick presets and undo |
 | `sound/sound-core.js` | 63 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
-| `sound/sound-screen.js` | 184 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
+| `sound/sound-screen.js` | 187 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
 
 ## CSS files (`src/css/`)

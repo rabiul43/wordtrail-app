@@ -216,7 +216,7 @@
       }
       if (OFF.on) [rows, secs].forEach(m => m.forEach((flags, node) => { if (flags.every(Boolean)) node.classList.add('off-empty'); }));
       let note = v.querySelector(':scope > .off-note');
-      if (OFF.on && hid) {
+      if (OFF.on && hid && sel !== '#home') {
         if (!note) { note = h('p', { class: 'off-note', role: 'status' }); (v.firstElementChild ? v.firstElementChild.after(note) : v.append(note)); }
         const t = shown ? 'Showing downloaded books only' : 'None of these books are downloaded';
         if (note.textContent !== t) note.textContent = t;
@@ -246,7 +246,10 @@
     $('#off-count').textContent = vis.length ? plural(vis.length, 'book') : '';
     const none = $('#off-none');
     none.hidden = vis.length > 0 || !OFF.ready;
-    $('#off-none-t').textContent = qs && all.length ? 'No downloaded book matches your search.' : 'No downloads yet. When you are back online, open a book and tap Download.';
+    const noMatch = !!(qs && all.length);
+    $('#off-none-h').textContent = noMatch ? 'No matches' : 'No downloaded books yet';
+    $('#off-none-t').textContent = noMatch ? 'No downloaded book matches your search.' : 'Download books while online to listen offline.';
+    $('#off-retry').hidden = noMatch;
     grid.hidden = !vis.length;
   }
   function offSearchInit() {
@@ -332,37 +335,12 @@
     if (forced) { const g = document.createElement('button'); g.type = 'button'; g.className = 'offbar-go'; g.textContent = 'Go online'; bar.append(g); }
     bar.classList.toggle('forced', forced);
   }
-  /* Offline prompt: when the connection is lost while browsing (anywhere except the reader), a card offers "Go to Downloads".
-     "No thanks" keeps it away until the connection has been back and gone again. It is never shown in the player, nor for "Downloads only". */
-  let offPromptSkip = false, offPromptT = 0;
-  function offPromptShow(on) {
-    const sh = $('#offsheet'); if (!sh) return;
-    clearTimeout(offPromptT);
-    if (on) {
-      if (!sh.hidden) return;
-      sh.hidden = false; void sh.offsetWidth; sh.classList.add('show');
-    } else if (!sh.hidden) {
-      sh.classList.remove('show');
-      offPromptT = setTimeout(() => { sh.hidden = true; }, 280);
-    }
-  }
-  function offPromptSync() {
-    if (!OFF.on || offForced()) { offPromptSkip = false; offPromptShow(false); return; }   // online again, or chosen by hand
-    offPromptShow(el.player.hidden && !offPromptSkip);   // el.player.hidden = outside the reader
-  }
-  function offPromptInit() {
-    const sh = $('#offsheet'); if (!sh) return;
-    $('.offsheet-no', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); });
-    $('.offsheet-go', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); showTab('downloads'); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sh.hidden && sh.classList.contains('show')) { offPromptSkip = true; offPromptShow(false); } });
-  }
   function offRefresh() {
     const bar = $('#offbar'); if (!bar) return;
-    offPromptSync();
     if (OFF.on) {
       clearTimeout(offBackT);
       const forced = offForced();
-      const t = forced ? 'Downloads only' : (OFF.ready ? "You're offline \u2014 " + plural(offBooks(), 'book') + ' available' : "You're offline");
+      const t = forced ? 'Downloads only' : (OFF.ready && offBooks() > 0 ? "You're offline \u2014 " + plural(offBooks(), 'book') + ' available' : "You're offline");
       bar.classList.remove('back');
       offBarText(bar, (forced ? 'f|' : 'o|') + t, t, forced);
       bar._was = forced ? 'f' : 'o';
@@ -381,6 +359,7 @@
     offGridDraw();
     shelfDlDraw();
     offHide();
+    tabHlPaint();   // the Downloads tab lights up while the offline home is showing
   }
   /* navigator.onLine is often wrong (some Android/VPN/Wi-Fi setups report false while the internet works), so "offline" is only
      believed after a real request fails. Any answer at all (even an opaque one) means the internet is there. */
@@ -409,6 +388,10 @@
     toast('Back online.', 2200);
     setTimeout(() => { autoPrefetch(true); dlResumePending(false); }, 1500);   // what was held back while Downloads only was on
   }
+  function offRetry() {   // the empty state's button: ask the network for real, say so when it is still down
+    const b = $('#off-retry'); if (b) b.disabled = true;
+    offProbe().then(alive => { if (alive) { OFF.net = false; offEval(); toast('Back online.', 2200); } else toast('Still offline. Check your connection.', 3000); }).finally(() => { if (b) b.disabled = false; });
+  }
   function offSetAuto(v) { P.offAuto = !!v; savePrefs(); offSyncSwitches(); offSet(); }
   function offApply(on) {
     if (on === OFF.on) { offRefresh(); return; }
@@ -433,7 +416,8 @@
       toast(offMsg(), 3500);
     }, true);
     const bar = $('#offbar'); if (bar) bar.addEventListener('click', e => { if (e.target.closest && e.target.closest('.offbar-go')) offSetForce(false); });
-    offSyncSwitches(); offSearchInit(); offPromptInit();
+    const rt = $('#off-retry'); if (rt) rt.addEventListener('click', offRetry);
+    offSyncSwitches(); offSearchInit();
     Promise.resolve(dlReady).then(() => { OFF.ready = true; offRecentsRefresh(); offRefresh(); });
     offSet();   // the page may open while offline
   }

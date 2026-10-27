@@ -113,17 +113,6 @@
 </svg>
 
 <div id="offbar" class="offbar" role="status" aria-live="polite" hidden></div>
-<section id="offsheet" class="offsheet" role="dialog" aria-labelledby="offsheet-t" aria-describedby="offsheet-d" hidden>
-  <svg class="offsheet-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10m0 0-4-4m4 4 4-4M5 19h14"/></svg>
-  <div class="offsheet-body">
-    <h2 id="offsheet-t">You're offline</h2>
-    <p id="offsheet-d">Listen to your downloaded books, or find new books to download when you're back online.</p>
-    <div class="offsheet-acts">
-      <button type="button" class="offsheet-no">No thanks</button>
-      <button type="button" class="offsheet-go">Go to Downloads</button>
-    </div>
-  </div>
-</section>
 
 <!-- Slim app bar (styles in 99-home-header.css): logo (home link), search, account. Shown on every Home-area screen except the Library,
      which has its own header above, and never in the player. showView() in 080 shows and hides it. -->
@@ -193,7 +182,9 @@
     <div id="off-grid" class="off-grid"></div>
     <div id="off-none" class="tab-empty off-none" hidden>
       <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>
+      <h2 id="off-none-h">No downloaded books yet</h2>
       <p id="off-none-t"></p>
+      <button id="off-retry" type="button" class="off-retry">Retry connection</button>
     </div>
   </section>
 

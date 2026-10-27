@@ -581,6 +581,7 @@ html[data-off] #rq, html[data-off] #prog { display: none !important; }
 .off-hide, .off-empty { display: none !important; }   /* offline: books that are not on this device, and rows and sections left with none */
 .off-note { margin: .2rem 1rem .6rem; font-size: .8rem; color: var(--muted); }
 .off-note[hidden] { display: none; }
+#home > .off-note { display: none !important; }   /* the offline home already says it: the Downloaded heading and the bottom strip */
 .ht-list { gap: .9rem; }
 .ht-list li { font-size: .95rem; grid-template-columns: 2rem 1fr; }
 .ht-sec { margin: 1rem 0 .5rem; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -766,17 +767,14 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .fol-un { flex: none; min-height: 2.75rem; padding: 0 .85rem; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: var(--r-pill); font: 600 var(--small) var(--font-ui); cursor: pointer; }
 .tile-new { position: absolute; top: .4rem; right: .4rem; z-index: 1; background: var(--accent); color: var(--accent-ink); font: 700 .72rem/1.2 var(--font-ui); padding: .12rem .55rem; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); }
 
-/* Offline prompt (like YouTube's "You're offline"): a card above the tab bar, shown outside the reader only. Logic: offPrompt* in 280. */
-.offsheet { position: fixed; z-index: 10; left: 50%; width: min(100%, 46rem); box-sizing: border-box; bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + var(--offbar-h, 0px)); display: flex; gap: 1.1rem; align-items: flex-start; padding: 1.25rem 1.25rem 1.4rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--r-card) var(--r-card) 0 0; box-shadow: 0 -8px 28px rgba(0,0,0,.28); transform: translate(-50%, 140%); opacity: 0; transition: transform .26s var(--ease), opacity .2s var(--ease); }
-.offsheet[hidden] { display: none; }
-.offsheet.show { transform: translate(-50%, 0); opacity: 1; }
-.offsheet-ic { flex: none; width: 2.8rem; height: 2.8rem; padding: .65rem; box-sizing: border-box; border-radius: 50%; background: var(--surface); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.offsheet-body { flex: 1; min-width: 0; }
-.offsheet h2 { margin: 0 0 .4rem; font: 700 1.05rem/1.25 var(--font-ui); }
-.offsheet p { margin: 0 0 1rem; font: 400 .92rem/1.4 var(--font-ui); opacity: .82; }
-.offsheet-acts { display: flex; justify-content: flex-end; gap: .75rem; }
-.offsheet-acts button { position: relative; min-height: 2.7rem; padding: 0 1.3rem; border: 0; border-radius: var(--r-pill); font: 600 .92rem/1 var(--font-ui); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.offsheet-no { background: transparent; color: var(--accent); }
-.offsheet-go { background: var(--accent); color: var(--accent-ink); }
-.offsheet-acts button:focus-visible { outline: var(--focus-w, 2px) solid currentColor; outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .offsheet { transition: none; } }
+
+/* Offline home polish: room under the search bar, one clear empty state with a Retry button */
+.off-home { padding-top: 1.1rem; }
+.off-none { gap: .35rem; padding: 2.2rem 1.2rem 1.8rem; }
+.off-none .ic { width: 3rem; height: 3rem; stroke-width: 1.8; margin-bottom: .4rem; }
+.off-none h2 { margin: 0; }
+.off-none p { margin: 0 0 .9rem; }
+.off-retry { min-height: 2.75rem; padding: 0 1.4rem; border: 1.5px solid var(--accent); border-radius: var(--r-pill); background: transparent; color: var(--accent); font: 600 .92rem/1 var(--font-ui); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.off-retry[hidden] { display: none; }
+.off-retry:disabled { opacity: .55; cursor: default; }
+.off-retry:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: 2px; }

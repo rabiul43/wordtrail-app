@@ -107,7 +107,10 @@
     $('#amb-scenes').addEventListener('click', ambPresetClear); $('#amb-sug-go').addEventListener('click', ambPresetClear);
     document.addEventListener('visibilitychange', () => { if (document.hidden && AMB.preview) { AMB.preview = false; ambSync(); } });   // a mixer left open with the screen off stops playing
     ['play', 'playing', 'pause', 'ended', 'waiting', 'stalled', 'error', 'emptied', 'abort', 'canplay', 'loadstart', 'loadedmetadata', 'seeked'].forEach(ev => audio.addEventListener(ev, ambSync));   // the sound follows what is really heard: it waits for the audio to start, and stops if it stalls or fails
-    audio.addEventListener('play',  () => { musicAttach(); musicPlay(); });
+    audio.addEventListener('play',  () => { musicAttach(); musicPlay(); });   // musicPlay waits (musNarrating) until the recording is really playing
+    ['playing', 'canplay', 'seeked', 'waiting', 'stalled', 'loadstart', 'emptied', 'abort', 'error'].forEach(ev => audio.addEventListener(ev, () => {   // music follows what is heard: it starts when the voice does and stops while a recording loads or stalls
+      if (musNarrating()) { musicAttach(); musicPlay(); } else if (MUS.live || MUS.playing) musicPause();
+    }));
     audio.addEventListener('pause', () => musicPause());
     audio.addEventListener('ended', () => musicPause());
     audio.addEventListener('playing', () => { if (S.curId != null && S.curId >= 0) ambStory(S.curId); });   // after a jump or search the sentence is already current, so setCurrent will not run for it

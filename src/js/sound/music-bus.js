@@ -21,8 +21,14 @@
      running for the music even when ambient is silent. */
   const musicActive = () => !!(MUS.on && MUS.live);
 
-  /* The book's narrator is being played (not paused or finished). Independent of ambient. */
-  const musNarrating = () => !!S.book && !audio.paused && !audio.ended;
+  /* The book's narrator is really being HEARD (not just asked to play): not paused, finished, failed, loading a recording or stalled
+     for lack of data. Same rule as ambPlaying() for the background sounds, so music never plays over a silent, loading book.
+     A short seek keeps the music as it is. Independent of ambient. */
+  const musNarrating = () => {
+    if (!S.book || audio.paused || audio.ended || audio.error) return false;
+    if (audio.seeking) return !!(MUS.live || MUS.playing);
+    return !S.loadingAudio && audio.readyState > 2;
+  };
 
   /* ---------- Ducking under the narrator ----------
      Same states as the ambient duck (ambVoiceState: s speaking, p pause, u unknown, o off), but its own
