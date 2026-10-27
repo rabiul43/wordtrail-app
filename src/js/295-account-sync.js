@@ -480,20 +480,21 @@
     if (p) p.textContent = i && !acStale ? 'Signed in as ' + (i.email || i.name) : 'Your library, settings and progress. Sign in to sync them across devices.';
     acAvatar(i && !acStale ? i : null);
   }
-  /* the round account button in the Home header: photo, else the first letter of the name or email, else a person icon (signed out). Tapping it opens the Account tab. */
+  /* the round account button (the Library header and the slim bar on the other screens, both `.sb-avatar`): photo, else the first letter of the name or email, else a person icon (signed out). Tapping it opens the Account tab. */
   function acAvatar(i) {
-    const b = document.getElementById('sb-avatar'); if (!b) return;
-    const ic = b.querySelector('.ic'), ini = b.querySelector('.sb-ini'), img = b.querySelector('.sb-img');
-    const who = i ? String(i.name || i.email || '').trim() : '';
-    const letter = who ? Array.from(who)[0].toUpperCase() : '';
-    ini.textContent = letter; ini.hidden = !letter || !!(i && i.photo);
-    ic.style.display = letter ? 'none' : '';
-    if (i && i.photo) { if (img.getAttribute('src') !== i.photo) { img.onerror = () => { img.hidden = true; ini.hidden = !letter; ic.style.display = letter ? 'none' : ''; }; img.src = i.photo; } img.hidden = false; ic.style.display = 'none'; }
-    else { img.hidden = true; img.removeAttribute('src'); }
-    b.classList.toggle('signed', !!i);
-    b.setAttribute('aria-label', i ? 'Account: ' + (i.email || i.name) : 'Account: sign in');
+    document.querySelectorAll('.sb-avatar').forEach(b => {
+      const ic = b.querySelector('.ic'), ini = b.querySelector('.sb-ini'), img = b.querySelector('.sb-img');
+      const who = i ? String(i.name || i.email || '').trim() : '';
+      const letter = who ? Array.from(who)[0].toUpperCase() : '';
+      ini.textContent = letter; ini.hidden = !letter || !!(i && i.photo);
+      ic.style.display = letter ? 'none' : '';
+      if (i && i.photo) { if (img.getAttribute('src') !== i.photo) { img.onerror = () => { img.hidden = true; ini.hidden = !letter; ic.style.display = letter ? 'none' : ''; }; img.src = i.photo; } img.hidden = false; ic.style.display = 'none'; }
+      else { img.hidden = true; img.removeAttribute('src'); }
+      b.classList.toggle('signed', !!i);
+      b.setAttribute('aria-label', i ? 'Account: ' + (i.email || i.name) : 'Account: sign in');
+    });
   }
-  { const b = document.getElementById('sb-avatar'); if (b) b.addEventListener('click', () => { const t = document.querySelector('.tab[data-tab="account"]'); if (t) t.click(); }); }
+  document.querySelectorAll('.sb-avatar').forEach(b => b.addEventListener('click', () => { const t = document.querySelector('.tab[data-tab="account"]'); if (t) t.click(); }));
   acTabMark();
 
   /* start: signed-in users reconnect a few seconds after the app opens; guests never download the sign-in code */

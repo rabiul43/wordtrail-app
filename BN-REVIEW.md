@@ -87,3 +87,9 @@ Western digits are kept everywhere (the app prints them that way: 2 ঘণ্ট
 - The Feature guide and How to use sheets (long explanations), Settings descriptions, author pages, reviews and the sync dashboard.
 - Book titles, authors, genres from the catalogue and the reader text are never translated (by design, see `I18N_SKIP`).
 - The first-run onboarding appears before a language can be chosen, so a new user sees English. Bengali there only shows for someone who set Language to বাংলা first (for example after a reset or on a second device with synced prefs). Choosing "Bengali" as native language in step 2 does not switch the app language.
+
+## Added with the slim app bar and the clickable logo
+
+| English | Current | Question |
+|---|---|---|
+| Wordtrail home (logo link label, read by screen readers) | Wordtrail হোম | The app calls the Home tab "ঘর" elsewhere. Keep "হোম" here, or use "Wordtrail-এর ঘর"? |

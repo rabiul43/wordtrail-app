@@ -36,6 +36,10 @@ html[data-hdr="new"] .searchbar.stuck { box-shadow: var(--shadow-sm); }
 .sb-brand { align-items: center; gap: .55rem; color: var(--accent); }
 .sb-brand .mark { width: 2rem; height: 2rem; flex: none; }
 .sb-name { display: none; font: 600 1.15rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+/* the logo is a link to Home now (data-home, see goHome in 080): same look, a 44px target (the negative margin keeps the old spacing), a focus ring */
+.sb-brand { min-height: 2.75rem; margin-inline: -.3rem; padding-inline: .3rem; border-radius: var(--r-ctl); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.sb-brand:focus-visible, .ab-brand:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+.sb-brand:active, .ab-brand:active { opacity: .75; }
 
 /* the search field: text on the left, filters and search on the right */
 html[data-hdr="new"] #search-form .field {
@@ -98,6 +102,41 @@ html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
 @media (prefers-reduced-motion: reduce) { html[data-hdr="new"] #search-form .field { transition: none; } }
 
 /* ==========================================================================
+   Slim app bar (#appbar): logo (home link), search icon, account button
+   --------------------------------------------------------------------------
+   showView() (080) shows it on every Home-area screen except the Library, which keeps its own header above (Collections, My books,
+   Account, the book page, See all), never in the player, and sets <html data-appbar> at the same time. Sticky like the Library header.
+   Its content uses the same column as the pages (.home), so the logo and the account button stay in the same place on every screen.
+   The account button is the same `.sb-avatar` as in the Library header (acAvatar in 295 paints both).
+   ========================================================================== */
+.appbar { position: sticky; top: 0; z-index: 9; background: var(--bg); border-bottom: 1px solid var(--line); transition: box-shadow var(--dur) var(--ease), background-color var(--dur) var(--ease); }
+.appbar[hidden] { display: none; }
+.appbar.stuck { background: var(--glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: var(--shadow-sm); }
+html[data-lite] .appbar.stuck { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--bg); }
+html[data-appbar] { --ab-h: calc(3.25rem + env(safe-area-inset-top, 0px) + 1px); }
+.ab-in { box-sizing: border-box; display: flex; align-items: center; gap: .4rem; max-width: 46rem; height: calc(3.25rem + env(safe-area-inset-top, 0px)); margin: 0 auto; padding: env(safe-area-inset-top, 0px) 1.1rem 0; }
+.ab-brand { display: flex; align-items: center; gap: .55rem; min-height: 2.75rem; margin-inline: -.3rem auto; padding-inline: .3rem; border-radius: var(--r-ctl); color: var(--accent); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.ab-brand .mark { width: 1.9rem; height: 1.9rem; flex: none; }
+.ab-name { font: 600 1.15rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+.ab-search { display: grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+.ab-search .ic { width: 1.3rem; height: 1.3rem; }
+@media (hover: hover) { .ab-search:hover { background: var(--surface); color: var(--ink); } }
+.ab-search:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+.appbar .sb-avatar { display: grid; }
+.sb-avatar[aria-current="page"] { box-shadow: 0 0 0 2px var(--accent); }
+/* the page starts right under the bar (the bar already clears the notch); things that stick to the top of a page stick under the bar */
+html[data-appbar] .home { padding-top: .9rem; }
+html[data-appbar] .seeall-head.col-sticky { top: var(--ab-h); }
+@media (min-width: 700px) {
+  .ab-in { max-width: 82rem; padding-inline: var(--page-pad); }
+  .sb-avatar { width: 2.4rem; height: 2.4rem; }
+}
+@media (min-width: 1600px) { .ab-in { max-width: 92rem; } }
+/* with the full sidebar open the name is already in the sidebar (as in the Library header), so the bar keeps only search and account */
+@media (min-width: 700px) { html[data-nav="open"] body:not(:has(#player:not([hidden]))) .ab-brand { display: none; } html[data-nav="open"] body:not(:has(#player:not([hidden]))) .ab-search { margin-inline-start: auto; } }
+@media (prefers-reduced-motion: reduce) { .appbar { transition: none; } }
+
+/* ==========================================================================
    Side rail (tablet and computer, >= 700px)
    Default: narrow rail, icon over a small label, the open page filled with a bar on its left edge,
    Account pinned at the bottom. The menu button at the top opens it into a sidebar (icon + label in a row,
@@ -108,11 +147,14 @@ html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
   .tabbar { transition: width var(--dur) var(--ease); }
   body { transition: padding-inline-start var(--dur) var(--ease); }
 
-  .tb-brand { display: flex; align-items: center; justify-content: center; gap: .65rem; flex: none; width: 100%; height: 2.9rem; margin-bottom: .9rem; padding: 0; border: 0; border-radius: var(--r-ctl); background: transparent; color: var(--accent); cursor: pointer; }
-  @media (hover: hover) { .tb-brand:hover { background: var(--surface); } }
-  .tb-brand:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: -2px; }
-  .tb-brand .tb-menu { width: 1.45rem; height: 1.45rem; flex: none; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
-  .tb-brand .mark, .tb-brand span { display: none; }
+  /* top of the rail: the menu button (opens and closes the sidebar) and, only while the sidebar is open, the logo and name as a link to Home */
+  .tb-brand { display: flex; align-items: center; gap: .15rem; flex: none; width: 100%; height: 2.9rem; margin-bottom: .9rem; }
+  .tb-toggle, .tb-home { height: 100%; border: 0; border-radius: var(--r-ctl); background: transparent; color: var(--accent); cursor: pointer; }
+  .tb-toggle { display: grid; place-items: center; flex: 1; min-width: 0; padding: 0; }
+  .tb-home { display: none; align-items: center; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  @media (hover: hover) { .tb-toggle:hover, .tb-home:hover { background: var(--surface); } }
+  .tb-toggle:focus-visible, .tb-home:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: -2px; }
+  .tb-toggle .tb-menu { width: 1.45rem; height: 1.45rem; flex: none; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
   body:has(#player:not([hidden])) .tb-brand { visibility: hidden; }
 
   /* narrow rail items: icon over label, filled when open, bar on the left edge */
@@ -124,9 +166,10 @@ html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
 
   /* opened: a sidebar */
   html[data-nav="open"] body:not(:has(#player:not([hidden]))) { --nav-w: 14rem; --nav-pad: .75rem; }
-  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand { justify-content: flex-start; padding: 0 .9rem; }
-  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand .mark { display: block; width: 1.8rem; height: 1.8rem; flex: none; }
-  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-brand span { display: inline; font: 600 1.3rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-toggle { flex: none; width: 2.9rem; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-home { display: flex; flex: 1; min-width: 0; gap: .65rem; padding: 0 .6rem; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-home .mark { display: block; width: 1.8rem; height: 1.8rem; flex: none; }
+  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tb-home span { font: 600 1.3rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
   html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab { flex-direction: row; justify-content: flex-start; gap: .85rem; min-height: 2.9rem; padding: 0 .9rem; font-size: .92rem; }
   html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab svg { width: 1.35rem; height: 1.35rem; }
   /* the name is in the sidebar now, so the Home header drops its own */

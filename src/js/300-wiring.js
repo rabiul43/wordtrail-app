@@ -36,6 +36,7 @@
     initPullToRefresh();
     initRecentSearches();
     initSearchFilters();
+    appBarInit();
     $('#mini-open').addEventListener('click', () => { showView('player'); requestAnimationFrame(() => { try { resnap(); } catch (e) { /* not ready */ } }); });
     $('#mini-play').addEventListener('click', togglePlay);
     /* Close: stop playback and tuck the bar away. It returns when a book is opened or played again. */

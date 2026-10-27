@@ -38,6 +38,7 @@
     $('#detail').hidden = !det;
     if (det && DET.stale && DET.book) { DET.stale = false; detDraw(); }
     $('#tabbar').hidden = !home;
+    appBarShow(home && el.home.hidden);   // every Home-area screen except the Library (which has its own header)
     el.player.hidden = v !== 'player';
     if (home) window.scrollTo(0, 0);
     wakeSync();
@@ -45,6 +46,41 @@
     try { offPromptSync(); } catch (e) { /* offline code not ready yet */ }
     if (v === 'player') paintPlayerHeart();
     histSoon();
+  }
+  /* ------ slim app bar (#appbar) and the logo as a Home link ------
+     The Library has its own header (logo, search, account). Collections, My books, Account, the book page and See all get the slim bar
+     (logo, search icon, account button) so the logo and the account button are on every screen except the player. */
+  function appBarShow(on) {
+    const b = $('#appbar'); if (!b) return;
+    b.hidden = !on;
+    document.documentElement.toggleAttribute('data-appbar', !!on);
+    $$('.sb-avatar').forEach(a => { if (curTab === 'account' && on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  }
+  /* The logo goes Home: from the book page, See all and the other tabs it returns to the Library (and drops an open search);
+     on the Library it empties an open search, or scrolls to the top. */
+  function goHome() {
+    if (!el.player.hidden) return;
+    const here = curTab === 'library' && !seeOpen && !DET.book && !DET.author;
+    if (el.results && !el.results.hidden) clearSearch(false);
+    if (here) { window.scrollTo({ top: 0, behavior: motionOk() }); return; }
+    showTab('library');
+  }
+  /* The search icon in the slim bar: to the Library with the cursor in the search field (focus runs inside the tap, so phones open the keyboard). */
+  function appBarSearch() {
+    if (!el.player.hidden) return;
+    if (curTab !== 'library' || seeOpen || DET.book || DET.author) showTab('library');
+    window.scrollTo(0, 0);
+    el.q.focus();
+  }
+  function appBarInit() {
+    document.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('a[data-home]'); if (!a) return;
+      if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // let "open in new tab" work
+      e.preventDefault(); goHome();
+    });
+    const s = $('#ab-search'); if (s) s.addEventListener('click', appBarSearch);
+    const b = $('#appbar');
+    if (b) addEventListener('scroll', () => { b.classList.toggle('stuck', window.scrollY > 2); }, { passive: true });
   }
   guideDoc('player', 'Mini player', "When you leave a book, a bar at the bottom keeps it one tap away. Tap it to return, or tap its play button. Tap the x to stop and close it; it comes back when you play a book again.", '2026-10-10');
   /* ------ mini-player: keeps the current book one tap away while browsing ------ */
