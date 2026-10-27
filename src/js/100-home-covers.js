@@ -245,15 +245,35 @@
       const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', width: '200', height: '300', referrerpolicy: 'no-referrer' });   // width/height = the 2:3 shape (the CSS box already fixes the real size; the colour behind is the placeholder)
       const isSe = () => img.dataset.se === '1';
       const good = () => isSe() || st !== 'auto' || (img.naturalWidth >= 300 && img.naturalHeight >= img.naturalWidth * 1.25 && img.naturalHeight <= img.naturalWidth * 1.9);
-      const next = () => {
+      /* A cover that neither loads nor fails (a stalled connection) never reaches the next source by itself.
+         So each try gets a time limit, counted only while the image is really on screen (a lazy image far below
+         has not started yet). A slow try then repeats once through the Worker (the same route the audio uses),
+         and only after that moves on to the next source. */
+      let cur = -1, viaPx = false, tm = 0;
+      const load = (u, o) => {
+        clearTimeout(tm); img.dataset.se = o ? '1' : ''; img.src = u;
+        const watch = () => {
+          if (box._tok !== tok || !img.isConnected || img.classList.contains('loaded')) return;
+          const r = img.getBoundingClientRect();
+          if (!r.width || r.bottom < -1500 || r.top > innerHeight + 1500) { tm = setTimeout(watch, 3000); return; }   // not shown or far away: not started yet
+          next();
+        };
+        tm = setTimeout(watch, 7000);
+      };
+      const next = (noRetry) => {
+        clearTimeout(tm);
+        if (box._tok !== tok) return;
+        if (!noRetry && cur >= 0 && !viaPx) { const p = px(srcs[cur]); if (p !== srcs[cur]) { viaPx = true; load(p, seList[cur]); return; } }   // same cover, through the Worker
+        viaPx = false;
         if (gk && seList.length && i === seList.length) store.set(gk, { t: Date.now() });   // every guess failed
-        if (i < srcs.length) { const o = seList[i]; img.dataset.se = o ? '1' : ''; img.src = srcs[i++]; return; }
+        if (i < srcs.length) { cur = i; const o = seList[i]; load(srcs[i++], o); return; }
+        cur = -1;
         if (st === 'se' || tried) return;
         tried = true;
         openLibraryCover(b).then(u => { if (u && !srcs.includes(u)) { img.dataset.se = ''; img.src = st === 'auto' ? u.replace('-M.jpg', '-L.jpg') : u; } });
       };
-      img.addEventListener('load', () => { if (img.naturalWidth > 1 && good()) { img.classList.add('loaded'); if (large && img.naturalHeight) { const po = box.parentNode; if (po && po.classList && po.classList.contains('pcover-poster')) po.style.setProperty('--ar', String(Math.min(1.8, Math.max(.5, img.naturalWidth / img.naturalHeight)).toFixed(3))); } if (gk && isSe()) store.set(gk, { u: img.src }); } else next(); });   // the player poster takes the cover's own shape, so a wide cover is shown whole instead of cropped
-      img.addEventListener('error', next);
+      img.addEventListener('load', () => { if (img.naturalWidth > 1 && good()) { clearTimeout(tm); img.classList.add('loaded'); if (large && img.naturalHeight) { const po = box.parentNode; if (po && po.classList && po.classList.contains('pcover-poster')) po.style.setProperty('--ar', String(Math.min(1.8, Math.max(.5, img.naturalWidth / img.naturalHeight)).toFixed(3))); } if (gk && isSe()) store.set(gk, { u: img.src }); } else next(true); });   // the player poster takes the cover's own shape, so a wide cover is shown whole instead of cropped
+      img.addEventListener('error', () => next());
       box.append(img);   // attached straight away: a detached lazy image may never start loading
       next();
     };

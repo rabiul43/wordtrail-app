@@ -96,7 +96,7 @@
   function verPrep(id, info) {
     if (VER.pre.has(id) || !S.book || (navigator.connection && navigator.connection.saveData)) return;
     const sp = verSpot(info); if (!sp) return;
-    const a = new Audio(); a.preload = 'metadata'; a.src = sp.url;
+    const a = new Audio(); a.preload = 'metadata'; a.src = px(sp.url); // same Worker route as the main player
     if (sp.time > 0) a.addEventListener('loadedmetadata', () => { try { a.currentTime = sp.time; } catch (e) { /* plays from the start */ } }, { once: true });
     VER.pre.set(id, { a, sp });
   }
@@ -111,7 +111,7 @@
       btn.disabled = false;
       sp = verSpot(info);
       if (!sp) { toast('No sample available for this reader', 2500); return; }
-      a = new Audio(); a.src = sp.url;
+      a = new Audio(); a.src = px(sp.url);
       if (sp.time > 0) a.addEventListener('loadedmetadata', () => { try { a.currentTime = sp.time; } catch (e) { /* plays from the start */ } }, { once: true });
     }
     const resume = !audio.paused;

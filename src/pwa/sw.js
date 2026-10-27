@@ -160,11 +160,13 @@ async function cover(event) {
     return hit;
   }
   if (!noCors.has(host)) {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);   // a stalled host must not hold the cover (or double the wait with the second try below)
     try {
-      const r = await fetch(url, { mode: 'cors', credentials: 'omit' });
+      const r = await fetch(url, { mode: 'cors', credentials: 'omit', signal: ctl.signal });
+      clearTimeout(to);
       if (r.ok) { event.waitUntil(keepCover(cache, url, r.clone())); return r; }
       return r;                                               // a real answer (404 ...): shown as it is, not kept
-    } catch (e) { /* offline, or the host refuses CORS: try the plain request below */ }
+    } catch (e) { clearTimeout(to); if (ctl.signal.aborted) return Response.error(); /* offline, or the host refuses CORS: try the plain request below */ }
   }
   const r = await fetch(req);                                 // the original request, as before there was a service worker
   if (r && r.type === 'opaque') noCors.add(host);             // it works only without CORS: remember, and do not keep it
