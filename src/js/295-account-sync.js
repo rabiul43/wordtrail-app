@@ -424,15 +424,51 @@
     } finally { acBusy = false; renderAcctSync(); }
   }
 
+  async function acWipeCloud() {   // removes every synced item of this account from the cloud (this device keeps its own copy)
+    const snap = await acCol().get(); let batch = acDb.batch(), n = 0;
+    for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = acDb.batch(); } }
+    await batch.commit();
+    try { localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
+  }
   async function acDeleteCloud() {
-    if (!acUser || !confirm('Delete everything saved in your account? Data on this device is kept.')) return;
+    if (!acUser) { toast('Still connecting. Try again in a moment.', 3000); return; }
+    if (!confirm('Delete everything saved in your account? Data on this device is kept.')) return;
+    try { await acWipeCloud(); toast('Cloud data deleted.', 2500); }
+    catch (e) { toast('Could not delete the cloud data.', 3500); }
+  }
+  /* Delete account: two confirmations, then the cloud data, then the sign-in itself. Data on this device is kept, and ratings or
+     reviews already published stay (they belong to the book pages). Firebase asks for a recent sign-in before it deletes an
+     account; when it does, the cloud data is already gone and the person is told to sign in again and repeat the tap. */
+  async function acDeleteAccount() {
+    if (!acUser || !acInfo()) { toast('Still connecting. Try again in a moment.', 3000); return; }
+    if (!confirm('Delete your account? Everything saved in your account and your sign-in are removed. Data on this device is kept. Ratings and reviews you already published stay unless you remove them first. This cannot be undone.')) return;
+    if (!confirm('Last check: delete your account for good?')) return;
     try {
-      const snap = await acCol().get(); let batch = acDb.batch(), n = 0;
-      for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = acDb.batch(); } }
-      await batch.commit();
-      try { localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
-      toast('Cloud data deleted.', 2500);
-    } catch (e) { toast('Could not delete the cloud data.', 3500); }
+      await acWipeCloud();
+      await acUser.delete();
+    } catch (e) {
+      if (e && e.code === 'auth/requires-recent-login') toast('For safety, sign out, sign in again, then tap Delete account again.', 6000);
+      else toast('Could not delete the account.', 4000);
+      renderAcctSync(); return;
+    }
+    acUser = null; acStale = false; acSaveInfo(null); try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
+    acDirty.clear(); acDirtySave(); acMsg = ''; renderAcctSync();
+    toast('Account deleted.', 3500);
+  }
+  /* Account > Data and privacy: export works signed in or out; the two deletes need a signed-in account */
+  function renderAcctData() {
+    const box = $('#acct-data'); if (!box) return;
+    box.textContent = '';
+    const signed = !!acInfo() && !acStale;
+    const row = (icon, name, desc, fn, cls) => {
+      return h('button', { class: 'acct-link' + (cls ? ' ' + cls : ''), type: 'button', onclick: fn }, acSvg('<use href="#' + icon + '"/>'), h('span', {}, name, h('small', {}, desc)), acSvg('<use href="#i-go"/>', 'ic go'));
+    };
+    box.append(h('h2', { id: 'acct-data-h' }, 'Data and privacy'),
+      row('i-m-download', 'Export my data', 'Download a backup file of your saved books, words, bookmarks and positions', () => { const b = $('#b-bkdl'); if (b) b.click(); }),   // the same button as Settings > Backup, so the backup code is not called from here
+      ...(signed ? [
+        row('i-m-trash', 'Delete my cloud data', 'Removes what is synced to your account. Data on this device is kept', acDeleteCloud),
+        row('i-m-person', 'Delete account', 'Removes your account and everything saved in it', acDeleteAccount, 'danger')] : []));
+    box.hidden = false;
   }
 
   const acSvg = (d, cls) => { const n = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); n.setAttribute('viewBox', '0 0 24 24'); n.setAttribute('class', cls || 'ic'); n.setAttribute('aria-hidden', 'true'); n.innerHTML = d; return n; };
@@ -440,6 +476,7 @@
   const AC_CLOUD = '<path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 8.6 4.7 4.7 0 0 1 17 18H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 13.2 11.4 15l3.2-3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
   function renderAcctSync() {
     acTabMark();
+    renderAcctData();
     const box = $('#acct-sync'); if (!box) return;
     box.textContent = '';
     const info = acInfo();
@@ -469,8 +506,7 @@
         h('button', { class: 'btn ghost', type: 'button', onclick: acSignOut }, 'Sign out')),
       err,
       h('details', { class: 'acct-more' }, h('summary', {}, 'What to sync'),
-        h('div', { class: 'acct-opts' }, rows),
-        h('div', { class: 'acct-links' }, h('button', { type: 'button', class: 'danger', onclick: acDeleteCloud }, 'Delete my cloud data')))));
+        h('div', { class: 'acct-opts' }, rows))));
   }
   /* shows who is signed in: a green dot on the Account tab, and the line under the Account title */
   function acTabMark() {

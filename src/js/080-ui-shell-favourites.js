@@ -113,17 +113,12 @@
     miniProgress();
   }
 
-  /* ---------- feature guide (Account > Feature guide) ----------
+  /* ---------- feature guide (Settings > Help > Feature guide) ----------
      Built from GUIDE_REG, which every feature fills in beside its own code with guideDoc(). */
   const GUIDE_NEW_DAYS = 30;
   const guideIsNew = f => { if (!f.since) return false; const t = Date.parse(f.since + 'T00:00:00'); return isFinite(t) && Date.now() - t < GUIDE_NEW_DAYS * 864e5; };
-  function guideBadge() {
-    const sp = $('#acct-guide > span'); if (!sp) return;
-    const seen = store.get('wt:guide:seen', ''), unseen = GUIDE_REG.some(f => guideIsNew(f) && f.since > seen);
-    let b = sp.querySelector('.gd-new');
-    if (unseen && !b) { b = h('em', { class: 'gd-new' }, 'New'); sp.insertBefore(b, sp.querySelector('small')); }
-    else if (!unseen && b) b.remove();
-  }
+  const guideUnseen = () => { const seen = store.get('wt:guide:seen', ''); return GUIDE_REG.some(f => guideIsNew(f) && f.since > seen); };
+  function guideBadge() { /* the New badge is drawn on the Feature guide row of Settings (guideUnseen) */ }
   function initGuide() {
     const list = $('#guide-list'), q = $('#guide-q'), none = $('#guide-none');
     if (!list) return;

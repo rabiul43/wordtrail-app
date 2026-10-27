@@ -92,14 +92,14 @@
   /* Account tab: the list of followed authors with a "N new" badge and an unfollow button */
   function renderFollowing() {
     const host = $('#acct-fol'); if (!host) return;
-    let waited = false;
+    let waited = false, all = false;
     const paint = () => {
       host.textContent = '';
       const list = folList();
       if (!list.length) { host.hidden = true; return; }
       if (catReady()) Object.values(folAll()).forEach(x => { if (x && x.f && !(x.m >= 0)) folSeen(x.n); });
       host.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Authors you follow'), h('span', {}, plural(list.length, 'author'))),
-        h('ul', { class: 'rtl-list' }, list.map(x => {
+        h('ul', { class: 'rtl-list' }, (all ? list : list.slice(0, 3)).map(x => {
           const nw = folNew(folAll()[folKey(x.n)]).length, n = catReady() ? authorBooks(x.n).length : 0;
           return h('li', { class: 'rtl-card' },
             h('button', { class: 'rtl-main', type: 'button', 'aria-label': 'Open author ' + x.n, onclick: () => openAuthor({ name: x.n }) },
@@ -107,7 +107,8 @@
               h('span', { class: 'rtl-body' }, h('b', {}, x.n), n ? h('span', { class: 'rtl-c' }, plural(n, 'book')) : null)),
             nw ? h('span', { class: 'fol-new' }, nw + ' new') : null,
             h('button', { class: 'fol-un', type: 'button', 'aria-label': 'Unfollow ' + x.n, onclick: () => { followSet(x.n, false); paint(); toast('Unfollowed ' + x.n); } }, 'Following'));
-        })));
+        })),
+        ...(list.length > 3 ? [h('button', { class: 'btn ghost small rtl-all', type: 'button', 'aria-expanded': String(all), onclick: () => { all = !all; paint(); } }, all ? 'Show less' : 'See all')] : []));
       host.hidden = false;
       if (!catReady() && !waited) { waited = true; catLoad().then(paint).catch(() => { /* the list stays without counts */ }); }
     };

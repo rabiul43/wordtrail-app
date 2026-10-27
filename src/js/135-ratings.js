@@ -405,33 +405,39 @@
     paintChips(); reset();
     rtLoad(b, false).then(t => { if (!live()) return; paintSum(t, null); if (t && t.n) rtReviewCount(b).then(rc => { if (live() && rc) paintSum(t, rc); }); });
   }
-  /* the "Your ratings" and "Finished, not rated yet" lists on the Account tab; shown to signed-in users only */
+  /* the "Your ratings" and "Finished, not rated yet" lists on the Account tab (two sections); shown to signed-in users only.
+     Each shows its first 3 books, with See all / Show less. */
   let myBack = false;
   function renderMyRatings() {
-    const host = $('#acct-rt'); if (!host) return;
-    host.textContent = '';
-    if (!acInfo() || rtCalm()) { host.hidden = true; return; }
+    const host = $('#acct-rt'), fhost = $('#acct-fin'); if (!host) return;
+    host.textContent = ''; if (fhost) fhost.textContent = '';
+    if (!acInfo() || rtCalm()) { host.hidden = true; if (fhost) fhost.hidden = true; return; }
     const mine = myRatings(), rated = Object.keys(mine).filter(id => mine[id] && mine[id].r > 0).sort((x, y) => (mine[y].t || 0) - (mine[x].t || 0));
     const book = (id, m) => ({ id, title: m.title || 'Untitled', authors: m.authors || '', cover: m.cover || '', ia: m.ia || '' });
     const open = b => { openDetail(b); requestAnimationFrame(() => { const s = $('.det-rate'); if (s) s.scrollIntoView({ block: 'start' }); }); };
-    const rows = (ids, show) => ids.slice(0, show);
+    const SHOW = 3;
     const cardOf = (b, kids, label, edit) => h('li', { class: 'rtl-card' },
       h('button', { class: 'rtl-main', type: 'button', 'aria-label': label, onclick: () => open(b) }, h('span', { class: 'rtl-cover', 'aria-hidden': 'true' }, coverNode(b)), h('span', { class: 'rtl-body' }, h('b', {}, rtTitle(b.title)), ...kids)),
       edit ? h('button', { class: 'rtl-edit', type: 'button', 'aria-label': 'Edit your rating of ' + rtTitle(b.title), onclick: () => open(b) }, 'Edit') : null);
-    let all = false;
+    const more = (n, on, flip) => n > SHOW ? [h('button', { class: 'btn ghost small rtl-all', type: 'button', 'aria-expanded': String(on), onclick: flip }, on ? 'Show less' : 'See all')] : [];
+    let all = false, allFin = false;
     const paint = () => {
       host.textContent = '';
       if (rated.length) {
         const avg = rated.reduce((a, id) => a + mine[id].r, 0) / rated.length;
-        const shown = all ? rated : rows(rated, 8);
+        const shown = all ? rated : rated.slice(0, SHOW);
         host.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Your ratings'), h('span', {}, plural(rated.length, 'book') + ' · average ' + avg.toFixed(1))),
           h('ul', { class: 'rtl-list' }, shown.map(id => { const m = mine[id]; return cardOf(book(id, m), [rtStars(m.r), h('span', { class: m.c ? 'rtl-c' : 'rtl-c none' }, m.c || 'No review written')], 'Open ' + rtTitle(m.title || 'this book'), true); })),
-          ...(rated.length > shown.length ? [h('button', { class: 'btn ghost small rtl-all', type: 'button', onclick: () => { all = true; paint(); } }, 'Show all ' + rated.length)] : []));
+          ...more(rated.length, all, () => { all = !all; paint(); }));
       }
-      const ratedSet = new Set(rated), fin = (ST.done || []).filter(x => x && x.id != null && !ratedSet.has(String(x.id))).slice(0, 10);
-      if (fin.length) host.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Finished, not rated yet')),
-        h('ul', { class: 'rtl-list' }, fin.map(x => cardOf(book(String(x.id), x), [h('span', { class: 'rt-stars rtl-empty', 'aria-hidden': 'true' }, '★★★★★')], 'Rate ' + rtTitle(x.title || 'this book'), false))));
       host.hidden = !host.firstChild;
+      if (!fhost) return;
+      fhost.textContent = '';
+      const ratedSet = new Set(rated), fin = (ST.done || []).filter(x => x && x.id != null && !ratedSet.has(String(x.id))).slice(0, 30), shownF = allFin ? fin : fin.slice(0, SHOW);
+      if (fin.length) fhost.append(h('div', { class: 'home-section-head rtl-head' }, h('h2', {}, 'Finished, not rated yet'), h('span', {}, plural(fin.length, 'book'))),
+        h('ul', { class: 'rtl-list' }, shownF.map(x => cardOf(book(String(x.id), x), [h('span', { class: 'rt-stars rtl-empty', 'aria-hidden': 'true' }, '★★★★★')], 'Rate ' + rtTitle(x.title || 'this book'), false))),
+        ...more(fin.length, allFin, () => { allFin = !allFin; paint(); }));
+      fhost.hidden = !fhost.firstChild;
     };
     paint();
     myRtBackfill();

@@ -2,8 +2,8 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 76,
-  "dependencies": 645,
-  "pointing_to_a_later_file": 214,
+  "dependencies": 644,
+  "pointing_to_a_later_file": 213,
   "largest_cycle": 70
  },
  "dependencies": [
@@ -75,7 +75,6 @@
   "090-synced-stats-book-search.js -> 180-sync-alignment.js",
   "090-synced-stats-book-search.js -> 270-sheets-nextup-back.js",
   "090-synced-stats-book-search.js -> 280-downloads-progress.js",
-  "090-synced-stats-book-search.js -> 290-backup-maintenance.js",
   "090-synced-stats-book-search.js -> 295-account-sync.js",
   "095-weekly-report.js -> 030-helpers-offline-audio.js",
   "095-weekly-report.js -> 080-ui-shell-favourites.js",

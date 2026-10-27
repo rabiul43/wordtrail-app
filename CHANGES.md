@@ -1,5 +1,14 @@
 # Changes in this version
 
+## Account tab tidied into sections
+- Order now: profile and sync card, "Your activity" (Saved books and Recently listened as two tiles), Authors you follow, Your ratings, Finished, not rated yet, Listening stats (unchanged), History, About, then Data and privacy at the bottom.
+- Authors you follow, Your ratings and Finished, not rated yet each show their first 3 books with "See all" / "Show less". Finished, not rated yet is now its own section (`#acct-fin`, same `.acct-rt` class, so Calm mode still hides it).
+- NEW Data and privacy: Export my data (presses the Settings > Backup button, works signed out too), Delete my cloud data (moved here from inside "What to sync"), and Delete account (red, two confirmations). Delete account removes the cloud data, then the sign-in (`acUser.delete()`). If Firebase asks for a recent sign-in, the person is told to sign in again and repeat the tap. Ratings and reviews already published stay (the confirmation says so). Not tested against a real Firebase account.
+- Not built: "Signed-in devices". The app keeps no device list in the cloud, so there is nothing to show.
+- The Settings shortcut is gone from Account (Settings is in the tab bar and side bar). Help moved to the bottom of Settings: Feature guide (with its New badge), How to use, Keyboard shortcuts (mouse or trackpad only). They are also found by Settings search.
+- Files: 10-body-views.html (template), 090, 080 (badge moved: `guideUnseen`), 130, 135, 290, 295, 20-home-library.css, 98b-desktop-polish.css (comment), i18n/bn.json (13 strings), BN-REVIEW.md, tools/account_tidy_check.js (NEW), tools/tangle_baseline.json, MODULES.md / DEPENDENCIES.md.
+- Test: `python build.py --no-min`, then `node tools/account_tidy_check.js`, `node tools/unit_check.js`, `node tools/startup_check.js`, `python tools/tangle_check.py`.
+
 ## Downloads is its own page (no duplicate chip)
 - The "Downloaded" chip is gone from My books (it was the same page as the Downloads tab). My books now has Saved and Synced books; the Downloads tab opens the same list with its own title "Downloads" and no chips.
 - `showTab('downloads')` is an alias like 'synced' (sets `shelfMode = 'dl'`). The Downloads tab now lights up on that page; the My books tab always opens on Saved or Synced, never on Downloads. A reload comes back to Downloads (`wt:ui` tab "downloads").

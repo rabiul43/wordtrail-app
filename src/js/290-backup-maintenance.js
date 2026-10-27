@@ -283,23 +283,29 @@
     ['advanced', 'presync', 'i-m-refresh', 'Pre-sync books', 'Prepare timing ahead of time', '', 'github precompute sync batch', () => { SMH.from = true; $('#btn-presync').click(); }],
     ['advanced', 'amb', 'i-m-wave', 'Sound', 'Ambient, story sounds, music, opening sound and presets', '', 'sound ambient rain fire background music opening effects scene preset master volume', () => { SMH.from = true; ambOpen(); }],
     ['advanced', 'dev', 'i-m-code', 'Developer', 'Scene tests, sync and performance, clean-up', '', 'debug developer tools', () => smOpenTab('dev'), 'dev'],
-    ['advanced', 'diag', 'i-m-info', 'Diagnostics', 'Log errors and slow moments', '', 'log errors debug report', () => smOpenTab('dev', () => { const c = document.getElementById('in-diag'); return c && (c.closest('.row') || c); }), 'dev']
+    ['advanced', 'diag', 'i-m-info', 'Diagnostics', 'Log errors and slow moments', '', 'log errors debug report', () => smOpenTab('dev', () => { const c = document.getElementById('in-diag'); return c && (c.closest('.row') || c); }), 'dev'],
+    ['help', 'guide', 'i-m-book', 'Feature guide', 'Everything the app can do, and how to use it', '', 'help guide features manual new', () => { SMH.from = true; initGuide(); openSheet('sheet-guide'); }],
+    ['help', 'howto', 'i-m-help', 'How to use', 'Double-tap, press and hold, swipe', '', 'help gestures tips tap hold swipe', () => { SMH.from = true; openSheet('sheet-howto'); }],
+    ['help', 'keys', 'i-m-kbd', 'Keyboard shortcuts', 'Space, arrows, N and P. Press ? anywhere', '', 'help keys keyboard shortcuts', () => { SMH.from = true; openSheet('sheet-keys'); }, 'kbd']
   ];
+  /* Developer rows need Developer unlocked; Keyboard shortcuts needs a mouse or trackpad */
+  const smShow = r => r[8] === 'dev' ? smDev() : r[8] === 'kbd' ? !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) : true;
+  const smSecName = { basics: 'Basics', advanced: 'Advanced', help: 'Help' };
   const smRow = (name, desc, icon, val, pill, go) => h('button', { class: 'mrow sh-row', type: 'button', onclick: () => go() },
     h('span', { class: 'mr-i', 'aria-hidden': 'true' }, svgIcon('#' + icon)),
     h('span', { class: 'mr-main' }, h('span', { class: 'mr-t' }, name), h('span', { class: 'mr-d' }, desc)),
     val ? h('span', { class: 'sh-val' }, val) : null, pill ? h('span', { class: 'sh-pill' }, pill) : null);
   function smHomePaint() {
     const box = $('#sh-home'); box.textContent = '';
-    [['basics', 'Basics'], ['advanced', 'Advanced']].forEach(([sec, title]) => {
-      const rows = smRows().filter(r => r[0] === sec && (r[8] !== 'dev' || smDev()));
-      box.append(h('section', { class: 'sh-sec', 'aria-label': title }, h('h3', {}, title), h('div', { class: 'more-list' }, rows.map(r => smRow(r[3], r[4], r[2], r[5], '', r[7])))));
+    [['basics', 'Basics'], ['advanced', 'Advanced'], ['help', 'Help']].forEach(([sec, title]) => {
+      const rows = smRows().filter(r => r[0] === sec && smShow(r));
+      box.append(h('section', { class: 'sh-sec', 'aria-label': title }, h('h3', {}, title), h('div', { class: 'more-list' }, rows.map(r => smRow(r[3], r[4], r[2], r[5], r[1] === 'guide' && guideUnseen() ? 'New' : '', r[7])))));
     });
   }
   /* everything that can be found: the rows above, each label and heading in the tabbed Settings, and the book tools */
   function smIndex() {
     const out = [], seen = new Set(), dev = smDev();
-    smRows().filter(r => r[8] !== 'dev' || dev).forEach(r => { seen.add(r[3].toLowerCase()); out.push({ name: r[3], desc: (r[0] === 'basics' ? 'Basics' : 'Advanced') + ' \u00b7 ' + r[4], hay: (r[3] + ' ' + r[4] + ' ' + r[6]).toLowerCase(), icon: r[2], go: r[7] }); });
+    smRows().filter(smShow).forEach(r => { seen.add(r[3].toLowerCase()); out.push({ name: r[3], desc: smSecName[r[0]] + ' \u00b7 ' + r[4], hay: (r[3] + ' ' + r[4] + ' ' + r[6]).toLowerCase(), icon: r[2], go: r[7] }); });
     const tabs = {}; $$('#sp-tabs button').forEach(b => { tabs[b.dataset.sp] = smNorm(b.textContent); });
     $$('#sheet-settings .sp').forEach(p => {
       const tab = p.dataset.sp; if (tab === 'dev' && !dev) return;
@@ -366,7 +372,7 @@
       if (SMH.taps >= 7) { SMH.taps = 0; window.wtSettingsTab('dev', true); SMH.idx = null; smHomePaint(); smSearch(SMH.q); toast('Developer settings unlocked.', 2500); }
     });
   }
-  guideDoc('account', 'Settings home', "Account > Settings opens one page with a search box and two sections. Basics: theme, text, speed and the sleep timer. Advanced: precise timing, pre-sync, cinematic sound, and Developer and Diagnostics once Developer is unlocked. Each row opens the full panel, with a Back button to return. Search finds any setting, and the book tools in the More menu.", '2026-10-19');
+  guideDoc('account', 'Settings home', "Settings opens one page with a search box and three sections. Basics: theme, text, speed and the sleep timer. Help: the Feature guide, How to use and Keyboard shortcuts. Advanced: precise timing, pre-sync, cinematic sound, and Developer and Diagnostics once Developer is unlocked. Each row opens the full panel, with a Back button to return. Search finds any setting, and the book tools in the More menu.", '2026-10-19');
   function fillSettings() {
     covSegSync();
     homeCustPaint();

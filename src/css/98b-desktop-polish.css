@@ -31,8 +31,8 @@
    The wrappers are transparent on phones, so the phone order is exactly as before:
      <div class="tab-head">…</div>
      <section id="acct-sync">…</section>                  (stays a direct child)
-     <div class="acct-main">  #acct-fol  #acct-rt  #ls  </div>
-     <div class="acct-side">  .acct-card  #acct-settings  .acct-help  #acct-history  .about </div>
+     <div class="acct-main">  .acct-stats  #acct-fol  #acct-rt  #acct-fin  #ls  </div>
+     <div class="acct-side">  #acct-history  .about  #acct-data </div>
    Desktop grid:   [ tab-head          tab-head ]
                    [ main              sync     ]
                    [ main              side     ]   (main spans rows 2-3)            */

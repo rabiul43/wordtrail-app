@@ -94,3 +94,12 @@ Western digits are kept everywhere (the app prints them that way: 2 ঘণ্ট
 |---|---|---|
 | Wordtrail home (logo link label, read by screen readers) | Wordtrail হোম | The app calls the Home tab "ঘর" elsewhere. Keep "হোম" here, or use "Wordtrail-এর ঘর"? |
 | Downloads (tab and page title) | ডাউনলোড | Next to "Downloaded" (ডাউনলোড করা). Fine as a page title? |
+
+## Account tidy (new, unreviewed)
+| English | Current Bengali | Question |
+|---|---|---|
+| Data and privacy | ডেটা ও গোপনীয়তা | Fine as a heading? |
+| Export my data | আমার ডেটা এক্সপোর্ট করুন | Keep the loanword "এক্সপোর্ট"? |
+| Delete account | অ্যাকাউন্ট মুছুন | OK |
+| Delete your account? ... This cannot be undone. | আপনার অ্যাকাউন্ট মুছবেন? ... এটি ফেরানো যাবে না। | Is the warning clear enough? |
+| Settings opens one page with ... three sections | সেটিংস একটি সার্চ বক্স ও তিনটি অংশসহ ... | Guide text: Help section added |

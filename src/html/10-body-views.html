@@ -335,38 +335,16 @@
   <div class="tab-head"><h1>Account</h1><p>Your library, settings and progress. Sign in to sync them across devices.</p></div>
   <section id="acct-sync" aria-label="Sign in and sync"></section>
   <div class="acct-main">
+  <section class="acct-stats" aria-label="Your activity">
+    <div class="acct-tile"><strong id="acct-favs">0</strong><span>Saved books</span></div>
+    <div class="acct-tile"><strong id="acct-recents">0</strong><span>Recently listened</span></div>
+  </section>
   <section id="acct-fol" class="acct-rt" aria-label="Authors you follow" hidden></section>
   <section id="acct-rt" class="acct-rt" aria-label="Your ratings" hidden></section>
+  <section id="acct-fin" class="acct-rt" aria-label="Finished, not rated yet" hidden></section>
   <section id="ls" class="ls" aria-labelledby="ls-h"></section>
   </div>
   <div class="acct-side">
-  <div class="acct-card">
-    <div class="acct-row"><span>Saved books</span><strong id="acct-favs">0</strong></div>
-    <div class="acct-row"><span>Recently listened</span><strong id="acct-recents">0</strong></div>
-  </div>
-  <button id="acct-settings" class="acct-link" type="button">
-    <svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg>
-    <span>Settings<small>Theme, text size, speed and sync</small></span>
-    <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
-  </button>
-  <section class="acct-help" aria-labelledby="help-h">
-    <h2 id="help-h">Help</h2>
-    <button id="acct-guide" class="acct-link" type="button">
-      <svg class="ic" aria-hidden="true"><use href="#i-m-book"/></svg>
-      <span>Feature guide<small>Everything the app can do, and how to use it</small></span>
-      <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
-    </button>
-    <button id="acct-howto" class="acct-link" type="button">
-      <svg class="ic" aria-hidden="true"><use href="#i-m-help"/></svg>
-      <span>How to use<small>Double-tap, press and hold, swipe</small></span>
-      <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
-    </button>
-    <button id="acct-keys" class="acct-link" type="button">
-      <svg class="ic" aria-hidden="true"><use href="#i-m-kbd"/></svg>
-      <span>Keyboard shortcuts<small>Space, arrows, N and P. Press ? anywhere</small></span>
-      <svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg>
-    </button>
-  </section>
   <section id="acct-history" class="acct-history" hidden>
     <h2>History</h2>
     <div id="acct-history-list" class="list"></div>
@@ -375,6 +353,7 @@
     <h2 id="about-h">About</h2>
     <p>Audio comes from LibriVox and the text from Project Gutenberg, both public domain. LibriVox does not publish sentence times, so Wordtrail estimates them in your browser. If the highlight drifts, double-tap the sentence you are hearing. You can also turn on Sync and tap it. Either way, the sentences around it are re-timed too.</p>
   </section>
+  <section id="acct-data" class="acct-data" aria-labelledby="acct-data-h" hidden></section>
   </div>
 </template>
 

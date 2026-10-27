@@ -405,3 +405,13 @@ body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(9.5rem + env(safe
   -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent); }
 body.genre-on #sec-picks, body:has(#filter-results:not([hidden])) #sec-picks { display: none; }
 
+
+/* Account: activity tiles, and the Data and privacy section */
+.acct-stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 0 0 1.2rem; }
+.acct-tile { display: grid; gap: .1rem; background: var(--surface); border-radius: var(--r-card); padding: .8rem 1rem; }
+.acct-tile strong { font: 600 1.6rem/1.1 var(--font-display); }
+.acct-tile span { color: var(--muted); font-size: var(--small); }
+.acct-data { display: flex; flex-direction: column; gap: var(--sec-gap); margin-top: 1.4rem; }
+.acct-data h2 { margin: 0 0 .1rem .25rem; font: 600 var(--h2)/1.2 var(--font-display); letter-spacing: -.01em; color: var(--ink); text-transform: none; }
+.acct-link.danger, .acct-link.danger .go { color: #E4574F; }
+.acct-link.danger small { color: var(--muted); }
