@@ -158,6 +158,11 @@
     rsCount(shown.length, books.length);
     el.resultList.textContent = '';
     if (!shown.length && books.length + (RS.scope === 'genre' ? 1 : 0) > 0) {
+      if (lfActive()) {   // results exist, but the level / read-along filter hides every one: say so, and clear just those filters
+        el.resultList.append(stateNode('empty', 'Your filters are hiding these results', 'A level or read-along filter is on. Books without a reading level are hidden while a level is chosen.', 'Clear filters', () => { LF.lvl.clear(); LF.ready = false; lfPaint(); showBooks(RS.all); }));
+        el.results.classList.remove('loading'); el.results.hidden = false;
+        return;
+      }
       el.resultList.append(stateNode('empty', 'Nothing matches these filters', lfActive() ? 'No books match every filter here. Try turning one off. Books without a reading level are hidden while a level is chosen.' : 'Try a different filter, or search everything.', 'Reset filters', () => { RS.scope = 'all'; LF.lvl.clear(); LF.ready = false; rsPaint(); showBooks(RS.all); }));
       el.results.classList.remove('loading'); el.results.hidden = false;
       return;

@@ -1,5 +1,10 @@
 # Changes in this version
 
+## Search page: no Continue listening card, clearer "filters hide everything"
+- While a search is showing results, the Continue listening card (`#recents`) is hidden together with the other home rows (`syncHomeRows`, 110). It returns when the search box is cleared.
+- When results exist but the Level / read-along filter hides every one, the empty state now says "Your filters are hiding these results" with a "Clear filters" button that clears just those filters and shows the results (120, `showBooks`). Other empty states are unchanged.
+- Files: 110, 120, i18n/bn.json (3 strings), tools/account_tidy_check.js (3 more checks).
+
 ## Account tab tidied into sections
 - Order now: profile and sync card, "Your activity" (Saved books and Recently listened as two tiles), Authors you follow, Your ratings, Finished, not rated yet, Listening stats (unchanged), History, About, then Data and privacy at the bottom.
 - Authors you follow, Your ratings and Finished, not rated yet each show their first 3 books with "See all" / "Show less". Finished, not rated yet is now its own section (`#acct-fin`, same `.acct-rt` class, so Calm mode still hides it).

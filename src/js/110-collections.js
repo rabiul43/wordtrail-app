@@ -229,7 +229,7 @@
 
   /* Hide homepage rows when a search is active; restore when search is cleared */
   function syncHomeRows(searching) {
-    const ids = ['sec-tod', 'sec-picks', 'sec-genre', 'sec-newweek', 'sec-collections'];
+    const ids = ['recents', 'sec-tod', 'sec-picks', 'sec-genre', 'sec-newweek', 'sec-collections'];   // 'recents' = the Continue listening card: it has nothing to do with a search
     ids.forEach(id => {
       const el = $('#' + id);
       if (el) el.style.display = searching ? 'none' : '';

@@ -40,7 +40,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `104-see-all-suggestions.js` | 137 | "See all" button and page, empty/error states, recent searches, live suggestions while typing |
 | `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
 | `110-collections.js` | 238 | Collections tab |
-| `120-search-recommendations.js` | 573 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
+| `120-search-recommendations.js` | 578 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 194 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 162 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 133 | Author page, large "pick up where you left off" card |

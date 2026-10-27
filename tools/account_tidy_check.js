@@ -33,7 +33,7 @@ function grab(file, name) {
 /* ---- the stand-in page ---- */
 class Txt { constructor(t) { this.nodeType = 3; this.data = String(t); } get textContent() { return this.data; } }
 class El {
-  constructor(tag) { this.nodeType = 1; this.tag = tag; this.kids = []; this.attrs = {}; this.className = ''; this.hidden = false; this.ls = {}; this.innerHTML = ''; }
+  constructor(tag) { this.nodeType = 1; this.tag = tag; this.kids = []; this.attrs = {}; this.className = ''; this.hidden = false; this.ls = {}; this.innerHTML = ''; this.style = { display: '' }; }
   append(...n) { n.forEach(x => this.kids.push(x)); }
   get firstChild() { return this.kids[0] || null; }
   set textContent(v) { this.kids = v === '' ? [] : [new Txt(v)]; }
@@ -42,7 +42,7 @@ class El {
   getAttribute(k) { return this.attrs[k]; }
   addEventListener(t, f) { (this.ls[t] = this.ls[t] || []).push(f); }
   click() { (this.ls.click || []).forEach(f => f({ target: this })); }
-  get classList() { const el = this; return { add: c => { if (!el.has(c)) el.className = (el.className + ' ' + c).trim(); }, contains: c => el.has(c) }; }
+  get classList() { const el = this; return { add: c => { if (!el.has(c)) el.className = (el.className + ' ' + c).trim(); }, contains: c => el.has(c), remove: c => { el.className = (' ' + el.className + ' ').replace(' ' + c + ' ', ' ').trim(); } }; }
   has(c) { return (' ' + this.className + ' ').includes(' ' + c + ' '); }
   all(test, out = []) { this.kids.forEach(k => { if (k.nodeType === 1) { if (test(k)) out.push(k); k.all(test, out); } }); return out; }
   byClass(c) { return this.all(k => k.has(c)); }
@@ -51,7 +51,7 @@ class El {
 const doc = { createElement: t => new El(t), createElementNS: (ns, t) => new El(t), createTextNode: t => new Txt(t) };
 const hosts = {};
 const host = id => (hosts[id] = new El('section'));
-['#acct-fol', '#acct-rt', '#acct-fin', '#acct-data', '#sh-home', '#b-bkdl'].forEach(host);
+['#recents', '#sec-tod', '#sec-picks', '#sec-genre', '#sec-newweek', '#sec-collections', '#acct-fol', '#acct-rt', '#acct-fin', '#acct-data', '#sh-home', '#b-bkdl'].forEach(host);
 
 /* ---- everything the real functions lean on ---- */
 const state = { signed: true, calm: false, toasts: [], confirms: [], answers: [], wiped: 0, deleted: 0, deleteErr: null, fine: true, guideNew: false, followed: [], rated: {}, done: [] };
@@ -68,6 +68,9 @@ const ctx = {
   acSvg: () => new El('svg'),
   svgIcon: () => new El('svg'), matchMedia: () => ({ matches: state.fine }),
   P: { theme: 'auto', speed: 1 }, S: { book: null, sleep: 0 }, SMH: { from: false, q: '' }, smTheme: () => 'Auto', smDev: () => false, smNorm: s => String(s || '').trim(),
+  RS: { all: [], scope: 'all' }, LF: { lvl: new Set(), ready: false }, el: { resultList: new El('div'), results: new El('div') },
+  rsSort: x => x, rsFilter: list => (ctx.LF.lvl.size ? [] : list), rsCount() {}, lfPaint() {}, rsPaint() {}, vlist: (host, list) => { host.shownCount = list.length; host._vl = { nodes: [] }; }, bookCard: b => b, checkReady() {},
+  stateNode: (kind, title, text, label, fn) => { const n = new El('div'); n.title = title; n.label = label; n.act = fn; return n; },
   guideUnseen: () => state.guideNew, initGuide() {}, openSheet() {}, spdPaint() {}, ambOpen() {}, smOpenTab() {}, smH3() {}, qkOpt() {}, qkPaint() {}, closeSheets() {}, window: {}
 };
 ctx.window.matchMedia = ctx.matchMedia;
@@ -93,8 +96,11 @@ const code = [
   grab('290-backup-maintenance.js', 'smSecName'),
   grab('290-backup-maintenance.js', 'smRow'),
   grab('290-backup-maintenance.js', 'smHomePaint'),
-  grab('290-backup-maintenance.js', 'smIndex')
+  grab('290-backup-maintenance.js', 'smIndex'),
+  grab('120-search-recommendations.js', 'showBooks'),
+  grab('110-collections.js', 'syncHomeRows')
 ].join('\n');
+ctx.lfActive = () => ctx.LF.lvl.size > 0 || ctx.LF.ready;
 const names = Object.keys(ctx);
 const api = new Function(...names, 'api', `
   let acUser = { delete: api.userDelete }, acStale = false, acMsg = 'x';
@@ -102,7 +108,7 @@ const api = new Function(...names, 'api', `
   const acWipeCloud = async () => { api.wiped++; if (api.wipeErr) throw api.wipeErr; };
   const localStorage = { removeItem() {} };
   ${code}
-  return { renderFollowing, renderMyRatings, renderAcctData, acDeleteAccount, acDeleteCloud, smHomePaint, smIndex, smRows, smShow, setUser: u => { acUser = u; } };
+  return { showBooks, syncHomeRows, renderFollowing, renderMyRatings, renderAcctData, acDeleteAccount, acDeleteCloud, smHomePaint, smIndex, smRows, smShow, setUser: u => { acUser = u; } };
 `);
 const bind = { wiped: 0, userDelete: async () => { state.deleted++; if (state.deleteErr) throw state.deleteErr; } };
 const fns = api(...names.map(n => ctx[n]), bind);
@@ -228,6 +234,26 @@ const btnText = (el, cls) => el.byClass(cls).map(b => b.textContent);
     state.fine = true; const idx = fns.smIndex();
     const g = idx.find(x => x.name === 'Feature guide'); assert.ok(g && /^Help/.test(g.desc));
     assert.ok(idx.find(x => x.name === 'How to use')); assert.ok(idx.find(x => x.name === 'Keyboard shortcuts'));
+  });
+
+  /* Search page */
+  ok('searching hides the Continue listening card and the other home rows; clearing brings them back', () => {
+    fns.syncHomeRows(true);
+    ['#recents', '#sec-tod', '#sec-picks', '#sec-genre', '#sec-newweek', '#sec-collections'].forEach(id => assert.equal(hosts[id].style.display, 'none', id));
+    fns.syncHomeRows(false);
+    ['#recents', '#sec-tod'].forEach(id => assert.equal(hosts[id].style.display, ''));
+  });
+  ok('results hidden by a level filter: a clear message, and "Clear filters" brings them back', () => {
+    ctx.RS.all = [{ id: 1 }, { id: 2 }]; ctx.LF.lvl.add('hard');
+    fns.showBooks(ctx.RS.all);
+    const n = ctx.el.resultList.kids[0];
+    assert.equal(n.title, 'Your filters are hiding these results'); assert.equal(n.label, 'Clear filters'); assert.equal(ctx.el.results.hidden, false);
+    n.act();
+    assert.equal(ctx.LF.lvl.size, 0); assert.equal(ctx.el.resultList.shownCount, 2);
+  });
+  ok('no results at all and no filter: no filter message (the normal empty states are unchanged)', () => {
+    ctx.el.resultList.kids = []; ctx.RS.all = []; ctx.LF.lvl.clear(); ctx.LF.ready = false;
+    fns.showBooks([]); assert.ok(!ctx.el.resultList.kids[0] || ctx.el.resultList.kids[0].title !== 'Your filters are hiding these results');
   });
 
   if (failed) { console.log('\n' + failed + ' check(s) failed'); process.exit(1); }
