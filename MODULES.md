@@ -43,7 +43,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `120-search-recommendations.js` | 573 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 193 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 162 | Book stats on the details page, start/finish sending, share button |
-| `132-author-page-resume-card.js` | 95 | Author page, large "pick up where you left off" card |
+| `132-author-page-resume-card.js` | 122 | Author page, large "pick up where you left off" card |
 | `133-open-progress-saved-state.js` | 239 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
 | `135-ratings.js` | 492 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |

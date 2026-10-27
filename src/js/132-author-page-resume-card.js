@@ -27,8 +27,12 @@
   function drawAuthor(a) {
     const d = $('#detail'); d.textContent = '';
     const words = a.name.split(/\s+/).filter(Boolean), ini = (words[0] ? words[0][0] : '?') + (words.length > 1 ? words[words.length - 1][0] : '');
-    const years = h('p', { class: 'det-meta', hidden: true }), stats = h('p', { class: 'det-meta' }), body = h('div', { class: 'det-more' });
-    const bio = h('section', { class: 'det-about wp-sec', hidden: true });
+    const years = h('p', { class: 'det-meta', hidden: true }), stats = h('p', { class: 'det-meta' }), body = h('div', { class: 'det-more aut-more' });
+    const bio = h('section', { class: 'det-about aut-about wp-sec', hidden: true });
+    /* desktop banner only (phones hide these, see 98-desktop-layout.css): bio teaser, "Start with" button, blurred cover backdrop */
+    const bioHero = h('div', { class: 'aut-bio', hidden: true });
+    const startBtn = h('button', { class: 'aut-start-btn', type: 'button', hidden: true });
+    const detBack = h('div', { class: 'det-bg', 'aria-hidden': 'true' });
     const fol = h('button', { class: 'fol-btn', type: 'button' });
     const paintFol = () => { const on = isFollowing(a.name); fol.className = 'fol-btn' + (on ? ' on' : ''); fol.textContent = on ? '\u2713 Following' : '+ Follow'; };
     fol.addEventListener('click', async () => {
@@ -41,11 +45,23 @@
     const iniEl = h('div', { class: 'aut-ini', 'aria-hidden': 'true' }, ini.toUpperCase());
     d.append(
       h('div', { class: 'det-top' }, h('button', { class: 'ib', type: 'button', 'aria-label': 'Back', onclick: closeDetail }, svgIcon('#i-back')), h('span', {}, 'Author')),
-      h('section', { class: 'det-hero', style: '--h:' + Math.floor(moodHash(a.name) * 360) },
+      h('section', { class: 'det-hero aut-hero', style: '--h:' + Math.floor(moodHash(a.name) * 360) },
+        detBack,
         iniEl,
-        h('h1', {}, a.name), years, stats, fol),
+        h('div', { class: 'aut-info' },
+          h('h1', {}, a.name), h('div', { class: 'aut-meta' }, years, stats), bioHero,
+          h('div', { class: 'aut-actions' }, startBtn, fol))),
       bio, body);
-    wpAuthor(a.name).then(rec => { if (DET.author === a) wpShow(bio, 'About the author', rec); }).catch(() => { /* no bio section */ });
+    wpAuthor(a.name).then(rec => {
+      if (DET.author !== a) return;
+      wpShow(bio, 'About the author', rec);
+      if (!rec) return;
+      const p = h('p', { class: 'det-desc clamp wp' }, rec.x);
+      const more = h('button', { class: 'sec-more', type: 'button', 'aria-expanded': 'false', onclick: () => { const open = !p.classList.toggle('clamp'); more.textContent = open ? 'Show less' : 'Read more'; more.setAttribute('aria-expanded', String(open)); } }, 'Read more');
+      bioHero.textContent = '';
+      bioHero.append(p, ...(rec.x.length > 160 ? [more] : []), h('p', { class: 'wp-src' }, 'From ', h('a', { href: rec.u, target: '_blank', rel: 'noopener noreferrer' }, 'Wikipedia'), ' \u00b7 CC BY-SA'));
+      bioHero.hidden = false;
+    }).catch(() => { /* no bio section */ });
     (async () => {
       try { await Promise.all([catLoad(), VER.load().catch(() => {})]); } catch (e) { /* use what loaded */ }
       if (DET.author !== a) return;
@@ -54,24 +70,35 @@
       if (!books.length) { stats.hidden = true; body.append(stateNode('empty', 'No books found', 'There are no recordings by ' + a.name + ' in the library yet.')); return; }
       const pics = books.filter(b => b.ia).concat(books.filter(b => !b.ia)).slice(0, 3).map(nxPub);
       const fan = colFan({ books: pics }); fan.classList.add('aut-fan', 'n' + pics.length); iniEl.replaceWith(fan);
+      try {   // desktop banner: the first cover, blurred, fills the back of the hero (hidden on small screens)
+        const fillBack = () => { const im = fan.querySelector('img.loaded'); if (!im) return false; detBack.style.backgroundImage = 'url("' + (im.currentSrc || im.src) + '")'; detBack.classList.add('on'); return true; };
+        if (!fillBack()) { const mo = new MutationObserver(() => { if (fillBack()) mo.disconnect(); }); mo.observe(fan, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'src'] }); setTimeout(() => mo.disconnect(), 15000); }
+      } catch (e) { /* no blurred backdrop */ }
       const tot = books.reduce((x, b) => x + (b.total || 0), 0);
       stats.textContent = books.length + (books.length === 1 ? ' book' : ' books') + (tot ? ' \u00b7 ' + Math.max(1, Math.round(tot / 3600)) + ' h of audio' : '');
       authorYears(a, books).then(m => { if (DET.author !== a || !m) return; years.textContent = m.y1 && m.y2 ? m.y1 + '\u2013' + m.y2 : m.y1 ? 'Born ' + m.y1 : 'Died ' + m.y2; years.hidden = false; });
       const heard = new Set(listenedList().map(r => String(r.id)));
       const start = books.length >= 3 ? books.filter(b => !heard.has(String(b.id))).sort((x, y) => x.total - y.total)[0] : null;
-      if (start) body.append(h('section', { class: 'home-section' }, h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, 'Start here'), h('p', { class: 'mood-sub' }, 'The shortest one you have not heard'))), bookCard(nxPub(start), () => openDetail(nxPub(start)))));
+      if (start) {
+        startBtn.append(svgIcon('#i-play'), h('span', {}, 'Start with ' + start.title));
+        startBtn.title = 'The shortest book you have not heard yet';
+        startBtn.addEventListener('click', () => openDetail(nxPub(start)));
+        startBtn.hidden = false;
+      }
+      if (start) body.append(h('section', { class: 'home-section aut-start' }, h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, 'Start here'), h('p', { class: 'mood-sub' }, 'The shortest one you have not heard'))), bookCard(nxPub(start), () => openDetail(nxPub(start)))));
       let mode = 'best', shown = 30;
-      const list = h('div', { class: 'list' }), more = h('button', { class: 'genre-more', type: 'button', hidden: true }, 'Show more'), chips = h('div', { class: 'pk-chips', role: 'group', 'aria-label': 'Sort books' });
+      const list = h('div', { class: 'list aut-list' }), grid = h('div', { class: 'aut-grid' }), more = h('button', { class: 'genre-more', type: 'button', hidden: true }, 'Show more'), chips = h('div', { class: 'pk-chips', role: 'group', 'aria-label': 'Sort books' });
       const sorted = () => books.slice().sort(mode === 'az' ? (x, y) => x.title.localeCompare(y.title) : mode === 'short' ? (x, y) => x.total - y.total : mode === 'rated' && !rtCalm() ? rtCmp : (x, y) => (y.ia ? 1 : 0) - (x.ia ? 1 : 0) || (+x.id) - (+y.id));
       const draw = () => {
         const all = sorted();
-        list.textContent = ''; all.slice(0, shown).forEach(b => list.append(bookCard(nxPub(b), () => openDetail(nxPub(b)))));
+        list.textContent = ''; grid.textContent = '';
+        all.slice(0, shown).forEach(b => { list.append(bookCard(nxPub(b), () => openDetail(nxPub(b)))); grid.append(tileNode(nxPub(b), () => openDetail(nxPub(b)))); });   // rows on phones, cover grid on desktop (CSS shows one)
         more.hidden = all.length <= shown;
         $$('button', chips).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.k === mode)));
       };
       [['best', 'Best match'], ['az', 'A\u2013Z'], ['short', 'Shortest'], ['rated', 'Top rated']].forEach(([k, t]) => { const c = h('button', { class: 'fchip' + (k === 'rated' ? ' rt-only' : ''), type: 'button', 'aria-pressed': 'false', onclick: () => { mode = k; shown = 30; draw(); if (k === 'rated') rtSumLoad().then(draw); } }, t); c.dataset.k = k; chips.append(c); });
       more.addEventListener('click', () => { shown += 30; draw(); });
-      body.append(h('section', { class: 'home-section' }, h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, 'All books'))), chips, list, more));
+      body.append(h('section', { class: 'home-section aut-books' }, h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, 'All books'))), chips, list, grid, more));
       draw();
     })();
   }

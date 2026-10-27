@@ -286,6 +286,69 @@
   #detail .det-hero .det-share .ic, #detail .det-hero .det-share svg { width: 1.2rem; height: 1.2rem; }
 }
 
+/* ---------- desktop author page: banner (cover fan left, details right) + cover grid ----------
+   Every rule below is new and scoped to .aut-* / .aut-hero, so the book page, Home and phones are not touched.
+   Outside the media query the extra pieces are hidden or "display: contents", so the phone card looks exactly as before. */
+.aut-grid, .aut-bio, .aut-start-btn { display: none; }
+.aut-info, .aut-meta, .aut-actions { display: contents; }
+@media (min-width: 900px) {
+  #detail > .det-hero.aut-hero {
+    max-width: none; margin-inline: calc(-1 * var(--page-pad, 2rem)); margin-top: -.9rem;
+    padding: 5.2rem max(var(--page-pad, 2rem), calc((100% - 68rem) / 2)) 3rem;
+    grid-template-columns: 19rem minmax(0, 1fr); column-gap: 3rem; row-gap: .6rem; justify-items: start; text-align: left; align-content: center;
+    border: 0; border-radius: 0; overflow: hidden; isolation: isolate;
+    background: linear-gradient(to bottom, color-mix(in srgb, hsl(var(--h) 55% 40%) 35%, var(--bg)), var(--bg));
+  }
+  #detail:has(> .det-hero.aut-hero) { position: relative; }
+  #detail > .det-top:has(+ .det-hero.aut-hero) { position: absolute; z-index: 3; top: 1.1rem; left: max(var(--page-pad, 2rem), calc((100% - 68rem) / 2)); right: auto; max-width: none; margin: 0; width: auto; }
+  #detail > .det-hero.aut-hero > .det-bg { display: block; position: absolute; top: 0; right: 0; bottom: 0; width: 44%; z-index: -2; background-size: cover; background-position: center 30%; opacity: 0; transition: opacity .6s;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 70%); mask-image: linear-gradient(to right, transparent 0, #000 70%); }
+  #detail > .det-hero.aut-hero > .det-bg.on { opacity: .8; }
+  #detail > .det-hero.aut-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to bottom, transparent 55%, var(--bg) 98%); pointer-events: none; }
+  #detail > .det-hero.aut-hero > .aut-fan, #detail > .det-hero.aut-hero > .aut-ini { grid-column: 1; grid-row: 1; align-self: center; margin: 0 0 0 1.5rem; }   /* room for the tilted first cover, so it does not touch the rail */
+  #detail > .det-hero.aut-hero > .aut-info { display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; grid-column: 2; grid-row: 1; align-self: center; min-width: 0; }
+  #detail > .aut-more { width: 100%; }
+  #detail > .det-hero.aut-hero > .aut-ini { width: 9rem; height: 9rem; font-size: 3rem; }
+  /* the cover fan, bigger (same 2:3 covers, overlapping by half) */
+  #detail .aut-hero .aut-fan { width: 18.8rem; height: 16.5rem; }
+  #detail .aut-hero .aut-fan.n2 { width: 14.1rem; }
+  #detail .aut-hero .aut-fan.n1 { width: 9.4rem; }
+  #detail .aut-hero .aut-fan .cover { width: 9.4rem; height: 14.1rem; font-size: 2.4rem; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.55); }
+  #detail .aut-hero .aut-fan .cover:nth-child(1) { left: 0; }
+  #detail .aut-hero .aut-fan .cover:nth-child(2) { left: 4.7rem; }
+  #detail .aut-hero .aut-fan .cover:nth-child(3) { left: 9.4rem; }
+  /* years and counts on one line */
+  .aut-meta { display: flex; align-items: baseline; flex-wrap: wrap; }
+  .aut-meta .det-meta { margin: 0; font-size: .95rem; padding-inline: 1rem; border-inline-start: 1px solid var(--line); }
+  .aut-meta .det-meta:first-child, .aut-meta .det-meta[hidden] + .det-meta { padding-inline-start: 0; border-inline-start: 0; }
+  /* bio teaser: three lines, then Read more */
+  .aut-bio:not([hidden]) { display: flex; flex-direction: column; align-items: flex-start; max-width: 34rem; margin-top: .3rem; }
+  .aut-bio .det-desc { margin: 0 0 .3rem; color: color-mix(in srgb, var(--ink) 82%, var(--bg)); font-size: .95rem; line-height: 1.55; }
+  .aut-bio .wp-src { margin-top: .35rem; }
+  /* actions: Start with + Follow */
+  .aut-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; margin-top: .9rem; }
+  .aut-hero .fol-btn { margin-top: 0; min-height: 2.9rem; }
+  .aut-start-btn:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-width: 13rem; max-width: min(26rem, 100%); min-height: 2.9rem; padding: 0 1.6rem; border-radius: .6rem; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font: 600 1rem var(--font-ui); cursor: pointer; transition: transform var(--dur, .15s) var(--ease, ease); }
+  .aut-start-btn:active { transform: scale(var(--press)); }
+  .aut-start-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .aut-start-btn .ic { width: 1.1rem; height: 1.1rem; }
+  .aut-start-btn span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .aut-actions:has(> .aut-start-btn:not([hidden])) > .fol-btn:not(.on) { background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); border-color: var(--line); }
+  /* their job moved into the banner */
+  .aut-about, .aut-start { display: none; }
+  /* all books: sort chips beside the heading, covers in a grid */
+  .aut-books { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 1rem; row-gap: .9rem; }
+  .aut-books > .home-section-head { grid-column: 1; margin: 0; }
+  .aut-books > .pk-chips { grid-column: 2; flex-wrap: wrap; overflow: visible; justify-content: flex-end; }
+  .aut-books > .aut-list, .aut-books > .aut-grid, .aut-books > .genre-more { grid-column: 1 / -1; }
+  .aut-books > .aut-list { display: none; }
+  .aut-books > .aut-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 1.8rem 1.4rem; margin-top: .4rem; }
+  .aut-grid .tile { width: 100%; }
+  .aut-grid .tile .tile-cover { border-radius: 12px; box-shadow: var(--shadow-cover); }
+  .aut-books > .genre-more { margin-top: 0; }
+}
+@media (min-width: 1600px) { .aut-books > .aut-grid { grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); } }
+
 /* ---------- rail: new items added in this session ---------- */
 /* Settings opens a sheet, not a page — never show the active bar on it */
 .tab[data-tab="settings"][aria-current="page"]::before { display: none; }

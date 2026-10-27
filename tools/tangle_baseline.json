@@ -2,7 +2,7 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 76,
-  "dependencies": 644,
+  "dependencies": 645,
   "pointing_to_a_later_file": 214,
   "largest_cycle": 70
  },
@@ -188,6 +188,7 @@
   "132-author-page-resume-card.js -> 030-helpers-offline-audio.js",
   "132-author-page-resume-card.js -> 070-network-data.js",
   "132-author-page-resume-card.js -> 080-ui-shell-favourites.js",
+  "132-author-page-resume-card.js -> 101-home-tiles.js",
   "132-author-page-resume-card.js -> 104-see-all-suggestions.js",
   "132-author-page-resume-card.js -> 110-collections.js",
   "132-author-page-resume-card.js -> 120-search-recommendations.js",

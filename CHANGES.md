@@ -44,3 +44,9 @@
 - From 700px wide the left bar is a narrow rail by default (icon over label, open page filled with an accent bar on its left edge, Account at the bottom). The menu button at the top opens it into a sidebar with the logo and name; the choice is remembered (`P.navOpen`, `<html data-nav="rail|open">`, `applyNav()` in `090`, click in `300`, early attribute in `00-head.html`).
 - The player always keeps the narrow rail. Phones keep the bottom tab bar.
 - Styles: end of `src/css/99-home-header.css`. The old "full sidebar from 1200px" rules in `98-desktop-layout.css` and the `.tb-brand` logo block were replaced (`#nav-toggle` in `10-body-views.html`).
+
+## Author page on large screens (900px and wider)
+- Same banner idea as the book page: full-width hero with the author's cover fan on the left (bigger), a soft blurred cover backdrop on the right, name, years and "7 books · 42 h" on one line, a 3-line bio teaser ("Read more", Wikipedia credit kept), and a "Start with <shortest unheard book>" button next to Follow.
+- "All books" is a cover grid on desktop, with the sort chips on the heading row. The old "Start here" card and "About the author" section are hidden on desktop (the banner holds them); phones keep them.
+- Files: `src/js/132-author-page-resume-card.js` (drawAuthor: new `.aut-hero`, `.aut-info`, `.aut-meta`, `.aut-bio`, `.aut-actions`, `.aut-start-btn`, `.aut-grid`, `.det-bg`), `src/css/98-desktop-layout.css` (new block "desktop author page"), `tools/tangle_baseline.json` (132 now uses `tileNode` from 101).
+- Nothing else is touched: every new rule is scoped to `.aut-*` and sits inside `@media (min-width: 900px)`. Below 900px the extra elements are hidden or `display: contents`. Checked by screenshots of the real build: phone author page, phone book page and desktop book page are pixel-identical to before.

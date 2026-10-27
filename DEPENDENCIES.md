@@ -31,7 +31,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `120-search-recommendations.js` | 573 | 64 | 22 | 61 |
 | `130-book-detail.js` | 193 | 30 | 16 | 20 |
 | `131-book-stats-share.js` | 162 | 13 | 4 | 31 |
-| `132-author-page-resume-card.js` | 95 | 6 | 4 | 26 |
+| `132-author-page-resume-card.js` | 122 | 6 | 4 | 27 |
 | `133-open-progress-saved-state.js` | 239 | 26 | 13 | 17 |
 | `134-version-picker.js` | 271 | 15 | 3 | 12 |
 | `135-ratings.js` | 492 | 66 | 12 | 34 |
@@ -155,7 +155,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`fmtShort`, `guideDoc`, `offDim`, `store`); `070-network-data.js` (`LVL`); `080-ui-shell-favourites.js` (`curTab`, `seeOpen`, `setStatus`); `100-home-covers.js` (`GENRES`, `tileCoverNode`); `102-home-sections.js` (`activeGenre`, `loadFeatured`, `loadRecentlyAdded`, `openGenre`); `105-home-loaders.js` (`loadDaily`); `120-search-recommendations.js` (`dlLabel`, `dlMarkPaint`, `loadPicks`); `130-book-detail.js` (`openDetail`); `135-ratings.js` (`rtChipText`, `rtSpeak`, `rtSumLoad`); `270-sheets-nextup-back.js` (`sheetOpen`)
 
-**Shared:** `fillRow` (102, 110, 120, 131, 150, 270), `initPullToRefresh` (300), `paintTiles` (120), `refreshHome` (300), `rowSkeletons` (102, 104, 105), `swr` (102, 104), `tileNode` (104, 110, 280)
+**Shared:** `fillRow` (102, 110, 120, 131, 150, 270), `initPullToRefresh` (300), `paintTiles` (120), `refreshHome` (300), `rowSkeletons` (102, 104, 105), `swr` (102, 104), `tileNode` (104, 110, 132, 280)
 
 ### `102-home-sections.js`
 
@@ -207,7 +207,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `132-author-page-resume-card.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`guideDoc`); `070-network-data.js` (`CAT`, `VER`, `catLoad`); `080-ui-shell-favourites.js` (`DET`, `toast`); `104-see-all-suggestions.js` (`stateNode`); `110-collections.js` (`colFan`, `svgIcon`); `120-search-recommendations.js` (`bookCard`, `coverNode`, `listenedList`, `moodHash`); `130-book-detail.js` (`bookInfo`, `catReady`, `closeDetail`, `folSeen`, `followSet`, `isFollowing`, `openDetail`, `wpAuthor`, `wpShow`); `133-open-progress-saved-state.js` (`resumeRecent`); `135-ratings.js` (`rtCalm`, `rtSumLoad`); `270-sheets-nextup-back.js` (`nxPub`)
+**Needs:** `030-helpers-offline-audio.js` (`guideDoc`); `070-network-data.js` (`CAT`, `VER`, `catLoad`); `080-ui-shell-favourites.js` (`DET`, `toast`); `101-home-tiles.js` (`tileNode`); `104-see-all-suggestions.js` (`stateNode`); `110-collections.js` (`colFan`, `svgIcon`); `120-search-recommendations.js` (`bookCard`, `coverNode`, `listenedList`, `moodHash`); `130-book-detail.js` (`bookInfo`, `catReady`, `closeDetail`, `folSeen`, `followSet`, `isFollowing`, `openDetail`, `wpAuthor`, `wpShow`); `133-open-progress-saved-state.js` (`resumeRecent`); `135-ratings.js` (`rtCalm`, `rtSumLoad`); `270-sheets-nextup-back.js` (`nxPub`)
 
 **Shared:** `authorBooks` (130), `authorIndex` (130), `drawAuthor` (130), `resumeHero` (120)
 
