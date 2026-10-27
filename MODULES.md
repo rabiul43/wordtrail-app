@@ -67,7 +67,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `280-downloads-progress.js` | 728 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `290-backup-maintenance.js` | 392 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 540 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
-| `296-desktop-bar.js` | 44 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Optional: errors are swallowed so the app runs without it |
+| `296-desktop-bar.js` | 44 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 61 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
 | `300-wiring.js` | 782 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |

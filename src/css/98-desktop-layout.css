@@ -23,7 +23,7 @@
 .tb-brand { display: none; }
 .mini-ctl { display: contents; }          /* on phones the play button stays a direct child of the mini player, as before */
 .mini-ib, .mini-sk { display: none; }
-.dt-tracks { display: none; }
+.dt-tracks, .dt-side { display: none; }
 
 /* phones: the bottom bar is a 4-column grid (20-home-library.css), so only the four main tabs belong in it.
    Account is the avatar in the header (its click handler triggers this tab) and Settings is a row inside Account.
@@ -151,7 +151,32 @@
   .dt-track[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
   .dt-track[aria-current="true"] .n, .dt-track[aria-current="true"] .d { color: inherit; }
   .dt-track:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: -2px; }
-  .nr .dt-tracks { display: none; }                          /* the Focus page keeps its own layout */
+  .nr .dt-tracks, .nr .dt-side { display: none; }            /* the Focus page keeps its own layout */
+
+  /* collapse / expand the left panel (cover + title + tracks): the toggle is a round chevron on the cover's inner corner;
+     collapsed, the column shrinks to nothing and the same chevron stays at the left edge of the text */
+  .player > .reader { transition: grid-template-columns .28s cubic-bezier(.2, .7, .2, 1); }
+  .player > .reader > .dt-side {
+    display: grid; place-items: center; grid-column: 1; grid-row: 1 / span 3; align-self: start; justify-self: end; position: sticky; top: .7rem; z-index: 6;
+    width: 2.25rem; height: 2.25rem; margin: .7rem .7rem 0 0; padding: 0; border: 1px solid var(--line); border-radius: 50%;
+    background: var(--glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--ink); cursor: pointer;
+    transition: transform .28s cubic-bezier(.2, .7, .2, 1), background-color .15s;
+  }
+  .dt-side .ic { width: 1.15rem; height: 1.15rem; transition: transform .28s cubic-bezier(.2, .7, .2, 1); }
+  [dir="rtl"] .dt-side .ic { transform: scaleX(-1); }
+  @media (hover: hover) { .dt-side:hover { background: var(--surface-2); } }
+  .dt-side:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: 2px; }
+  .player > .reader.side-off { grid-template-columns: 0 minmax(0, 1fr); }
+  .reader.side-off > .pcover, .reader.side-off > .ptitle, .reader.side-off > .dt-tracks {
+    visibility: hidden; opacity: 0; pointer-events: none; transition: opacity .18s, visibility 0s linear .28s;
+  }
+  .reader.side-off::before { opacity: 0; }
+  .player > .reader.side-off > .dt-side { justify-self: start; margin: .7rem 0 0 .9rem; }
+  .reader.side-off > .dt-side .ic { transform: scaleX(-1); }
+  [dir="rtl"] .reader.side-off > .dt-side .ic { transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .player > .reader, .dt-side, .dt-side .ic, .reader.side-off > .pcover, .reader.side-off > .ptitle, .reader.side-off > .dt-tracks { transition: none; }
+  }
 
   .player > .reader > .calbar { grid-column: 2; grid-row: 1; align-self: start; }
   .player > .reader > .page {

@@ -1,5 +1,13 @@
 # Changes in this version
 
+## Player: collapse / expand the left panel (desktop, from 1100px)
+- NEW round chevron button `#dt-side` on the inner corner of the cover. It hides the whole left panel (cover, title, track list); the text column then takes the full width and centres itself. While collapsed, the same chevron stays at the left edge of the text to bring the panel back.
+- The choice is remembered on this device (`wt:dt-side`, not synced or backed up) and applies to every book. Default is open. The `[` key does the same while a book is open and nothing is being typed (listed in Keyboard shortcuts).
+- `aria-expanded`, `aria-controls` and a changing label on the button; the hidden panel is `visibility: hidden`, so its tracks cannot be tabbed into. Animation is off with `prefers-reduced-motion`. RTL mirrors the chevron. Phones and tablets are untouched (the panel does not exist below 1100px).
+- Files: 10-body-views.html, 20-sheets-player.html, 98-desktop-layout.css, 296-desktop-bar.js, i18n/bn.json (3 strings).
+- Test: `python build.py --no-min`, then `node tools/unit_check.js`, `node tools/startup_check.js`, `python tools/tangle_check.py`.
+
+
 ## Search page: no Continue listening card, clearer "filters hide everything"
 - While a search is showing results, the Continue listening card (`#recents`) is hidden together with the other home rows (`syncHomeRows`, 110). It returns when the search box is cleared.
 - When results exist but the Level / read-along filter hides every one, the empty state now says "Your filters are hiding these results" with a "Clear filters" button that clears just those filters and shows the results (120, `showBooks`). Other empty states are unchanged.

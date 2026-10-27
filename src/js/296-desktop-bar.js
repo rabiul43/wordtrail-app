@@ -27,7 +27,27 @@
     Array.from(list.children).forEach((r, i) => { if (i === S.sec) r.setAttribute('aria-current', 'true'); else r.removeAttribute('aria-current'); });
     const cur = list.children[S.sec]; if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });
   }
+  /* collapse / expand the left panel (cover + title + tracks). The choice is remembered on this device (wt:dt-side) and the [ key does the same. */
+  const DT_SIDE_KEY = 'wt:dt-side';
+  function dtSide(off, save) {
+    const rd = $('#reader'), b = $('#dt-side'); if (!rd || !b) return;
+    rd.classList.toggle('side-off', off);
+    const label = off ? 'Show track panel' : 'Hide track panel';
+    b.setAttribute('aria-expanded', off ? 'false' : 'true'); b.setAttribute('aria-label', label); b.title = label + ' ( [ )';
+    if (save) store.set(DT_SIDE_KEY, off ? 1 : 0);
+  }
+  function dtSideToggle() {
+    if (!DT_WIDE.matches || el.player.hidden) return;
+    const rd = $('#reader'); if (rd) dtSide(!rd.classList.contains('side-off'), true);
+  }
   function dtInit() {
+    const sb = $('#dt-side');
+    document.addEventListener('keydown', e => {   // [ hides or shows the panel (only while a book is open and nothing is being typed)
+      if (e.key !== '[' || e.ctrlKey || e.metaKey || e.altKey || el.player.hidden || !el.backdrop.hidden) return;
+      if (e.target.closest('input, textarea, select')) return;
+      e.preventDefault(); dtSideToggle();
+    });
+    if (sb) { sb.addEventListener('click', dtSideToggle); dtSide(store.get(DT_SIDE_KEY, 0) === 1, false); }
     const sk = $('#mini-seek');
     if (sk) {
       sk.addEventListener('input', () => { sk._drag = true; el.seek.value = sk.value; sk.style.setProperty('--fill', (sk.value / (+sk.max || 1) * 100) + '%'); el.seek.dispatchEvent(new Event('input')); });
