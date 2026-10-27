@@ -33,7 +33,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `070-network-data.js` | 632 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 315 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 686 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
-| `100-home-covers.js` | 280 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
+| `100-home-covers.js` | 300 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
 | `103-browse-filters.js` | 250 | browse filters (length, mood, language, narrator, level, sort, minimum rating), filter panel. Declares `LF` |

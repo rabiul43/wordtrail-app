@@ -21,7 +21,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `080-ui-shell-favourites.js` | 315 | 46 | 28 | 30 |
 | `090-synced-stats-book-search.js` | 686 | 60 | 19 | 46 |
 | `095-weekly-report.js` | 103 | 6 | 1 | 6 |
-| `100-home-covers.js` | 280 | 42 | 20 | 3 |
+| `100-home-covers.js` | 300 | 42 | 20 | 3 |
 | `101-home-tiles.js` | 163 | 13 | 7 | 23 |
 | `102-home-sections.js` | 215 | 17 | 12 | 24 |
 | `103-browse-filters.js` | 250 | 30 | 12 | 28 |
