@@ -259,6 +259,7 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
 .tabbar { position: fixed; z-index: 8; left: 50%; bottom: 0; transform: translateX(-50%); width: min(100%, 46rem); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--bg); border-radius: var(--r-card) var(--r-card) 0 0; box-shadow: var(--shadow-up); padding: .35rem .5rem max(.35rem, env(safe-area-inset-bottom)); }
 .tabbar[hidden] { display: none; }
 .shelf-seg { display: flex; gap: .45rem; margin: 0 0 .8rem; }
+.shelf-seg[hidden] { display: none; }
 .shelf-seg .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 #shelf-ra { display: grid; gap: .9rem; align-content: start; grid-template-columns: minmax(0, 1fr); max-width: 100%; box-sizing: border-box; }
 #shelf-ra[hidden] { display: none; }

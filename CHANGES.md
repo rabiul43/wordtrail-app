@@ -1,5 +1,10 @@
 # Changes in this version
 
+## Downloads is its own page (no duplicate chip)
+- The "Downloaded" chip is gone from My books (it was the same page as the Downloads tab). My books now has Saved and Synced books; the Downloads tab opens the same list with its own title "Downloads" and no chips.
+- `showTab('downloads')` is an alias like 'synced' (sets `shelfMode = 'dl'`). The Downloads tab now lights up on that page; the My books tab always opens on Saved or Synced, never on Downloads. A reload comes back to Downloads (`wt:ui` tab "downloads").
+- Files: 10-body-views.html, 080, 280, 300, 20-home-library.css, i18n/bn.json ("Downloads"), BN-REVIEW.md, DEPENDENCIES.md / MODULES.md.
+
 ## Logo = Home, and a slim app bar on every screen
 - The logo is a real link now (`<a data-home>`): Library header, the new slim bar, and the open side bar. One click handler (`appBarInit`, 080) calls `goHome()`: from the book page, See all, Collections, My books or Account it returns to the Library (and empties an open search); on the Library it empties an open search, or scrolls to the top. Ctrl/Cmd/middle click still opens the app in a new tab.
 - NEW slim app bar `#appbar` (logo + name, search icon, account button) on every Home-area screen except the Library (which keeps its own header) and never in the player. `showView()` in 080 shows it (`appBarShow`) and sets `<html data-appbar>`. The search icon (`appBarSearch`) goes to the Library and puts the cursor in the search field. Sticky, same column as the pages, so the logo and the account button stay in the same place on every screen.

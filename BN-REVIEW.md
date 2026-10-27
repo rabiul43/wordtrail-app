@@ -93,3 +93,4 @@ Western digits are kept everywhere (the app prints them that way: 2 ঘণ্ট
 | English | Current | Question |
 |---|---|---|
 | Wordtrail home (logo link label, read by screen readers) | Wordtrail হোম | The app calls the Home tab "ঘর" elsewhere. Keep "হোম" here, or use "Wordtrail-এর ঘর"? |
+| Downloads (tab and page title) | ডাউনলোড | Next to "Downloaded" (ডাউনলোড করা). Fine as a page title? |

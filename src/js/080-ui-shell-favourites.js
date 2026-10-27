@@ -156,14 +156,19 @@
   function applyShelfMode() {
     $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
     $('#shelf').dataset.mode = shelfMode;
+    /* Downloads is its own tab (no chip): same page, own title, no chips. My books keeps the Saved and Synced books chips. */
+    $('#shelf-title').textContent = shelfMode === 'dl' ? 'Downloads' : 'My books';
+    $('#shelf-seg').hidden = shelfMode === 'dl';
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
     if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function showTab(t, keep) {
     if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; }
+    if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
     curTab = t; seeOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
-    $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === t) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    const hl = t === 'shelf' && shelfMode === 'dl' ? 'downloads' : t;   // the Downloads tab lights up on the Downloads page
+    $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     if (t === 'shelf') applyShelfMode();
     if (t === 'collections') renderCollections();
     if (t === 'account') renderAccount();
@@ -177,7 +182,7 @@
   let uiBusy = true, uiT = 0;
   function uiSave() {
     if (uiBusy || !el.player.hidden) return;   // while the player is open, keep the last home screen
-    const tab = curTab === 'shelf' && shelfMode === 'ra' ? 'synced' : curTab;
+    const tab = curTab === 'shelf' && shelfMode === 'ra' ? 'synced' : curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : curTab;
     const plain = !seeOpen && !DET.book && !DET.author && !(curTab === 'collections' && COL.open);
     const q = curTab === 'library' && !DET.book && !DET.author && !seeOpen && !el.results.hidden ? (el.q.value || '').trim() : '';
     const col = curTab === 'collections' && COL.open && !DET.book && !DET.author ? String(COL.open) : '';
@@ -189,7 +194,7 @@
     window.addEventListener('pagehide', () => { clearTimeout(uiT); uiSave(); });
     const s = store.get(UI_KEY, null);
     if (!s || typeof s.tab !== 'string') { uiBusy = false; return; }
-    try { if (s.tab !== 'library' && ['collections', 'shelf', 'account', 'synced'].includes(s.tab)) showTab(s.tab); } catch (e) { /* stay on the library */ }
+    try { if (s.tab !== 'library' && ['collections', 'shelf', 'account', 'synced', 'downloads'].includes(s.tab)) showTab(s.tab); } catch (e) { /* stay on the library */ }
     /* an open collection and a search are brought back too (search results come from the saved cache when they can) */
     try { if (s.col && s.tab === 'collections') openCollection(s.col); } catch (e) { /* stay on the shelves */ }
     let again = false;

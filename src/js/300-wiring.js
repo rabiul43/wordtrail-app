@@ -27,7 +27,8 @@
     $$('#tabbar .tab').forEach(b => b.addEventListener('click', () => {
       const t = b.dataset.tab;
       if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
-      if (t === 'downloads') { closeSheets(); shelfMode = 'dl'; showTab('shelf'); return; }
+      if (t === 'downloads') { closeSheets(); showTab('downloads'); return; }
+      if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My books never opens on the Downloads page
       pendingBack = null; showTab(t);
     }));
     $('#shelf-browse').addEventListener('click', () => showTab('library'));

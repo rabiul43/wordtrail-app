@@ -262,7 +262,7 @@
     if (cb) cb.addEventListener('click', () => { if (OFF.on) setTimeout(offGridDraw, 0); });
   }
   function offRecentsRefresh() { try { if (typeof renderRecents === 'function') renderRecents(); } catch (e) { /* home not drawn yet */ } }
-  /* ---------- My books > Downloaded (chip data-m="dl"; drawn from dlMeta only, so it works online and offline) ----------
+  /* ---------- Downloads page (tab "downloads" = My books page in mode dl; drawn from dlMeta only, so it works online and offline) ----------
      Summary card (size of everything saved here, share of the browser's quota when the Storage API tells), then one row per book
      with its cover, a download mark, the chapters saved and a Remove button. shelfDlDraw runs from offRefresh (paintCards: a
      download started, finished or was removed) and skips the redraw when nothing changed. */
@@ -353,7 +353,7 @@
   function offPromptInit() {
     const sh = $('#offsheet'); if (!sh) return;
     $('.offsheet-no', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); });
-    $('.offsheet-go', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); shelfMode = 'dl'; showTab('shelf'); });
+    $('.offsheet-go', sh).addEventListener('click', () => { offPromptSkip = true; offPromptShow(false); showTab('downloads'); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sh.hidden && sh.classList.contains('show')) { offPromptSkip = true; offPromptShow(false); } });
   }
   function offRefresh() {
