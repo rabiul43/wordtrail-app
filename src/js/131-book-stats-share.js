@@ -158,5 +158,5 @@
           h('button', { class: 'det-btn', type: 'button', onclick: () => openBook(b, { play: true }) }, svgIcon('#i-play'), listenLabel),
           heartNode(b, 'on-detail'),
           h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
-      ratingsSection(b), about, bgrd, more);
+      about, ratingsSection(b), bgrd, more);
   }

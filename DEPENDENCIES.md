@@ -31,7 +31,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `120-search-recommendations.js` | 573 | 64 | 22 | 61 |
 | `130-book-detail.js` | 193 | 30 | 16 | 20 |
 | `131-book-stats-share.js` | 162 | 13 | 4 | 31 |
-| `132-author-page-resume-card.js` | 122 | 6 | 4 | 27 |
+| `132-author-page-resume-card.js` | 133 | 6 | 4 | 28 |
 | `133-open-progress-saved-state.js` | 239 | 26 | 13 | 17 |
 | `134-version-picker.js` | 271 | 15 | 3 | 12 |
 | `135-ratings.js` | 492 | 66 | 12 | 34 |
@@ -95,7 +95,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `090-synced-stats-book-search.js` (`stDirty`, `stLoad`, `stSave`, `stSummary`); `102-home-sections.js` (`plural`); `120-search-recommendations.js` (`paintCards`); `140-open-book.js` (`updateHeader`); `150-player-reader.js` (`loadAudio`, `pre`); `280-downloads-progress.js` (`dqClear`, `dqGet`, `fmtMB`, `paintDl`, `renderTracks`); `300-wiring.js` (`init`)
 
-**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (120, 140, 280), `PROXY` (133, 280), `adb` (280), `buzz` (11 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090, 280), `dmMB` (280), `dmRender` (280, 290), `dmSize` (090, 280), `dmUsedPct` (280), `fmt` (150, 260, 280, 296, 300), `fmtLong` (7 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offForced` (280), `offHave` (120, 280), `offMsg` (280), `offNearSaved` (140, 280), `offTrackOn` (140, 280), `reduceMotion` (090, 150, 246, 247), `savePrefs` (20 files), `srcSeq` (150), `store` (35 files), `storeHook` (295), `warmUrl` (050, 140, 150)
+**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `OFF` (120, 140, 280), `PROXY` (133, 280), `adb` (280), `buzz` (11 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280), `dlOk` (180, 280), `dlPersist` (280), `dlReady` (090, 140, 280), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090, 280), `dmMB` (280), `dmRender` (280, 290), `dmSize` (090, 280), `dmUsedPct` (280), `fmt` (150, 260, 280, 296, 300), `fmtLong` (8 files), `fmtShort` (101, 110), `guideDoc` (26 files), `idb` (12 files), `isLocal` (050, 140, 150, 180, 280), `motionOk` (102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offForced` (280), `offHave` (120, 280), `offMsg` (280), `offNearSaved` (140, 280), `offTrackOn` (140, 280), `reduceMotion` (090, 150, 246, 247), `savePrefs` (20 files), `srcSeq` (150), `store` (35 files), `storeHook` (295), `warmUrl` (050, 140, 150)
 
 ### `031-virtual-list.js`
 
@@ -207,7 +207,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `132-author-page-resume-card.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`guideDoc`); `070-network-data.js` (`CAT`, `VER`, `catLoad`); `080-ui-shell-favourites.js` (`DET`, `toast`); `101-home-tiles.js` (`tileNode`); `104-see-all-suggestions.js` (`stateNode`); `110-collections.js` (`colFan`, `svgIcon`); `120-search-recommendations.js` (`bookCard`, `coverNode`, `listenedList`, `moodHash`); `130-book-detail.js` (`bookInfo`, `catReady`, `closeDetail`, `folSeen`, `followSet`, `isFollowing`, `openDetail`, `wpAuthor`, `wpShow`); `133-open-progress-saved-state.js` (`resumeRecent`); `135-ratings.js` (`rtCalm`, `rtSumLoad`); `270-sheets-nextup-back.js` (`nxPub`)
+**Needs:** `030-helpers-offline-audio.js` (`fmtLong`, `guideDoc`); `070-network-data.js` (`CAT`, `VER`, `catLoad`); `080-ui-shell-favourites.js` (`DET`, `toast`); `101-home-tiles.js` (`tileNode`); `104-see-all-suggestions.js` (`stateNode`); `110-collections.js` (`colFan`, `svgIcon`); `120-search-recommendations.js` (`bookCard`, `coverNode`, `listenedList`, `moodHash`); `130-book-detail.js` (`bookInfo`, `catReady`, `closeDetail`, `folSeen`, `followSet`, `isFollowing`, `openDetail`, `wpAuthor`, `wpShow`); `133-open-progress-saved-state.js` (`resumeRecent`); `135-ratings.js` (`rtCalm`, `rtSumLoad`); `270-sheets-nextup-back.js` (`nxPub`)
 
 **Shared:** `authorBooks` (130), `authorIndex` (130), `drawAuthor` (130), `resumeHero` (120)
 

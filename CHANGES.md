@@ -50,3 +50,11 @@
 - "All books" is a cover grid on desktop, with the sort chips on the heading row. The old "Start here" card and "About the author" section are hidden on desktop (the banner holds them); phones keep them.
 - Files: `src/js/132-author-page-resume-card.js` (drawAuthor: new `.aut-hero`, `.aut-info`, `.aut-meta`, `.aut-bio`, `.aut-actions`, `.aut-start-btn`, `.aut-grid`, `.det-bg`), `src/css/98-desktop-layout.css` (new block "desktop author page"), `tools/tangle_baseline.json` (132 now uses `tileNode` from 101).
 - Nothing else is touched: every new rule is scoped to `.aut-*` and sits inside `@media (min-width: 900px)`. Below 900px the extra elements are hidden or `display: contents`. Checked by screenshots of the real build: phone author page, phone book page and desktop book page are pixel-identical to before.
+
+## Home: "Continue listening" becomes a full-width banner (one book in progress, 900px and wider)
+- When only one book is in progress (`#recent-list.rc-solo`), the card spans the page: bigger cover (11rem), the cover blurred behind on the right, bigger title, progress bar, Resume button and "x h left" in one row.
+- With two or more books the hero keeps the existing layout (hero left, "Also in progress" right).
+- Files: `src/js/132-author-page-resume-card.js` (resumeHero: `.rs-bg` backdrop, `.resume-left` time left), `src/css/20-home-library.css` (new block after the wide-screens rules). Phones and 700-899px are unchanged (screenshots of the real build are pixel-identical for 1 and 2 books at 390 and 800px, and for 2 books at 1440px).
+
+## Book page: "Ratings and reviews" now sits below "About this book"
+- `src/js/131-book-stats-share.js` (drawDetail): order is now About, Ratings and reviews, the Wikipedia background section, then More like this. Same order on every screen size. Nothing else changed.

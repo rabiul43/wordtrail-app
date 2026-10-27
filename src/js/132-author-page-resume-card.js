@@ -107,8 +107,18 @@
   function resumeHero(r) {
     const pct = Math.max(0, Math.min(100, Math.round((r.pct || 0) * 100)));
     const left = pct >= 100 ? 'Finished' : pct < 1 ? 'Just started' : pct + '% listened';
+    const total = r.total || (CAT.books && (CAT.books.find(b => String(b.id) === String(r.id)) || {}).total) || 0;
+    const leftSec = total > 0 && pct < 100 ? Math.round(total * Math.max(0, 1 - (r.pct || 0)) / (P.speed || 1)) : 0;
+    const cov = coverNode({ id: r.id, title: r.title, authors: r.authors, cover: r.cover, ia: r.ia });
+    /* desktop banner (only when this is the one book in progress, see 20-home-library.css): the cover, blurred, fills the right side */
+    const back = h('div', { class: 'rs-bg', 'aria-hidden': 'true' });
+    try {
+      const fillBack = () => { const im = cov.querySelector('img.loaded'); if (!im) return false; back.style.backgroundImage = 'url("' + (im.currentSrc || im.src) + '")'; back.classList.add('on'); return true; };
+      if (!fillBack()) { const mo = new MutationObserver(() => { if (fillBack()) mo.disconnect(); }); mo.observe(cov, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'src'] }); setTimeout(() => mo.disconnect(), 15000); }
+    } catch (e) { /* no blurred backdrop */ }
     return h('div', { class: 'resume' },
-      h('div', { class: 'resume-cover', 'aria-hidden': 'true' }, coverNode({ id: r.id, title: r.title, authors: r.authors, cover: r.cover, ia: r.ia })),
+      back,
+      h('div', { class: 'resume-cover', 'aria-hidden': 'true' }, cov),
       h('div', { class: 'resume-body' },
         h('div', { class: 'resume-k' }, pct >= 100 ? 'Finished' : 'Continue listening'),
         h('div', { class: 'resume-t' }, r.title),
@@ -116,6 +126,7 @@
       h('div', { class: 'resume-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(pct), 'aria-label': 'Listening progress' }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'resume-row' },
           h('span', { class: 'resume-pct' }, left),
+          h('span', { class: 'resume-left' }, leftSec >= 60 ? fmtLong(leftSec) + ' left' : ''),
           h('button', { class: 'resume-btn', type: 'button', 'aria-label': (pct >= 100 ? 'Listen again: ' : 'Resume: ') + r.title, onclick: () => resumeRecent(r) },
             (() => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true'); const pth = document.createElementNS('http://www.w3.org/2000/svg', 'path'); pth.setAttribute('d', 'M8 5v14l11-7z'); s.append(pth); return s; })(),
             pct >= 100 ? 'Listen again' : 'Resume')));
