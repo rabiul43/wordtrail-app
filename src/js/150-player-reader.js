@@ -393,7 +393,7 @@
     try { audio.preservesPitch = true; } catch (e) { /* older browsers */ }
     el.seek.max = S.durs[i] || 100;
     updateSeekUI(time || 0);
-    renderSection(i); updateHeader(); markTracks(); setMediaSession(); paintSkipIntro();
+    renderSection(i); updateHeader(); markTracks(); setMediaSession(); paintSkipIntro(); neKick(i);
     if (cached || !local) { if (autoplay) audio.play().catch(onPlayFail); }
     else warmUrl(id, i).then(u => {
       if (my !== srcSeq) return; // another track was chosen meanwhile

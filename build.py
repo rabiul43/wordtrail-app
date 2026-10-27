@@ -138,6 +138,7 @@ PARTS = [
     ('file', 'src/js/247-player-menu.js'),
     ('file', 'src/js/250-characters.js'),
     ('file', 'src/js/260-audio-effects.js'),
+    ('file', 'src/js/265-notice-engine.js'),
     ('file', 'src/js/270-sheets-nextup-back.js'),
     ('file', 'src/js/280-downloads-progress.js'),
     ('file', 'src/js/290-backup-maintenance.js'),

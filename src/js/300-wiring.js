@@ -331,6 +331,7 @@
     });
     $('#in-awake').addEventListener('change', e => { P.keepAwake = e.target.checked; savePrefs(); wakeSync(); });
     $('#in-nn').addEventListener('change', e => { P.foldSkipped = e.target.checked; savePrefs(); if (S.model) { S.curId = -1; replan(true); } toast(P.foldSkipped ? 'Not-narrated text is folded away' : 'Not-narrated text is shown in the reader'); });
+    $('#in-smartcut').addEventListener('change', e => { P.smartCut = e.target.checked; savePrefs(); if (S.model) replan(false); if (e.target.checked && S.book) neKick(S.sec); toast(P.smartCut ? 'Smart detection is on' : 'Smart detection is off'); });
     $('#in-skipcuts').addEventListener('change', e => { P.skipCuts = e.target.checked; savePrefs(); if (S.model) replan(false); toast(P.skipCuts ? 'Intro and outro will be skipped' : 'Intro and outro skipping is off'); });
     $('#in-bcol').addEventListener('change', e => { P.bookColors = e.target.checked; savePrefs(); if (e.target.checked && S.book && !el.player.hidden) bookAccent(S.book); else clearAccent(); });
     $('#in-langs').addEventListener('change', e => { P.otherLangs = e.target.checked; savePrefs(); catPurge(); refreshHome(); toast(P.otherLangs ? 'Showing all languages' : 'Showing English only'); });

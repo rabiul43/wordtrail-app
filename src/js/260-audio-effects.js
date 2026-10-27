@@ -325,6 +325,8 @@
      Shows for the first 30 seconds of a track and jumps to where the text starts (the app's own estimate), or about 15 s in
      when there is no text. Settings > Audio can turn it off. */
   function introTarget() {
+    const hint = neHint(S.sec);   // exact time heard by the notice engine (265-notice-engine.js)
+    if (hint > 3) return Math.max(0, hint - 0.2);
     const p = S.plan && S.plan[S.sec];
     let t = p && p.ids && p.ids.length ? p.cLo : 0;
     if (!(t > 3 && t < 75)) t = 15;

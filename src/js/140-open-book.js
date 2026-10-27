@@ -259,8 +259,8 @@
   }
   /* [introEnd, outroStart|null] for a track, or null (then the fixed lead/outro apply). */
   function cutFor(i) {
-    if (P.skipCuts === false || !CUTS.d || !S.book) return null;
-    const b = CUTS.d.b[S.book.id], e = b && b[i];
+    if (P.skipCuts === false || !S.book) return null;
+    const b = CUTS.d && CUTS.d.b[S.book.id], e0 = b && b[i], e = Array.isArray(e0) ? e0 : neCut(i);   // cuts.json first, then what the notice engine heard (265-notice-engine.js)
     if (!Array.isArray(e)) return null;
     const d = S.durs[i] || 0;
     let a = +e[0] || 0, o = e[1] == null ? null : +e[1];
