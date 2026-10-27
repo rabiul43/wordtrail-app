@@ -50,7 +50,7 @@
     try { const n = (await sndCacheList()).reduce((a, x) => a + x.size, 0); el.textContent = n < 1048576 ? '0 MB' : Math.round(n / 1048576) + ' MB'; } catch (e) { el.textContent = ''; }
   }
   async function sndCacheClear() {
-    if (!confirm('Remove the music and sound files saved on this device? They download again when needed. Your own recordings are kept.')) return;
+    if (!await askConfirm({ title: 'Remove saved sounds?', text: 'The music and sound files saved on this device are removed. They download again when needed. Your own recordings are kept.', ok: 'Remove' })) return;
     try {
       for (const x of await sndCacheList()) { try { await (await caches.open(x.cache)).delete(x.url); } catch (e) { /* skip */ } }
       try { localStorage.removeItem('wt-snd-used'); localStorage.removeItem(SND_KEEP_KEY); } catch (e) { /* ignore */ }

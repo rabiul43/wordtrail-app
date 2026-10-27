@@ -105,7 +105,7 @@
     musOffPaint(); sndCacheSizePaint();
   }
   async function musOffClear() {
-    if (!confirm('Remove the music saved for offline? It downloads again when needed.')) return;
+    if (!await askConfirm({ title: 'Remove offline music?', text: 'It downloads again when needed.', ok: 'Remove' })) return;
     try {
       const keep = sndKeepSet(), c = await caches.open('wt-music');
       for (const url of keep) { try { await c.delete(url); } catch (err) { /* skip */ } }

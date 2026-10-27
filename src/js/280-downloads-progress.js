@@ -301,7 +301,7 @@
         h('span', { class: 'sd-cover', 'aria-hidden': 'true' }, cv),
         h('span', { class: 'sd-body' }, h('span', { class: 'sd-t' }, b.title), h('span', { class: 'sd-a' }, b.authors), status)),
       h('button', { class: 'sd-rm', type: 'button', 'aria-label': 'Remove download of ' + b.title, onclick: async () => {
-        if (!confirm('Remove the downloaded audio of "' + b.title + '" (' + dmMB(r.size) + ') from this device?')) return;
+        if (!await askConfirm({ title: 'Remove this download?', item: b.title, meta: dmMB(r.size), text: 'The audio is removed from this device. You can download it again any time.', ok: 'Remove' })) return;
         if (!await dmDrop(m.id)) toast('Could not remove it right now.', 4000); else toast('Download removed.');
         paintCards(); paintDl(); dmRender(); shelfDlDraw(true);
       } }, 'Remove'));
@@ -447,7 +447,7 @@
   async function dlRemove() {
     const b = S.book;
     if (!b || DL.running || !dlSaved(b.id)) return;
-    if (!confirm('Remove the downloaded audio of "' + b.title + '" from this device?')) return;
+    if (!await askConfirm({ title: 'Remove this download?', item: b.title, text: 'The audio is removed from this device. You can download it again any time.', ok: 'Remove' })) return;
     try { await adb.dropBook(b.id); } catch (e) { toast('Could not remove the download.', 4000); return; }
     dlMeta.delete(String(b.id));
     { const q = dqGet(); if (q && q.id === String(b.id)) dqClear(); }
@@ -717,7 +717,7 @@
     const t = trackState(i);
     if (t.state === 'busy' || t.state === 'wait') return;
     if (t.state === 'done') {
-      if (!confirm('Remove the downloaded audio of \"' + (b.secs[i].title || 'this track') + '\" from this device?')) return;
+      if (!await askConfirm({ title: 'Remove this track?', item: b.secs[i].title || 'this track', text: 'The audio is removed from this device. You can download it again any time.', ok: 'Remove' })) return;
       dlDropTrack(b.id, i); paintTrack(i); toast('Download removed.'); return;
     }
     if (DL.running) { toast('Another download is running. Please wait until it finishes.', 3500); return; }

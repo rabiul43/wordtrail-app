@@ -41,6 +41,7 @@ PARTS = [
     ('file', 'src/css/98-desktop-layout.css'),
     ('file', 'src/css/98b-desktop-polish.css'),
     ('file', 'src/css/99-home-header.css'),
+    ('file', 'src/css/99b-confirm.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

@@ -172,7 +172,7 @@
     } catch (e) { acErr = acNice(e); renderAcctSync(); }
   }
   async function acSignOut() {
-    if (!confirm('Sign out? Your data stays on this device and in your account.')) return;
+    if (!await askConfirm({ title: 'Sign out?', text: 'Your data stays on this device and in your account.', ok: 'Sign out', tone: 'calm' })) return;
     try { if (acFb) await acFb.auth().signOut(); } catch (e) { /* ignore */ }
     acUser = null; acStale = false; acSaveInfo(null); try { localStorage.removeItem(AC_META); localStorage.removeItem(AC_BIG); } catch (e) { /* ignore */ }
     acDirty.clear(); acDirtySave(); acMsg = ''; renderAcctSync();
@@ -432,7 +432,7 @@
   }
   async function acDeleteCloud() {
     if (!acUser) { toast('Still connecting. Try again in a moment.', 3000); return; }
-    if (!confirm('Delete everything saved in your account? Data on this device is kept.')) return;
+    if (!await askConfirm({ title: 'Delete your cloud data?', text: 'Everything saved in your account is deleted. Data on this device is kept.', ok: 'Delete' })) return;
     try { await acWipeCloud(); toast('Cloud data deleted.', 2500); }
     catch (e) { toast('Could not delete the cloud data.', 3500); }
   }
@@ -441,8 +441,8 @@
      account; when it does, the cloud data is already gone and the person is told to sign in again and repeat the tap. */
   async function acDeleteAccount() {
     if (!acUser || !acInfo()) { toast('Still connecting. Try again in a moment.', 3000); return; }
-    if (!confirm('Delete your account? Everything saved in your account and your sign-in are removed. Data on this device is kept. Ratings and reviews you already published stay unless you remove them first. This cannot be undone.')) return;
-    if (!confirm('Last check: delete your account for good?')) return;
+    if (!await askConfirm({ title: 'Delete your account?', text: 'Everything saved in your account and your sign-in are removed. Data on this device is kept. Ratings and reviews you already published stay unless you remove them first. This cannot be undone.', ok: 'Delete account' })) return;
+    if (!await askConfirm({ title: 'Last check', text: 'Delete your account for good?', ok: 'Yes, delete it' })) return;
     try {
       await acWipeCloud();
       await acUser.delete();

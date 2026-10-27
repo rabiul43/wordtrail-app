@@ -287,7 +287,7 @@
         h('div', { class: 'dm-t' }, h('b', {}, r.m.title || 'Untitled'), sub),
         h('span', { class: 'dm-sz' }, dmMB(r.size)),
         h('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Remove download of ' + (r.m.title || 'this book'), onclick: async () => {
-          if (!confirm('Remove the downloaded audio of "' + (r.m.title || 'this book') + '" (' + dmMB(r.size) + ') from this device?')) return;
+          if (!await askConfirm({ title: 'Remove this download?', item: r.m.title || 'this book', meta: dmMB(r.size), text: 'The audio is removed from this device. You can download it again any time.', ok: 'Remove' })) return;
           if (!await dmDrop(r.m.id)) toast('Could not remove it right now.', 4000); else toast('Download removed.');
           paintCards(); paintDl(); dmRender();
         } }, 'Remove')));
@@ -300,7 +300,7 @@
     const rows = [...dlMeta.values()];
     if (!rows.length) { toast('No books are downloaded.'); return; }
     const size = rows.reduce((a, m) => a + dmSize(m), 0);
-    if (!confirm('Delete the downloaded audio of ' + plural(rows.length, 'book') + ' (' + dmMB(size) + ')? Your positions, stats and favourites are kept.')) return;
+    if (!await askConfirm({ title: 'Delete all downloads?', item: plural(rows.length, 'book'), meta: dmMB(size), text: 'Your positions, stats and favourites are kept.', ok: 'Delete all' })) return;
     let ok = 0; for (const m of rows) if (await dmDrop(m.id)) ok++;
     toast(ok === rows.length ? plural(ok, 'book') + ' deleted, ' + dmMB(size) + ' freed.' : ok + ' of ' + rows.length + ' deleted. A book that is downloading right now was skipped.', 4500);
     paintCards(); paintDl(); dmRender();
@@ -310,7 +310,7 @@
     const fset = dmFinished(), rows = [...dlMeta.values()].filter(m => fset.has(String(m.id)));
     if (!rows.length) { toast('No finished books are downloaded.'); return; }
     const size = rows.reduce((a, m) => a + dmSize(m), 0);
-    if (!confirm('Delete the downloaded audio of ' + plural(rows.length, 'finished book') + ' (' + dmMB(size) + ')? Your positions, stats and favourites are kept.')) return;
+    if (!await askConfirm({ title: 'Delete finished books?', item: plural(rows.length, 'finished book'), meta: dmMB(size), text: 'Your positions, stats and favourites are kept.', ok: 'Delete' })) return;
     let ok = 0; for (const m of rows) if (await dmDrop(m.id)) ok++;
     toast(ok === rows.length ? plural(ok, 'finished book') + ' deleted, ' + dmMB(size) + ' freed.' : ok + ' of ' + rows.length + ' deleted. A book that is downloading right now was skipped.', 4500);
     paintCards(); paintDl(); dmRender();

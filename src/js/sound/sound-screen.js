@@ -1,8 +1,8 @@
   /* ---------- sound-screen.js ----------
      Sound screen: reset, the mixer rows, My own words, ambSync and ambInit. */
   const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'sndBalance', 'ambBook', 'ambG', 'musSeen', 'sndDev'];
-  function sndResetAll() {
-    if (!confirm('Put all sound settings back to normal? Your saved mixes for each book are cleared too.')) return;
+  async function sndResetAll() {
+    if (!await askConfirm({ title: 'Reset sound settings?', text: 'Everything goes back to normal. Your saved mixes for each book are cleared too.', ok: 'Reset', tone: 'calm' })) return;
     SND_RESET_KEYS.forEach(x => { delete P[x]; });
     AMB.preset = ''; AMB.undo = null; AMB.auto = null; AMB.autoId = null; AMB.bookId = '';
     savePrefs(); ambBookCheck(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambPaintScenes(); ambMatchScene(); ambCustomPaint(); ambShiftLabel(); ambPresetPaint();

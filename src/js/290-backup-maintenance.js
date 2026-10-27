@@ -109,7 +109,7 @@
     if (!d || d.app !== 'wordtrail' || d.kind !== 'backup' || d.v !== 1 || !bkIsObj(d.ls)) { toast('That is not a Wordtrail backup file.', 4500); return; }
     const ok = bkCheck(d), keys = Object.keys(ok.ls), n = keys.length + Object.keys(ok.idb).length;
     if (!n) { toast('That backup has nothing this app can restore.', 4500); return; }
-    if (!confirm('Restore ' + n + ' saved items from the backup of ' + (String(d.created || '').slice(0, 10) || 'unknown date') + '?' + (ok.skipped ? ' ' + ok.skipped + ' damaged items will be skipped.' : '') + ' Matching data on this device will be replaced.')) return;
+    if (!await askConfirm({ title: 'Restore this backup?', item: 'Backup of ' + (String(d.created || '').slice(0, 10) || 'unknown date'), meta: n + ' items', text: (ok.skipped ? ok.skipped + ' damaged items will be skipped. ' : '') + 'Matching data on this device will be replaced.', ok: 'Restore', tone: 'calm' })) return;
     window.__wtRestoring = true;
     const before = {};   // what was here, so a failed restore can be undone
     try {

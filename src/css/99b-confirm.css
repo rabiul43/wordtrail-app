@@ -1,0 +1,22 @@
+/* ---------- Confirm dialog (replaces the browser's confirm() popup; see askConfirm in 080) ---------- */
+.cf-back { position: fixed; inset: 0; z-index: 400; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 env(safe-area-inset-bottom); background: color-mix(in srgb, #000 62%, transparent); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.cf-back.on { opacity: 1; }
+.cf-card { width: min(100%, 26rem); box-sizing: border-box; margin: 0 .75rem .75rem; padding: 1.5rem 1.35rem 1.15rem; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-xl); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); font-family: var(--font-ui); transform: translateY(1.5rem) scale(.97); opacity: 0; transition: transform var(--dur-slow) var(--spring), opacity var(--dur) var(--ease); }
+.cf-back.on .cf-card { transform: none; opacity: 1; }
+.cf-ic { width: 3rem; height: 3rem; border-radius: 50%; display: grid; place-items: center; margin: 0 0 .9rem; background: color-mix(in srgb, var(--err) 16%, transparent); color: var(--danger); }
+.cf-card[data-tone="calm"] .cf-ic { background: var(--accent-soft); color: var(--accent); }
+.cf-ic svg { width: 1.45rem; height: 1.45rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cf-t { margin: 0 0 .4rem; font-family: var(--font-display); font-size: 1.4rem; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }
+.cf-item { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; margin: .7rem 0 .2rem; padding: .65rem .8rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-ctl); font-size: .95rem; }
+.cf-item b { font-weight: 600; overflow-wrap: anywhere; }
+.cf-item span { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; font-size: .88rem; }
+.cf-p { margin: .55rem 0 0; color: var(--muted); font-size: .96rem; line-height: 1.5; }
+.cf-row { display: flex; gap: .6rem; margin-top: 1.3rem; }
+.cf-row button { flex: 1 1 0; min-height: 2.9rem; border: 0; border-radius: var(--r-ctl); font: inherit; font-weight: 600; font-size: 1rem; cursor: pointer; transition: transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease); }
+.cf-row button:active { transform: scale(.97); }
+.cf-no { background: var(--surface); color: var(--ink); border: 1px solid var(--line) !important; }
+.cf-yes { background: var(--accent); color: var(--accent-ink); }
+.cf-card[data-tone="danger"] .cf-yes { background: var(--err); color: var(--err-ink); }
+.cf-row button:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+@media (min-width: 640px) { .cf-back { align-items: center; } .cf-card { margin: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .cf-back, .cf-card { transition: none; } }

@@ -5,6 +5,47 @@
     if (action) el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; clearTimeout(toastTimer); action[1](); } }, action[0]));
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.toast.hidden = true; }, ms);
   }
+  /* Themed replacement for window.confirm(). Resolves true (OK) or false (Cancel, Esc, tap outside).
+     askConfirm({ title, text, item, meta, ok, cancel, tone })  tone: 'danger' (default, red button) or 'calm'.
+     Use as:  if (!await askConfirm({ ... })) return;  (the caller must be async) */
+  let cfOpen = null;
+  function askConfirm(o) {
+    o = o || {};
+    if (cfOpen) cfOpen(false);
+    return new Promise(resolve => {
+      const tone = o.tone === 'calm' ? 'calm' : 'danger', prev = document.activeElement;
+      const svg = tone === 'calm'
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5M12 16h.01"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+      const ic = h('div', { class: 'cf-ic' }); ic.innerHTML = svg;
+      const no = h('button', { type: 'button', class: 'cf-no' }, o.cancel || 'Keep it');
+      const yes = h('button', { type: 'button', class: 'cf-yes' }, o.ok || 'Remove');
+      const card = h('div', { class: 'cf-card', role: 'alertdialog', 'aria-modal': 'true', 'aria-labelledby': 'cf-t', 'aria-describedby': 'cf-p', 'data-tone': tone },
+        ic, h('h2', { class: 'cf-t', id: 'cf-t' }, o.title || 'Are you sure?'),
+        o.item ? h('div', { class: 'cf-item' }, h('b', {}, o.item), o.meta ? h('span', {}, o.meta) : '') : '',
+        o.text ? h('p', { class: 'cf-p', id: 'cf-p' }, o.text) : '',
+        h('div', { class: 'cf-row' }, no, yes));
+      const back = h('div', { class: 'cf-back' }, card);
+      let done = false;
+      const finish = v => {
+        if (done) return; done = true; cfOpen = null;
+        document.removeEventListener('keydown', onKey, true);
+        back.classList.remove('on'); setTimeout(() => back.remove(), 200);
+        try { if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) { /* element gone */ }
+        resolve(v);
+      };
+      const onKey = e => {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(false); }
+        else if (e.key === 'Tab') { const f = [no, yes], i = f.indexOf(document.activeElement); e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + 2) % 2].focus(); }
+      };
+      cfOpen = finish;
+      no.onclick = () => finish(false); yes.onclick = () => finish(true);
+      back.addEventListener('click', e => { if (e.target === back) finish(false); });
+      document.addEventListener('keydown', onKey, true);
+      document.body.append(back);
+      requestAnimationFrame(() => { back.classList.add('on'); no.focus({ preventScroll: true }); });
+    });
+  }
   function setStatus(msg, kind, action) {
     el.status.className = 'status' + (kind ? ' ' + kind : '');
     el.status.textContent = msg || '';
