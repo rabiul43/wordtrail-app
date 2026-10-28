@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Audiobooks you can read along with.">
 <meta name="theme-color" content="#0F1220">
-<script>try{var __t=(JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{}).theme,__l=matchMedia('(prefers-color-scheme: light)').matches,__c=({light:'#FAF7F2',sepia:'#EFE6D0',contrast:'#000000',dark:'#0F1220'})[__t]||(__l?'#FAF7F2':'#0F1220');document.querySelector('meta[name="theme-color"]').setAttribute('content',__c);}catch(e){}</script>
-<script>try{var __p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};document.documentElement.setAttribute('data-nav',__p.navOpen===true?'open':'rail');document.documentElement.setAttribute('data-hdr',(__p.hdrNew===false&&!matchMedia('(min-width:700px)').matches)?'classic':'new');}catch(e){document.documentElement.setAttribute('data-hdr','new');}</script>
+<script>/* The saved settings are read once here; the small scripts below reuse window.__wtP (read-only). */try{window.__wtP=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};}catch(e){window.__wtP={};}try{var __t=window.__wtP.theme,__l=matchMedia('(prefers-color-scheme: light)').matches,__c=({light:'#FAF7F2',sepia:'#EFE6D0',contrast:'#000000',dark:'#0F1220'})[__t]||(__l?'#FAF7F2':'#0F1220');document.querySelector('meta[name="theme-color"]').setAttribute('content',__c);}catch(e){}</script>
+<script>try{var __p=window.__wtP||{};document.documentElement.setAttribute('data-nav',__p.navOpen===true?'open':'rail');document.documentElement.setAttribute('data-hdr',(__p.hdrNew===false&&!matchMedia('(min-width:700px)').matches)?'classic':'new');}catch(e){document.documentElement.setAttribute('data-hdr','new');}</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -14,7 +14,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Wordtrail">
-<link rel="preconnect" href="https://librivox.org" crossorigin>
 <link rel="dns-prefetch" href="https://archive.org">
 <title>Wordtrail</title>
 <!--WT-FONTS-PRECONNECT--><link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,7 +69,7 @@ html.resuming .boot-sk { display: none; }
 <script>try { var __o = JSON.parse(localStorage.getItem('wt:open') || 'null'); if (__o && __o.id && localStorage.getItem('wt:onboarded')) { document.documentElement.classList.add('resuming'); setTimeout(function () { document.documentElement.classList.remove('resuming'); }, 8000); } } catch (e) {}</script>
 <!--WT-FONTS-LINKS--><script>
 /* Fonts: with "Faster loading" on, the Google Fonts stylesheet no longer blocks the first paint (text shows in the system font, then swaps). Off = the old blocking <link>. */
-(function(){var on=true;try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}');on=!p||p.fastLoad!==false;}catch(e){}
+(function(){var on=true;try{var p=window.__wtP;on=!p||p.fastLoad!==false;}catch(e){}
 var u="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Outfit:wght@300;400;500;600&display=swap";
 document.write(on?'<link rel="stylesheet" href="'+u+'" media="print" onload="this.media=\'all\'">':'<link rel="stylesheet" href="'+u+'">');})();
 </script>
@@ -100,10 +99,10 @@ var o=['Wordtrail diagnostics','UA: '+n.userAgent,'memory: '+(n.deviceMemory||'?
 'counts: '+(Object.keys(c).map(function(k){return k+' '+c[k];}).join(', ')||'none')+(D.drop?' (+'+D.drop+' older dropped)':''),''];
 D.log.forEach(function(x){o.push(new Date(x.t).toTimeString().slice(0,8)+'  '+x.type+'  '+x.msg+(x.n>1?'  (x'+x.n+')':''));});
 if(!D.log.length)o.push('(no entries yet)');return o.join('\n');};
-try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};D.set(p.diag!==false);}catch(e){D.set(true);}
+try{var p=window.__wtP||{};D.set(p.diag!==false);}catch(e){D.set(true);}
 })();
 </script>
 <script>
 /* Lite graphics: set before first paint (same rule as applyLite() in the main script). */
-(function(){try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};var m=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;var n=navigator;var weak=m||(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4);if(p.calm===true)document.documentElement.setAttribute('data-calm','');if(p.liteForce===true||(p.liteGfx!==false&&weak))document.documentElement.setAttribute('data-lite','');}catch(e){}})();
+(function(){try{var p=window.__wtP||{};var m=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;var n=navigator;var weak=m||(n.deviceMemory&&n.deviceMemory<=2)||(n.hardwareConcurrency&&n.hardwareConcurrency<=4);if(p.calm===true)document.documentElement.setAttribute('data-calm','');if(p.liteForce===true||(p.liteGfx!==false&&weak))document.documentElement.setAttribute('data-lite','');}catch(e){}})();
 </script>

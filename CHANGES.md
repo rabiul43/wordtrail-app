@@ -116,3 +116,7 @@
 - Three timers ticked all day, even with nothing playing: smart mix (250 ms), sound balance (500 ms), scene label (1 s). They now come from one helper, `idleTimer()` / `idleTimersSync()` in `src/js/sound/sound-core.js`, and run only while audio plays and the page is visible (or while the Sound sheet is open). Play, pause, seek, show/hide and the Sound sheet opening start and stop them; each runs once more on stopping so its display is final.
 - Governed by the existing Settings > Advanced "Save battery while playing and in the background" switch (off = old always-on behaviour).
 - Files: `src/js/sound/sound-core.js`, `smart-mix.js`, `sound-screen.js`, `src/js/300-wiring.js`. Checked in headless Chromium: idle page has only the 10-minute mood timer; play starts the timers, pause stops them, no errors. Not tested with real audio on a phone.
+
+## P3: page header leftovers
+- Removed the unused `<link rel="preconnect" href="https://librivox.org">` (LibriVox is only a fallback; the catalog and lists come from the local catalog). The archive.org DNS prefetch stays (covers).
+- The saved settings (`wt:prefs`) were parsed five times by the inline scripts in `src/html/00-head.html`; now parsed once into `window.__wtP` and reused by the theme, nav/header, fonts, diagnostics and lite-graphics scripts. Same results, also with missing or broken settings.
