@@ -1,9 +1,11 @@
 ## strength=strong|weak|normal checks how loud the weather is made: heavy rain / driving snow = strong, light drizzle / soft rain / distant thunder = weak.
 ## Scene test fixtures. Format:
 ##   === id | genres: a, b        starts a case (genres optional; trap marks a tricky case)
+##   === id | chapter           the whole case is one chapter: its setting (main place, weather, time, mood) is scanned first, as the app does
 ##   # place=sea/harbour weather=none time=night mood=dread trans=door     expectations for the NEXT paragraph
 ##   Paragraph text (a blank line ends it).
 ## Values: a word, alternatives with /, or none (nothing should be detected). A key left out is not checked.
+## A key with nothing after the = (like "place=") is not checked yet. Cases whose id starts with "real-" are real book paragraphs (made by tools/pick_paragraphs.py): the test prints one score for them, e.g. "182 of 200 correct".
 ## place = keys of the place list, weather = rain storm wind snow fog, time = night day, mood = dread danger peace sorrow merry
 ## trans = door gate steps none (the transition sound from the previous paragraph's place to this one)
 ## Replace or add cases with real Gutenberg paragraphs. Keep each excerpt to 1-3 paragraphs.
@@ -790,3 +792,445 @@ The light of the lamp shone on the rain, and the rain ran down the glass.
 # strength=normal/none
 The sky was heavy with rain, and the air smelled of it as they set out.
 
+
+## ---- Skip rules (SC_SKIP in 231-scene-scoring.js): each rule has one case that must trigger (-yes) and one that must not (-no) ----
+
+## figure of speech: "the fog of war"
+=== skip-fog-of-war-yes
+# weather=fog
+A thick fog lay over the river, and the boats crept along the bank.
+
+=== skip-fog-of-war-no
+# weather=none
+Years later he still spoke of the fog of war, and of the doubt that came with it.
+
+## figure of speech: "waves of relief"
+=== skip-waves-of-yes
+# place=sea
+The waves broke on the rocks while the gulls wheeled over the water.
+
+=== skip-waves-of-no
+# place=none
+Waves of relief swept over her as she read the letter again, then waves of fear.
+
+## figure of speech: "rained blows", "tears rained down"
+=== skip-rained-blows-yes
+# weather=rain
+It rained all night, and in the morning the road was a river of mud.
+
+=== skip-rained-blows-no
+# weather=none
+The big man rained blows on the door, and tears rained down her cheeks.
+
+## figure of speech: "the ghost of a smile"
+=== skip-ghost-of-a-smile-yes
+# place=haunted
+A ghost drifted down the stair of the empty house, and the candle guttered.
+
+=== skip-ghost-of-a-smile-no
+# place=none mood=none
+The ghost of a smile touched her lips, and then it was gone.
+
+## colour: "midnight blue", "night-black"
+=== skip-midnight-blue-yes
+# time=night
+It was midnight, and the moon stood over the silent roofs.
+
+=== skip-midnight-blue-no
+# time=none
+She wore a midnight blue cloak and a hat with a night-black ribbon.
+
+## colour: "snow-white", "her hair was snow white"
+=== skip-snow-white-yes
+# weather=snow
+Snow fell all day on the village, and the roads were closed.
+
+=== skip-snow-white-no
+# weather=none
+Her hair was snow white, and her old face was kind.
+
+## colour: "the colour of snow"
+=== skip-colour-of-yes
+# weather=snow
+The snow came down thick, and by noon the whole valley was buried.
+
+=== skip-colour-of-no
+# weather=none
+Her gown was the colour of snow, and her cheeks the colour of blood.
+
+## oath: "I swear by the lightning"
+=== skip-swear-by-yes
+# weather=storm
+Lightning split the sky, and the thunder shook the windows of the house.
+
+=== skip-swear-by-no
+# weather=none
+He swore by the lightning that he would never come back.
+
+## oath: a short shout such as "Thunder and lightning!"
+=== skip-oath-shout-yes
+# weather=storm
+The thunder crashed and the lightning lit the whole sky!
+
+=== skip-oath-shout-no
+# weather=none
+"Thunder and lightning!" he roared. "Blast it, hell and thunder!"
+
+## name: "Mr. Rain", "Lady Castle"
+=== skip-name-honorific-yes
+# weather=rain
+The rain beat on the roof, and the gutters ran over.
+
+=== skip-name-honorific-no
+# weather=none
+Mr. Rain called on Lady Castle after breakfast and left his card.
+
+## name: "Captain Hook" on land
+=== skip-name-title-yes
+# place=sea
+The captain gave the order, and the crew hauled the sails up the mast.
+
+=== skip-name-title-no
+# place=none
+Captain Hook strode into the nursery, and his crew waited outside the door.
+
+## verb use: "a haunting melody"
+=== skip-haunting-yes
+# place=haunted
+The house was haunted, and a ghost walked its empty halls at night.
+
+=== skip-haunting-no
+# place=none mood=none
+She hummed a haunting melody as she worked, and the haunting tune followed her.
+
+## verb use: "harbour a grudge"
+=== skip-harbour-verb-yes
+# place=harbour/sea
+The ship came into the harbour, and the sailors threw their ropes ashore.
+
+=== skip-harbour-verb-no
+# place=none
+He would harbour a grudge against them, and harbour doubts about the plan.
+
+## ---- Sticky place (ambPlacePick in 231-scene-scoring.js) ----
+
+## stays in place: quiet paragraphs, nothing new is named
+=== place-stays-quiet
+# place=castle
+The great hall of the castle was cold and vast, and the torches on the stone walls threw long shadows.
+
+# place=castle
+The count spoke slowly, and the guests listened without a word.
+
+# place=castle
+Nobody moved, and the hours wore on.
+
+# place=castle
+He poured the wine and spoke again of the old days.
+
+## short mention: another place is seen or named once, nobody goes there
+=== place-short-mention
+# place=tavern
+The tavern was warm and noisy, and the landlord filled the tankards for the drinkers at the bar.
+
+# place=tavern
+They drank and talked for an hour, and nobody spoke of the road.
+
+# place=tavern
+The old man told a long tale, and the others laughed and listened.
+
+# place=tavern
+Through the window he could see the forest, the dark trees and branches, and the mossy ferns.
+
+# place=tavern
+Then someone asked for more ale, and the landlord went to fetch it.
+
+## real move: the text says they went there
+=== place-real-move-phrase
+# place=tavern
+The tavern was warm and noisy, and the landlord filled the tankards for the drinkers at the bar.
+
+# place=cave
+At dawn he rose and entered the cave, and the water dripped from the rocks.
+
+## real move: no moving words, but the new place wins clearly for three paragraphs
+=== place-real-move-slow
+# place=tavern
+The tavern was warm and noisy, and the landlord filled the tankards for the drinkers at the bar.
+
+# place=tavern
+The road led deep into the forest, between tall trees and thick branches, and the ferns and moss and leaves lay on the path.
+
+# place=tavern
+The forest grew darker, the trunks and ferns crowding close, and the moss was soft underfoot.
+
+# place=tavern
+Deep in the forest the trees stood close, and the branches met overhead.
+
+# place=forest
+The path wound on through the trees, and the forest was silent.
+
+## ---- Chapter setting (ambBgAdd / ambBgMake / ambBgApply in 231-scene-scoring.js) ----
+## "| chapter" means the whole case is one chapter: its scores are summed first, like the background scan does.
+
+## weather: a rainy chapter; one odd word of mist must not switch it, and a quiet stretch must not drop the rain
+=== chapter-weather-holds | chapter
+# weather=rain
+Rain hammered the roof of the cottage all night, and the rain ran down the glass in streams.
+
+# weather=rain
+He sat by the fire and read the old letters again.
+
+# weather=rain
+Nobody spoke, and the clock ticked on.
+
+# weather=rain
+She poured the tea and stared at the wall.
+
+# weather=rain
+A wisp of mist curled up from his pipe.
+
+# weather=rain
+The rain came down harder, and the rain beat on the roof.
+
+## weather: the same chapter, but now the text clearly says fog: clear text still wins
+=== chapter-weather-clear | chapter
+# weather=rain
+Rain hammered the roof of the cottage all night, and the rain ran down the glass in streams.
+
+# weather=rain
+He sat by the fire, and the rain kept falling on the roof.
+
+# weather=rain
+Nobody spoke, and the clock ticked on.
+
+# weather=rain
+She poured the tea and stared at the wall.
+
+# weather=fog
+A thick fog lay over the valley, and the white fog hid the road and the hedges.
+
+## time: a night chapter; one odd word of morning must not turn it to day
+=== chapter-time-holds | chapter
+# time=night
+It was a dark night, and the moon hung over the silent roofs, and the stars were out.
+
+# time=night
+He walked on without a word.
+
+# time=night
+The road turned and he followed it.
+
+# time=night
+Somewhere a dog barked once.
+
+# time=night
+He thought of the morning, still far off.
+
+# time=night
+The night was long, and the moon was cold on the stones.
+
+## mood: a dread chapter; one odd cheerful word must not change it
+=== chapter-mood-holds | chapter
+# mood=dread/danger
+A cold dread settled over the house, and every shadow seemed to hold some terror.
+
+# mood=dread/danger
+He climbed the stairs without a word.
+
+# mood=dread/danger
+The door stood open at the end of the hall.
+
+# mood=dread/danger
+Somewhere below a clock struck the hour.
+
+# mood=dread/danger
+For a moment he almost laughed at his own fear.
+
+# mood=dread/danger
+The dread came back, and the terror of the dark house closed over him.
+
+## place: a chapter set in the tavern; the place must not fade away, and a place named once must not take over
+=== chapter-place-holds | chapter
+# place=tavern
+The tavern was warm and noisy, and the landlord filled the tankards for the drinkers at the bar.
+
+# place=tavern
+They talked for an hour.
+
+# place=tavern
+The old man told a long tale, and the others listened.
+
+# place=tavern
+Nobody wanted to go home.
+
+# place=tavern
+Someone laughed and clapped his hands.
+
+# place=tavern
+Through the window he saw the forest, dark among the trees.
+
+# place=tavern
+Nobody spoke of leaving.
+
+# place=tavern
+The landlord filled the tankards again at the bar of the tavern.
+
+## place: the same chapter, but now the text clearly says they left: clear text still wins
+=== chapter-place-clear | chapter
+# place=tavern
+The tavern was warm and noisy, and the landlord filled the tankards for the drinkers at the bar.
+
+# place=tavern
+They drank and talked in the tavern for an hour.
+
+# place=tavern
+The old man told a long tale, and the others listened.
+
+# place=tavern
+Nobody wanted to go home.
+
+# place=cave
+At dawn he rose and entered the cave, and the water dripped from the rocks.
+
+## ---- Skip rules from the round-1 scan report (SC_SKIP in 231-scene-scoring.js) ----
+
+## figure of speech: "like a lightning stroke", "too like the lightning"
+=== skip-lightning-like-yes
+# weather=storm
+The lightning flashed again, and the thunder rolled over the hills while the rain came down in sheets.
+
+=== skip-lightning-like-no
+# weather=none
+It was all new to him, raw and horrible, and it had fallen upon him like a lightning stroke.
+
+## figure of speech: "a long morning visit", "evening dress"
+=== skip-morning-visit-yes
+# time=day
+The morning came cold and bright, and the sun rose slowly over the roofs of the town.
+
+=== skip-morning-visit-no
+# time=none
+She paid them a long morning visit, and the kindness of her manner pleased them all.
+
+## verb use: "had haunted her all the year"
+=== skip-haunted-her-yes
+# mood=dread/danger
+A cold dread settled over the house, and every shadow seemed to hold some terror.
+
+=== skip-haunted-her-no
+# mood=none
+Her evening was pleasant. The sense of flux which had haunted her all the year disappeared for a time, and she forgot how she had trembled.
+
+## verb use: "their ghosts will haunt me"
+=== skip-ghosts-haunt-yes
+# place=haunted
+The ghosts walked the empty halls of the old house at night, and the house was haunted.
+
+=== skip-ghosts-haunt-no
+# place=none
+My wife and children's ghosts will haunt me still, and I cannot rest.
+
+## round-1 re-scan rules (written from the flagged sentences; -no = the rule must fire, -yes = the rule must NOT fire)
+## comparison: "quicker than the lightning's flash"
+=== skip-lightning-than-no | trap
+# weather=none
+Quicker than thought, quicker than the lightning's flash, fifty monkish habits disappeared, and fifty knights in splendid armor stood revealed!
+
+=== skip-lightning-than-yes
+# weather=storm
+Brighter than the moon, the lightning split the sky above the hills, and then the thunder rolled over the valley.
+
+## comparison: "mad as the sea and wind"
+=== skip-mad-as-sea-no | trap
+# place=none weather=none
+Mad as the sea and wind, when both contend Which is the mightier. In his lawless fit Behind the arras hearing something stir, Whips out his rapier, cries.
+
+=== skip-mad-as-sea-yes
+# place=sea
+He grew restless as the sea rose against the hull, and the sailors hauled at the ropes while the ship rolled on the waves.
+
+## figure: "the calm that precedes the storm"
+=== skip-calm-storm-no | trap
+# weather=none
+Again: as the profound calm which only apparently precedes and prophesies of the storm, is perhaps more awful than the storm itself.
+
+=== skip-calm-storm-yes
+# weather=storm
+The first great drops fell, and then the storm broke over the hills, and the lightning struck a tree beside the road while the thunder rolled.
+
+## timetable: "the time of sailing"
+=== skip-sailing-time-no | trap
+# place=none
+He fell thunderstruck on a seat. He saw it all now. He remembered that the time of sailing had been changed.
+
+=== skip-sailing-time-yes
+# place=sea
+They were sailing across the bay, and the wind filled the sails while the waves slapped at the bow of the ship.
+
+## figure: "a mist seemed to sweep over her eyes"
+=== skip-mist-eyes-no | trap
+# weather=none
+The corners of her mouth shook and a mist seemed to sweep over her eyes.
+
+=== skip-mist-eyes-yes
+# weather=fog
+A thick mist lay over the fields, and the cows stood half hidden in the fog.
+
+## noise: "the roar and thunder of the streets"
+=== skip-thunder-streets-no | trap
+# weather=none
+The roar and thunder of the streets of Paris brought it all back to him.
+
+=== skip-thunder-streets-yes
+# weather=storm/rain
+The thunder of the storm shook the windows, and the rain beat hard on the roof all night.
+
+## height: "above the level of the sea"
+=== skip-sea-level-no | trap
+# place=none
+The plateau is nearly two thousand feet above the level of the sea.
+
+=== skip-sea-level-yes
+# place=sea
+The sea was calm, and the boat rocked gently on the waves, a mile from the shore.
+
+## request: "begged that the carriage might be sent"
+=== skip-carriage-sent-no | trap
+# place=none
+She wrote to her mother, to beg that the carriage might be sent for them in the course of the afternoon.
+
+=== skip-carriage-sent-yes
+# place=carriage/city
+The carriage rattled down the street, the wheels loud on the stones, and the driver cracked his whip over the horses.
+
+## round-1 re-scan, second set (real paragraphs from the re-scan; -no = the rule must fire, -yes = the rule must NOT fire)
+## figure: "the storm which awakens the sleeper" (a person asleep, not a sleeper train)
+=== skip-sleeper-awakens-no | trap
+# place=none
+But at the moment the glass touched her lips, her hand remained suspended; she heard something on the road which sounded like the rattling of a distant gallop. Then it grew nearer, and it seemed to her, almost at the same time, that she heard the neighing of horses.
+
+# place=none
+This noise acted upon her joy like the storm which awakens the sleeper in the midst of a happy dream; she grew pale and ran to the window, while Mme. Bonacieux, rising all in a tremble, supported herself upon her chair to avoid falling. Nothing was yet to be seen, only they heard the galloping.
+
+=== skip-sleeper-train-yes
+# place=train
+She booked a berth in the night sleeper, and the train rattled out of the station while the porter carried her bags along the platform.
+
+## guard: "four soldiers of The Guard entered"
+=== skip-soldiers-guard-no | trap
+# place=none
+Scarcely had I gained my post than the tapestry at the opposite end of the chamber separated and four soldiers of The Guard entered, surrounding a female figure. As they approached Than Kosis the soldiers fell to either side.
+
+=== skip-soldiers-guard-yes
+# place=battle
+The soldiers charged across the field, the cannon roared, and the army fought the enemy through the smoke of the battle.
+
+## figure: "this haunting nameless pain"
+=== skip-haunting-pain-no | trap
+# place=none
+I cannot divine what it meaneth, This haunting nameless pain: A tale of the bygone ages Keeps brooding through my brain.
+
+=== skip-haunting-pain-yes
+# place=haunted
+The ghosts walked the empty halls of the old house at night, and the haunting wail of the dead filled the haunted rooms.

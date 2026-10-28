@@ -226,6 +226,7 @@ HOST_SLOTS = {
     "proxy":    (b"__WT_HOST_PROXY__",    False, False),
     "hf_proxy": (b"__WT_HOST_HF_PROXY__", True,  False),
     "stats":    (b"__WT_HOST_STATS__",    True,  False),
+    "scene":    (b"__WT_HOST_SCENE__",    True,  False),
     "music":    (b"__WT_HOST_MUSIC__",    False, True),
 }
 
@@ -278,7 +279,7 @@ def apply_hosts_headers(text, hosts):
     is made sure to be allowed in connect-src. With today's addresses the wildcards there already cover them, so nothing is added;
     after a move to a new domain the new address is added for you."""
     text = text.replace("__WT_HOST_PROXY__", host_origin(hosts["proxy"]))
-    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "music") if hosts[k]]
+    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "scene", "music") if hosts[k]]
     lines = text.split("\n")
     for i, line in enumerate(lines):
         if not line.lstrip().startswith("Content-Security-Policy-Report-Only:"):
@@ -347,7 +348,7 @@ if __name__ == "__main__":
         with open(hp, "w", encoding="utf-8", newline="") as f:
             f.write(apply_hosts_headers(ht, hosts))
     check_no_placeholders(dist)
-    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "music")))
+    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "scene", "music")))
     # self-hosted fonts (only when tools/fetch_fonts.py has been run); a stale dist/fonts from an older build is replaced
     fonts_out = os.path.join(dist, "fonts")
     shutil.rmtree(fonts_out, ignore_errors=True)

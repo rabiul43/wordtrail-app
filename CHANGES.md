@@ -101,3 +101,13 @@
 - Settings > Storage: the book list no longer widens the tab past the sheet (grid column minmax(0,1fr)); long titles wrap to 2 lines; Remove button is 44px tall.
 - Music now follows what is heard (musNarrating): it waits while a recording loads or stalls, stops when a new recording starts loading, and starts when the voice does.
 - Offline home: the "Showing downloaded books only" line under the status bar is removed (also hidden by CSS as a safeguard).
+
+## Scene detection, round 2 (fewer wrong scenes, a score, an optional free AI)
+- src/js/231-scene-scoring.js -> SC_SKIP rules (figure of speech, colour, oath, name, verb use), ambName / ambOath / ambSkip; sticky place (ambPlacePick: moved, or clearly ahead for 3 paragraphs); chapter setting (ambBgAdd / ambBgMake / ambBgApply); each score also records the word that gave it (hw); SC_CHANGE also catches "came into", "stepped out into"
+- src/js/233-scene-chapters-label.js -> the chapter scan keeps a small summary (place, weather, time, mood); ambAutoStep: word cuts from corrections (ambFixWords), the free AI (ambAiApply / ambAiAsk, off by default)
+- src/js/232-scene-test.js -> corrections store their trigger words and a device-only paragraph snippet (wt:ambfixtxt); "Export all corrections"; the test prints one score ("182 of 200 correct", per kind) and the paragraphs that got better or worse than the baseline; cases with "| chapter" and "real-" ids
+- src/js/sound/sound-screen.js, src/js/sound/sound-presets.js, src/html/28-sheet-sound.html -> switch "Ask a free AI when unsure", button "Export all corrections"
+- src/dev/scene-tests.txt -> new cases for every skip rule, sticky place, chapter setting; "real-" cases made by tools/pick_paragraphs.py (scanner-tools)
+- 231-scene-scoring.js (round-1 scan report) -> 4 more SC_SKIP rows: "like a lightning stroke", "morning visit / evening dress", "had haunted her" (mood), "their ghosts will haunt me"; scanner-tools/scan_books.py now flags a scene start only when the figure-of-speech pattern is within 60 characters of the word that started it, and no longer treats time words flipping back as a mistake
+- tools/scene-ai-worker/ (new) -> the free Cloudflare Worker for the AI option (README.md inside); its address is the new "scene" entry in hosts.json (empty = off), added to build.py
+- DEPENDENCIES.md, MODULES.md -> refreshed with tools/deps.py

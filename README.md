@@ -40,7 +40,7 @@ If a change needs a name from another file, say so or upload that file too. Shar
 
 ## Moving to a new web address
 
-Edit `hosts.json` only, then run `python build.py`. The build checks every address (it must be https://, and `proxy` and `music` cannot be empty; `hf_proxy` and `stats` may be left empty to switch that feature off), puts them into the app, and makes sure `dist/_headers` allows them. It stops with a plain message if one is wrong or if a `__WT_HOST_...` placeholder is left unfilled. Do not type an address into `src/js/` again: those files hold placeholders.
+Edit `hosts.json` only, then run `python build.py`. The build checks every address (it must be https://, and `proxy` and `music` cannot be empty; `hf_proxy`, `stats` and `scene` (the free AI Worker) may be left empty to switch that feature off), puts them into the app, and makes sure `dist/_headers` allows them. It stops with a plain message if one is wrong or if a `__WT_HOST_...` placeholder is left unfilled. Do not type an address into `src/js/` again: those files hold placeholders.
 
 ## Rules that keep it safe
 

@@ -35,7 +35,7 @@
     const L = ambLevels(); AMB_SOUNDS.forEach(([k]) => { $('#amb-' + k).value = String(L[k] || 0); });
     $('#amb-vol').value = String(Math.round(ambVol() * 100)); $('#amb-int').value = String(P.ambInt == null ? 100 : P.ambInt);
     $('#amb-duck').checked = P.ambDuck !== false; $('#amb-smart').checked = P.ambSmart !== false; $('#amb-cues').checked = P.ambCues !== false; $('#amb-trans').checked = P.ambTrans !== false;
-    $('#amb-auto').checked = P.ambAuto !== false; $('#amb-tod').checked = P.ambTod !== false;
+    $('#amb-auto').checked = P.ambAuto !== false; $('#amb-ai').checked = P.ambAi === true; $('#amb-tod').checked = P.ambTod !== false;
     const c = $('#in-ambon'); if (c) c.checked = P.ambOn === true;
     ambGroups(); ambMaster(); ambAutoPaint(); sndPaint();
   }

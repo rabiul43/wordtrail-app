@@ -68,6 +68,7 @@
       <div class="snd-panel" id="snd-p-story" role="tabpanel" aria-labelledby="snd-t-story" hidden>
         <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-cues">Story sound effects</label><small>A short sound at a word like thunder, a knock or a bell</small></div><input type="checkbox" id="amb-cues" class="snd-sw" role="switch"></div>
         <div class="snd-lrow snd-sub"><div class="snd-ltxt"><label for="amb-trans">Transition sounds</label><small>A door or footsteps when the story moves somewhere new. Works when "Follow the story" is on. Off in Calm mode.</small></div><input type="checkbox" id="amb-trans" class="snd-sw" role="switch"></div>
+        <div class="snd-lrow snd-sub"><div class="snd-ltxt"><label for="amb-ai">Ask a free AI when unsure</label><small>Off by default. When a paragraph is unclear, that one paragraph is sent to a free AI service, which suggests its place, weather, time and mood. The answer is saved on this device. With no internet, or when the free allowance is used up, the normal scene detection is used. Needs "Follow the story".</small></div><input type="checkbox" id="amb-ai" class="snd-sw" role="switch"></div>
         <div class="amb-row"><label for="amb-cshift" id="amb-cshift-l">Sound timing</label><input id="amb-cshift" type="range" min="-10" max="10" step="1" aria-label="Story sound timing: earlier or later"></div>
         <h3 class="amb-h">Kinds of sounds</h3>
         <div class="amb-sub" id="amb-cats">
@@ -126,6 +127,9 @@
       <h3 class="amb-h">Storage</h3>
     <div class="row" style="flex-wrap:wrap;gap:.5rem"><label style="flex:1 1 8rem">Saved sound files<small class="spd-s">Music and opening clips kept on this device. The oldest are removed above 150 MB.</small></label><span class="spd-s" id="snd-cache-size"></span>
       <div style="flex-basis:100%"><button id="snd-cache-clear" class="btn small ghost" type="button">Clear sound cache</button></div></div>
+      <h3 class="amb-h">Scene corrections</h3>
+      <div class="amb-fixrow"><button id="amb-fix-export" class="btn small ghost" type="button">Export all corrections</button></div>
+      <p class="help amb-note">Saves the scenes you marked as wrong, in every book, as a small file. It stays on this device.</p>
       <h3 class="amb-h">Reset</h3>
       <div class="amb-fixrow"><button id="snd-reset-all" class="btn small ghost" type="button">Reset all sound settings</button></div>
     </details>

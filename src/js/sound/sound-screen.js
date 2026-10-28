@@ -1,6 +1,6 @@
   /* ---------- sound-screen.js ----------
      Sound screen: reset, the mixer rows, My own words, ambSync and ambInit. */
-  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'sndBalance', 'ambBook', 'ambG', 'musSeen', 'sndDev'];
+  const SND_RESET_KEYS = ['ambOn', 'amb', 'ambVol', 'ambInt', 'ambDuck', 'ambSmart', 'ambCues', 'ambTrans', 'ambAuto', 'ambTod', 'ambLook', 'ambAi', 'ambCueShift', 'ambCats', 'ambCueCustom', 'ambSrc', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol', 'sndOn', 'sndVol', 'sceneLabel', 'sndBalance', 'ambBook', 'ambG', 'musSeen', 'sndDev'];
   async function sndResetAll() {
     if (!await askConfirm({ title: 'Reset sound settings?', text: 'Everything goes back to normal. Your saved mixes for each book are cleared too.', ok: 'Reset', tone: 'calm' })) return;
     SND_RESET_KEYS.forEach(x => { delete P[x]; });
@@ -49,7 +49,7 @@
     ambBookCheck(); const L = ambLevels();
     AMB_SOUNDS.forEach(([k]) => { $('#amb-' + k).value = String(L[k] || 0); });
     ambGroups(); $('#amb-vol').value = String(Math.round(ambVol() * 100)); $('#amb-duck').checked = P.ambDuck !== false; $('#amb-smart').checked = P.ambSmart !== false; $('#amb-cues').checked = P.ambCues !== false; $('#amb-trans').checked = P.ambTrans !== false; Object.keys(CUE_CATS).forEach(c => { $('#amb-cat-' + c).checked = (P.ambCats || {})[c] !== false; }); ambCustomPaint(); ambShiftLabel(); $('#amb-int').value = String(P.ambInt == null ? 100 : P.ambInt); $('#amb-tod').checked = P.ambTod !== false;
-    $('#amb-auto').checked = P.ambAuto !== false; ambAutoPaint(); AMB.preset = ''; AMB.undo = null; ambPresetPaint();
+    $('#amb-auto').checked = P.ambAuto !== false; $('#amb-ai').checked = P.ambAi === true; ambAutoPaint(); AMB.preset = ''; AMB.undo = null; ambPresetPaint();
     ambPaintScenes(); ambMatchScene(); sndPaint();
     AMB.preview = false; openSheet('sheet-amb'); ambSync();   // silent on open: a preview starts only when a scene or a sound name is tapped
   }
@@ -128,9 +128,11 @@
     });
     $('#amb-wrong-chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; $('#amb-wrong-pick').hidden = true; $('#amb-wrong').setAttribute('aria-expanded', 'false'); ambFixAdd(b.dataset.k); });
     $('#amb-fix-clear').addEventListener('click', ambFixClear);
+    $('#amb-fix-export').addEventListener('click', ambFixExport);
     $('#amb-smart').addEventListener('change', e => { P.ambSmart = e.target.checked; savePrefs(); AMB.duckS = ''; });   // re-apply the dip at once
     $('#amb-cues').addEventListener('change', e => { P.ambCues = e.target.checked; savePrefs(); ambSync(); });
     $('#amb-trans').addEventListener('change', e => { P.ambTrans = e.target.checked; savePrefs(); });
+    $('#amb-ai').addEventListener('change', e => { P.ambAi = e.target.checked; savePrefs(); });
     $('#amb-int').addEventListener('input', e => { P.ambInt = +e.target.value; savePrefs(); ambApply(0.4); ambSync(); });
     $('#amb-tod').addEventListener('change', e => { P.ambTod = e.target.checked; savePrefs(); ambTod(); ambPaintScenes(); });
     $('#amb-scenes').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) ambScenePreview(c.dataset.k); });   // tap = hear it for 5 s, then "Use this" keeps it

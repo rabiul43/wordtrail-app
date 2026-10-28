@@ -55,9 +55,9 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
 | `200-player-controls.js` | 505 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
 | `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
-| `231-scene-scoring.js` | 226 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
-| `232-scene-test.js` | 150 | Scene test (Settings > Developer) |
-| `233-scene-chapters-label.js` | 112 | chapter titles and look-ahead, scene label on the mini-player |
+| `231-scene-scoring.js` | 310 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
+| `232-scene-test.js` | 233 | Scene test (Settings > Developer) |
+| `233-scene-chapters-label.js` | 165 | chapter titles and look-ahead, scene label on the mini-player |
 | `234-scene-prescore.js` | 68 | `SCP`: a second background worker that scores the paragraphs of the open book ahead of the reader (`ambSceneScore`) and stores the answers in `ix.pa[j].sc`. Built from the page copy of `230-scene-words.js` + `231-scene-scoring.js` (`#scene-worker-src`, written by `build.py` with the `copy` kind). Falls back to the main thread when the worker is off or fails |
 | `246-controls-search.js` | 69 | Controls sheet search box (Enter opens the one match), section nav that follows the scroll, keep highlighted line in view |
 | `247-player-menu.js` | 112 | Player menu: the three-dot button opens a dropdown (Timing, Text and reading, Live translation, Tracks, Settings, then "More" that opens Listen / Book / Fix rows in place, and "All controls" for the Controls sheet). Rows pass their tap to the existing buttons (markup `#dmenu` in `30-sheets-settings.html`, styles at the end of `97-controls-sheet.css`) |
@@ -105,7 +105,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/sound-presets.js` | 82 | Sound screen: hear a sound, quick presets and undo |
 | `sound/sound-core.js` | 63 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
-| `sound/sound-screen.js` | 187 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
+| `sound/sound-screen.js` | 189 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
 
 ## CSS files (`src/css/`)

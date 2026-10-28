@@ -12,13 +12,14 @@
   }
   function ambChapScan(ix, ch) {   // score a chapter's paragraphs a dozen at a time (they are kept, so reading them later costs nothing), then the next chapter
     const c = ambChapIdx(ix)[ch]; if (!c || c.done || c.busy) return;
-    c.busy = true; c.sum = {}; let j = c.a; const end = Math.min(c.b, c.a + 400);
+    c.busy = true; c.sum = {}; c.bs = { p: {}, w: {}, m: {}, t: {} }; let j = c.a; const end = Math.min(c.b, c.a + 400);
     const run = () => {
-      try { for (let n = 0; n < 12 && j <= end; n++, j++) { const sc = ambSceneScore(ix, j); for (const k in sc.p) c.sum[k] = (c.sum[k] || 0) + Math.min(sc.p[k], 4); } } catch (e) { j = end + 1; }
+      try { for (let n = 0; n < 12 && j <= end; n++, j++) { const sc = ambSceneScore(ix, j); ambBgAdd(c.bs, sc); for (const k in sc.p) c.sum[k] = (c.sum[k] || 0) + Math.min(sc.p[k], 4); } } catch (e) { j = end + 1; }
       if (j <= end) { setTimeout(run, 40); return; }
       c.busy = false; c.done = true;
       let top = '', ts = 0, sec = 0; for (const k in c.sum) { const v = c.sum[k]; if (v > ts) { sec = ts; ts = v; top = k; } else if (v > sec) sec = v; }
       c.top = top && ts >= 6 && ts >= sec * 1.5 ? top : '';   // one place has to clearly lead, or the chapter has no single place
+      c.bg = ambBgMake(c.bs); c.bs = null;   // the chapter's setting (place, weather, time, mood): four short names, see ambBgApply (231)
       try {
         const A = AMB.auto, id = S.curId, cur = A && A.model && A.model._scn === ix && id != null && ix.sents[id] ? ix.sents[id].ch : null;
         if (cur === ch && c.top && !A.place && !A.hold) { A.refix = true; A.sig = ''; ambAutoStep(); }   // the chapter just opened with no place yet: the scan has one
@@ -40,7 +41,57 @@
       for (const k in nx.p) R.p[k] = (R.p[k] || 0) + nx.p[k] * nw;
       if (nx.go) R.p[nx.go] = (R.p[nx.go] || 0) + 2;
     }
+    if (c.bg) ambBgApply(R, c.bg);   // the chapter's setting: a weak guess, used only while this paragraph is unclear
     return d === 0;
+  }
+  /* Ask a free AI (optional, off by default: Sound mixer > Sound effects tab). When the rules are unsure about a paragraph, that one paragraph is sent to a small
+     free Cloudflare Worker (tools/scene-ai-worker) that answers with its place, weather, time and mood. The answer is saved on this device (its own key, never synced)
+     per book and paragraph, so a paragraph is asked only once. Reading never waits: the answer comes later and the scene is read again. With no answer (no internet,
+     the free allowance used up, a slow reply) the rules decide as before. A correction from the reader still beats the answer. */
+  const AI_URL = '__WT_HOST_SCENE__' /* set in hosts.json; empty = the free AI is off */, AI_KEY = 'wt:ambai', AI_DAYKEY = 'wt:ambai-day';
+  const AI_LOW = 4, AI_MINLEN = 200, AI_DAY = 120, AI_MAX = 200, AI_BOOKS = 60, AI_PAUSE = 15 * 60 * 1000;   // unsure below this score; text at least this long; calls a day on this device; paragraphs per book; books; pause after a failure
+  const AI_W = { p: 4.5, w: 4, m: 5.5, t: 3.5 };   // how strongly an answer counts: above the "enter" score of its kind, below clear text
+  const AI = { busy: false, off: 0, id: '', mem: null };
+  function aiBook() {   // this book's saved answers: { id, n: sentences in the text, a: [[paragraph, place, weather, time, mood], ...] }
+    const m = S.model, id = S.book && String(S.book.id); if (!m || !m.sents || !id) return null;
+    if (AI.mem && AI.id === id && AI.mem.n === m.sents.length) return AI.mem;
+    const b = (store.get(AI_KEY, []) || []).find(x => x && x.id === id);
+    AI.id = id; AI.mem = b && b.n === m.sents.length ? b : { id, n: m.sents.length, a: [] }; return AI.mem;
+  }
+  function aiSave(b) {   // the newest book goes last; the oldest paragraphs and books fall away (200 and 60)
+    const all = (store.get(AI_KEY, []) || []).filter(x => x && x.id !== b.id); all.push(b);
+    store.set(AI_KEY, all.slice(-AI_BOOKS));
+  }
+  function aiToday() { return new Date().toISOString().slice(0, 10); }   // (the free allowance also resets at 00:00 UTC)
+  function ambAiApply(R, pi) {   // a saved answer adds to what the rules found and quiets their faint guesses of the same kind; clear text (AI_LOW or more) is not touched
+    if (P.ambAi !== true) return;
+    const b = aiBook(), e = b && b.a.find(x => x[0] === pi); if (!e) return;
+    [['p', e[1]], ['w', e[2]], ['t', e[3]], ['m', e[4]]].forEach(([k, name]) => {
+      const o = R[k]; if (!name || !o) return;
+      for (const n in o) if (n !== name && o[n] < AI_LOW) o[n] *= 0.5;
+      o[name] = Math.max(o[name] || 0, AI_W[k]);
+    });
+  }
+  function ambAiAsk(m, ix, pi, R, A) {   // an unsure paragraph: ask once, in the background
+    if (!AI_URL || P.ambAi !== true || AI.busy || Date.now() < AI.off || navigator.onLine === false) return;
+    if (Math.max(R.p[A.place] || 0, R.w[A.wx] || 0, (R.m[A.mood] || 0) * 0.8) >= AI_LOW) return;   // (the same score that becomes the confidence below)
+    const b = aiBook(), pe = ix.pa[pi]; if (!b || !pe || b.a.some(x => x[0] === pi)) return;
+    const u = store.get(AI_DAYKEY, null); if (u && u.d === aiToday() && u.n >= AI_DAY) return;   // enough for today on this device: the free allowance is shared by every reader
+    const text = m.sents.slice(pe.a, pe.b + 1).map(x => x.t || '').join(' ').trim(); if (text.length < AI_MINLEN) return;   // a line of talk says little about the place
+    AI.busy = true; const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 8000);
+    fetch(AI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal,
+      body: JSON.stringify({ t: text.slice(0, 900), p: Object.keys(SC_PLACES), w: Object.keys(SC_WX), m: Object.keys(SC_MOOD) }) })
+      .then(r => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+      .then(j => {
+        const known = (v, o) => typeof v === 'string' && Object.prototype.hasOwnProperty.call(o, v) ? v : '';   // only names the engine knows
+        b.a.push([pi, known(j.p, SC_PLACES), known(j.w, SC_WX), j.t === 'night' || j.t === 'day' ? j.t : '', known(j.m, SC_MOOD)]);
+        if (b.a.length > AI_MAX) b.a.shift();
+        if (AI.mem === b) aiSave(b);
+        const d = aiToday(), c = store.get(AI_DAYKEY, null); store.set(AI_DAYKEY, { d, n: c && c.d === d ? c.n + 1 : 1 });
+        if (AMB.auto && AMB.auto.model === m && S.model === m && S.curId != null && ambSceneIdx(m).pi[S.curId] === pi) { AMB.auto.refix = true; ambAutoStep(); }   // still in this paragraph: read it again with the answer
+      })
+      .catch(() => { AI.off = Date.now() + AI_PAUSE; })   // no internet, allowance used up or a slow reply: rules only for a while
+      .finally(() => { clearTimeout(tm); AI.busy = false; });
   }
   function ambAutoStep() {   // called when the reader moves to a new sentence; does the work only when the paragraph changes
     AMB.autoId = S.curId; AMB.autoSec = S.sec;
@@ -54,16 +105,18 @@
       if (pi == null || (A.model === m && A.pi === pi && !A.refix && !look)) return;
       A.refix = false; if (look) A.look = pi;
       let jump = A.model !== m || Math.abs(pi - A.pi) > 1; const skipped = jump; A.model = m; A.pi = pi;   // skipped: the reader jumped (seek, new book), so no transition sound
-      const R = ambGenreApply(ambSceneRead(ix, pi), S.book); if (ambChapBoost(ix, id, pi, R, look)) jump = true;   // a new chapter may start in a new place
+      const R = ambGenreApply(ambSceneRead(ix, pi), S.book); ambFixWords(m, ix, pi, R); if (ambChapBoost(ix, id, pi, R, look)) jump = true;   // a new chapter may start in a new place
+      if (!look) ambAiApply(R, pi);   // (the saved answer of the free AI, if the reader turned it on)
       const mm = A.memo, n = R.t.night || 0, d = R.t.day || 0, t0 = A.time;
       const place0 = A.place;
-      A.place = ambPlacePick(ix, pi, R, A.place, jump, mm.p || (mm.p = {}));
+      A.place = ambPlacePick(ix, pi, R, A.place, jump, mm.p || (mm.p = {}), look);
       if (!look) {   // (the look ahead is for places only: weather, time and mood wait for their own paragraph)
         A.wx = ambPick(R.w, A.wx, 3, 1.5, jump, mm.w || (mm.w = {}));
         A.wi = (A.wx && R.wi && R.wi[A.wx]) || 1;   // how strong the weather is said to be
         A.mood = ambPick(R.m, A.mood, 4.5, 2.2, jump, mm.m || (mm.m = {}));
         A.time = ambPick({ night: Math.max(0, n - d * 0.7), day: Math.max(0, d - n * 0.7) }, A.time, 2.5, 1.2, jump, mm.t || (mm.t = {}));
       }
+      if (!look) ambAiAsk(m, ix, pi, R, A);   // unsure about this paragraph: ask the free AI in the background (it never holds up reading)
       if (A.hold && A.place + '|' + A.wx !== A.holdSig) A.hold = false;   // the story has moved on: the scene takes over again
       const flip = A.time !== t0; if (flip) ambTod(true, true);   // day <-> night in the story: the night softening eases in or out over several seconds
       const fx0 = ambFixNear(m, pi), fsc = fx0 && fx0.k !== '-' ? AMB_SCENES.find(x => x.k === fx0.k) : null, fx = fx0 && (fx0.k === '-' || fsc) ? fx0 : null;   // a correction from the reader: a strong prior that rules this paragraph and its neighbours
