@@ -1,6 +1,25 @@
   /* ---------- sound-core.js ----------
      Sound screen: the master switch and master volume (sndOn, sndMul, sndPaint, sndApplyAll). */
   /* ---------- the Sound screen: master switch, master volume and the glue between its controls ---------- */
+  /* ---------- idle timers ----------
+     The smart mix (250 ms), the sound balance (500 ms) and the scene label (1 s) used to tick all day, even with nothing playing.
+     idleTimer() registers one; it runs only while audio plays and the page is visible, or while its own "also" check says someone
+     is looking at what it feeds (the Sound sheet is open). Every change that matters calls idleTimersSync(): play, pause, seek,
+     show/hide, the Sound sheet opening, the settings switches. Each timer runs once more when it stops, so what it paints is final.
+     With "Save battery while playing and in the background" off (Settings > Advanced) they run all the time, as before. */
+  const IDLE_T = [];
+  function idleTimer(fn, ms, also) { const T = { fn, ms, also, id: 0 }; IDLE_T.push(T); return T; }
+  function idleTimersSync(kick) {
+    IDLE_T.forEach(T => {
+      const want = P.idleWork === false || (!document.hidden && (!audio.paused || (T.also ? !!T.also() : false)));
+      if (want && !T.id) { T.id = setInterval(T.fn, T.ms); try { T.fn(); } catch (e) { /* a help, never a reason to stop */ } }
+      else if (!want && T.id) { clearInterval(T.id); T.id = 0; try { T.fn(); } catch (e) { /* as above */ } }
+      else if (kick && want) { try { T.fn(); } catch (e) { /* as above */ } }
+    });
+  }
+  ['play', 'pause', 'seeked', 'loadedmetadata'].forEach(ev => audio.addEventListener(ev, () => idleTimersSync(ev === 'seeked' || ev === 'loadedmetadata')));
+  document.addEventListener('visibilitychange', () => idleTimersSync());
+  { const sh = $('#sheet-amb'); if (sh) new MutationObserver(() => idleTimersSync(true)).observe(sh, { attributes: true, attributeFilter: ['hidden'] }); }
   function sndOn() { return P.sndOn !== false; }
   function sndMul() { return sndOn() ? (P.sndVol == null ? 100 : Math.max(0, Math.min(100, P.sndVol))) / 100 : 0; }
   function sndVolPaint() {   // master volume: filled track, % readout and a speaker icon that shows mute at 0

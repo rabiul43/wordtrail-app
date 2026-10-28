@@ -337,7 +337,7 @@
     $('#in-langs').addEventListener('change', e => { P.otherLangs = e.target.checked; savePrefs(); catPurge(); refreshHome(); toast(P.otherLangs ? 'Showing all languages' : 'Showing English only'); });
     $('#in-worker').addEventListener('change', e => { P.bgWorker = e.target.checked; savePrefs(); BG.reset(); SCP.reset(); });
     $('#in-layout').addEventListener('change', e => { P.layoutBatch = e.target.checked; savePrefs(); });
-    $('#in-idle').addEventListener('change', e => { P.idleWork = e.target.checked; savePrefs(); hbSync(); });
+    $('#in-idle').addEventListener('change', e => { P.idleWork = e.target.checked; savePrefs(); hbSync(); idleTimersSync(); });
     $('#in-net').addEventListener('change', e => { P.fastNet = e.target.checked; savePrefs(); });
     $('#in-skipbtn').addEventListener('change', e => { P.skipBtn = e.target.checked; savePrefs(); paintSkipIntro(); });
     $('#in-smartrw').addEventListener('change', e => { P.smartRewind = e.target.checked; savePrefs(); });

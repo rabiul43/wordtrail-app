@@ -170,20 +170,20 @@
     $('#snd-now-amb').addEventListener('click', scenesOn); $('#amb-scene-off-go').addEventListener('click', scenesOn);
     /* The scene is read while neither Music nor Background sounds is on only when someone can see it (the Sound sheet is open or
        the mini-player label is on). One check a second; ambAutoStep itself does work only when the paragraph changes. */
-    setInterval(() => {
+    idleTimer(() => {
       if (document.hidden || !S.book || !sndOn() || AMB.on || MUS.on || P.ambAuto === false) return;
       if (P.sceneLabel !== true && $('#sheet-amb').hidden) return;
       if (S.curId === AMB.autoId && S.sec === AMB.autoSec) return;   // same sentence as last time
       try { ambAutoStep(); } catch (e) { /* the label is a help, never a reason to stop anything */ }
-    }, 1000);
+    }, 1000, () => !$('#sheet-amb').hidden);   // runs while playing, or while the Sound sheet is open (a seek also checks once)
     $('#snd-balance').addEventListener('change', e => { P.sndBalance = e.target.checked; savePrefs(); sndBalSync(); });   // on (the default) or off: the music and sounds glide to their new levels
-    setInterval(sndBalSync, 500); sndBalSync(true);   // follows the Music, Background sounds, volume and Sound switches wherever they are changed; cheap checks, work only when the state flips
+    idleTimer(sndBalSync, 500, () => !$('#sheet-amb').hidden); sndBalSync(true); idleTimersSync();   // follows the Music, Background sounds, volume and Sound switches wherever they are changed; cheap checks, work only when the state flips
     $('#in-muson').addEventListener('change', e => { P.musOn = e.target.checked; savePrefs(); if (e.target.checked) { musicAttach(); musicPlay(); } else musicPause(); try { qkPaint(); } catch (err) { /* the tile is optional */ } });
     $('#mus-vol').addEventListener('input', e => { musicVolChange(+e.target.value); musVolPaint(); });
     $('#in-musduck').addEventListener('change', e => { P.musDuck = e.target.checked; savePrefs(); MUS.duckS = ''; sndPaint(); });   // re-apply the dip at once
     sndPaint(); ambPresetPaint();
     try { sndTabsInit(); } catch (e) { console.warn('sound tabs', e); }
     musicInit();
-    $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); });
+    $('#in-scenelabel').addEventListener('change', e => { P.sceneLabel = e.target.checked; savePrefs(); ambAutoPaint(); idleTimersSync(true); });
     $('#mini-scene').addEventListener('click', e => { e.stopPropagation(); ambOpen(); });
   }

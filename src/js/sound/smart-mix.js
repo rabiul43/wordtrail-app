@@ -2,7 +2,7 @@
      Smart mix: keeps the narrator on top and music and ambient sound at a steady, comfortable distance below it, whatever the
      recording, the music clip or the scene.
 
-     What it measures (every 250 ms, only while the book plays and the narrator is speaking):
+     What it measures (every 250 ms, only while the book plays and the narrator is speaking; the timer itself runs only while audio plays):
        voice   the narrator's level, from the voice analyser (vgraph), plus the Loudness evener's current gain
        music   the level of the music bus after its ducking (tap on MUS.duck)
        ambient the level of the ambient bus after its ducking (tap on AMB.master)
@@ -85,7 +85,7 @@
     try {
       smxBook(); if (!!P.smxSaved !== smxOn()) smxLock();
       const live = smxOn() && !!S.book && !!vgraph;
-      if (live !== SMX.live) { SMX.live = live; smxPaint(); }
+      if (live !== SMX.live) { SMX.live = live; smxPaint(); try { sndBalSync(); } catch (e) { /* the balance is a help */ } }
       if (!live || document.hidden || audio.paused || audio.seeking || S.loadingAudio) return;
       const vf = smxDb(vgraph, 'vbuf');
       if (vf == null || vf < -48) return;                                   // the narrator is not speaking right now: hold everything
@@ -111,7 +111,7 @@
       }
     } catch (e) { /* the smart mix is a help, never a reason to stop anything */ }
   }
-  setInterval(smxTick, 250);
+  idleTimer(smxTick, 250);   // only while the book plays (see idleTimer in sound-core.js)
   $$('.smx-sw').forEach(sw => sw.addEventListener('change', e => {
     P.smartMix = e.target.checked; savePrefs();
     if (!P.smartMix) { SMX.t = { mus: 0, amb: 0 }; SMX.lin = { mus: 1, amb: 1 }; SMX.r = { v: [], mus: [], amb: [] }; }

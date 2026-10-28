@@ -111,3 +111,8 @@
 - 231-scene-scoring.js (round-1 scan report) -> 4 more SC_SKIP rows: "like a lightning stroke", "morning visit / evening dress", "had haunted her" (mood), "their ghosts will haunt me"; scanner-tools/scan_books.py now flags a scene start only when the figure-of-speech pattern is within 60 characters of the word that started it, and no longer treats time words flipping back as a mistake
 - tools/scene-ai-worker/ (new) -> the free Cloudflare Worker for the AI option (README.md inside); its address is the new "scene" entry in hosts.json (empty = off), added to build.py
 - DEPENDENCIES.md, MODULES.md -> refreshed with tools/deps.py
+
+## P10: little timers that never stop
+- Three timers ticked all day, even with nothing playing: smart mix (250 ms), sound balance (500 ms), scene label (1 s). They now come from one helper, `idleTimer()` / `idleTimersSync()` in `src/js/sound/sound-core.js`, and run only while audio plays and the page is visible (or while the Sound sheet is open). Play, pause, seek, show/hide and the Sound sheet opening start and stop them; each runs once more on stopping so its display is final.
+- Governed by the existing Settings > Advanced "Save battery while playing and in the background" switch (off = old always-on behaviour).
+- Files: `src/js/sound/sound-core.js`, `smart-mix.js`, `sound-screen.js`, `src/js/300-wiring.js`. Checked in headless Chromium: idle page has only the 10-minute mood timer; play starts the timers, pause stops them, no errors. Not tested with real audio on a phone.
