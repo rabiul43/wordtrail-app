@@ -51,7 +51,55 @@
     host.append(h('div', { class: 'nn' }, bar, body));
     return body;
   }
+  /* ---------- building a chapter in steps ---------- */
+  const RB_FIRST = 60;   // sentences built before the first paint of a long chapter
+  /* Builds sentences of R.p from R.pos on: up to `stop` (an index into p.ids), and then, if `budget` (ms) is given,
+     on until the time is used. Appends them to the page and carries open paragraphs over to the next call. */
+  function buildSents(R, stop, budget) {
+    const p = R.p, ids = p.ids, t0 = performance.now(), frag = document.createDocumentFragment(), touched = new Set(), first = R.pos === 0;
+    while (R.pos < ids.length) {
+      const id = ids[R.pos], s = S.model.sents[id];
+      const skipIt = R.nn.has(id) && !s.h;
+      if (skipIt && !R.nnBody) { R.nnBody = nnBlock(frag, R.nnWords.get(id) || 0); R.curP = -2; R.pEl = null; }
+      else if (!skipIt && R.nnBody) { R.nnBody = null; R.curP = -2; R.pEl = null; }
+      if (!s.h) { if (s.p !== R.qp) { R.qp = s.p; R.qst = 0; } const qr = quoteRanges(s.t, R.qst); R.qst = qr.st; s.q = qr.r.length ? qr.r : null; }
+      const sp = h('span', { class: 's', 'data-i': String(id), text: s.t });
+      if (s.q) fillSentence(sp, s);
+      S.spans.set(id, sp);
+      if (S.chMark && S.chMark.m === S.model && S.chMark.ids.has(id)) sp.classList.add('chm');
+      if (s.h) { frag.append(h('h2', { class: 'chap' }, sp)); const sm = chapSummary(s.ch); if (sm) frag.append(sm); R.curP = -2; R.pEl = null; }
+      else {
+        if (s.p !== R.curP) { R.pEl = h('p'); (R.nnBody || frag).append(R.pEl); R.curP = s.p; R.pCur = { e: R.pEl, n: 0 }; } else R.pEl.append(' ');
+        R.pCur.n += s.t.length + 1; touched.add(R.pCur);
+        R.pEl.append(sp);
+      }
+      if (!s.h && !skipIt && S.model.chapters[s.ch] && S.model.chapters[s.ch].end === id + 1) { const qc = quizCard(s.ch); if (qc) { (R.nnBody || frag).append(qc); R.curP = -2; R.pEl = null; } }
+      R.pos++;
+      if (R.pos >= stop && (budget == null || performance.now() - t0 >= budget)) break;
+    }
+    const done = R.pos >= ids.length;
+    if (done && R.i === S.secs.length - 1 && S.book) frag.append(finishCard(S.book));
+    if (R.useCv) for (const q of touched) q.e.style.setProperty('--pn', String(Math.max(1, Math.ceil(q.n / R.cpl))));
+    el.page.append(frag);
+    if (done) { clearTimeout(R.tid); if (S.rb === R) S.rb = null; }
+    if (!first && typeof hlPaint === 'function') hlPaint();   // highlights and notes on the sentences just added
+  }
+  function rbNext(R) {
+    R.tid = setTimeout(() => {
+      if (S.rb !== R) return;
+      buildSents(R, 0, 8);
+      if (S.rb === R) rbNext(R);
+    }, 0);
+  }
+  /* The span of a sentence; if its chapter is still being built, builds up to it first. */
+  function spanById(id) {
+    let sp = S.spans.get(id);
+    const R = S.rb;
+    if (!sp && R && S.sentSec && S.sentSec[id] === R.i && S.sentPos[id] >= R.pos) { buildSents(R, S.sentPos[id] + 20, null); sp = S.spans.get(id); }
+    return sp;
+  }
   function renderSection(i) {
+    if (S.rb) { clearTimeout(S.rb.tid); S.rb = null; }
     el.page.textContent = ''; el.page.classList.remove('cv'); S.spans.clear(); S.curId = -1;
     S.wSp = null; S.wEls = null; S.wTimes = null; S.wId = -1; S.wIdx = -1;
     setTimeout(() => enqueueAlign(S.sec, true), 0);
@@ -72,38 +120,22 @@
       el.page.append(noteNode('No text is lined up with this track.', [['Choose text', () => openSheet('sheet-text')]]));
       updateHeader(); return;
     }
-    const frag = document.createDocumentFragment();
-    let curP = -2, pEl = null, qp = -2, qst = 0, pCur = null;
-    const pArr = [], useCv = p.ids.length > 150 && typeof CSS !== 'undefined' && CSS.supports && CSS.supports('content-visibility', 'auto');
+    const useCv = p.ids.length > 150 && typeof CSS !== 'undefined' && CSS.supports && CSS.supports('content-visibility', 'auto');
     const nn = P.foldSkipped === true && S.nn ? S.nn : new Set(), nnWords = new Map();   // off by default: the text stays in the reader
     { let st = -1, w = 0; for (const id of p.ids) { const x = S.model.sents[id]; if (nn.has(id) && !x.h) { if (st < 0) { st = id; w = 0; } w += (x.t.match(/\S+/g) || []).length; nnWords.set(st, w); } else st = -1; } }
-    let nnBody = null;
-    for (const id of p.ids) {
-      const s = S.model.sents[id];
-      const skipIt = nn.has(id) && !s.h;
-      if (skipIt && !nnBody) { nnBody = nnBlock(frag, nnWords.get(id) || 0); curP = -2; pEl = null; }
-      else if (!skipIt && nnBody) { nnBody = null; curP = -2; pEl = null; }
-      if (!s.h) { if (s.p !== qp) { qp = s.p; qst = 0; } const qr = quoteRanges(s.t, qst); qst = qr.st; s.q = qr.r.length ? qr.r : null; }
-      const sp = h('span', { class: 's', 'data-i': String(id), text: s.t });
-      if (s.q) fillSentence(sp, s);
-      S.spans.set(id, sp);
-      if (S.chMark && S.chMark.m === S.model && S.chMark.ids.has(id)) sp.classList.add('chm');
-      if (s.h) { frag.append(h('h2', { class: 'chap' }, sp)); const sm = chapSummary(s.ch); if (sm) frag.append(sm); curP = -2; pEl = null; }
-      else {
-        if (s.p !== curP) { pEl = h('p'); (nnBody || frag).append(pEl); curP = s.p; pCur = { e: pEl, n: 0 }; pArr.push(pCur); } else pEl.append(' ');
-        pCur.n += s.t.length + 1;
-        pEl.append(sp);
-      }
-      if (!s.h && !skipIt && S.model.chapters[s.ch] && S.model.chapters[s.ch].end === id + 1) { const qc = quizCard(s.ch); if (qc) { (nnBody || frag).append(qc); curP = -2; pEl = null; } }
-    }
-    if (i === S.secs.length - 1 && S.book) frag.append(finishCard(S.book));
+    /* R remembers where the building of this chapter has got to, so it can go on in small steps. */
+    const R = { i, p, pos: 0, curP: -2, pEl: null, qp: -2, qst: 0, pCur: null, nnBody: null, nn, nnWords, useCv, cpl: 24, tid: 0 };
     if (useCv) { // guess each paragraph's height from its length, so the scroll bar is about right before it is drawn
       const fs = parseFloat(getComputedStyle(el.page).fontSize) || 17;
-      const cpl = Math.max(24, Math.min(90, Math.floor(((el.page.clientWidth || 360) - 40) / (fs * 0.5))));
-      for (const q of pArr) q.e.style.setProperty('--pn', String(Math.max(1, Math.ceil(q.n / cpl))));
+      R.cpl = Math.max(24, Math.min(90, Math.floor(((el.page.clientWidth || 360) - 40) / (fs * 0.5))));
       el.page.classList.add('cv');
     }
-    el.page.append(frag);
+    /* A long chapter is built in steps: the first screens at once, the rest a few milliseconds at a time, so the
+       page never freezes. A sentence that is asked for before its turn (a saved place, a seek, a tap in a list)
+       is built on the spot by spanById(). A short chapter is still built in one go. */
+    S.rb = R;
+    buildSents(R, p.ids.length > 150 ? RB_FIRST : p.ids.length, null);
+    if (S.rb === R) rbNext(R);
     scrollStop(); el.reader.scrollTop = 0;
     S.follow = true; el.follow.hidden = true;
     updateHeader();
@@ -324,7 +356,7 @@
     ambStory(id);
     updateSyncUI();
     if (P.liveTr) ltUpdate();
-    const sp = S.spans.get(id);
+    const sp = spanById(id);
     if (!sp) return;
     sp.classList.add('now');
     if (!S.wSp) wrapWords(sp, id);
