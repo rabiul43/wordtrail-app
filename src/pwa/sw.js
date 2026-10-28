@@ -45,6 +45,7 @@ self.addEventListener('activate', event => {
     const keep = [SHELL, FONTS, LANG, CATALOG, COVERS];
     for (const k of await caches.keys()) if (/^wt-(shell|fonts|lang|catalog|covers)-/.test(k) && !keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
+    schedulePrune();                                         // old covers beyond the limit go once things are quiet, not now
   })());
 });
 
@@ -172,7 +173,22 @@ function isCover(u) {
   return false;
 }
 
-// Save one cover (stamped with the time, so it can be renewed later) and, now and then, drop the oldest ones beyond COVER_MAX.
+// Drop the oldest covers beyond COVER_MAX. Never run while covers are loading: it is asked for after every 25th save, but it only
+// starts once no cover has been saved for PRUNE_QUIET ms (and once when a new worker activates), so the cover requests never wait for it.
+let pruneTimer = 0;
+const PRUNE_QUIET = 4000;
+async function pruneCovers() {
+  try {
+    const cache = await caches.open(COVERS), keys = await cache.keys();       // keys come oldest first
+    await Promise.all(keys.slice(0, Math.max(0, keys.length - COVER_MAX)).map(k => cache.delete(k)));
+  } catch (e) { /* tidy-up only: try again later */ }
+}
+function schedulePrune() {
+  clearTimeout(pruneTimer);
+  pruneTimer = setTimeout(pruneCovers, PRUNE_QUIET);   // each new save pushes it back, so it waits for a quiet moment
+}
+
+// Save one cover (stamped with the time, so it can be renewed later).
 async function keepCover(cache, url, r) {
   try {
     if (!/^image\//i.test(r.headers.get('content-type') || '')) return;   // a redirect page or an error text is not a cover
@@ -180,10 +196,7 @@ async function keepCover(cache, url, r) {
     if (blob.size > COVER_BIG || !blob.size) return;
     const hd = new Headers(r.headers); hd.set('x-wt-t', String(Date.now()));
     await cache.put(url, new Response(blob, { status: 200, headers: hd }));
-    if (++coverPuts % 25 === 0) {
-      const keys = await cache.keys();
-      for (let i = 0; i < keys.length - COVER_MAX; i++) await cache.delete(keys[i]);   // keys come oldest first
-    }
+    if (++coverPuts % 25 === 0) schedulePrune();
   } catch (e) { /* storage full or similar: the cover still shows, it is just not kept */ }
 }
 
