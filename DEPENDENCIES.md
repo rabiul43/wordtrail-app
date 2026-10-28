@@ -13,7 +13,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | File | Lines | Declares | Shared with others | Needs from other files |
 |---|---|---|---|---|
 | `030-helpers-offline-audio.js` | 328 | 60 | 48 | 18 |
-| `031-virtual-list.js` | 91 | 1 | 1 | 1 |
+| `031-virtual-list.js` | 96 | 1 | 1 | 1 |
 | `040-worker-newreader.js` | 149 | 21 | 16 | 3 |
 | `050-audio-clips.js` | 358 | 41 | 5 | 15 |
 | `060-position-bookmarks.js` | 241 | 36 | 8 | 36 |
