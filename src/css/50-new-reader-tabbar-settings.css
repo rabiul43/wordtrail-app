@@ -74,7 +74,7 @@
 .tr-word[hidden] { display: none; }
 
 /* ---------- Tab bar: new icons + active indicator ---------- */
-.tabbar { background: var(--glass); -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); border-top: 1px solid var(--line); border-radius: var(--r-xl) var(--r-xl) 0 0; padding-top: .3rem; }
+.tabbar { background: var(--glass); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--line); border-radius: var(--r-xl) var(--r-xl) 0 0; padding-top: .3rem; }
 .tab { position: relative; gap: .2rem; padding: .35rem 0 .3rem; font-size: .7rem; letter-spacing: .01em; transition: color var(--dur) var(--ease); }
 .tab::before { content: ""; position: absolute; top: -.3rem; left: 50%; width: 1.6rem; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); transform: translateX(-50%) scaleX(0); transition: transform var(--dur) var(--ease); }
 .tab-ic { display: grid; place-items: center; width: 3.2rem; height: 1.9rem; border-radius: var(--r-pill); transition: background var(--dur) var(--ease); }

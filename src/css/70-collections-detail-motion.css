@@ -177,7 +177,7 @@ body.genre-on #sec-tod, body:has(#filter-results:not([hidden])) #sec-tod { displ
 /* ---------- Reading-level badge + level filter chips ---------- */
 .lvl { --lc: var(--accent); display: inline-flex; align-items: center; border: 1px solid color-mix(in srgb, var(--lc) 55%, transparent); color: var(--lc); background: color-mix(in srgb, var(--lc) 12%, transparent); border-radius: var(--r-pill); padding: .12rem .55rem; font-size: .72rem; font-weight: 650; white-space: nowrap; line-height: 1.5; }
 .lvl[hidden] { display: none; }
-.tile-lvl { position: absolute; top: .4rem; left: .4rem; z-index: 1; font-size: .66rem; padding: .05rem .45rem; background: color-mix(in srgb, var(--bg) 84%, var(--lc)); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: var(--shadow-sm); }
+.tile-lvl { position: absolute; top: .4rem; left: .4rem; z-index: 1; font-size: .66rem; padding: .05rem .45rem; background: color-mix(in srgb, var(--bg) 92%, var(--lc)); box-shadow: var(--shadow-sm); }
 .flt-chips button[data-t]::before { content: ""; display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; margin-right: .4rem; background: var(--lc); }
 .flt-chips button[data-t="0"] { --lc: color-mix(in srgb, #3FB57A 72%, var(--ink)); }
 .flt-chips button[data-t="1"] { --lc: var(--accent); }
@@ -720,7 +720,7 @@ i.sv { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); } 
 :root[data-calm] .det-rate, :root[data-calm] .rt-prompt { display: none; }   /* Calm mode: no scores or popularity numbers */
 
 /* Ratings on tiles and lists (rsLoad in 135-ratings.js) */
-.tile-rate { position: absolute; left: .4rem; bottom: .4rem; z-index: 1; font: 600 .7rem/1.2 var(--font-ui); padding: .1rem .5rem; border-radius: var(--r-pill); color: var(--ink); background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font-variant-numeric: tabular-nums; }
+.tile-rate { position: absolute; left: .4rem; bottom: .4rem; z-index: 1; font: 600 .7rem/1.2 var(--font-ui); padding: .1rem .5rem; border-radius: var(--r-pill); color: var(--ink); background: color-mix(in srgb, var(--bg) 92%, transparent); font-variant-numeric: tabular-nums; }
 .tile-rate[hidden], .cb-rate[hidden] { display: none; }
 .cb-rate { font-size: var(--label); color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
 :root[data-calm] .tile-rate, :root[data-calm] .cb-rate { display: none; }   /* Calm mode: no scores or popularity numbers */

@@ -142,7 +142,7 @@
 .card .chips .sbadge.dl { margin: 0; }
 .sbadge.combo > .cb-sync[data-s="no"] { color: var(--muted); font-weight: 500; }
 .sbadge.combo:has(> .cb-sync[data-s="no"]:not([hidden])):not(:has(> .cb-best:not([hidden]))) { background: transparent; border-color: color-mix(in srgb, var(--muted) 40%, transparent); }
-.heart.on-card { left: calc(4.5rem - 1.7rem - .25rem); right: auto; top: calc(.85rem + 6rem - 1.7rem - .25rem); width: 1.7rem; height: 1.7rem; background: var(--glass); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 0 0 1px var(--line); }
+.heart.on-card { left: calc(4.5rem - 1.7rem - .25rem); right: auto; top: calc(.85rem + 6rem - 1.7rem - .25rem); width: 1.7rem; height: 1.7rem; background: var(--glass); box-shadow: 0 0 0 1px var(--line); }
 .list > .card-wrap:first-child .heart.on-card { top: calc(.85rem + 6rem - 1.7rem - .25rem); }
 
 /* ---------- 6: skeleton rows + no-results ---------- */
