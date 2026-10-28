@@ -335,6 +335,8 @@ if __name__ == "__main__":
     os.makedirs(dist, exist_ok=True)
     with open(os.path.join(dist, "index.html"), "wb") as f:
         f.write(data)
+    with open(os.path.join(dist, "version.json"), "w", encoding="utf-8") as f:   # sw.js compares this tiny file instead of downloading the page
+        f.write('{"v":"%s"}' % stamp)
     for code, blob in LAZY.items():
         with open(os.path.join(dist, "i18n-%s.json" % code), "wb") as f:
             f.write(blob)

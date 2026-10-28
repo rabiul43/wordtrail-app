@@ -1,8 +1,10 @@
 /* Wordtrail service worker. It does two small things and nothing else:
  *
- *  1. The app page (one file) is fetched from the network first (up to 3 s) so a new version shows up at once. If the
- *     network is slow or offline, the saved copy opens instead and the newest page is saved in the background; the open
- *     page then gets a 'wt-update' message and offers "Reload". The very first visit (nothing saved yet) uses the network.
+ *  1. The app page (one file) is checked first with a tiny file, version.json (about 40 bytes, written by build.py). Same
+ *     version as the saved page: the saved page opens and nothing else is downloaded or saved. Different version (or no
+ *     version.json): the full page is fetched (up to 3 s) so a new version shows up at once. If the network is slow or
+ *     offline, the saved copy opens instead and the newest page is saved in the background; the open page then gets a
+ *     'wt-update' message and offers "Reload". The very first visit (nothing saved yet) uses the network.
  *  2. Big language files (i18n-bn.json) are kept, so that language works offline.
  *  3. The font files are kept, so text keeps its look offline: our own fonts/*.woff2 (cache first: their names carry a hash,
  *     so a file never changes) and, for the few fonts still loaded from elsewhere, the Google Fonts files.
@@ -24,10 +26,16 @@ let coverPuts = 0;
 const noCors = new Set();              // cover hosts that answered a plain request but refused a CORS one: not tried again this run
 const ROOT = new URL('./', self.registration.scope).href; // the page, whatever it is called (query strings are ignored)
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
+const VER_KEY = ROOT + 'version.json';   // inside the SHELL cache: the version of the page saved under ROOT
 
 self.addEventListener('install', event => {
   // Save the page now if we can, so the very first offline open already works. Failing here is fine.
-  event.waitUntil(caches.open(SHELL).then(c => fetch(ROOT, { cache: 'no-cache' }).then(r => { if (r.ok) return c.put(ROOT, plain(r)); })).catch(() => {}));
+  event.waitUntil(caches.open(SHELL).then(async c => {
+    const r = await fetch(ROOT, { cache: 'no-cache' }); if (!r.ok) return;
+    const ok = plain(r), buf = await ok.clone().arrayBuffer();
+    await c.put(ROOT, ok);
+    await rememberVersion(c, buf, await latestVersion());
+  }).catch(() => {}));
   self.skipWaiting();
 });
 
@@ -56,27 +64,55 @@ async function tellPages() {
   try { for (const c of await self.clients.matchAll({ type: 'window' })) c.postMessage({ type: 'wt-update' }); } catch (e) { /* none open */ }
 }
 
+// The tiny version file. null when it cannot be read (old deploy, offline, error page): the full page is then used as before.
+async function latestVersion() {
+  try {
+    const r = await fetch(VER_KEY, { cache: 'no-store' });
+    if (!r.ok) return null;
+    const v = ((await r.json()) || {}).v;
+    return typeof v === 'string' && /^[\w.-]{3,64}$/.test(v) ? v : null;
+  } catch (e) { return null; }
+}
+async function savedVersion(cache) {
+  try { const r = await cache.match(VER_KEY); return r ? (await r.text()) : null; } catch (e) { return null; }
+}
+// Called right after the page was saved. The version is kept only if the saved page really carries it (the build writes the same
+// stamp into the page), so a CDN that still serves the previous page can never leave "new version, old page" saved.
+async function rememberVersion(cache, buf, v) {
+  try {
+    if (v && new TextDecoder().decode(buf).includes(v)) await cache.put(VER_KEY, new Response(v));
+    else await cache.delete(VER_KEY);
+  } catch (e) { /* the next launch just downloads the page again */ }
+}
+
 async function shell(event) {
   const cache = await caches.open(SHELL), cached = await cache.match(ROOT);
   let usedCached = false;                                   // true once the saved (maybe older) page was handed to the app
-  const net = fetch(ROOT, { cache: 'no-cache' }).then(async r => {
+  const full = async v => {                                 // download, compare, save the whole page
+    const r = await fetch(ROOT, { cache: 'no-cache' });
     if (!r || !r.ok) throw new Error('bad response');       // an error page never replaces the saved copy
-    const ok = plain(r);
+    const ok = plain(r), fresh = await ok.clone().arrayBuffer();
     let changed = false;
     try {                                                    // compare with what is saved (a fresh read, the one served is already in use)
       const old = await cache.match(ROOT);
-      if (old) changed = !(await sameBody(await old.arrayBuffer(), await ok.clone().arrayBuffer()));
+      if (old) changed = !(await sameBody(await old.arrayBuffer(), fresh));
     } catch (e) { changed = false; }
-    await cache.put(ROOT, ok.clone());
+    if (changed || !cached) await cache.put(ROOT, ok.clone());   // identical bytes: nothing to write
+    await rememberVersion(cache, fresh, v);
     if (changed && usedCached) tellPages();                  // the app is showing the older page: offer the reload
     return ok;
-  });
-  if (!cached) return net.catch(() => fetch(event.request)); // first visit: just the network
+  };
+  if (!cached) return full(await latestVersion()).catch(() => fetch(event.request)); // first visit: just the network
+  const net = (async () => {
+    const v = await latestVersion();
+    if (v && v === await savedVersion(cache)) return cached.clone();   // up to date: no page download, no write
+    return full(v);
+  })();
   event.waitUntil(net.catch(() => {}));
   /* Network first: the newest page opens whenever the network answers within NET_WAIT. If it is slow or offline, the saved
      page opens at once and the newest one keeps downloading (then the app offers "Reload"). */
-  const slow = new Promise(res => setTimeout(() => { usedCached = true; res(cached); }, NET_WAIT));
-  const fast = net.catch(() => { usedCached = true; return cached; });
+  const slow = new Promise(res => setTimeout(() => { usedCached = true; res(cached.clone()); }, NET_WAIT));
+  const fast = net.catch(() => { usedCached = true; return cached.clone(); });
   return Promise.race([fast, slow]);
 }
 
