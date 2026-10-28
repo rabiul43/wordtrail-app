@@ -76,6 +76,6 @@ By default the page still loads its fonts from Google. To serve them yourself (o
     python tools/fetch_fonts.py     # once, with internet: fills src/fonts/
     python build.py
 
-`build.py` then puts the `@font-face` rules into the page, preloads the three first-screen files, drops the Google `<link>`s and copies the files to `dist/fonts/`.
+`build.py` then puts the `@font-face` rules into the page, preloads the two first-screen files (Inter, Fraunces), drops the Google `<link>`s and copies the files to `dist/fonts/`.
 Commit `src/fonts/` so the GitHub build has it. `src/pwa/_headers` gives `/fonts/*` a one-year cache (the file names carry a hash, so they never change).
 Change families or weights in `FAMILIES` at the top of `tools/fetch_fonts.py` and run it again. Lexend, Atkinson and OpenDyslexic (picked in Settings > Reading) are still loaded from their CDNs on demand.

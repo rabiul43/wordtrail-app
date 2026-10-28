@@ -29,14 +29,13 @@ FAMILIES = {
     "Fraunces":          ("Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700",                 {"latin", "latin-ext"}),
     "Inter":             ("Inter:wght@400;500;600;700",                            {"latin", "latin-ext"}),
     "Newsreader":        ("Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400", {"latin", "latin-ext"}),
-    "Literata":          ("Literata:opsz,wght@7..72,600",                          {"latin", "latin-ext"}),
     "Outfit":            ("Outfit:wght@300;400;500;600",                           {"latin", "latin-ext"}),
     # Only the Bengali letters: Inter / Newsreader already cover Latin text inside a Bengali page.
     "Noto Sans Bengali": ("Noto+Sans+Bengali:wght@400;500;600;700",                {"bengali"}),
 }
 
 # Files worth preloading: the upright Latin face of the fonts the first screen uses.
-PRELOAD_FAMILIES = ("Inter", "Fraunces", "Newsreader")
+PRELOAD_FAMILIES = ("Inter", "Fraunces")   # Newsreader is reader-only; it loads when the reader opens
 
 # Google only answers with WOFF2 when the browser looks modern.
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
