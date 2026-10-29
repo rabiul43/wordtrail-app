@@ -2,7 +2,7 @@
      Rain, café, wind, waves and more are made on the device with the Web Audio API (no files to download, works offline).
      They follow the book: on while it plays, faded out when it pauses (so the sleep timer ends them too). While the
      mixer is open they play so you can hear your mix. Settings > Audio switches the feature on or off. */
-  const AMB = { ctx: null, master: null, g: {}, built: false, on: false, preview: false, timer: 0, clinkIv: 0, evIv: 0, live: {}, nx: {}, tickAt: 0, beatAt: 0, tickAlt: 0, duckIv: 0, duck: null, duckT: 1, slow: false, rec: {}, recBusy: {}, recFail: {}, recMap: {}, bookId: '', nextThunder: 0, white: null, brown: null, scene: '' };
+  const AMB = { ctx: null, master: null, g: {}, built: false, on: false, preview: false, timer: 0, clinkIv: 0, evIv: 0, live: {}, nx: {}, tickAt: 0, beatAt: 0, tickAlt: 0, duckIv: 0, duck: null, duckT: 1, slow: false, rec: {}, recBusy: {}, recFail: {}, recMap: {}, bookId: '', nextThunder: 0, white: null, brown: null, scene: '', narr: null };
   const AMB_SOUNDS = [
     ['rain', 'Rain', 'nature'], ['wind', 'Wind', 'nature'], ['waves', 'Waves', 'nature'], ['river', 'River', 'nature'], ['birds', 'Birds', 'nature'], ['night', 'Night', 'nature'], ['thunder', 'Thunder', 'nature'],
     ['fire', 'Fire', 'indoors'], ['cafe', 'Café', 'indoors'], ['clock', 'Clock', 'indoors'], ['creaks', 'Creaks', 'indoors'], ['drips', 'Drips', 'indoors'],

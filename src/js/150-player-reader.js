@@ -492,10 +492,14 @@
   function vizPrime() {            // call from a user gesture so the context can start
     if (vctx) { if (vctx.state !== 'running') vctx.resume().catch(() => {}); return; }
     if (!wantGraph()) return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { S.vizFail = true; vizLayout(); return; }
-    try { vctx = new AC(); vctx.resume().catch(() => {}); } catch (e) { S.vizFail = true; vizLayout(); }
+    AMB.narr = narratorTapLive;
+    vctx = audioCtx();   // the ONE shared AudioContext (ambient-engine.js), not a second one: two contexts mean two audio threads and double wakeups (audit P13)
+    if (!vctx) { S.vizFail = true; vizLayout(); return; }
+    vctx.resume().catch(() => {});
   }
+  /* True while the narrator's sound runs through the shared context. Handed to the engine as AMB.narr, which audioSuspendSoon()
+     asks, so silent ambient and music never suspend the context under a playing narrator. */
+  const narratorTapLive = () => !!(vgraph && !audio.paused);
   function vizTryBuild() {
     if (vgraph || !wantGraph() || !vctx || !S.vizSrc || audio.crossOrigin !== 'anonymous') return;
     vctx.resume().then(() => {
@@ -505,7 +509,8 @@
         an.fftSize = 1024; an.smoothingTimeConstant = 0.72;
         src.connect(an); enhBuild(src);
         vgraph = an; vdata = new Uint8Array(1024);
-        vctx.onstatechange = () => { if (vctx.state !== 'running' && !audio.paused) vctx.resume().catch(() => {}); };
+        const heal = () => { if (vctx.state !== 'running' && !audio.paused) vctx.resume().catch(() => {}); };
+        if (vctx.addEventListener) vctx.addEventListener('statechange', heal); else vctx.onstatechange = heal;   // the context is shared: add a listener, never replace the music's
       } catch (e) { /* leave normal playback untouched */ }
     }).catch(() => {});
   }

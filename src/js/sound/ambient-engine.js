@@ -32,15 +32,15 @@
     AMB.sH.gain.setTargetAtTime(sh, t, tc || 1.2);
     AMB.spaceApplied = space;
   }
-  function audioCtx() {   // the ONE AudioContext of the app, shared by ambient, music and the opening sound; created on first use, so music works with ambient off
+  function audioCtx() {   // the ONE AudioContext of the app, shared by ambient, music, the opening sound and the narrator's sound wave / enhancer; created on first use, so music works with ambient off
     if (AMB.ctx) return AMB.ctx;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
     try { AMB.ctx = new AC(); } catch (e) { return null; }
     return AMB.ctx;
   }
-  function audioSuspendSoon(ms, key) {   // stop the engine to save battery, but only when ambient is silent AND music is not playing; ambient and music each keep their own timer
+  function audioSuspendSoon(ms, key) {   // stop the engine to save battery, but only when ambient is silent, music is not playing AND the narrator is not running through it; ambient and music each keep their own timer
     clearTimeout(AMB[key]);
-    AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive()) AMB.ctx.suspend().catch(() => {}); }, ms);
+    AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive() && !(AMB.narr && AMB.narr())) AMB.ctx.suspend().catch(() => {}); }, ms);
   }
   function ambBuild() {   // the ambient engine; each sound's layer is built only while its level is above zero (ambLayerOn)
     if (AMB.built) return true;

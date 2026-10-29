@@ -1,5 +1,14 @@
 # Changes in this version
 
+## One AudioContext for the whole app (audit P13)
+- 150-player-reader.js (`vizPrime`): the sound wave and Audio enhancer made their own `AudioContext`. They now take the shared one, `audioCtx()` from ambient-engine.js, the same context ambient, music and the opening sound use. Two contexts meant two audio threads and double wakeups, which costs most battery on iOS.
+- Needed so the narrator is not cut off: `audioSuspendSoon` (ambient-engine.js) stops the shared context when ambient is silent and music is idle. It now also asks `AMB.narr()`, which 150 sets to "the narrator is playing through the graph", so the context is not suspended under a playing narrator. A paused narrator lets it suspend; `play` already resumes it.
+- The narrator's "context stopped, wake it" handler is added with `addEventListener('statechange')` instead of `onstatechange =`, so it never replaces another listener on the shared context (music keeps its own).
+- New field `narr: null` on `AMB` (ambient-scenes.js). It is a hook, so ambient-engine.js does not depend on the player file.
+- Not changed: the short-lived contexts used only to decode audio (140, 050, 170, 180, 265). Each is closed right after use, so they are never running at the same time as the main one.
+- Test: `python build.py --no-min`, then `node tools/unit_check.js`, `node tools/startup_check.js`, `python tools/tangle_check.py`. One new file dependency is intended: 150 -> ambient-engine (`audioCtx`). The other tangle failures (the two older dependencies, the `before-P11` / `before-P12` copies) were there before this change.
+- Not tested on a real iPhone: play with sound wave or enhancer on, ambient and music off, then pause and play again, and lock the screen.
+
 ## Less double ticking while playing (audit P12)
 - 150-player-reader.js: the `timeupdate` handler called `tick()` about 4 times a second, on top of the loop that already calls it about 20 times a second (or every frame with the sound wave). It now skips that call while the loop ran in the last 250 ms and the page is showing.
 - Kept on purpose: a hidden page (screen off) pauses the loop, so `timeupdate` still ticks there. That is what ends a track at its cut point, stops the chapter sleep timer and prefetches the next track in the background. It also still ticks if the loop ever stalls. The first `timeupdate` after a seek or track change (resnap) is unchanged.
