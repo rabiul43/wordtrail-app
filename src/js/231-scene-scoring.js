@@ -78,6 +78,9 @@
     ['figure', 'w', /^(?:storm|tempest)s?$/, /\b(?:than|(?:wrapper|envelope)\s+of)\s+(?:the\s+)?$/, null],   // "more awful than the storm itself", "the wrapper and envelope of the storm": the calm-and-storm figure, not a storm now
     ['figure', 'p', /^islands?$/, null, /^\s+(?:split|cracked|broke|parted|drifted|melted)\b/],   // "as the islands split and cracked" (ice floes): not an island
     ['figure', 'p', /^cellar$/, /\bcalm\s+in\s+the\s+$/, null],   // "one would be calm on top of it, calm in the cellar": a joke that it is calm anywhere, not a cellar
+    ['figure', 'p', /^.+$/, /\bmeet\b[^.;!?]{0,25}\b(?:at|in|near)\s+the\s+$/, null],   // "meet presently at the palace": a place to go to later, not where the scene is
+    ['figure', 'p', /^the\s/, /\bmeet\b[^.;!?]{0,25}\b(?:at|in|near)\s+$/, null],   // same, for a phrase that already starts with "the" ("the palace")
+    ['figure', 'p', /^(?:apples?|roses?|cherry|cherries|peach|peaches|lilies|poppies)$/, /\b(?:cheeks?|lips?|face|faces|complexion|skin|mouth)\s+(?:[a-z]+\s+)?(?:like|as)\s+(?:(?:[a-z]+\s+){1,2}and\s+)?(?:the\s+|an?\s+)?$/, null],   // "red cheeks like apples and roses": a face, not a garden
   ];
   function ambOath(low, idx) {   // oath: a short shout such as "Thunder and lightning!" or "By thunder!": not a storm
     const e = low.indexOf('!', idx); if (e < 0 || /[.?]/.test(low.slice(idx, e))) return false;
@@ -163,6 +166,24 @@
     }
     return any ? mk : null;
   }
+  /* Verse: poetry and play verse (Whitman, Wordsworth, Shakespeare's witches) names the sea, a mountain or the dark as a figure, not as the place of the story.
+     The text has no line breaks, so a verse paragraph is told by its lines: each line starts with a capital, so a capital word such as "And", "The", "Then", "Of"
+     comes right after a comma or semicolon (", And marigolds all in a row"). Prose never does that (a quote mark or a full stop comes between).
+     Verse = 2 such words, or 1 such word with 3 capitals after commas in all (Whitman); a long paragraph needs a few more. Verse counts SC_VERSE x as much
+     as prose (a scene can still start from several clear words), whatever the genre. A heading is never verse. */
+  const SC_VERSE = 0.5;
+  const SC_VCAP = new RegExp('[,;]\\s+(?:And|But|Then|The|For|Or|When|That|Who|Which|With|As|If|In|On|Of|To|By|From|All|Where|While|Yet|Nor|So|Some|Thy|My|Its|Their|Our|Not|At|Upon|Into|Come|Go|What|How|Why|Let|Thus|Till|Those|These|This|Such|Each|Every|One|Out|Up|Down|Over|Under|Through|Before|After|Now|Here|There|Though|Than|Like|More|Most|Many|Make|Take|Give|Whose|Whom|Doth|Hath|Ere|Since|Whilst|Within|Without|Against|Among|Between|Beneath|Beyond|Above|About|Around|Along|Behind|Yea|Nay|Ay|Ne|Lo)\\b', 'g');
+  const SC_VANY = /[,;]\s+(?!(?:I|O|Oh|Mr|Mrs|Dr|St|Miss|Ms)\b)[A-Z][a-z\u2019'-]+/g;
+  function ambVerse(ix, j) {   // true when paragraph j reads as verse (kept on the paragraph)
+    const e = ix.pa[j]; if (e.vs != null) return e.vs;
+    let v = false;
+    if (!ix.sents[e.a].h) {
+      let t = ''; for (let i = e.a; i <= e.b && i < e.a + 60; i++) t += (ix.sents[i].t || '') + ' ';
+      const a = (t.match(SC_VCAP) || []).length;
+      if (a) { const x = Math.floor(t.length / 1500); v = a >= 2 + x || (a >= 1 && (t.match(SC_VANY) || []).length >= 3 + 3 * x); }
+    }
+    return (e.vs = v);
+  }
   /* Genre priors: a small nudge (0.5 to 1) from the book's genres and title, the same text the "Suggested for this book" card reads.
      It only breaks ties: a name gets its prior only when the text already says something about it (score above 0), so the text always wins
      and a prior alone can never start a scene. Rows are [pattern, {kind: {name: prior}}]; kinds p = place, w = weather, t = time, m = mood.
@@ -197,6 +218,7 @@
   function ambSceneScore(ix, j) {   // what one paragraph says: scores per kind and name (kept, so a paragraph is read once)
     const e = ix.pa[j]; if (e.sc) return e.sc;
     const o = { p: {}, w: {}, t: {}, m: {}, end: { p: {}, w: {}, t: {} } }, hits = {}, lex = ambLex();
+    const vf = ambVerse(ix, j) ? SC_VERSE : 1;   // verse counts less (see SC_VERSE)
     const ended = (kind, name, w, cap, q) => { const E = o.end[kind]; E[name] = (E[name] || 0) + w * 2 * (q || 1) * (cap ? 0.35 : 1); };   // a negated/ended hit: a mark that takes the scene back out
     const qs = { m: 0 };   // is a quote open? carried from sentence to sentence of this paragraph
     const add = (kind, name, w, cap, q, term) => {
@@ -207,7 +229,7 @@
     for (let i = e.a; i <= e.b && i < e.a + 60; i++) {   // a very long paragraph: its first 60 sentences are enough
       const text = ix.sents[i].t || '', low = text.toLowerCase(), lead = text.search(/[A-Za-z]/), re = /[a-z]+/g; let m;
       let qm = ambQuoteMask(text, qs); if (qm && qm.length !== low.length) qm = null;   // (a rare letter that changes length when lowercased: read it as narration)
-      const qf = k => (qm && qm[k] ? SC_QW : 1), near = (a, b) => { if (!qm) return false; for (let k = Math.max(0, a - 22); k < Math.min(qm.length, b + 22); k++) if (qm[k]) return true; return false; };
+      const qf = k => (qm && qm[k] ? SC_QW : 1) * vf, near = (a, b) => { if (!qm) return false; for (let k = Math.max(0, a - 22); k < Math.min(qm.length, b + 22); k++) if (qm[k]) return true; return false; };
       while ((m = re.exec(low))) {
         const hit = lex.get(m[0]); if (!hit) continue;
         if (SC_TAG.test(m[0]) && near(m.index, m.index + m[0].length)) continue;   // '"Get out," he whispered': a speech tag says who spoke, not what the scene is
