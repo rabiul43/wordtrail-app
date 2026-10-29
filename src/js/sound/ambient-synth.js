@@ -1,27 +1,28 @@
   /* ---------- ambient-synth.js ----------
      Ambient: sounds made on the device: noise, room reverb, raindrops, rain, rolling thunder, room mix. */
   function ambNoise(ctx, kind) {   // 10 seconds with two unrelated channels: it sounds wide, and the loop is far too long to notice
-    const sr = ctx.sampleRate, len = Math.floor(sr * 10), n = Math.floor(sr * 0.4), buf = ctx.createBuffer(2, len, sr);
+    const sr = ctx.sampleRate, len = Math.floor(sr * 10), n = Math.floor(sr * 0.4), buf = ctx.createBuffer(2, len, sr), tail = new Float32Array(n), tot = len + n;
+    let s = (Math.random() * 4294967296) | 1;   // xorshift32 instead of Math.random() per sample: about 3x faster for the million samples a loop needs, and the first start runs on the main thread
     for (let c = 0; c < 2; c++) {
-      const d = new Float32Array(len + n);   // a little extra at the end: it is folded into the start, so the end runs straight into the beginning
+      const o = buf.getChannelData(c);   // written straight into the buffer; only the extra end piece is kept aside: it is folded into the start, so the end runs straight into the beginning
       let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0, last = 0;
-      for (let i = 0; i < len + n; i++) {
-        const w = Math.random() * 2 - 1;
-        if (kind === 'white') d[i] = w * 0.5;
-        else if (kind === 'pink') { b0 = .99886 * b0 + w * .0555179; b1 = .99332 * b1 + w * .0750759; b2 = .969 * b2 + w * .153852; b3 = .8665 * b3 + w * .3104856; b4 = .55 * b4 + w * .5329522; b5 = -.7616 * b5 - w * .016898; d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * .5362) * 0.11; b6 = w * .115926; }
-        else { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+      for (let i = 0; i < tot; i++) {
+        s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+        const w = s * (1 / 2147483648); let v;   // s is a signed 32-bit number, so w runs from -1 to 1
+        if (kind === 'white') v = w * 0.5;
+        else if (kind === 'pink') { b0 = .99886 * b0 + w * .0555179; b1 = .99332 * b1 + w * .0750759; b2 = .969 * b2 + w * .153852; b3 = .8665 * b3 + w * .3104856; b4 = .55 * b4 + w * .5329522; b5 = -.7616 * b5 - w * .016898; v = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * .5362) * 0.11; b6 = w * .115926; }
+        else { last = (last + 0.02 * w) / 1.02; v = last * 3.5; }
+        if (i < len) o[i] = v; else tail[i - len] = v;
       }
-      const o = buf.getChannelData(c);
-      for (let i = 0; i < len; i++) o[i] = d[i];
-      for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI / 2; o[i] = d[i] * Math.sin(a) + d[len + i] * Math.cos(a); }   // equal-power fold: no click and no dip at the loop point
+      for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI / 2; o[i] = o[i] * Math.sin(a) + tail[i] * Math.cos(a); }   // equal-power fold: no click and no dip at the loop point
     }
     return buf;
   }
   function ambIR(ctx, sec) {   // a made-up room: noise that fades out and gets darker as it goes
-    const sr = ctx.sampleRate, len = Math.floor(sr * sec), pre = Math.floor(sr * 0.012), ramp = sr * 0.03, b = ctx.createBuffer(2, len, sr);
+    const sr = ctx.sampleRate, len = Math.floor(sr * sec), pre = Math.floor(sr * 0.012), ramp = sr * 0.03, b = ctx.createBuffer(2, len, sr), k = Math.pow(10, -3 / (len - pre));   // k: the fade of one sample, so the fade is a running product instead of a Math.pow per sample
     for (let c = 0; c < 2; c++) {
-      const d = b.getChannelData(c); let y = 0;
-      for (let i = pre; i < len; i++) { const x = (i - pre) / (len - pre); y += (0.55 - 0.42 * x) * ((Math.random() * 2 - 1) - y); d[i] = y * Math.pow(10, -3 * x) * (i - pre < ramp ? (i - pre) / ramp : 1); }
+      const d = b.getChannelData(c); let y = 0, env = 1;
+      for (let i = pre; i < len; i++) { const x = (i - pre) / (len - pre); y += (0.55 - 0.42 * x) * ((Math.random() * 2 - 1) - y); d[i] = y * env * (i - pre < ramp ? (i - pre) / ramp : 1); env *= k; }
     }
     return b;
   }
