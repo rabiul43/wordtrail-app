@@ -1,5 +1,10 @@
 # Changes in this version
 
+## Less double ticking while playing (audit P12)
+- 150-player-reader.js: the `timeupdate` handler called `tick()` about 4 times a second, on top of the loop that already calls it about 20 times a second (or every frame with the sound wave). It now skips that call while the loop ran in the last 250 ms and the page is showing.
+- Kept on purpose: a hidden page (screen off) pauses the loop, so `timeupdate` still ticks there. That is what ends a track at its cut point, stops the chapter sleep timer and prefetches the next track in the background. It also still ticks if the loop ever stalls. The first `timeupdate` after a seek or track change (resnap) is unchanged.
+- New name `loopAt` (one line next to `raf`).
+
 ## Scroll restore no longer leaves 3 listeners behind (audit P11)
 - 080-ui-shell-favourites.js (`uiInit`): the "reader scrolled themselves" listeners (touchstart, wheel, keydown, mousedown) used `once`, which only removes the one that fired, so the other three stayed for the whole session. They are now all removed as soon as the scroll restore ends. Behaviour is unchanged.
 - The other tap/key listeners were checked: each is added once at startup, or removes itself (`musGestureArm`, the review menu). Nothing else grows with session length.

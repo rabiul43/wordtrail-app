@@ -454,10 +454,10 @@
     lpNote();
     paintBookProg();
   }
-  let raf = 0, rafT = 0, lastSeekTick = -1;
+  let raf = 0, rafT = 0, lastSeekTick = -1, loopAt = -1e9;   // loopAt: when the loop last ran
   function stopLoop() { cancelAnimationFrame(raf); clearTimeout(rafT); rafT = 0; }
   function loop() {
-    rafT = 0;
+    rafT = 0; loopAt = performance.now();
     tick(false); if (!el.player.hidden) vizFrame();
     const q = Math.floor(audio.currentTime * 4);
     if (q !== lastSeekTick && !S.seeking) { lastSeekTick = q; updateSeekUI(audio.currentTime); if (el.player.hidden) miniProgress(); }
@@ -690,7 +690,7 @@
   function resnap() { tick(true); updateSeekUI(nowT()); }
   audio.addEventListener('timeupdate', () => {
     if (S.resnap && !audio.seeking && !S.loadingAudio) { S.resnap = false; resnap(); }
-    else tick(false);
+    else if (document.hidden || performance.now() - loopAt > 250) tick(false);   // the loop already ticks about 20 times a second while the page is showing; this is the backup for a hidden page (the loop pauses) or a stalled loop
     if (audio.paused || document.hidden) updateSeekUI(nowT());
   });
   audio.addEventListener('seeked', () => { resnap(); });
