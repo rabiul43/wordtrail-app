@@ -70,6 +70,14 @@
     ['figure', 'p', /^sleepers?$/, /\b(?:awaken\w*|wak(?:e|es|ed|ing)|woke|woken|rous(?:e|es|ed|ing)|disturb\w*|startl(?:e|es|ed|ing))\s+(?:the\s+)?$/, null],   // "the storm which awakens the sleeper": a person asleep, not a sleeper train
     ['figure', 'p', /^soldiers?$/, null, /^\s+of\s+(?:the\s+)?(?:[a-z'\u2019]+\s+){0,2}guards?\b/],   // "ten soldiers of the jeddak's Guard": a guard standing watch, not a battle
     ['verb', 'pm', /^haunting$/, null, /^\s+(?:[a-z]+\s+)?(?:pain|sorrow|grief|memory|memories|fear|dread|thoughts?|sadness|loneliness|question|dream|doubt|look|sense|feeling|image|echo)\b/],   // "this haunting nameless pain": a feeling, not a haunted place
+    ['figure', 'p', /^carriages?$/, /\b(?:seat\s+in\s+(?:his|her|the|my|our|their)\s+|preparations?\s+of\s+(?:new\s+)?)$/, /^\s+and\s+(?:bearing|manner|manners|air|gait|furniture)\b/],   // "a seat in his carriage" (an offer), "preparations of new carriages and furniture" (goods), "the carriage and bearing of a ruler" (how he stands)
+    ['figure', 'p', /^battle$/, null, /^-(?:scarred|worn|hardened)\b/],   // "a battle-scarred face": a person, not a battle
+    ['figure', 'w', /^(?:rain|rains|snow|storm|storms|wind|winds|fog|mist)$/, null, /^\s+(?:always|often|usually|generally|invariably)\s+(?:made|came|set|began|chose|managed|contrived|seemed)\b/],   // "the rain always made a point of setting in": a habit, not weather now
+    ['figure', 't', /^starry$/, null, /^\s+(?:dress|gown|robe|cloak|mantle)\b/],   // "the starry dress": clothes, not a night sky
+    ['figure', 'p', /^.+$/, /\b(?:was|were|is|are)\s+(?:just\s+)?going\s+to\s+(?:the\s+|a\s+)?$/, null],   // "the family was going to church": on the way, not there yet
+    ['figure', 'w', /^(?:storm|tempest)s?$/, /\b(?:than|(?:wrapper|envelope)\s+of)\s+(?:the\s+)?$/, null],   // "more awful than the storm itself", "the wrapper and envelope of the storm": the calm-and-storm figure, not a storm now
+    ['figure', 'p', /^islands?$/, null, /^\s+(?:split|cracked|broke|parted|drifted|melted)\b/],   // "as the islands split and cracked" (ice floes): not an island
+    ['figure', 'p', /^cellar$/, /\bcalm\s+in\s+the\s+$/, null],   // "one would be calm on top of it, calm in the cellar": a joke that it is calm anywhere, not a cellar
   ];
   function ambOath(low, idx) {   // oath: a short shout such as "Thunder and lightning!" or "By thunder!": not a storm
     const e = low.indexOf('!', idx); if (e < 0 || /[.?]/.test(low.slice(idx, e))) return false;

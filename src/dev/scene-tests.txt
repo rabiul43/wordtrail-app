@@ -1234,3 +1234,1107 @@ I cannot divine what it meaneth, This haunting nameless pain: A tale of the bygo
 === skip-haunting-pain-yes
 # place=haunted
 The ghosts walked the empty halls of the old house at night, and the haunting wail of the dead filled the haunted rooms.
+
+## real-paragraph round (rules found from the 200 real paragraphs; -no = the rule must fire, -yes = the rule must NOT fire)
+## goods, posture, an offer: "new carriages and furniture", "a seat in his carriage"
+=== skip-carriage-goods-no | trap
+# place=none
+The preparations of new carriages and furniture might wait for London and spring, when her own taste could have fairer play.
+
+=== skip-carriage-seat-no | trap
+# place=none
+Her brother was civilly offering a seat in his carriage, if the weather were Mr. Elton's only objection.
+
+=== skip-carriage-ride-yes
+# place=carriage
+They climbed into the carriage, the door was shut, and the horses started with a jerk along the lane.
+
+## compound: "a battle-scarred face"
+=== skip-battle-scarred-no | trap
+# place=none
+The old husky had a battle-scarred face and a single eye which flashed as he looked at us.
+
+=== skip-battle-scarred-yes
+# place=battle
+The battle raged all day on the plain; the cannon roared and the soldiers fought on through the smoke.
+
+## habit: "the rain always made a point of setting in"
+=== skip-weather-always-no | trap
+# weather=none
+The rain always made a point of setting in just as he had some out-door work to do.
+
+=== skip-weather-always-yes
+# weather=rain/wind/storm
+He lay awake through the long nights, with the wind and the rain always rushing by the window.
+
+## clothes: "the starry dress"
+=== skip-starry-dress-no | trap
+# time=none
+When the fur cloak fell off a little on one side, the starry dress sparkled underneath it.
+
+=== skip-starry-sky-yes
+# time=night
+The sky was clear and starry, and the night was still over the sleeping town.
+
+## on the way: "the family was going to church"
+=== skip-going-to-church-no | trap
+# place=none
+When the family was going to church, she stayed at home with her prayer-book.
+
+=== skip-going-to-church-yes
+# place=church
+The family went to church and sat in the pews, and the choir sang a hymn while the vicar climbed into the pulpit.
+
+## word weight: "natives", "trunk", "prisoner" are weak place words (230-scene-words.js, weight 1): they name people or a luggage box, not a place (-no = the word alone must not start a place; -yes = real place words around it still do)
+=== weight-natives-no | trap
+# place=none
+He wrote that the natives were friendly, and that the natives he met on the road offered him bread.
+
+=== weight-natives-yes
+# place=island
+The natives came down to the beach of the island with coconuts, and the marooned sailors showed them the treasure and the cove.
+
+=== weight-trunk-no | trap
+# place=none
+Mrs. Bell had packed her trunk the evening before, and now the trunk was strapped and corded in the hall, waiting for the man.
+
+=== weight-trunk-yes
+# place=attic
+In the attic, under the rafters and the cobwebs, stood an old trunk, and the dusty trunks beside it were full of lumber.
+
+=== weight-prisoner-no | trap
+# place=none
+The soldiers brought the prisoner to the officer, and the officer asked the prisoner his name and where he had come from.
+
+=== weight-prisoner-yes
+# place=cellar
+The jailer unlocked the cell, and the prisoner, in chains and shackles, was thrown into the dark dungeon.
+
+## Real paragraphs, labelled by Claude (labels written without looking at the engine's answers). Place = a key of the place list or none; a field left empty is not checked.
+
+=== real-pg308-1139 | genres: travel, adventure
+## pg308.txt, paragraph 1139
+# place=river weather=none time=none mood=none
+Jack, who has made himself a bed up in the prow of all the rugs and coats he can collect, and who has been lying there asleep for the last two hours, partially wakes up on being thus appealed to, and recollects all about the matter, and also remembers that there was an unusually strong stream against them all the way—likewise a stiff wind.
+
+=== real-pg174-0152 | genres: horror, gothic
+## pg174.txt, paragraph 152
+# place=none weather=none time=none mood=none
+As they entered the studio, Dorian Gray put his hand upon Lord Henry’s arm. “In that case, let our friendship be a caprice,” he murmured, flushing at his own boldness, then stepped up on the platform and resumed his pose.
+
+=== real-pg1260-3079 | genres: gothic, horror
+## pg1260.txt, paragraph 3079
+# place=none weather=none time=none mood=none
+“But I do think hardly of you,” I said; “and I’ll tell you why—not so much because you refused to give me shelter, or regarded me as an impostor, as because you just now made it a species of reproach that I had no ‘brass’ and no house. Some of the best people that ever lived have been as destitute as I am; and if you are a Christian, you ought not to consider poverty a crime.”
+
+=== real-pg2680-0114 | genres: essay, philosophy
+## pg2680.txt, paragraph 114
+# place=none weather=none time=none mood=none
+VIII. Whatsoever doth happen in the world, doth happen justly, and so if thou dost well take heed, thou shalt find it. I say not only in right order by a series of inevitable consequences, but according to justice and as it were by way of equal distribution, according to the true worth of everything. Continue then to take notice of it, as thou hast begun, and whatsoever thou dost, do it not without this proviso, that it be a thing of that nature that a good man (as the word good is properly taken) may do it. This observe carefully in every action.
+
+=== real-pg113-1953 | genres: children
+## pg113.txt, paragraph 1953
+# place=none weather=rain time=none mood=none
+“I wish my father would come home,” he said. “I want to tell him myself. I’m always thinking about it—but we couldn’t go on like this much longer. I can’t stand lying still and pretending, and besides I look too different. I wish it wasn’t raining today.”
+
+=== real-pg2048-1131 | genres: classic, literary
+## pg2048.txt, paragraph 1131
+# place=none weather=none time=none mood=none
+Go, little booke, God send thee good passage, And specially let this be thy prayere, Unto them all that thee will read or hear, Where thou art wrong, after their help to call, Thee to correct in any part or all. CHAUCER’S Belle Dame sans Mercie.
+
+=== real-pg141-0870 | genres: romance
+## pg141.txt, paragraph 870
+# place=none weather=none time=none mood=none
+To such feelings delay, even the delay of much preparation, would have been an evil, and Mr. Rushworth could hardly be more impatient for the marriage than herself. In all the important preparations of the mind she was complete: being prepared for matrimony by an hatred of home, restraint, and tranquillity; by the misery of disappointed affection, and contempt of the man she was to marry. The rest might wait. The preparations of new carriages and furniture might wait for London and spring, when her own taste could have fairer play.
+
+=== real-pg1257-4050 | genres: historical, history
+## pg1257.txt, paragraph 4050
+# place=none weather=none time=none mood=danger
+D’Artagnan was over him at a bound, and said to the Englishman, pointing his sword to his throat, “I could kill you, my Lord, you are completely in my hands; but I spare your life for the sake of your sister.”
+
+=== real-pg599-2873 | genres: classic, social
+## pg599.txt, paragraph 2873
+# place= weather=none time=none mood=none
+She had had a little black profile of him done for a shilling, and this was hung up by the side of another portrait over her bed. One day the boy came on his accustomed visit, galloping down the little street at Brompton, and bringing, as usual, all the inhabitants to the windows to admire his splendour, and with great eagerness and a look of triumph in his face, he pulled a case out of his great-coat--it was a natty white great-coat, with a cape and a velvet collar--pulled out a red morocco case, which he gave her.
+
+=== real-pg2701-0245 | genres: adventure
+## pg2701.txt, paragraph 245
+# place=none weather=none time=none mood=none
+“The Whale is harpooned to be sure; but bethink you, how you would manage a powerful unbroken colt, with the mere appliance of a rope tied to the root of his tail.” —A Chapter on Whaling in Ribs and Trucks.
+
+=== real-pg2852-0427 | genres: mystery, detective
+## pg2852.txt, paragraph 427
+# place=none weather=none time=none mood=none
+“Well, I don’t profess to understand it yet. This case of yours is very complex, Sir Henry. When taken in conjunction with your uncle’s death I am not sure that of all the five hundred cases of capital importance which I have handled there is one which cuts so deep. But we hold several threads in our hands, and the odds are that one or other of them guides us to the truth. We may waste time in following the wrong one, but sooner or later we must come upon the right.”
+
+=== real-pg245-2011 | genres: travel, adventure
+## pg245.txt, paragraph 2011
+# place=river weather=none time=day mood=none
+At two o'clock the 'Susie' reached Troy, sixty-five miles above the mouth of Black River. Here on the left comes in Little River; just beyond that the Ouachita, and on the right the Tensas. These three rivers form the Black River. Troy, or a portion of it, is situated on and around three large Indian mounds, circular in shape, which rise above the present water about twelve feet. They are about one hundred and fifty feet in diameter, and are about two hundred yards apart. The houses are all built between these mounds, and hence are all flooded to a depth of eighteen inches on their floors.
+
+=== real-pg940-0149 | genres: historical, history
+## pg940.txt, paragraph 149
+# place=forest weather=none time=none mood=danger
+“Who comes?” demanded the scout, throwing his rifle carelessly across his left arm, and keeping the forefinger of his right hand on the trigger, though he avoided all appearance of menace in the act. “Who comes hither, among the beasts and dangers of the wilderness?”
+
+=== real-pg25344-0886 | genres: classic, literary
+## pg25344.txt, paragraph 886
+# place=market/church weather=none time=none mood=none
+While Hester stood in that magic circle of ignominy, where the cunning cruelty of her sentence seemed to have fixed her forever, the admirable preacher was looking down from the sacred pulpit upon an audience whose very inmost spirits had yielded to his control. The sainted minister in the church! The woman of the scarlet letter in the market-place! What imagination would have been irreverent enough to surmise that the same scorching stigma was on them both!
+
+=== real-pg159-0352 | genres: science fiction
+## pg159.txt, paragraph 352
+# place=beach/sea weather=none time=none mood=none
+At last I roused myself from my inaction, and turning seaward walked straight into the water. The water was very shallow at first. I was thirty yards out before the waves reached to my waist. Dimly I could see the intertidal creatures darting away from my feet.
+
+=== real-pg34901-0081 | genres: essay, philosophy
+## pg34901.txt, paragraph 81
+# place=none weather=none time=none mood=none
+Let us now pass to the second division of the argument, and dismissing the supposition that any of the received opinions may be false, let us assume them to be true, and examine into the worth of the manner in which they are likely to be held, when their truth is not freely and openly canvassed. However unwillingly a person who has a strong opinion may admit the possibility that his opinion may be false, he ought to be moved by the consideration that however true it may be, if it is not fully, frequently, and fearlessly discussed, it will be held as a dead dogma, not a living truth.
+
+=== real-pg2775-0614 | genres: literary, social
+## pg2775.txt, paragraph 614
+# place=none weather=none time=night mood=
+He was oiling the breech action of a gun. It was an unusual thing for him to do, at that time of night, in his evening clothes. It never occurred to her, nevertheless, that he was going to shoot himself with that implement. She knew that he was doing it just for occupation—to keep himself from thinking. He looked up when she opened the door, his face illuminated by the light cast upwards from the round orifices in the green candle shades.
+
+=== real-pg45-0849 | genres: children
+## pg45.txt, paragraph 849
+# place=none weather=none time=none mood=sorrow
+“My last hope is gone,” she told Marilla. “I went up and saw Mrs. Barry myself and she treated me very insultingly. Marilla, I do not think she is a well-bred woman. There is nothing more to do except to pray and I haven’t much hope that that’ll do much good because, Marilla, I do not believe that God Himself can do very much with such an obstinate person as Mrs. Barry.”
+
+=== real-pg1524-1294 | genres: drama, classic
+## pg1524.txt, paragraph 1294
+# place=none weather=none time=none mood=none
+OSRIC. The King, sir, hath laid that in a dozen passes between you and him, he shall not exceed you three hits. He hath laid on twelve for nine. And it would come to immediate trial if your lordship would vouchsafe the answer.
+
+=== real-pg98-0748 | genres: war, adventure
+## pg98.txt, paragraph 748
+# place=none weather=none time=none mood=none
+“Partly through paying me to help you, I suppose. But it’s not worth your while to apostrophise me, or the air, about it; what you want to do, you do. You were always in the front rank, and I was always behind.”
+
+=== real-pg244-0148 | genres: mystery, detective
+## pg244.txt, paragraph 148
+# place=none weather=none time=none mood=none
+“Gregson is the smartest of the Scotland Yarders,” my friend remarked; “he and Lestrade are the pick of a bad lot. They are both quick and energetic, but conventional—shockingly so. They have their knives into one another, too. They are as jealous as a pair of professional beauties. There will be some fun over this case if they are both put upon the scent.”
+
+=== real-pg119-1004 | genres: travel, adventure
+## pg119.txt, paragraph 1004
+# place=none weather=none time=none mood=none
+What I meant, was, that I would break one of his legs, or something of that sort; but in Lucerne I instantly saw that I could impair his mind. That would be more lasting, and more satisfactory every way. So I bought the cuckoo clock; and if I ever get home with it, he is “my meat,” as they say in the mines. I thought of another candidate--a book-reviewer whom I could name if I wanted to--but after thinking it over, I didn't buy him a clock. I couldn't injure his mind.
+
+=== real-pg35-0279 | genres: science fiction
+## pg35.txt, paragraph 279
+# place=none weather=none time=none mood=none
+“But at last the lever was fixed and pulled over. The clinging hands slipped from me. The darkness presently fell from my eyes. I found myself in the same grey light and tumult I have already described.
+
+=== real-pg521-0070 | genres: adventure
+## pg521.txt, paragraph 70
+# place= weather=none time=day mood=none
+I bethought myself, however, that, perhaps the skin of him might, one way or other, be of some value to us; and I resolved to take off his skin if I could. So Xury and I went to work with him; but Xury was much the better workman at it, for I knew very ill how to do it. Indeed, it took us both up the whole day, but at last we got off the hide of him, and spreading it on the top of our cabin, the sun effectually dried it in two days’ time, and it afterwards served me to lie upon.
+
+=== real-pg2097-0625 | genres: mystery, detective
+## pg2097.txt, paragraph 625
+# place=none weather=none time=none mood=none
+“You are under the charge of Mr. Athelney Jones, of Scotland Yard. He is going to bring you up to my rooms, and I shall ask you for a true account of the matter. You must make a clean breast of it, for if you do I hope that I may be of use to you. I think I can prove that the poison acts so quickly that the man was dead before ever you reached the room.”
+
+=== real-pg158-0576 | genres: romance
+## pg158.txt, paragraph 576
+# place=none weather=none time=none mood=none
+But hardly had she so spoken, when she found her brother was civilly offering a seat in his carriage, if the weather were Mr. Elton’s only objection, and Mr. Elton actually accepting the offer with much prompt satisfaction. It was a done thing; Mr. Elton was to go, and never had his broad handsome face expressed more pleasure than at this moment; never had his smile been stronger, nor his eyes more exulting than when he next looked at her.
+
+=== real-pg246-0429 | genres: poetry, pastoral
+## pg246.txt, paragraph 429
+# place=none weather=none time=none mood=none
+(XXXVII.) One of the Persian Poets--Attar, I think--has a pretty story about this. A thirsty Traveller dips his hand into a Spring of Water to drink from. By-and-by comes another who draws up and drinks from an earthen bowl, and then departs, leaving his Bowl behind him. The first Traveller takes it up for another draught; but is surprised to find that the same Water which had tasted sweet from his own hand tastes bitter from the earthen Bowl. But a Voice--from Heaven, I think--tells him the clay from which the Bowl is made was once Man; and, into whatever shape renew'd, can never lose the bitter flavour of Mortality.
+
+=== real-pg844-0590 | genres: drama, classic
+## pg844.txt, paragraph 590
+# place=none weather=none time=none mood=none
+CECILY. You must not laugh at me, darling, but it had always been a girlish dream of mine to love some one whose name was Ernest. [Algernon rises, Cecily also.] There is something in that name that seems to inspire absolute confidence. I pity any poor married woman whose husband is not called Ernest.
+
+=== real-pg71-0045 | genres: essay, philosophy
+## pg71.txt, paragraph 45
+# place=none weather=none time=none mood=none
+This, then, is my position at present. But one cannot be too much on his guard in such a case, lest his actions be biassed by obstinacy, or an undue regard for the opinions of men. Let him see that he does only what belongs to himself and to the hour.
+
+=== real-pg2148-0818 | genres: literary, short stories
+## pg2148.txt, paragraph 818
+# place=none weather=none time=none mood=peace
+The general floor of the amphitheatre was grass of the same character as that I had found in the road; if anything, more deliciously soft, thick, velvety, and miraculously green. It was hard to conceive how all this beauty had been attained.
+
+=== real-pg62-1020 | genres: science fiction
+## pg62.txt, paragraph 1020
+# place=none weather=none time=none mood=none
+He was an almost perfect specimen of manhood; tall, straight as an arrow, superbly muscled and with the carriage and bearing of a ruler of men. I did not need to be told that he was Tardos Mors, Jeddak of Helium.
+
+=== real-pg1597-0495 | genres: fairy, fantasy
+## pg1597.txt, paragraph 495
+# place=none weather=none time=none mood=none
+“They are only dreams,” said the Raven. “They come to fetch the thoughts of the high personages to the chase; 'tis well, for now you can observe them in bed all the better. But let me find, when you enjoy honor and distinction, that you possess a grateful heart.”
+
+=== real-pg2145-2677 | genres: historical, history
+## pg2145.txt, paragraph 2677
+# place=none weather=none time=none mood=none
+The speaker sat in his chair; there were the royal head, the bloodless face, the masterful air, under the influence of which visitors forgot the broken limbs and distorted body of the man. The full black eyes gazed out under the white brows steadily, but not sternly. A moment thus, then he crossed his hands upon his breast.
+
+=== real-pg2891-2601 | genres: literary, social
+## pg2891.txt, paragraph 2601
+# place=none weather=none time=none mood=none
+“It all turns on affection now,” said Margaret. “Affection. Don’t you see?” Resuming her usual methods, she wrote the word on the house with her finger. “Surely you see. I like Helen very much, you not so much. Mr. Mansbridge doesn’t know her. That’s all. And affection, when reciprocated, gives rights. Put that down in your notebook, Mr. Mansbridge. It’s a useful formula.”
+
+=== real-pg236-0156 | genres: adventure
+## pg236.txt, paragraph 156
+# place=forest/jungle/lake weather=none time=day mood=none
+As the dawn was breaking the Sambhur belled Once, twice and again! And a doe leaped up, and a doe leaped up From the pond in the wood where the wild deer sup. This I, scouting alone, beheld, Once, twice and again!
+
+=== real-pg1514-0177 | genres: drama, classic
+## pg1514.txt, paragraph 177
+# place=none weather=none time= mood=none
+TITANIA. Come, now a roundel and a fairy song; Then for the third part of a minute, hence; Some to kill cankers in the musk-rose buds; Some war with reremice for their leathern wings, To make my small elves coats; and some keep back The clamorous owl, that nightly hoots and wonders At our quaint spirits. Sing me now asleep; Then to your offices, and let me rest.
+
+=== real-pg74-0205 | genres: children
+## pg74.txt, paragraph 205
+# place=none weather=none time=none mood=none
+Although my book is intended mainly for the entertainment of boys and girls, I hope it will not be shunned by men and women on that account, for part of my plan has been to try to pleasantly remind adults of what they once were themselves, and of how they felt and thought and talked, and what queer enterprises they sometimes engaged in.
+
+=== real-pg215-0237 | genres: adventure
+## pg215.txt, paragraph 237
+# place=camp weather=none time=night mood=
+For a long time after his rescue, Buck did not like Thornton to get out of his sight. From the moment he left the tent to when he entered it again, Buck would follow at his heels. His transient masters since he had come into the Northland had bred in him a fear that no master could be permanent. He was afraid that Thornton would pass out of his life as Perrault and François and the Scotch half-breed had passed out. Even in the night, in his dreams, he was haunted by this fear. At such times he would shake off sleep and creep through the chill to the flap of the tent, where he would stand and listen to the sound of his master’s breathing.
+
+=== real-pg36-0223 | genres: science fiction
+## pg36.txt, paragraph 223
+# place=village weather=none time=night mood=dread
+Ripley Street was deserted, and except for a lighted window or so the village showed not a sign of life; but I narrowly escaped an accident at the corner of the road to Pyrford, where a knot of people stood with their backs to me. They said nothing to me as I passed. I do not know what they knew of the things happening beyond the hill, nor do I know if the silent houses I passed on my way were sleeping securely, or deserted and empty, or harassed and watching against the terror of the night.
+
+=== real-pg863-0678 | genres: mystery, detective
+## pg863.txt, paragraph 678
+# place=none weather=none time=day mood=sorrow
+Ever since the early hours of the morning, John had been hard at work, sending telegrams—one of the first had gone to Evelyn Howard—writing notices for the papers, and generally occupying himself with the melancholy duties that a death entails.
+
+=== real-pg1533-0576 | genres: drama, classic
+## pg1533.txt, paragraph 576
+# place=none weather=none time=none mood=dread
+MACBETH. Thou are too like the spirit of Banquo. Down! Thy crown does sear mine eyeballs:—and thy hair, Thou other gold-bound brow, is like the first. A third is like the former.—Filthy hags! Why do you show me this?—A fourth!—Start, eyes! What, will the line stretch out to th’ crack of doom? Another yet!—A seventh!—I’ll see no more:— And yet the eighth appears, who bears a glass Which shows me many more; and some I see That twofold balls and treble sceptres carry. Horrible sight!—Now I see ’tis true; For the blood-bolter’d Banquo smiles upon me, And points at them for his.—What! is this so?
+
+=== real-pg120-1100 | genres: adventure
+## pg120.txt, paragraph 1100
+# place=forest/river weather=none time=none mood=none
+So thinking, and in famous spirits, I began to set my face homeward for the block house and my companions. I remembered that the most easterly of the rivers which drain into Captain Kidd’s anchorage ran from the two-peaked hill upon my left, and I bent my course in that direction that I might pass the stream while it was small. The wood was pretty open, and keeping along the lower spurs, I had soon turned the corner of that hill, and not long after waded to the mid-calf across the watercourse.
+
+=== real-pg2641-2142 | genres: literary, social
+## pg2641.txt, paragraph 2142
+# place=none weather=none time=none mood=none
+“Silly boy! He thinks he’s being dignified. He knew we should go off in the spring—he has known it for six months—that if mother wouldn’t give her consent we should take the thing into our own hands. They had fair warning, and now he calls it an elopement. Ridiculous boy—”
+
+=== real-pg514-1944 | genres: children
+## pg514.txt, paragraph 1944
+# place=study weather=none time=none mood=merry/peace
+“I’m so full of happiness, that if Father was only here, I couldn’t hold one drop more,” said Beth, quite sighing with contentment as Jo carried her off to the study to rest after the excitement, and to refresh herself with some of the delicious grapes the ‘Jungfrau’ had sent her.
+
+=== real-pg1322-1457 | genres: poetry, pastoral
+## pg1322.txt, paragraph 1457
+# place=none weather=none time=none mood=
+How solemn as one by one, As the ranks returning worn and sweaty, as the men file by where stand, As the faces the masks appear, as I glance at the faces studying the masks, (As I glance upward out of this page studying you, dear friend, whoever you are,) How solemn the thought of my whispering soul to each in the ranks, and to you, I see behind each mask that wonder a kindred soul, O the bullet could never kill what you really are, dear friend, Nor the bayonet stab what you really are; The soul! yourself I see, great as any, good as the best, Waiting secure and content, which the bullet could never kill, Nor the bayonet stab O friend.
+
+=== real-pg12-0929 | genres: fantasy, fairy
+## pg12.txt, paragraph 929
+# place=none weather=none time=none mood=none
+At last the Red Queen began. “You’ve missed the soup and fish,” she said. “Put on the joint!” And the waiters set a leg of mutton before Alice, who looked at it rather anxiously, as she had never had to carve a joint before.
+
+=== real-pg217-4282 | genres: literary, social
+## pg217.txt, paragraph 4282
+# place=none weather=none time=night mood=sorrow
+And afterwards he loved her—loved her to the last fibre of his being. He loved her. But he wanted, somehow, to cry. There was something he could not bear for her sake. He stayed with her till quite late at night. As he rode home he felt that he was finally initiated. He was a youth no longer. But why had he the dull pain in his soul? Why did the thought of death, the after-life, seem so sweet and consoling?
+
+=== real-pg289-0736 | genres: fantasy, fairy
+## pg289.txt, paragraph 736
+# place=none weather=none time=none mood=none
+Toad eagerly scrambled into the seat vacated by the driver, took the steering-wheel in his hands, listened with affected humility to the instructions given him, and set the car in motion, but very slowly and carefully at first, for he was determined to be prudent.
+
+=== real-pg76-1861 | genres: adventure
+## pg76.txt, paragraph 1861
+# place=none weather=none time=none mood=none
+“Prisoners don’t have geese running around the donjon-keep to pull pens out of, you muggins. They always make their pens out of the hardest, toughest, troublesomest piece of old brass candlestick or something like that they can get their hands on; and it takes them weeks and weeks and months and months to file it out, too, because they’ve got to do it by rubbing it on the wall. They wouldn’t use a goose-quill if they had it. It ain’t regular.”
+
+=== real-pg389-0212 | genres: horror, gothic
+## pg389.txt, paragraph 212
+# place=none weather=none time=none mood=none
+A short while after the last of these terrible events, Austin came to see Mr. Villiers. He was curious to know whether Villiers had succeeded in discovering any fresh traces of Mrs. Herbert, either through Clarke or by other sources, and he asked the question soon after he had sat down.
+
+=== real-pg1513-1060 | genres: drama, classic
+## pg1513.txt, paragraph 1060
+# place=graveyard weather=none time=none mood=sorrow
+Pitiful sight! Here lies the County slain, And Juliet bleeding, warm, and newly dead, Who here hath lain this two days buried. Go tell the Prince; run to the Capulets. Raise up the Montagues, some others search.
+
+=== real-pg535-0041 | genres: travel, adventure
+## pg535.txt, paragraph 41
+# place=none weather=none time=none mood=
+I remembered having laughed myself when I had seen good men struggling with adversity in the person of a jackass, and the recollection filled me with penitence. That was in my old light days, before this trouble came upon me. God knows at least that I shall never laugh again, thought I. But oh, what a cruel thing is a farce to those engaged in it!
+
+=== real-pg730-3667 | genres: classic, social
+## pg730.txt, paragraph 3667
+# place=none weather=none time=none mood=none
+There had been something so tremendous in the shrinking off of the three, that the wretched man was willing to propitiate even this lad. Accordingly he nodded, and made as though he would shake hands with him.
+
+=== real-pg696-0265 | genres: gothic, horror
+## pg696.txt, paragraph 265
+# place=none weather=none time=none mood=none
+“Purity, or not purity,” said Bianca, “gone she is—a stranger is found that nobody knows; you question him yourself; he tells you he is in love, or unhappy, it is the same thing—nay, he owned he was unhappy about others; and is anybody unhappy about another, unless they are in love with them? and at the very next word, he asks innocently, pour soul! if my Lady Isabella is missing.”
+
+=== real-pg242-0049 | genres: literary, social
+## pg242.txt, paragraph 49
+# place=none weather=none time=none mood=none
+My grandfather said little. When he first came in he kissed me and spoke kindly to me, but he was not demonstrative. I felt at once his deliberateness and personal dignity, and was a little in awe of him. The thing one immediately noticed about him was his beautiful, crinkly, snow-white beard. I once heard a missionary say it was like the beard of an Arabian sheik. His bald crown only made it more impressive.
+
+=== real-pg55-0691 | genres: fantasy, fairy
+## pg55.txt, paragraph 691
+# place=none weather=none time=none mood=none
+Now while the tinsmiths had been at work mending the Woodman himself, another of the Winkies, who was a goldsmith, had made an axe-handle of solid gold and fitted it to the Woodman’s axe, instead of the old broken handle. Others polished the blade until all the rust was removed and it glistened like burnished silver.
+
+=== real-pg155-1138 | genres: mystery, detective
+## pg155.txt, paragraph 1138
+# place= weather=none time=none mood=
+At the sandhillocks we were met by the under-groom, running to us from the house. The lad is a good lad, and has an honest respect for me. He handed me a little note, with a decent sorrow in his face. “Penelope sent me with this, Mr. Betteredge,” he said. “She found it in Rosanna’s room.”
+
+=== real-pg140-0979 | genres: literary, social
+## pg140.txt, paragraph 979
+# place=none weather=none time=none mood=none
+“See that the cabbie—hic—is paid,” was the other’s response; and he linked his arm in Jurgis’. Jurgis was about to say, “I have the money for him,” but he restrained himself. The stout man in uniform signaled to the other, who went out to the cab, while he followed Jurgis and his young master.
+
+=== real-pg209-0372 | genres: horror, gothic
+## pg209.txt, paragraph 372
+# place=none weather=none time=none mood=none
+“Of carrying on an intercourse that he conceals from me? Ah, remember that, until further evidence, I now accuse nobody.” Then, before shutting her out to go, by another passage, to her own place, “I must just wait,” I wound up.
+
+=== real-pg175-1218 | genres: gothic, horror
+## pg175.txt, paragraph 1218
+# place=theatre weather=none time=none mood=
+"There's no Mauclair and no assistants! No one at the lights, I tell you! You can imagine," roared the stage-manager, "that that little girl must have been carried off by somebody else: she didn't run away by herself! It was a calculated stroke and we have to find out about it ... And what are the managers doing all this time? ... I gave orders that no one was to go down to the lights and I posted a fireman in front of the gas-man's box beside the organ. Wasn't that right?"
+
+=== real-pg786-1945 | genres: classic, social
+## pg786.txt, paragraph 1945
+# place=none weather=none time=none mood=none
+‘You’re a pretty article,’ growled the whelp, moving uneasily in his dark corner, ‘to come here with these precious imputations! You ought to be bundled out for not knowing how to behave yourself, and you would be by rights.’
+
+=== real-pg84-0263 | genres: horror, gothic
+## pg84.txt, paragraph 263
+# place=court weather=none time=day mood=sorrow
+I passed a night of unmingled wretchedness. In the morning I went to the court; my lips and throat were parched. I dared not ask the fatal question, but I was known, and the officer guessed the cause of my visit. The ballots had been thrown; they were all black, and Justine was condemned.
+
+=== real-pg3825-1088 | genres: drama, classic
+## pg3825.txt, paragraph 1088
+# place=none weather=none time=none mood=none
+HIGGINS. Of course I do, you little fool. Five minutes ago you were like a millstone round my neck. Now you’re a tower of strength: a consort battleship. You and I and Pickering will be three old bachelors together instead of only two men and a silly girl.
+
+=== real-pg164-2218 | genres: adventure
+## pg164.txt, paragraph 2218
+# place= weather=none time=none mood=none
+We were at cross-purposes. But, before I could reply, he showed me an open manuscript on his table, and said, in a more serious tone, “Here, M. Aronnax, is a manuscript written in several languages. It contains the sum of my studies of the sea; and, if it please God, it shall not perish with me. This manuscript, signed with my name, complete with the history of my life, will be shut up in a little floating case. The last survivor of all of us on board the Nautilus will throw this case into the sea, and it will go whither it is borne by the waves.”
+
+=== real-pg43-0229 | genres: horror, gothic
+## pg43.txt, paragraph 229
+# place=manor weather=none time=none mood=dread
+“Changed? Well, yes, I think so,” said the butler. “Have I been twenty years in this man’s house, to be deceived about his voice? No, sir; master’s made away with; he was made away with eight days ago, when we heard him cry out upon the name of God; and who’s in there instead of him, and why it stays there, is a thing that cries to Heaven, Mr. Utterson!”
+
+=== real-pg2776-0636 | genres: literary, short stories
+## pg2776.txt, paragraph 636
+# place=none weather=none time=none mood=none
+The next day Sarah showed Schulenberg a neat card on which the menu was beautifully typewritten with the viands temptingly marshalled under their right and proper heads from “hors d’oeuvre” to “not responsible for overcoats and umbrellas.”
+
+=== real-pg161-1513 | genres: romance
+## pg161.txt, paragraph 1513
+# place=none weather=none time=none mood=none
+“Certainly, there can be no difference; for Robert will now to all intents and purposes be considered as the eldest son;—and as to any thing else, they are both very agreeable young men: I do not know that one is superior to the other.”
+
+=== real-pg768-0500 | genres: gothic, horror
+## pg768.txt, paragraph 500
+# place=none weather=none time=none mood=none
+“Nay, nay, he’s noan at Gimmerton,” said Joseph. “I’s niver wonder but he’s at t’ bothom of a bog-hoile. This visitation worn’t for nowt, and I wod hev’ ye to look out, Miss—yah muh be t’ next. Thank Hivin for all! All warks togither for gooid to them as is chozzen, and piked out fro’ th’ rubbidge! Yah knaw whet t’ Scripture ses.” And he began quoting several texts, referring us to chapters and verses where we might find them.
+
+=== real-pg105-0876 | genres: romance
+## pg105.txt, paragraph 876
+# place=none weather=none time=none mood=none
+“Oh!” cried Elizabeth, “I have been rather too much used to the game to be soon overcome by a gentleman’s hints. However, when I found how excessively he was regretting that he should miss my father this morning, I gave way immediately, for I would never really omit an opportunity of bringing him and Sir Walter together. They appear to so much advantage in company with each other. Each behaving so pleasantly. Mr Elliot looking up with so much respect.”
+
+=== real-pg416-0312 | genres: literary, short stories
+## pg416.txt, paragraph 312
+# place=none weather=none time=none mood=none
+When Will Hurley, a middle-aged man who clerked in a drug store and who also belonged to the church, offered to walk home with her she did not protest. “Of course I will not let him make a practice of being with me, but if he comes to see me once in a long time there can be no harm in that,” she told herself, still determined in her loyalty to Ned Currie.
+
+=== real-pg944-0787 | genres: travel, adventure
+## pg944.txt, paragraph 787
+# place=none weather=none time=none mood=none
+It is impossible to be much surprised at the fear which natives and old residents, though some of them known to be men of great command of mind, so generally experience during earthquakes. I think, however, this excess of panic may be partly attributed to a want of habit in governing their fear, as it is not a feeling they are ashamed of. Indeed, the natives do not like to see a person indifferent. I heard of two Englishmen who, sleeping in the open air during a smart shock, knowing that there was no danger, did not rise. The natives cried out indignantly, "Look at those heretics, they do not even get out of their beds!"
+
+=== real-pg11-0072 | genres: fantasy, fairy
+## pg11.txt, paragraph 72
+# place=none weather=none time=none mood=none
+“I thought you did,” said the Mouse. “—I proceed. ‘Edwin and Morcar, the earls of Mercia and Northumbria, declared for him: and even Stigand, the patriotic archbishop of Canterbury, found it advisable—’”
+
+=== real-pg77-0437 | genres: classic, literary
+## pg77.txt, paragraph 437
+# place=garden weather=none time=none mood=none
+So this oddly composed little social party used to assemble under the ruinous arbor. Hepzibah—stately as ever at heart, and yielding not an inch of her old gentility, but resting upon it so much the more, as justifying a princess-like condescension—exhibited a not ungraceful hospitality. She talked kindly to the vagrant artist, and took sage counsel—lady as she was—with the wood-sawyer, the messenger of everybody’s petty errands, the patched philosopher. And Uncle Venner, who had studied the world at street-corners, and other posts equally well adapted for just observation, was as ready to give out his wisdom as a town-pump to give water.
+
+=== real-pg2166-0756 | genres: adventure
+## pg2166.txt, paragraph 756
+# place=none weather=none time=none mood=none
+At this moment our conference was interrupted by the cry that messengers had come from the king. Advancing to the door of the hut we ordered that they should be admitted, and presently three men entered, each bearing a shining shirt of chain armour, and a magnificent battle-axe.
+
+=== real-pg1342-1252 | genres: romance
+## pg1342.txt, paragraph 1252
+# place=hearth weather=none time=none mood=none
+The invitation was accepted, of course, and at a proper hour they joined the party in Lady Catherine’s drawing-room. Her Ladyship received them civilly, but it was plain that their company was by no means so acceptable as when she could get nobody else; and she was, in fact, almost engrossed by her nephews, speaking to them, especially to Darcy, much more than to any other person in the room.
+
+=== real-pg5230-0030 | genres: science fiction
+## pg5230.txt, paragraph 30
+# place=none weather=none time=none mood=none
+Mrs. Hall, nothing loath, answered his questions and developed a conversation. “It’s a steep road by the down, sir,” she said in answer to the question about a trap; and then, snatching at an opening, said, “It was there a carriage was upsettled, a year ago and more. A gentleman killed, besides his coachman. Accidents, sir, happen in a moment, don’t they?”
+
+=== real-pg1661-0508 | genres: mystery, detective
+## pg1661.txt, paragraph 508
+# place=none weather=none time=none mood=none
+“Oh, yes, mother is alive and well. I wasn’t best pleased, Mr. Holmes, when she married again so soon after father’s death, and a man who was nearly fifteen years younger than herself. Father was a plumber in the Tottenham Court Road, and he left a tidy business behind him, which mother carried on with Mr. Hardy, the foreman; but when Mr. Windibank came he made her sell the business, for he was very superior, being a traveller in wines. They got £ 4700 for the goodwill and interest, which wasn’t near as much as father could have got if he had been alive.”
+
+=== real-pg205-0044 | genres: essay, philosophy
+## pg205.txt, paragraph 44
+# place= weather=none time=none mood=none
+I have looked after the wild stock of the town, which give a faithful herdsman a good deal of trouble by leaping fences; and I have had an eye to the unfrequented nooks and corners of the farm; though I did not always know whether Jonas or Solomon worked in a particular field to-day; that was none of my business. I have watered the red huckleberry, the sand cherry and the nettle tree, the red pine and the black ash, the white grape and the yellow violet, which might have withered else in dry seasons.
+
+=== real-pg82-2728 | genres: historical, history
+## pg82.txt, paragraph 2728
+# place=none weather=none time=none mood=none
+“And Richard Plantagenet,” said the King, “desires no more fame than his good lance and sword may acquire him—and Richard Plantagenet is prouder of achieving an adventure, with only his good sword, and his good arm to speed, than if he led to battle a host of an hundred thousand armed men.”
+
+=== real-pg103-0180 | genres: adventure
+## pg103.txt, paragraph 180
+# place=none weather=none time=none mood=none
+“Mr. Fix,” said the consul, “I like your way of talking, and hope you’ll succeed; but I fear you will find it far from easy. Don’t you see, the description which you have there has a singular resemblance to an honest man?”
+
+=== real-pg541-1218 | genres: classic, literary
+## pg541.txt, paragraph 1218
+# place=garden weather=none time=night mood=sorrow
+Archer was dealing hurriedly with crowding thoughts. His whole future seemed suddenly to be unrolled before him; and passing down its endless emptiness he saw the dwindling figure of a man to whom nothing was ever to happen. He glanced about him at the unpruned garden, the tumble-down house, and the oak-grove under which the dusk was gathering. It had seemed so exactly the place in which he ought to have found Madame Olenska; and she was far away, and even the pink sunshade was not hers ...
+
+=== real-pg2814-0285 | genres: literary, short stories
+## pg2814.txt, paragraph 285
+# place=none weather=none time=none mood=none
+He was hungry for, except some biscuits which he had asked two grudging curates to bring him, he had eaten nothing since breakfast-time. He sat down at an uncovered wooden table opposite two work-girls and a mechanic. A slatternly girl waited on him.
+
+=== real-pg2591-0281 | genres: fairy, fantasy
+## pg2591.txt, paragraph 281
+# place= weather=none time=none mood=none
+Presently the bird came in and wanted to serve up the dinner, but he could nowhere see the cook. In his alarm and flurry, he threw the wood here and there about the floor, called and searched, but no cook was to be found. Then some of the wood that had been carelessly thrown down, caught fire and began to blaze. The bird hastened to fetch some water, but his pail fell into the well, and he after it, and as he was unable to recover himself, he was drowned.
+
+=== real-pg110-1375 | genres: classic, social
+## pg110.txt, paragraph 1375
+# place=none weather=none time=none mood=none
+Then those eyes flashed brightly through their filmy heaviness, before the remainder of her face was well awake. With an oddly compounded look of gladness, shyness, and surprise, she exclaimed—“O Mr Clare! How you frightened me—I—”
+
+=== real-pg3176-0512 | genres: travel, adventure
+## pg3176.txt, paragraph 512
+# place=graveyard weather=none time=none mood=none
+Go when you will, you find somebody snuffling over that tomb. Go when you will, you find it furnished with those bouquets and immortelles. Go when you will, you find a gravel-train from Marseilles arriving to supply the deficiencies caused by memento-cabbaging vandals whose affections have miscarried.
+
+=== real-pg13415-1044 | genres: literary, short stories
+## pg13415.txt, paragraph 1044
+# place=none weather=none time=none mood=none
+"You are always reading ..." she said cajolingly, evidently wishing to flatter him. "Do you know, George, what is one of the secrets of your success? You are very clever and well-read. What book have you there?"
+
+=== real-pg16-1507 | genres: fantasy, fairy
+## pg16.txt, paragraph 1507
+# place=none weather=none time=none mood=
+“George, George!” she cried when she could speak; and Mr. Darling woke to share her bliss, and Nana came rushing in. There could not have been a lovelier sight; but there was none to see it except a little boy who was staring in at the window. He had had ecstasies innumerable that other children can never know; but he was looking through the window at the one joy from which he must be for ever barred.
+
+=== real-pg2542-0424 | genres: drama, classic
+## pg2542.txt, paragraph 424
+# place=none weather=none time=none mood=none
+NORA. I couldn’t take that into account; I didn’t trouble myself about you at all. I couldn’t bear you, because you put so many heartless difficulties in my way, although you knew what a dangerous condition my husband was in.
+
+=== real-pg73-0248 | genres: war, adventure
+## pg73.txt, paragraph 248
+# place=battle weather= time=none mood=danger
+A hatless general pulled his dripping horse to a stand near the colonel of the 304th. He shook his fist in the other’s face. “You’ve got to hold ’em back!” he shouted, savagely; “you’ve got to hold ’em back!”
+
+=== real-pg2944-0382 | genres: essay, philosophy
+## pg2944.txt, paragraph 382
+# place=none weather=none time=none mood=none
+Converse with a mind that is grandly simple, and literature looks like word-catching. The simplest utterances are worthiest to be written, yet are they so cheap and so things of course, that in the infinite riches of the soul it is like gathering a few pebbles off the ground, or bottling a little air in a phial, when the whole earth and the whole atmosphere are ours. Nothing can pass there, or make you one of the circle, but the casting aside your trappings, and dealing man to man in naked truth, plain confession, and omniscient affirmation.
+
+=== real-pg2853-3722 | genres: historical, history
+## pg2853.txt, paragraph 3722
+# place=garden/library weather=none time=day mood=none
+He wrote that afternoon in the library; next he took a bath, after which he commanded the vestiplicæ to arrange his dress. Brilliant and stately as one of the gods, he went to the triclinium, to cast the eye of a critic on the preparations, and then to the gardens, where youths and Grecian maidens from the islands were weaving wreaths of roses for the evening.
+
+=== real-pg345-2072 | genres: horror, gothic
+## pg345.txt, paragraph 2072
+# place=none weather=none time=none mood=
+2 November.--Three days on the road. No news, and no time to write it if there had been, for every moment is precious. We have had only the rest needful for the horses; but we are both bearing it wonderfully. Those adventurous days of ours are turning up useful. We must push on; we shall never feel happy till we get the launch in sight again.
+
+=== real-pg1400-0646 | genres: classic, social
+## pg1400.txt, paragraph 646
+# place=none weather=none time=none mood=none
+Miss Pocket laughed, and Camilla laughed and said (checking a yawn), “The idea!” But I thought they seemed to think it rather a good idea too. The other lady, who had not spoken yet, said gravely and emphatically, “Very true!”
+
+=== real-pg203-3817 | genres: classic, literary
+## pg203.txt, paragraph 3817
+# place=none weather=none time=none mood=sorrow
+But to live,—to wear on, day after day, of mean, bitter, low, harassing servitude, every nerve dampened and depressed, every power of feeling gradually smothered,—this long and wasting heart-martyrdom, this slow, daily bleeding away of the inward life, drop by drop, hour after hour,—this is the true searching test of what there may be in man or woman.
+
+=== real-pg121-0940 | genres: romance
+## pg121.txt, paragraph 940
+# place=none weather=none time=none mood=none
+Henry only smiled. “I am sure it is quite unnecessary upon your sister’s account and mine. You must know it to be so; and the General made such a point of your providing nothing extraordinary: besides, if he had not said half so much as he did, he has always such an excellent dinner at home, that sitting down to a middling one for one day could not signify.”
+
+=== real-pg4517-0194 | genres: literary, social
+## pg4517.txt, paragraph 194
+# place=farm/country weather=none time=none mood=
+Zenobia’s fault-finding was of the silent kind, but not the less penetrating for that. During the first months Ethan alternately burned with the desire to see Mattie defy her and trembled with fear of the result. Then the situation grew less strained. The pure air, and the long summer hours in the open, gave back life and elasticity to Mattie, and Zeena, with more leisure to devote to her complex ailments, grew less watchful of the girl’s omissions; so that Ethan, struggling on under the burden of his barren farm and failing saw-mill, could at least imagine that peace reigned in his house.
+
+=== real-pg145-0702 | genres: classic, social
+## pg145.txt, paragraph 702
+# place=none weather=none time=none mood=none
+“The more fool he!” said Mr. Featherstone, with some difficulty; breaking into a severe fit of coughing that required Mary Garth to stand near him, so that she did not find out whose horses they were which presently paused stamping on the gravel before the door.
+
+=== real-pg308-0133 | genres: travel, adventure
+## pg308.txt, paragraph 133
+# place= weather=rain time= mood=none
+Rainwater is the chief article of diet at supper. The bread is two-thirds rainwater, the beefsteak-pie is exceedingly rich in it, and the jam, and the butter, and the salt, and the coffee have all combined with it to make soup.
+
+=== real-pg174-1495 | genres: horror, gothic
+## pg174.txt, paragraph 1495
+# place=none weather=none time=night mood=
+“Why have you stopped playing, Dorian? Go back and give me the nocturne over again. Look at that great, honey-coloured moon that hangs in the dusky air. She is waiting for you to charm her, and if you play she will come closer to the earth. You won’t? Let us go to the club, then. It has been a charming evening, and we must end it charmingly. There is some one at White’s who wants immensely to know you—young Lord Poole, Bournemouth’s eldest son. He has already copied your neckties, and has begged me to introduce him to you. He is quite delightful and rather reminds me of you.”
+
+=== real-pg1260-0016 | genres: gothic, horror
+## pg1260.txt, paragraph 16
+# place=none weather=none time=none mood=none
+Conventionality is not morality. Self-righteousness is not religion. To attack the first is not to assail the last. To pluck the mask from the face of the Pharisee, is not to lift an impious hand to the Crown of Thorns.
+
+=== real-pg2680-0543 | genres: essay, philosophy
+## pg2680.txt, paragraph 543
+# place=none weather=none time=none mood=none
+'After this you will take care not to tell so many fibs of me, especially in the Senate. A monstrous fine speech this is! O if I could kiss your head at every heading of it! You have looked down on all with a vengeance. This oration once read, in vain shall we study, in vain shall we toil, in vain strain every nerve. Farewell always, most sweet master.'
+
+=== real-pg113-0814 | genres: children
+## pg113.txt, paragraph 814
+# place= weather=none time=none mood=none
+If he did not come back until winter, or even autumn, there would be time to watch the secret garden come alive. Even if he found out then and took it away from her she would have had that much at least.
+
+=== real-pg2048-0132 | genres: classic, literary
+## pg2048.txt, paragraph 132
+# place=farm/country weather=none time=none mood=none
+In fact, he declared it was of no use to work on his farm; it was the most pestilent little piece of ground in the whole country; everything about it went wrong, in spite of him. His fences were continually falling to pieces; his cow would either go astray, or get among the cabbages; weeds were sure to grow quicker in his fields than anywhere else; the rain always made a point of setting in just as he had some out-door work to do; so that though his patrimonial estate had dwindled away under his management, acre by acre, until there was little more left than a mere patch of Indian corn and potatoes, yet it was the worst-conditioned farm in the neighborhood.
+
+=== real-pg141-1444 | genres: romance
+## pg141.txt, paragraph 1444
+# place=none weather=none time=none mood=none
+Edmund was not sorry to be admitted again among the number of those who might speak and hear. But though the conference had seemed full long to him, and though on looking at Fanny he saw rather a flush of vexation, he inclined to hope that so much could not have been said and listened to without some profit to the speaker.
+
+=== real-pg1257-6844 | genres: historical, history
+## pg1257.txt, paragraph 6844
+# place=none weather=none time=none mood=none
+“‘Come,’ said the wretch, ‘is not peace much better than such a war as that? I will restore you to liberty this moment; I will proclaim you a piece of immaculate virtue; I will name you the Lucretia of England.’
+
+=== real-pg599-0333 | genres: classic, social
+## pg599.txt, paragraph 333
+# place=none weather=none time=none mood=merry
+"Stop, my dearest diddle-diddle-darling," shouted Jos, now as bold as a lion, and clasping Miss Rebecca round the waist. Rebecca started, but she could not get away her hand. The laughter outside redoubled. Jos continued to drink, to make love, and to sing; and, winking and waving his glass gracefully to his audience, challenged all or any to come in and take a share of his punch.
+
+=== real-pg2701-2512 | genres: adventure
+## pg2701.txt, paragraph 2512
+# place=sea weather= time=none mood=
+“I crush the quadrant, the thunder turns the needles, and now the mad sea parts the log-line. But Ahab can mend all. Haul in here, Tahitian; reel up, Manxman. And look ye, let the carpenter make another log, and mend thou the line. See to it.”
+
+=== real-pg2852-1489 | genres: mystery, detective
+## pg2852.txt, paragraph 1489
+# place=none weather=none time=none mood=none
+“I have already told you that your reports reached me rapidly, being forwarded instantly from Baker Street to Coombe Tracey. They were of great service to me, and especially that one incidentally truthful piece of biography of Stapleton’s. I was able to establish the identity of the man and the woman and knew at last exactly how I stood. The case had been considerably complicated through the incident of the escaped convict and the relations between him and the Barrymores. This also you cleared up in a very effective way, though I had already come to the same conclusions from my own observations.
+
+=== real-pg245-0095 | genres: travel, adventure
+## pg245.txt, paragraph 95
+# place=river weather=none time=none mood=none
+A big cat-fish collided with Marquette's canoe, and startled him; and reasonably enough, for he had been warned by the Indians that he was on a foolhardy journey, and even a fatal one, for the river contained a demon 'whose roar could be heard at a great distance, and who would engulf them in the abyss where he dwelt.' I have seen a Mississippi cat-fish that was more than six feet long, and weighed two hundred and fifty pounds; and if Marquette's fish was the fellow to that one, he had a fair right to think the river's roaring demon was come.
+
+=== real-pg940-2150 | genres: historical, history
+## pg940.txt, paragraph 2150
+# place=none weather=none time=none mood=danger
+The chase was renewed with a diligence rendered tenfold encouraging by this glimpse of the captive. But the way was rugged, broken, and in spots nearly impassable. Uncas abandoned his rifle, and leaped forward with headlong precipitation. Heyward rashly imitated his example, though both were, a moment afterward, admonished of his madness by hearing the bellowing of a piece, that the Hurons found time to discharge down the passage in the rocks, the bullet from which even gave the young Mohican a slight wound.
+
+=== real-pg25344-0552 | genres: classic, literary
+## pg25344.txt, paragraph 552
+# place=none weather=none time=none mood=none
+“Aha! and is it Mistress Hester that has a word for old Roger Chillingworth?” answered he, raising himself from his stooping posture. “With all my heart! Why, Mistress, I hear good tidings of you on all hands! No longer ago than yester-eve, a magistrate, a wise and godly man, was discoursing of your affairs, Mistress Hester, and whispered me that there had been question concerning you in the council. It was debated whether or no, with safety to the common weal, yonder scarlet letter might be taken off your bosom. On my life, Hester, I made my entreaty to the worshipful magistrate that it might be done forthwith!”
+
+=== real-pg159-0560 | genres: science fiction
+## pg159.txt, paragraph 560
+# place=none weather=none time=none mood=
+He came forward and took my arm. “Blood on the sleeve,” said he, and rolled back the flannel. He pocketed his weapon, felt my arm about painfully, and led me inside. “Your arm is broken,” he said, and then, “Tell me exactly how it happened—what happened?”
+
+=== real-pg34901-0156 | genres: essay, philosophy
+## pg34901.txt, paragraph 156
+# place=none weather=none time=none mood=none
+But, without dwelling upon supposititious cases, there are, in our own day, gross usurpations upon the liberty of private life actually practised, and still greater ones threatened with some expectation of success, and opinions proposed which assert an unlimited right in the public not only to prohibit by law everything which it thinks wrong, but in order to get at what it thinks wrong, to prohibit any number of things which it admits to be innocent.
+
+=== real-pg2775-0023 | genres: literary, social
+## pg2775.txt, paragraph 23
+# place=none weather=none time=none mood=none
+Yet, if one doesn't know that at this hour and day, at this pitch of civilization to which we have attained, after all the preachings of all the moralists, and all the teachings of all the mothers to all the daughters in saecula saeculorum... but perhaps that is what all mothers teach all daughters, not with lips but with the eyes, or with heart whispering to heart. And, if one doesn't know as much as that about the first thing in the world, what does one know and why is one here?
+
+=== real-pg45-1485 | genres: children
+## pg45.txt, paragraph 1485
+# place=none weather=none time=none mood=none
+“Yes, I think I will,” said Miss Stacy. “I thought of taking another school, but I have decided to come back to Avonlea. To tell the truth, I’ve grown so interested in my pupils here that I found I couldn’t leave them. So I’ll stay and see you through.”
+
+=== real-pg1524-0359 | genres: drama, classic
+## pg1524.txt, paragraph 359
+# place=none weather=none time=none mood=none
+QUEEN. Good gentlemen, he hath much talk’d of you, And sure I am, two men there are not living To whom he more adheres. If it will please you To show us so much gentry and good will As to expend your time with us awhile, For the supply and profit of our hope, Your visitation shall receive such thanks As fits a king’s remembrance.
+
+=== real-pg98-2751 | genres: war, adventure
+## pg98.txt, paragraph 2751
+# place=court weather=none time=none mood=
+Frantic acclamations were again raised. Doctor Manette sat down, with his eyes looking around, and his lips trembling; his daughter drew closer to him. The craving man on the jury rubbed his hands together, and restored the usual hand to his mouth.
+
+=== real-pg244-0560 | genres: mystery, detective
+## pg244.txt, paragraph 560
+# place=desert weather=none time=none mood=
+“If we take you with us,” he said, in solemn words, “it can only be as believers in our own creed. We shall have no wolves in our fold. Better far that your bones should bleach in this wilderness than that you should prove to be that little speck of decay which in time corrupts the whole fruit. Will you come with us on these terms?”
+
+=== real-pg119-2062 | genres: travel, adventure
+## pg119.txt, paragraph 2062
+# place=hotel weather=none time=none mood=none
+Americans intending to spend a year or so in European hotels will do well to copy this bill and carry it along. They will find it an excellent thing to get up an appetite with, in the dispiriting presence of the squalid table d'hôte.
+
+=== real-pg35-0025 | genres: science fiction
+## pg35.txt, paragraph 25
+# place=hearth weather=none time=none mood=none
+“But,” said the Medical Man, staring hard at a coal in the fire, “if Time is really only a fourth dimension of Space, why is it, and why has it always been, regarded as something different? And why cannot we move about in Time as we move about in the other dimensions of Space?”
+
+=== real-pg521-0178 | genres: adventure
+## pg521.txt, paragraph 178
+# place=island weather=none time=none mood=none
+Upon the sides of this square post I cut every day a notch with my knife, and every seventh notch was as long again as the rest, and every first day of the month as long again as that long one; and thus I kept my calendar, or weekly, monthly, and yearly reckoning of time.
+
+=== real-pg2097-0390 | genres: mystery, detective
+## pg2097.txt, paragraph 390
+# place=none weather=none time=none mood=none
+“He acted according to his lights,” said Holmes, lifting him down from the barrel and walking him out of the timber-yard. “If you consider how much creasote is carted about London in one day, it is no great wonder that our trail should have been crossed. It is much used now, especially for the seasoning of wood. Poor Toby is not to blame.”
+
+=== real-pg158-0882 | genres: romance
+## pg158.txt, paragraph 882
+# place=none weather=none time=none mood=none
+Small heart had Harriet for visiting. Only half an hour before her friend called for her at Mrs. Goddard’s, her evil stars had led her to the very spot where, at that moment, a trunk, directed to The Rev. Philip Elton, White-Hart, Bath, was to be seen under the operation of being lifted into the butcher’s cart, which was to convey it to where the coaches past; and every thing in this world, excepting that trunk and the direction, was consequently a blank.
+
+=== real-pg246-0029 | genres: poetry, pastoral
+## pg246.txt, paragraph 29
+# place=none weather=none time=none mood=none
+I cannot see reason to alter my opinion, formed as it was more than a dozen years ago when Omar was first shown me by one to whom I am indebted for all I know of Oriental, and very much of other, literature. He admired Omar's Genius so much, that he would gladly have adopted any such Interpretation of his meaning as Mons. Nicolas' if he could.[7] That he could not, appears by his Paper in the Calcutta Review already so largely quoted; in which he argues from the Poems themselves, as well as from what records remain of the Poet's Life.
+
+=== real-pg844-0883 | genres: drama, classic
+## pg844.txt, paragraph 883
+# place=none weather=none time=none mood=none
+LADY BRACKNELL. At their age? The idea is grotesque and irreligious! Algernon, I forbid you to be baptized. I will not hear of such excesses. Lord Bracknell would be highly displeased if he learned that that was the way in which you wasted your time and money.
+
+=== real-pg71-0012 | genres: essay, philosophy
+## pg71.txt, paragraph 12
+# place=none weather=none time=none mood=none
+How does it become a man to behave toward the American government today? I answer that he cannot without disgrace be associated with it. I cannot for an instant recognize that political organization as my government which is the slave’s government also.
+
+=== real-pg2148-0255 | genres: literary, short stories
+## pg2148.txt, paragraph 255
+# place=sea/seastorm weather= time=night mood=dread
+“Never shall I forget the sensations of awe, horror, and admiration with which I gazed about me. The boat appeared to be hanging, as if by magic, midway down, upon the interior surface of a funnel vast in circumference, prodigious in depth, and whose perfectly smooth sides might have been mistaken for ebony, but for the bewildering rapidity with which they spun around, and for the gleaming and ghastly radiance they shot forth, as the rays of the full moon, from that circular rift amid the clouds which I have already described, streamed in a flood of golden glory along the black walls, and far away down into the inmost recesses of the abyss.
+
+=== real-pg62-0634 | genres: science fiction
+## pg62.txt, paragraph 634
+# place=none weather=none time=none mood=dread
+Finally all the hatred and maniacal loathing for these awful creatures who had placed me in this horrible place was centered by my tottering reason upon this single emissary who represented to me the entire horde of Warhoons.
+
+=== real-pg1597-0995 | genres: fairy, fantasy
+## pg1597.txt, paragraph 995
+# place=none weather=wind time=none mood=sorrow
+The following Sunday, when the family was going to church, they asked her whether she would not go with them; but she glanced sorrowfully, with tears in her eyes, at her crutches. The family went to hear the word of God; but she went alone into her little chamber; there was only room for a bed and chair to stand in it; and here she sat down with her Prayer-Book; and whilst she read with a pious mind, the wind bore the strains of the organ towards her, and she raised her tearful countenance, and said, “O God, help me!”
+
+=== real-pg2145-3747 | genres: historical, history
+## pg2145.txt, paragraph 3747
+# place= weather=none time=none mood=none
+Through the tree-tops shone the outer fronts of the palace. Turning to the right, the party proceeded a short distance to a spacious square, on the west side of which stood the residence of the governor. An excited multitude filled the square. Every face was directed towards a portico built over a broad doorway which was closed. Under the portico there was another array of legionaries.
+
+=== real-pg2891-2191 | genres: literary, social
+## pg2891.txt, paragraph 2191
+# place=none weather=none time=day mood=
+He laughed bitterly. Margaret went to the side-board and helped herself to one of the breakfast dishes. Being the last down, she turned out the spirit-lamp that kept them warm. She was tender, but grave. She knew that Henry was not so much confessing his soul as pointing out the gulf between the male soul and the female, and she did not desire to hear him on this point.
+
+=== real-pg236-0415 | genres: adventure
+## pg236.txt, paragraph 415
+# place=none weather=none time=none mood=none
+“Brothers, that was a dog’s death,” said Mowgli, feeling for the knife he always carried in a sheath round his neck now that he lived with men. “But he would never have shown fight. His hide will look well on the Council Rock. We must get to work swiftly.”
+
+=== real-pg1514-0574 | genres: drama, classic
+## pg1514.txt, paragraph 574
+# place=none weather=none time=none mood=none
+WALL. In this same interlude it doth befall That I, one Snout by name, present a wall: And such a wall as I would have you think That had in it a crannied hole or chink, Through which the lovers, Pyramus and Thisbe, Did whisper often very secretly. This loam, this rough-cast, and this stone, doth show That I am that same wall; the truth is so: And this the cranny is, right and sinister, Through which the fearful lovers are to whisper.
+
+=== real-pg74-1444 | genres: children
+## pg74.txt, paragraph 1444
+# place=none weather=none time=none mood=none
+There comes a time in every rightly-constructed boy’s life when he has a raging desire to go somewhere and dig for hidden treasure. This desire suddenly came upon Tom one day. He sallied out to find Joe Harper, but failed of success. Next he sought Ben Rogers; he had gone fishing. Presently he stumbled upon Huck Finn the Red-Handed. Huck would answer. Tom took him to a private place and opened the matter to him confidentially. Huck was willing. Huck was always willing to take a hand in any enterprise that offered entertainment and required no capital, for he had a troublesome superabundance of that sort of time which is not money. “Where’ll we dig?” said Huck.
+
+=== real-pg215-0340 | genres: adventure
+## pg215.txt, paragraph 340
+# place=none weather=none time=none mood=
+And here may well end the story of Buck. The years were not many when the Yeehats noted a change in the breed of timber wolves; for some were seen with splashes of brown on head and muzzle, and with a rift of white centring down the chest. But more remarkable than this, the Yeehats tell of a Ghost Dog that runs at the head of the pack. They are afraid of this Ghost Dog, for it has cunning greater than they, stealing from their camps in fierce winters, robbing their traps, slaying their dogs, and defying their bravest hunters.
+
+=== real-pg36-0418 | genres: science fiction
+## pg36.txt, paragraph 418
+# place=none weather=none time=none mood=danger
+“There’s hosts of people driving into Kingston in traps and carts and things, with boxes of valuables and all that,” he said. “They come from Molesey and Weybridge and Walton, and they say there’s been guns heard at Chertsey, heavy firing, and that mounted soldiers have told them to get off at once because the Martians are coming. We heard guns firing at Hampton Court station, but we thought it was thunder. What the dickens does it all mean? The Martians can’t get out of their pit, can they?”
+
+=== real-pg863-2143 | genres: mystery, detective
+## pg863.txt, paragraph 2143
+# place=court weather=none time=none mood=none
+The prisoner had been arrested in consequence of the discovery, in his room, by Detective Inspector Japp—a most brilliant officer—of the identical phial of strychnine which had been sold at the village chemist’s to the supposed Mr. Inglethorp on the day before the murder. It would be for the jury to decide whether or not these damning facts constituted an overwhelming proof of the prisoner’s guilt.
+
+=== real-pg1533-0229 | genres: drama, classic
+## pg1533.txt, paragraph 229
+# place=none weather=none time=none mood=dread
+MACBETH. Methought I heard a voice cry, “Sleep no more! Macbeth does murder sleep,”—the innocent sleep; Sleep that knits up the ravell’d sleave of care, The death of each day’s life, sore labour’s bath, Balm of hurt minds, great nature’s second course, Chief nourisher in life’s feast.
+
+=== real-pg120-0672 | genres: adventure
+## pg120.txt, paragraph 672
+# place=sea weather=none time=day mood=danger
+The squire was waiting for me at the stern window, all his faintness gone from him. He caught the painter and made it fast, and we fell to loading the boat for our very lives. Pork, powder, and biscuit was the cargo, with only a musket and a cutlass apiece for the squire and me and Redruth and the captain. The rest of the arms and powder we dropped overboard in two fathoms and a half of water, so that we could see the bright steel shining far below us in the sun, on the clean, sandy bottom.
+
+=== real-pg2641-0954 | genres: literary, social
+## pg2641.txt, paragraph 954
+# place=forest weather=none time=none mood=none
+Nature—simplest of topics, he thought—lay around them. He praised the pine-woods, the deep lasts of bracken, the crimson leaves that spotted the hurt-bushes, the serviceable beauty of the turnpike road. The outdoor world was not very familiar to him, and occasionally he went wrong in a question of fact. Mrs. Honeychurch’s mouth twitched when he spoke of the perpetual green of the larch.
+
+=== real-pg514-2827 | genres: children
+## pg514.txt, paragraph 2827
+# place=none weather=none time=none mood=none
+“You say often you wish a library. Here I gif you one, for between these lids (he meant covers) is many books in one. Read him well, and he will help you much, for the study of character in this book will help you to read it in the world and paint it with your pen.”
+
+=== real-pg1322-2119 | genres: poetry, pastoral
+## pg1322.txt, paragraph 2119
+# place=none weather=none time=none mood=merry
+O glad, exulting, culminating song! A vigor more than earth’s is in thy notes, Marches of victory--man disenthral’d--the conqueror at last, Hymns to the universal God from universal man--all joy! A reborn race appears--a perfect world, all joy! Women and men in wisdom innocence and health--all joy! Riotous laughing bacchanals fill’d with joy! War, sorrow, suffering gone--the rank earth purged--nothing but joy left! The ocean fill’d with joy--the atmosphere all joy! Joy! joy! in freedom, worship, love! joy in the ecstasy of life! Enough to merely be! enough to breathe! Joy! joy! all over joy!
+
+=== real-pg12-0459 | genres: fantasy, fairy
+## pg12.txt, paragraph 459
+# place=none weather=none time=none mood=none
+“I wonder why it wouldn’t do?” thought Alice, as she groped her way among the tables and chairs, for the shop was very dark towards the end. “The egg seems to get further away the more I walk towards it. Let me see, is this a chair? Why, it’s got branches, I declare! How very odd to find trees growing here! And actually here’s a little brook! Well, this is the very queerest shop I ever saw!”
+
+=== real-pg217-6395 | genres: literary, social
+## pg217.txt, paragraph 6395
+# place=none weather=none time=none mood=none
+She seemed to understand better now about men, and what they could or would do. She was less afraid of them, more sure of herself. That they were not the small egoists she had imagined them made her more comfortable. She had learned a good deal—almost as much as she wanted to learn. Her cup had been full. It was still as full as she could carry. On the whole, she would not be sorry when he was gone.
+
+=== real-pg289-0651 | genres: fantasy, fairy
+## pg289.txt, paragraph 651
+# place=hearth weather=none time=night mood=
+Very anxious in mind, the Mole left him for a time and busied himself with household matters; and it was getting dark when he returned to the parlour and found the Rat where he had left him, wide awake indeed, but listless, silent, and dejected. He took one hasty glance at his eyes; found them, to his great gratification, clear and dark and brown again as before; and then sat down and tried to cheer him up and help him to relate what had happened to him.
+
+=== real-pg76-0962 | genres: adventure
+## pg76.txt, paragraph 962
+# place= weather=none time=none mood=
+And then he busted into tears, and so did everybody. Then somebody sings out, “Take up a collection for him, take up a collection!” Well, a half a dozen made a jump to do it, but somebody sings out, “Let him pass the hat around!” Then everybody said it, the preacher too.
+
+=== real-pg389-0328 | genres: horror, gothic
+## pg389.txt, paragraph 328
+# place=none weather=none time=none mood=none
+The custodian of the museum informed me that local antiquaries were much puzzled, not by the inscription, or by any difficulty in translating it, but as to the circumstance or rite to which allusion is made.
+
+=== real-pg1513-0738 | genres: drama, classic
+## pg1513.txt, paragraph 738
+# place=none weather=none time=none mood=
+JULIET. O Fortune, Fortune! All men call thee fickle, If thou art fickle, what dost thou with him That is renown’d for faith? Be fickle, Fortune; For then, I hope thou wilt not keep him long But send him back.
+
+=== real-pg535-0122 | genres: travel, adventure
+## pg535.txt, paragraph 122
+# place= weather=wind time=none mood=none
+The wind had us on the stern, and hurried us bitingly forward. I buttoned myself into my coat, and walked on in a pleasant frame of mind with all men, when suddenly, at a corner, there was Fouzilhic once more in front of me. Nor only that, but there was the old gentleman who had escorted me so far the night before, running out of his house at sight of me, with hands upraised in horror.
+
+=== real-pg730-2754 | genres: classic, social
+## pg730.txt, paragraph 2754
+# place=none weather=none time=none mood=none
+The girl drew closer to the table, and made no offer to leave the room, although she could see that Monks was pointing to her. The Jew: perhaps fearing she might say something aloud about the money, if he endeavoured to get rid of her: pointed upward, and took Monks out of the room.
+
+=== real-pg696-0048 | genres: gothic, horror
+## pg696.txt, paragraph 48
+# place=none weather=none time=none mood=none
+“Ay, ay; ’tis he, ’tis he: he has stolen the helmet from good Alfonso’s tomb, and dashed out the brains of our young Prince with it,” never reflecting how enormous the disproportion was between the marble helmet that had been in the church, and that of steel before their eyes; nor how impossible it was for a youth seemingly not twenty, to wield a piece of armour of so prodigious a weight.
+
+=== real-pg242-0663 | genres: literary, social
+## pg242.txt, paragraph 663
+# place=none weather=none time=none mood=
+When you spun out into the floor with Tony, you didn’t return to anything. You set out every time upon a new adventure. I liked to schottische with her; she had so much spring and variety, and was always putting in new steps and slides. She taught me to dance against and around the hard-and-fast beat of the music. If, instead of going to the end of the railroad, old Mr. Shimerda had stayed in New York and picked up a living with his fiddle, how different Ántonia’s life might have been!
+
+=== real-pg55-0510 | genres: fantasy, fairy
+## pg55.txt, paragraph 510
+# place=none weather=none time=none mood=none
+“Oh, he will see you,” said the soldier who had taken her message to the Wizard, “although he does not like to have people ask to see him. Indeed, at first he was angry and said I should send you back where you came from. Then he asked me what you looked like, and when I mentioned your silver shoes he was very much interested. At last I told him about the mark upon your forehead, and he decided he would admit you to his presence.”
+
+=== real-pg155-0030 | genres: mystery, detective
+## pg155.txt, paragraph 30
+# place=none weather=none time=none mood=none
+Of all the deities worshipped in the temple, the moon-god alone escaped the rapacity of the conquering Mohammedans. Preserved by three Brahmins, the inviolate deity, bearing the Yellow Diamond in its forehead, was removed by night, and was transported to the second of the sacred cities of India—the city of Benares.
+
+=== real-pg140-0597 | genres: literary, social
+## pg140.txt, paragraph 597
+# place=city weather=none time=none mood=none
+So he came at last to the stockyards, to the black volcanoes of smoke and the lowing cattle and the stench. Then, seeing a crowded car, his impatience got the better of him and he jumped aboard, hiding behind another man, unnoticed by the conductor. In ten minutes more he had reached his street, and home.
+
+=== real-pg209-0084 | genres: horror, gothic
+## pg209.txt, paragraph 84
+# place=none weather=none time=none mood=
+I hesitated; then I judged best simply to hand her my letter—which, however, had the effect of making her, without taking it, simply put her hands behind her. She shook her head sadly. “Such things are not for me, miss.”
+
+=== real-pg175-2288 | genres: gothic, horror
+## pg175.txt, paragraph 2288
+# place=none weather=none time=none mood=none
+Despairing of ever obtaining a hearing, the Persian sat down to write. As the police did not want his evidence, perhaps the press would be glad of it; and he had just written the last line of the narrative I have quoted in the preceding chapters, when Darius announced the visit of a stranger who refused his name, who would not show his face and declared simply that he did not intend to leave the place until he had spoken to the daroga.
+
+=== real-pg786-0810 | genres: classic, social
+## pg786.txt, paragraph 810
+# place=none weather=none time=none mood=none
+Mr. Bounderby sat looking at her, as, with the points of a stiff, sharp pair of scissors, she picked out holes for some inscrutable ornamental purpose, in a piece of cambric. An operation which, taken in connexion with the bushy eyebrows and the Roman nose, suggested with some liveliness the idea of a hawk engaged upon the eyes of a tough little bird. She was so steadfastly occupied, that many minutes elapsed before she looked up from her work; when she did so Mr. Bounderby bespoke her attention with a hitch of his head.
+
+=== real-pg84-0464 | genres: horror, gothic
+## pg84.txt, paragraph 464
+# place=none weather=none time=none mood=sorrow
+“After some weeks my wound healed, and I continued my journey. The labours I endured were no longer to be alleviated by the bright sun or gentle breezes of spring; all joy was but a mockery which insulted my desolate state and made me feel more painfully that I was not made for the enjoyment of pleasure.
+
+=== real-pg3825-0693 | genres: drama, classic
+## pg3825.txt, paragraph 693
+# place=none weather=none time=none mood=none
+HIGGINS. As if I ever stop thinking about the girl and her confounded vowels and consonants. I’m worn out, thinking about her, and watching her lips and her teeth and her tongue, not to mention her soul, which is the quaintest of the lot.
+
+=== real-pg164-0502 | genres: adventure
+## pg164.txt, paragraph 502
+# place=none weather=none time=none mood=
+Under elegant glass cases, fixed by copper rivets, were classed and labelled the most precious productions of the sea which had ever been presented to the eye of a naturalist. My delight as a professor may be conceived.
+
+=== real-pg43-0328 | genres: horror, gothic
+## pg43.txt, paragraph 328
+# place=none weather=none time=none mood=
+“It is well,” replied my visitor. “Lanyon, you remember your vows: what follows is under the seal of our profession. And now, you who have so long been bound to the most narrow and material views, you who have denied the virtue of transcendental medicine, you who have derided your superiors—behold!”
+
+=== real-pg2776-1136 | genres: literary, short stories
+## pg2776.txt, paragraph 1136
+# place=none weather=none time=none mood=none
+“Miss Tildy,” said he, “I want to apologise for what I done the other evenin’. Tell you the truth, I was pretty well tanked up or I wouldn’t of done it. I wouldn’t do no lady that a-way when I was sober. So I hope, Miss Tildy, you’ll accept my ’pology, and believe that I wouldn’t of done it if I’d known what I was doin’ and hadn’t of been drunk.”
+
+=== real-pg161-0211 | genres: romance
+## pg161.txt, paragraph 211
+# place=none weather=none time=none mood=none
+Mrs. Dashwood entered into all their feelings with a warmth which left her no inclination for checking this excessive display of them. To her it was but the natural consequence of a strong affection in a young and ardent mind.
+
+=== real-pg768-0856 | genres: gothic, horror
+## pg768.txt, paragraph 856
+# place=none weather=none time=none mood=none
+“That is quite possible,” remarked Heathcliff, forcing himself to seem calm: “quite possible that your master should have nothing but common humanity and a sense of duty to fall back upon. But do you imagine that I shall leave Catherine to his duty and humanity? and can you compare my feelings respecting Catherine to his? Before you leave this house, I must exact a promise from you that you’ll get me an interview with her: consent, or refuse, I will see her! What do you say?”
+
+=== real-pg105-0304 | genres: romance
+## pg105.txt, paragraph 304
+# place=hearth weather=none time=day mood=none
+One morning, very soon after the dinner at the Musgroves, at which Anne had not been present, Captain Wentworth walked into the drawing-room at the Cottage, where were only herself and the little invalid Charles, who was lying on the sofa.
+
+=== real-pg416-0168 | genres: literary, short stories
+## pg416.txt, paragraph 168
+# place=farm weather=none time=none mood=none
+By the time the American Civil War had been over for twenty years, that part of Northern Ohio where the Bentley farms lay had begun to emerge from pioneer life. Jesse then owned machinery for harvesting grain. He had built modern barns and most of his land was drained with carefully laid tile drain, but in order to understand the man we will have to go back to an earlier day.
+
+=== real-pg944-0015 | genres: travel, adventure
+## pg944.txt, paragraph 15
+# place=none weather=none time=none mood=none
+Porto Praya--Ribeira Grande--Atmospheric Dust with Infusoria--Habits of a Sea-slug and Cuttle-fish--St. Paul's Rocks, non-volcanic--Singular Incrustations--Insects the first Colonists of Islands--Fernando Noronha--Bahia--Burnished Rocks--Habits of a Diodon--Pelagic Confervae and Infusoria--Causes of discoloured Sea.
+
+=== real-pg11-0144 | genres: fantasy, fairy
+## pg11.txt, paragraph 144
+# place=none weather=none time=none mood=none
+There was a dead silence instantly, and Alice thought to herself, “I wonder what they will do next! If they had any sense, they’d take the roof off.” After a minute or two, they began moving about again, and Alice heard the Rabbit say, “A barrowful will do, to begin with.”
+
+=== real-pg77-0622 | genres: classic, literary
+## pg77.txt, paragraph 622
+# place=none weather=none time=none mood=none
+To a disposition like Holgrave’s, at once speculative and active, there is no temptation so great as the opportunity of acquiring empire over the human spirit; nor any idea more seductive to a young man than to become the arbiter of a young girl’s destiny. Let us, therefore,—whatever his defects of nature and education, and in spite of his scorn for creeds and institutions,—concede to the daguerreotypist the rare and high quality of reverence for another’s individuality. Let us allow him integrity, also, forever after to be confided in; since he forbade himself to twine that one link more which might have rendered his spell over Phœbe indissoluble.
+
+=== real-pg2166-1287 | genres: adventure
+## pg2166.txt, paragraph 1287
+# place=cave weather=none time=none mood=dread
+It was a ghastly sight. There at the end of the long stone table, holding in his skeleton fingers a great white spear, sat Death himself, shaped in the form of a colossal human skeleton, fifteen feet or more in height. High above his head he held the spear, as though in the act to strike; one bony hand rested on the stone table before him, in the position a man assumes on rising from his seat, whilst his frame was bent forward so that the vertebræ of the neck and the grinning, gleaming skull projected towards us, and fixed its hollow eye-places upon us, the jaws a little open, as though it were about to speak.
+
+=== real-pg1342-0257 | genres: romance
+## pg1342.txt, paragraph 257
+# place=manor weather=none time=none mood=none
+Mr. Bingley inherited property to the amount of nearly a hundred thousand pounds from his father, who had intended to purchase an estate, but did not live to do it. Mr. Bingley intended it likewise, and sometimes made choice of his county; but, as he was now provided with a good house and the liberty of a manor, it was doubtful to many of those who best knew the easiness of his temper, whether he might not spend the remainder of his days at Netherfield, and leave the next generation to purchase.
+
+=== real-pg5230-1124 | genres: science fiction
+## pg5230.txt, paragraph 1124
+# place= weather=none time=none mood=
+He stood up abruptly and then knelt down on the ground by the side of the thing unseen. There was a pushing and shuffling, a sound of heavy feet as fresh people turned up to increase the pressure of the crowd. People now were coming out of the houses. The doors of the “Jolly Cricketers” stood suddenly wide open. Very little was said.
+
+=== real-pg1661-0923 | genres: mystery, detective
+## pg1661.txt, paragraph 923
+# place=none weather=none time=none mood=none
+“It is really two days since you had the letter. We should have acted before this. You have no further evidence, I suppose, than that which you have placed before us—no suggestive detail which might help us?”
+
+=== real-pg205-0195 | genres: essay, philosophy
+## pg205.txt, paragraph 195
+# place= weather=none time=none mood=none
+The Fitchburg Railroad touches the pond about a hundred rods south of where I dwell. I usually go to the village along its causeway, and am, as it were, related to society by this link. The men on the freight trains, who go over the whole length of the road, bow to me as to an old acquaintance, they pass me so often, and apparently they take me for an employee; and so I am. I too would fain be a track-repairer somewhere in the orbit of the earth.
+
+=== real-pg82-0174 | genres: historical, history
+## pg82.txt, paragraph 174
+# place=forest weather=none time=none mood=none
+Their conductor pursued an opposite road from that which Wamba had recommended, for the purpose of misleading them. The path soon led deeper into the woodland, and crossed more than one brook, the approach to which was rendered perilous by the marshes through which it flowed; but the stranger seemed to know, as if by instinct, the soundest ground and the safest points of passage; and by dint of caution and attention, brought the party safely into a wilder avenue than any they had yet seen; and, pointing to a large low irregular building at the upper extremity, he said to the Prior, “Yonder is Rotherwood, the dwelling of Cedric the Saxon.”
+
+=== real-pg103-1132 | genres: adventure
+## pg103.txt, paragraph 1132
+# place=train weather=none time=none mood=none
+Trains, like time and tide, stop for no one. The gentleman who uttered the cries was evidently a belated Mormon. He was breathless with running. Happily for him, the station had neither gates nor barriers. He rushed along the track, jumped on the rear platform of the train, and fell, exhausted, into one of the seats.
+
+=== real-pg541-0473 | genres: classic, literary
+## pg541.txt, paragraph 473
+# place=study weather=none time=none mood=none
+The papers he had retired to read did not tell him much in fact; but they plunged him into an atmosphere in which he choked and spluttered. They consisted mainly of an exchange of letters between Count Olenski's solicitors and a French legal firm to whom the Countess had applied for the settlement of her financial situation. There was also a short letter from the Count to his wife: after reading it, Newland Archer rose, jammed the papers back into their envelope, and reentered Mr. Letterblair's office.
+
+=== real-pg2814-0702 | genres: literary, short stories
+## pg2814.txt, paragraph 702
+# place=none weather=none time=none mood=none
+“His father was a decent respectable man,” Mr Henchy admitted. “Poor old Larry Hynes! Many a good turn he did in his day! But I’m greatly afraid our friend is not nineteen carat. Damn it, I can understand a fellow being hard up, but what I can’t understand is a fellow sponging. Couldn’t he have some spark of manhood about him?”
+
+=== real-pg2591-0949 | genres: fairy, fantasy
+## pg2591.txt, paragraph 949
+# place= weather=none time=none mood=none
+Then she ran into the kitchen, and cooked the king’s soup; and as soon as the cook was gone, she put the golden brooch into the dish. When the king got to the bottom, he ordered Cat-skin to be called once more, and soon saw the white finger, and the ring that he had put on it whilst they were dancing: so he seized her hand, and kept fast hold of it, and when she wanted to loose herself and spring away, the fur cloak fell off a little on one side, and the starry dress sparkled underneath it.
+
+=== real-pg110-3085 | genres: classic, social
+## pg110.txt, paragraph 3085
+# place=none weather=none time=none mood=
+Clare determined that he would no longer believe in her more recent and severer regard of him, but would go and find her immediately. He asked his father if she had applied for any money during his absence. His father returned a negative, and then for the first time it occurred to Angel that her pride had stood in her way, and that she had suffered privation. From his remarks his parents now gathered the real reason of the separation; and their Christianity was such that, reprobates being their especial care, the tenderness towards Tess which her blood, her simplicity, even her poverty, had not engendered, was instantly excited by her sin.
+
+=== real-pg3176-0529 | genres: travel, adventure
+## pg3176.txt, paragraph 529
+# place=graveyard weather=none time=none mood=none
+He died a nobody, and was buried at Cluny, A.D., 1144. They removed his body to the Paraclete afterward, and when Heloise died, twenty years later, they buried her with him, in accordance with her last wish. He died at the ripe age of 64, and she at 63. After the bodies had remained entombed three hundred years, they were removed once more. They were removed again in 1800, and finally, seventeen years afterward, they were taken up and transferred to Pere la Chaise, where they will remain in peace and quiet until it comes time for them to get up and move again.
+
+=== real-pg13415-0572 | genres: literary, short stories
+## pg13415.txt, paragraph 572
+# place=none weather=none time=none mood=none
+"But the most wonderful part of it all," laughed Kovrin, "is that I simply cannot recall where I got this legend from. Have I read it somewhere? Have I heard it? Or perhaps I dreamed of the black monk. I swear I don't remember. But the legend interests me. I have been thinking about it all day."
+
+=== real-pg16-0382 | genres: fantasy, fairy
+## pg16.txt, paragraph 382
+# place=none weather=none time=none mood=
+Indeed they were constantly bumping. They could now fly strongly, though they still kicked far too much; but if they saw a cloud in front of them, the more they tried to avoid it, the more certainly did they bump into it. If Nana had been with them, she would have had a bandage round Michael’s forehead by this time.
+
+=== real-pg2542-0615 | genres: drama, classic
+## pg2542.txt, paragraph 615
+# place=none weather=none time=none mood=none
+HELMER. My little Nora, there is an important difference between your father and me. Your father’s reputation as a public official was not above suspicion. Mine is, and I hope it will continue to be so, as long as I hold my office.
+
+=== real-pg73-0319 | genres: war, adventure
+## pg73.txt, paragraph 319
+# place=battle weather=none time=none mood=
+He saw a brigade going to the relief of its pestered fellows. He scrambled upon a wee hill and watched it sweeping finely, keeping formation in difficult places. The blue of the line was crusted with steel color, and the brilliant flags projected. Officers were shouting.
+
+=== real-pg2944-0045 | genres: essay, philosophy
+## pg2944.txt, paragraph 45
+# place=none weather=none time=none mood=none
+Again, in that protest which each considerate person makes against the superstition of his times, he repeats step for step the part of old reformers, and in the search after truth finds, like them, new perils to virtue. He learns again what moral vigor is needed to supply the girdle of a superstition. A great licentiousness treads on the heels of a reformation. How many times in the history of the world has the Luther of the day had to lament the decay of piety in his own household! “Doctor,” said his wife to Martin Luther, one day, “how is it that whilst subject to papacy we prayed so often and with such fervor, whilst now we pray with the utmost coldness and very seldom?”
+
+=== real-pg2853-0074 | genres: historical, history
+## pg2853.txt, paragraph 74
+# place=none weather=none time=none mood=none
+But in the unctorium the attention of Vinicius was turned to other objects; namely, to wonderful slave women who were waiting for the bathers. Two of them, Africans, resembling noble statues of ebony, began to anoint their bodies with delicate perfumes from Arabia; others, Phrygians, skilled in hairdressing, held in their hands, which were bending and flexible as serpents, combs and mirrors of polished steel; two Grecian maidens from Kos, who were simply like deities, waited as vestiplicæ, till the moment should come to put statuesque folds in the togas of the lords.
+
+=== real-pg345-0102 | genres: horror, gothic
+## pg345.txt, paragraph 102
+# place=none weather=none time=none mood=
+“Because your peasant is at heart a coward and a fool! Those flames only appear on one night; and on that night no man of this land will, if he can help it, stir without his doors. And, dear sir, even if he did he would not know what to do. Why, even the peasant that you tell me of who marked the place of the flame would not know where to look in daylight even for his own work. Even you would not, I dare be sworn, be able to find these places again?”
+
+=== real-pg1400-2630 | genres: classic, social
+## pg1400.txt, paragraph 2630
+# place=none weather=none time=none mood=none
+The watchman had not particularly noticed; he should say a working person; to the best of his belief, he had a dust-coloured kind of clothes on, under a dark coat. The watchman made more light of the matter than I did, and naturally; not having my reason for attaching weight to it.
+
+=== real-pg203-1415 | genres: classic, literary
+## pg203.txt, paragraph 1415
+# place=none weather=none time=none mood=none
+Miss Ophelia, as you now behold her, stands before you, in a very shining brown linen travelling-dress, tall, square-formed, and angular. Her face was thin, and rather sharp in its outlines; the lips compressed, like those of a person who is in the habit of making up her mind definitely on all subjects; while the keen, dark eyes had a peculiarly searching, advised movement, and travelled over everything, as if they were looking for something to take care of.
+
+=== real-pg121-0655 | genres: romance
+## pg121.txt, paragraph 655
+# place=none weather=none time=none mood=none
+“It is as much as should be said of anyone. To be always firm must be to be often obstinate. When properly to relax is the trial of judgment; and, without reference to my brother, I really think Miss Thorpe has by no means chosen ill in fixing on the present hour.”
+
+=== real-pg4517-0688 | genres: literary, social
+## pg4517.txt, paragraph 688
+# place=none weather=none time=none mood=sorrow
+She remained motionless, as if she had not heard him. Then she snatched her hands from his, threw her arms about his neck, and pressed a sudden drenched cheek against his face. “Ethan! Ethan! I want you to take me down again!”
+
+=== real-pg145-3833 | genres: classic, social
+## pg145.txt, paragraph 3833
+# place=none weather=none time=none mood=none
+“Many persons must have been in debt in the same way, but if they are respectable, people trust them. I am sure I have heard papa say that the Torbits were in debt, and they went on very well. It cannot be good to act rashly,” said Rosamond, with serene wisdom.
+
+=== real-pg308-0910 | genres: travel, adventure
+## pg308.txt, paragraph 910
+# place=river weather=none time=none mood=peace
+We had the river to ourselves, except that, far in the distance, we could see a fishing-punt, moored in mid-stream, on which three fishermen sat; and we skimmed over the water, and passed the wooded banks, and no one spoke.
+
+=== real-pg174-0629 | genres: horror, gothic
+## pg174.txt, paragraph 629
+# place=theatre weather=none time=none mood=
+As soon as it was over, Dorian Gray rushed behind the scenes into the greenroom. The girl was standing there alone, with a look of triumph on her face. Her eyes were lit with an exquisite fire. There was a radiance about her. Her parted lips were smiling over some secret of their own.
+
+=== real-pg1260-3335 | genres: gothic, horror
+## pg1260.txt, paragraph 3335
+# place=none weather=none time=none mood=none
+He drew over the picture the sheet of thin paper on which I was accustomed to rest my hand in painting, to prevent the cardboard from being sullied. What he suddenly saw on this blank paper, it was impossible for me to tell; but something had caught his eye. He took it up with a snatch; he looked at the edge; then shot a glance at me, inexpressibly peculiar, and quite incomprehensible: a glance that seemed to take and make note of every point in my shape, face, and dress; for it traversed all, quick, keen as lightning. His lips parted, as if to speak: but he checked the coming sentence, whatever it was.
+
+=== real-pg2680-0343 | genres: essay, philosophy
+## pg2680.txt, paragraph 343
+# place=none weather=none time=none mood=none
+II. It were indeed more happy and comfortable, for a man to depart out of this world, having lived all his life long clear from all falsehood, dissimulation, voluptuousness, and pride. But if this cannot be, yet it is some comfort for a man joyfully to depart as weary, and out of love with those; rather than to desire to live, and to continue long in those wicked courses. Hath not yet experience taught thee to fly from the plague? For a far greater plague is the corruption of the mind, than any certain change and distemper of the common air can be. This is a plague of creatures, as they are living creatures; but that of men as they are men or reasonable.
+
+=== real-pg113-1481 | genres: children
+## pg113.txt, paragraph 1481
+# place=none weather=none time=none mood=none
+“Well, she’s got a way of saying things,” ended Mrs. Medlock, much pleased. “Sometimes I’ve said to her, ‘Eh! Susan, if you was a different woman an’ didn’t talk such broad Yorkshire I’ve seen the times when I should have said you was clever.’”
+
+=== real-pg2048-0526 | genres: classic, literary
+## pg2048.txt, paragraph 526
+# place=church weather=none time=none mood=
+Previous to his departure he made all due arrangements with the holy fraternity of the convent for the funeral solemnities of his friend, who was to be buried in the cathedral of Wurtzburg near some of his illustrious relatives, and the mourning retinue of the count took charge of his remains.
+
+## calm-and-storm figure continued: "more awful than the storm itself", "the envelope of the storm"
+=== skip-storm-than-no | trap
+# weather=none
+The waiting is perhaps more awful than the storm itself, for the quiet is but the wrapper and envelope of the storm.
+
+=== skip-storm-than-yes
+# weather=storm/rain
+They sat out the storm in the barn, and the wind and rain howled and roared over the roof all night long.
+
+## ice floes: "the islands split and cracked"
+=== skip-islands-split-no | trap
+# place=none
+The ice began to move, and roarings were heard at a distance as the islands split and cracked in every direction.
+
+=== skip-islands-split-yes
+# place=island
+The ship anchored off the tropical island, and the castaways walked up the beach of the island.
+
+## figure: "calm in the cellar" (a joke that it is calm anywhere)
+=== skip-calm-cellar-no | trap
+# place=church
+One is calm before St. Mark's, one is calm within it, one would be calm on top of it, calm in the cellar; for the cathedral and its domes are masterfully ugly.
+
+=== skip-calm-cellar-yes
+# place=cellar
+He crept down the cellar steps and hid in the cellar among the wine barrels, where the cellar was cold and damp.

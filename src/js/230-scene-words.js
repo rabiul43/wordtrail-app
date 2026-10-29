@@ -124,12 +124,14 @@
     ['p', 'hearth', 1, 'warm! window! bedroom! stairs!'],
     ['p', 'cave', 3, 'cave cavern catacombs tunnel! tunnels! underground vault! grotto stalactites'],
     ['p', 'cellar', 3, 'cellar dungeon oubliette crypt'],
-    ['p', 'cellar', 2, 'shackles manacles fetters chains! gaoler jailer prisoner! cell! cells! turnkey'],
+    ['p', 'cellar', 2, 'shackles manacles fetters chains! gaoler jailer cell! cells! turnkey'],
+    ['p', 'cellar', 1, 'prisoner!'],   // also a person on trial or in a court: weaker evidence than the cell itself
     ['p', 'graveyard', 3, 'graveyard churchyard cemetery gravestone tombstone headstone mausoleum gravedigger sexton'],
     ['p', 'graveyard', 2, 'grave! graves! tomb! tombs! epitaph burial! buried! coffin'],
     ['p', 'graveyard', 1, 'yew! mourners! funeral'],
     ['p', 'attic', 3, 'attic garret rafters cobwebs skylight'],
-    ['p', 'attic', 2, 'loft! trunk! trunks! dusty! lumber! beams!'],
+    ['p', 'attic', 2, 'loft! dusty! lumber! beams!'],
+    ['p', 'attic', 1, 'trunk! trunks!'],   // also a luggage trunk on a journey or a visit
     ['p', 'haunted', 3, 'haunted haunting poltergeist spectre specter apparition phantom ghost! ghosts! ghostly'],
     ['p', 'haunted', 2, 'eerie uncanny spectral'],
     ['p', 'haunted', 1, 'abandoned! deserted!'],   // "in good spirits", "deserted the house": not a ghost word
@@ -190,7 +192,8 @@
     ['p', 'asylum', 2, 'physician! surgeon! stretcher! orderly! orderlies! lunatic! lunatics! bedlam'],
     ['p', 'jungle', 2, 'palms! parrot! parrots! monkeys! lianas vines! mangrove humid steaming!'],
     ['p', 'island', 3, 'island! islands! islet castaway castaways lagoon atoll archipelago'],
-    ['p', 'island', 2, 'treasure! coconut coconuts! cove! marooned stranded! natives! tropical'],
+    ['p', 'island', 2, 'treasure! coconut coconuts! cove! marooned stranded! tropical'],
+    ['p', 'island', 1, 'natives!'],   // also people of any country ("natives and old inhabitants")
     ['p', 'island', 1, 'coral! footprint!'],
     ['p', 'beach', 3, 'beach! beaches seashore seaside shoreline seashell seashells! sandcastle'],
     ['p', 'beach', 2, 'sand! pebbles! shells! footprints! paddling! driftwood sunbathing barefoot'],

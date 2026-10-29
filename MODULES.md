@@ -48,14 +48,14 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
 | `135-ratings.js` | 498 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
 | `140-open-book.js` | 732 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries |
-| `150-player-reader.js` | 754 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
+| `150-player-reader.js` | 722 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
 | `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
 | `200-player-controls.js` | 505 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
-| `230-scene-words.js` | 350 | scene detection: places, weather, time and mood tables, the word lists |
-| `231-scene-scoring.js` | 310 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
+| `230-scene-words.js` | 353 | scene detection: places, weather, time and mood tables, the word lists |
+| `231-scene-scoring.js` | 318 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 233 | Scene test (Settings > Developer) |
 | `233-scene-chapters-label.js` | 165 | chapter titles and look-ahead, scene label on the mini-player |
 | `234-scene-prescore.js` | 68 | `SCP`: a second background worker that scores the paragraphs of the open book ahead of the reader (`ambSceneScore`) and stores the answers in `ix.pa[j].sc`. Built from the page copy of `230-scene-words.js` + `231-scene-scoring.js` (`#scene-worker-src`, written by `build.py` with the `copy` kind). Falls back to the main thread when the worker is off or fails |
@@ -103,7 +103,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/story-transitions.js` | 65 | Story sounds: door, gate and footstep sounds when the place changes |
 | `sound/ambient-intensity.js` | 32 | Ambient: intensity, the levels really played (`ambLive`), night and time of day |
 | `sound/sound-presets.js` | 82 | Sound screen: hear a sound, quick presets and undo |
-| `sound/sound-core.js` | 82 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
+| `sound/sound-core.js` | 63 | Sound screen: master switch and volume (`sndOn`, `sndMul`, `sndPaint`, `sndApplyAll`) |
 | `sound/sound-cache.js` | 59 | Sound: size cap, keep list and clear for saved music and recordings |
 | `sound/sound-screen.js` | 189 | Sound screen: reset, mixer rows, "My own words", `ambSync`, `ambInit` |
 | `sound/sound-tabs.js` | 47 | Sound screen tabs (Ambient, Music, Opening, Story), the dot on a tab when a layer is on, the dimmed look while Sound is off (styles in `src/css/96-sound-tabs.css`) |
