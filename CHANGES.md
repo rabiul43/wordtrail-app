@@ -1,5 +1,9 @@
 # Changes in this version
 
+## Scroll restore no longer leaves 3 listeners behind (audit P11)
+- 080-ui-shell-favourites.js (`uiInit`): the "reader scrolled themselves" listeners (touchstart, wheel, keydown, mousedown) used `once`, which only removes the one that fired, so the other three stayed for the whole session. They are now all removed as soon as the scroll restore ends. Behaviour is unchanged.
+- The other tap/key listeners were checked: each is added once at startup, or removes itself (`musGestureArm`, the review menu). Nothing else grows with session length.
+
 ## Player: collapse / expand the left panel (desktop, from 1100px)
 - NEW round chevron button `#dt-side` on the inner corner of the cover. It hides the whole left panel (cover, title, track list); the text column then takes the full width and centres itself. While collapsed, the same chevron stays at the left edge of the text to bring the panel back.
 - The choice is remembered on this device (`wt:dt-side`, not synced or backed up) and applies to every book. Default is open. The `[` key does the same while a book is open and nothing is being typed (listed in Keyboard shortcuts).

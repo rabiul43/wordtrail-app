@@ -246,12 +246,14 @@
     if (!y) { if (again) setTimeout(() => { uiBusy = false; }, 3500); else uiBusy = false; return; }
     // Rows can still be filling in, so keep trying for a moment, and stop as soon as the reader scrolls themselves.
     let user = false; const t0 = performance.now();
+    const evs = ['touchstart', 'wheel', 'keydown', 'mousedown'];
     const stop = () => { user = true; };
-    ['touchstart', 'wheel', 'keydown', 'mousedown'].forEach(ev => window.addEventListener(ev, stop, { once: true, passive: true }));
+    const done = () => { uiBusy = false; evs.forEach(ev => window.removeEventListener(ev, stop)); };   // 'once' only removes the one event that fired: the other three used to stay for the whole session
+    evs.forEach(ev => window.addEventListener(ev, stop, { passive: true }));
     const step = () => {
-      if (user || performance.now() - t0 > 3000) { uiBusy = false; return; }
+      if (user || performance.now() - t0 > 3000) { done(); return; }
       window.scrollTo(0, y);
-      if (Math.abs(window.scrollY - y) < 2) { uiBusy = false; return; }
+      if (Math.abs(window.scrollY - y) < 2) { done(); return; }
       requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
