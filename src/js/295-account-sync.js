@@ -35,7 +35,7 @@
     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
   ];
-  let acFb = null, acLoading = null, acDb = null, acUser = null, acStale = false, acBusy = false, acTimer = null, acMsg = '', acErr = '';
+  let acFb = null, acLoading = null, acDb = null, acUser = null, acStale = false, acWhy = '', acBusy = false, acTimer = null, acMsg = '', acErr = '';
   /* keys changed here and not uploaded yet. Kept in wt:syncdirty so a closed page or a restart cannot forget them
      (an incremental sync only looks at changed cloud items, so it could not rediscover them). Not part of backups. */
   const AC_DIRTY = 'wt:syncdirty', acDirty = new Set();
@@ -178,10 +178,26 @@
     acDirty.clear(); acDirtySave(); acMsg = ''; renderAcctSync();
   }
 
+  /* The sign-in is expired because Firebase found no saved session. If this browser cannot keep site data at all
+     (private mode, blocked storage), say so, because signing in again will not help until that is changed. */
+  function acWhyCheck() {
+    try {
+      if (!window.indexedDB) { acWhy = 'This browser is not keeping site data, so it cannot stay signed in. Turn off private mode or allow storage for this site, then sign in again.'; return; }
+      const r = indexedDB.open('wt-storage-test');
+      r.onsuccess = () => { try { r.result.close(); indexedDB.deleteDatabase('wt-storage-test'); } catch (e) { /* ignore */ } };
+      r.onerror = () => { acWhy = 'This browser is blocking storage for this site, so it cannot stay signed in. Allow site data for it, then sign in again.'; renderAcctSync(); };
+    } catch (e) { acWhy = 'This browser is blocking storage for this site, so it cannot stay signed in. Allow site data for it, then sign in again.'; }
+  }
   function acAuthChanged(u) {
     acUser = u || null;
-    if (!u) { if (acInfo()) acStale = true; renderAcctSync(); return; }
-    acStale = false;
+    if (!u) { if (acInfo()) { acStale = true; acWhyCheck(); } renderAcctSync(); return; }
+    acStale = false; acWhy = '';
+    /* ask the browser not to clear this site's data: Firebase keeps the sign-in in IndexedDB, and a browser that evicts it
+       makes the sign-in look expired on every visit */
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* not supported */ }
+    /* Renew the sign-in token now. If Firebase cannot renew it (an API key that blocks the token service, a revoked account), the
+       reason is kept in wt:autherr and shown on the sign-in card, so "expired after a day or two" can be traced to its cause. */
+    try { u.getIdToken(true).then(() => { try { localStorage.removeItem('wt:autherr'); } catch (e) { /* ignore */ } }).catch(e => { try { localStorage.setItem('wt:autherr', JSON.stringify({ c: (e && e.code) || 'unknown', t: Date.now() })); } catch (x) { /* ignore */ } }); } catch (e) { /* ignore */ }
     const old = acInfo(), same = old && old.uid === u.uid;
     acSaveInfo({ uid: u.uid, email: u.email || '', name: u.displayName || '', photo: u.photoURL || '',
       cats: same && old.cats ? old.cats : { settings: true, library: true, marks: true, progress: true },
@@ -487,6 +503,8 @@
       gbtn.firstChild.replaceWith(acSvg(AC_G, 'acct-g-logo'));
       box.append(h('div', { class: 'acct-out' },
         acStale ? h('p', { class: 'acct-err', role: 'status' }, 'Your sign-in has expired on this device. Sign in again to keep syncing. Your data is safe.') : null,
+        acStale && acWhy ? h('p', { class: 'acct-out-n', role: 'status' }, acWhy) : null,
+        acStale ? (() => { let er = null; try { er = JSON.parse(localStorage.getItem('wt:autherr') || 'null'); } catch (e) { /* none */ } return er && er.c ? h('p', { class: 'acct-out-n' }, 'Reason code: ' + er.c) : null; })() : null,
         h('h2', { class: 'acct-out-t' }, 'Keep your place, on every device'),
         h('p', { class: 'acct-out-p' }, 'Sign in to sync your library, bookmarks, settings and listening progress.'),
         h('ul', { class: 'acct-out-l' }, AC_CATS.slice(1).map(c => h('li', {}, c[1])).concat([h('li', {}, 'Ratings and reviews')])),
