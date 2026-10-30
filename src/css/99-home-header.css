@@ -176,3 +176,9 @@ html[data-appbar] .seeall-head.col-sticky { top: var(--ab-h); }
   html[data-nav="open"] body:not(:has(#player:not([hidden]))) .sb-brand { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .tabbar, body { transition: none !important; } }
+
+/* account button state dot: guest = accent, signed in = green, session expired = amber */
+.sb-avatar::before { content: ""; position: absolute; top: -1px; right: -1px; width: .7rem; height: .7rem; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-sizing: border-box; z-index: 1; pointer-events: none; }
+.sb-avatar.signed::before { background: #3FB871; }
+.sb-avatar.stale::before { background: var(--warn); }
+:root[data-theme="contrast"] .sb-avatar::before { border-color: #000; }

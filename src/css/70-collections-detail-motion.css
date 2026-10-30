@@ -778,3 +778,9 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .off-retry[hidden] { display: none; }
 .off-retry:disabled { opacity: .55; cursor: default; }
 .off-retry:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: 2px; }
+
+/* My books: Following and Rated pages. The empty message hides itself while a list above it is showing. */
+#shelf-fol .acct-rt, #shelf-rt .acct-rt { margin-top: .2rem; }
+#acct-fol:not([hidden]) ~ .shelf-fol-empty, #acct-rt:not([hidden]) ~ .shelf-rt-empty, #acct-fin:not([hidden]) ~ .shelf-rt-empty { display: none; }
+:root[data-calm] .shelf-seg .chip[data-m="rt"] { display: none; }
+.shelf-seg .chip[hidden] { display: none; }

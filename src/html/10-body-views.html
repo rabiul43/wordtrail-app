@@ -289,6 +289,8 @@
   <div class="tab-head"><h1 id="shelf-title">My books</h1><p id="shelf-sub"></p></div>
   <div id="shelf-seg" class="shelf-seg" role="group" aria-label="My books view">
     <button type="button" class="chip" data-m="saved" aria-pressed="true">Saved</button>
+    <button type="button" class="chip" data-m="fol" aria-pressed="false">Following</button>
+    <button type="button" class="chip" data-m="rt" aria-pressed="false">Rated</button>
     <button type="button" class="chip" data-m="ra" aria-pressed="false">Synced books</button>
   </div>
   <div id="shelf-saved">
@@ -299,6 +301,18 @@
       <p>Tap the heart on any book and it will wait for you here.</p>
       <button id="shelf-browse" class="resume-btn" type="button">Browse the library</button>
     </div>
+  </div>
+  <div id="shelf-fol" hidden>
+    <section id="acct-fol" class="acct-rt" aria-label="Authors you follow" hidden></section>
+    <div class="tab-empty shelf-fol-empty">
+      <h2>No authors followed yet</h2>
+      <p>Open an author's page and tap Follow. Their new books will show up here.</p>
+    </div>
+  </div>
+  <div id="shelf-rt" hidden>
+    <section id="acct-fin" class="acct-rt" aria-label="Finished, not rated yet" hidden></section>
+    <section id="acct-rt" class="acct-rt" aria-label="Your ratings" hidden></section>
+    <div id="shelf-rt-empty" class="tab-empty shelf-rt-empty"></div>
   </div>
   <div id="shelf-dl" hidden>
     <div id="sd-sum" class="sd-sum" hidden>
@@ -323,16 +337,24 @@
 <main id="account" class="view home" hidden></main>
 
 <template id="tpl-account">
-  <div class="tab-head"><h1>Account</h1><p>Your library, settings and progress. Sign in to sync them across devices.</p></div>
+  <div class="tab-head"><h1>Account</h1><p>Sign in to keep your library on all your devices.</p></div>
+  <div id="acct-home" class="acct-home">
   <section id="acct-sync" aria-label="Sign in and sync"></section>
+  <button id="acct-act-row" class="acct-link" type="button" hidden><svg class="ic" aria-hidden="true"><use href="#i-m-clock"/></svg><span>Your activity<small id="acct-act-sub"></small></span><svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg></button>
+  <section id="acct-data" class="acct-data" aria-labelledby="acct-data-h" hidden></section>
+  <section class="about" aria-labelledby="about-h">
+    <h2 id="about-h">About</h2>
+    <p>Audio comes from LibriVox and the text from Project Gutenberg, both public domain. LibriVox does not publish sentence times, so Wordtrail estimates them in your browser. If the highlight drifts, double-tap the sentence you are hearing. You can also turn on Sync and tap it. Either way, the sentences around it are re-timed too.</p>
+  </section>
+  </div>
+  <div id="acct-activity" class="acct-activity" hidden>
+  <button id="acct-back" class="acct-back" type="button"><svg class="ic" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-go"/></svg>Account</button>
+  <div class="tab-head"><h1>Your activity</h1><p>Counted on this device.</p></div>
   <div class="acct-main">
   <section class="acct-stats" aria-label="Your activity">
     <div class="acct-tile"><strong id="acct-favs">0</strong><span>Saved books</span></div>
     <div class="acct-tile"><strong id="acct-recents">0</strong><span>Recently listened</span></div>
   </section>
-  <section id="acct-fol" class="acct-rt" aria-label="Authors you follow" hidden></section>
-  <section id="acct-rt" class="acct-rt" aria-label="Your ratings" hidden></section>
-  <section id="acct-fin" class="acct-rt" aria-label="Finished, not rated yet" hidden></section>
   <section id="ls" class="ls" aria-labelledby="ls-h"></section>
   </div>
   <div class="acct-side">
@@ -340,11 +362,7 @@
     <h2>History</h2>
     <div id="acct-history-list" class="list"></div>
   </section>
-  <section class="about" aria-labelledby="about-h">
-    <h2 id="about-h">About</h2>
-    <p>Audio comes from LibriVox and the text from Project Gutenberg, both public domain. LibriVox does not publish sentence times, so Wordtrail estimates them in your browser. If the highlight drifts, double-tap the sentence you are hearing. You can also turn on Sync and tap it. Either way, the sentences around it are re-timed too.</p>
-  </section>
-  <section id="acct-data" class="acct-data" aria-labelledby="acct-data-h" hidden></section>
+  </div>
   </div>
 </template>
 

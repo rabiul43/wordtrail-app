@@ -485,7 +485,13 @@
       acGisPreload();
       const gbtn = h('button', { class: 'acct-g', type: 'button', onclick: acSignIn }, h('span', {}), 'Sign in with Google');
       gbtn.firstChild.replaceWith(acSvg(AC_G, 'acct-g-logo'));
-      box.append(h('div', { class: 'acct-out' }, acStale ? h('p', { class: 'acct-err', role: 'status' }, 'Your sign-in has expired on this device. Sign in again to keep syncing. Your data is safe.') : null, gbtn, err));
+      box.append(h('div', { class: 'acct-out' },
+        acStale ? h('p', { class: 'acct-err', role: 'status' }, 'Your sign-in has expired on this device. Sign in again to keep syncing. Your data is safe.') : null,
+        h('h2', { class: 'acct-out-t' }, 'Keep your place, on every device'),
+        h('p', { class: 'acct-out-p' }, 'Sign in to sync your library, bookmarks, settings and listening progress.'),
+        h('ul', { class: 'acct-out-l' }, AC_CATS.slice(1).map(c => h('li', {}, c[1])).concat([h('li', {}, 'Ratings and reviews')])),
+        gbtn, err,
+        h('p', { class: 'acct-out-n' }, 'Signing in is optional. Without it, everything stays on this device.')));
       return;
     }
     const last = info.last ? 'Synced ' + new Date(info.last).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not synced yet';
@@ -513,11 +519,12 @@
     const i = acInfo(), t = document.querySelector('.tab[data-tab="account"]');
     if (t) t.classList.toggle('signed', !!i && !acStale);
     const p = document.querySelector('#account .tab-head p');
-    if (p) p.textContent = i && !acStale ? 'Signed in as ' + (i.email || i.name) : 'Your library, settings and progress. Sign in to sync them across devices.';
-    acAvatar(i && !acStale ? i : null);
+    if (p) p.textContent = i && !acStale ? 'Signed in as ' + (i.email || i.name) : 'Sign in to keep your library on all your devices.';
+    acAvatar(i || null, !!i && acStale);
+    try { if (curTab === 'shelf' && !$('#shelf').hidden) applyShelfMode(); } catch (e) { /* shelf not ready */ }
   }
   /* the round account button (the Library header and the slim bar on the other screens, both `.sb-avatar`): photo, else the first letter of the name or email, else a person icon (signed out). Tapping it opens the Account tab. */
-  function acAvatar(i) {
+  function acAvatar(i, stale) {
     document.querySelectorAll('.sb-avatar').forEach(b => {
       const ic = b.querySelector('.ic'), ini = b.querySelector('.sb-ini'), img = b.querySelector('.sb-img');
       const who = i ? String(i.name || i.email || '').trim() : '';
@@ -526,9 +533,26 @@
       ic.style.display = letter ? 'none' : '';
       if (i && i.photo) { if (img.getAttribute('src') !== i.photo) { img.onerror = () => { img.hidden = true; ini.hidden = !letter; ic.style.display = letter ? 'none' : ''; }; img.src = i.photo; } img.hidden = false; ic.style.display = 'none'; }
       else { img.hidden = true; img.removeAttribute('src'); }
-      b.classList.toggle('signed', !!i);
-      b.setAttribute('aria-label', i ? 'Account: ' + (i.email || i.name) : 'Account: sign in');
+      /* three states: guest (person icon, accent dot), signed in (photo or letter, green dot), expired (photo or letter, amber dot) */
+      b.classList.toggle('signed', !!i && !stale);
+      b.classList.toggle('stale', !!i && !!stale);
+      b.classList.toggle('guest', !i);
+      b.setAttribute('aria-label', !i ? 'Account: sign in' : stale ? 'Account: sign in again' : 'Account: ' + (i.email || i.name));
     });
+  }
+  /* One-time invitation for guests, shown a moment after their first saved book (called from toggleFav in 080).
+     Dismissible, never repeated, and skipped while a book is open in the player. */
+  function acFirstSavePrompt() {
+    try {
+      if (acInfo() || store.get('wt:signprompt', 0)) return;
+      acGisPreload();
+      setTimeout(() => {
+        if (acInfo() || store.get('wt:signprompt', 0) || (el.player && !el.player.hidden)) return;
+        store.set('wt:signprompt', 1);
+        askConfirm({ tone: 'calm', title: 'Saved to your library', text: 'Sign in to keep your favourites and progress on all your devices.', ok: 'Sign in with Google', cancel: 'Not now' })
+          .then(ok => { if (ok) Promise.resolve(acSignIn()).catch(() => {}); });
+      }, 2200);
+    } catch (e) { /* never break saving */ }
   }
   document.querySelectorAll('.sb-avatar').forEach(b => b.addEventListener('click', () => { const t = document.querySelector('.tab[data-tab="account"]'); if (t) t.click(); }));
   acTabMark();

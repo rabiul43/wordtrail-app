@@ -197,15 +197,30 @@
     if (!t || !m) return;
     m.append(t.content.cloneNode(true)); t.remove(); acctReady = true;
   }
+  /* Account has two pages: the account itself (sign-in or profile, data and privacy, About) and "Your activity"
+     (streak, listening, ratings, history). Opening the Account tab always starts on the first. */
+  function acctView(act) {
+    const home = $('#acct-home'), a = $('#acct-activity'), head = $('#account > .tab-head');
+    if (!home || !a) return;
+    home.hidden = !!act; a.hidden = !act; if (head) head.hidden = !!act;
+    window.scrollTo(0, 0);
+  }
   function renderAccount() {
     ensureAccount();
+    if (!$('#acct-act-row').onclick) { $('#acct-act-row').onclick = () => acctView(true); $('#acct-back').onclick = () => acctView(false); }
+    acctView(false);
     renderAcctSync();
     guideBadge();
     $('#acct-favs').textContent = String(getFavs().length);
     $('#acct-recents').textContent = String(P.recents.length);
     renderStats();
-    try { renderFollowing(); } catch (e) { /* authors list not ready */ }
-    try { renderMyRatings(); } catch (e) { /* ratings not ready */ }
+    /* the activity row only appears once there is something to show, and empty stats are not drawn */
+    try {
+      const m = stSummary(), nf = getFavs().length, nr = P.recents.length, has = nf > 0 || nr > 0 || m.secs > 0;
+      const parts = []; if (nf) parts.push(plural(nf, 'book') + ' saved'); if (m.cur) parts.push(m.cur + '-day streak'); if (!parts.length && m.secs >= 60) parts.push(Math.floor(m.secs / 60) + ' min listened');
+      $('#acct-act-row').hidden = !has; $('#acct-act-sub').textContent = parts.join(' · ');
+      $('#ls').hidden = m.secs <= 0;
+    } catch (e) { /* stats not ready: leave the row hidden */ }
     const hist = $('#acct-history'), list = $('#acct-history-list');
     list.textContent = '';
     hist.hidden = !P.recents.length;

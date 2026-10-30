@@ -408,3 +408,40 @@ html[data-lite] .gi.anim .fg { opacity: 1; }
 .snd-master { border-color: var(--accent); }
 #amb-presets { flex-wrap: wrap; overflow-x: visible; }
 .amb-pnote[hidden] { display: none; }
+
+/* signed-out Account card */
+.acct-out { gap: .9rem; }
+.acct-out-t { margin: .3rem 0 0; font-family: var(--font-display); font-size: 1.5rem; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; }
+.acct-out-p { margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.5; }
+.acct-out-l { list-style: none; margin: .2rem 0 .3rem; padding: 0; display: grid; gap: .55rem; font-size: .95rem; }
+.acct-out-l li { display: flex; align-items: center; gap: .65rem; }
+.acct-out-l li::before { content: ""; flex: none; width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); }
+.acct-out-n { margin: .2rem 0 0; text-align: center; color: var(--muted); font-size: .84rem; line-height: 1.5; }
+
+/* Account page (account only) and the separate "Your activity" page */
+.acct-home { display: grid; gap: 1rem; max-width: 34rem; }
+.acct-home > * { margin: 0; }
+.acct-activity { display: block; }
+.acct-activity[hidden], .acct-home[hidden] { display: none; }
+.acct-back { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.75rem; margin: 0 0 .2rem -.4rem; padding: 0 .6rem; border: 0; border-radius: 999px; background: transparent; color: var(--accent); font: 600 .95rem/1 inherit; cursor: pointer; }
+.acct-back .ic { width: 1.1rem; height: 1.1rem; }
+.acct-back:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+@media (min-width: 1100px) {
+  .acct-activity:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem); column-gap: 2.5rem; align-items: start; }
+  .acct-activity > .acct-back, .acct-activity > .tab-head { grid-column: 1 / -1; }
+  .acct-activity > .acct-main { display: block; min-width: 0; }
+  .acct-activity > .acct-side { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+}
+.acct-link[hidden], .acct-data[hidden], #ls[hidden] { display: none; }
+
+/* Account page: one centred column on tablets and desktops, with the sign-in as a proper card */
+.acct-out { padding: 1.5rem 1.35rem; margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.acct-out-t, .acct-out-p { text-align: center; }
+.acct-out-l { justify-self: center; }
+.acct-home { width: 100%; max-width: none; }
+@media (min-width: 700px) {
+  #account:has(> #acct-home:not([hidden])) { max-width: 34rem; margin-inline: auto; }
+  #account:has(> #acct-home:not([hidden])) > .tab-head { text-align: center; }
+  .acct-out { padding: 2rem 1.75rem; }
+  .acct-out-t { font-size: 1.65rem; }
+}

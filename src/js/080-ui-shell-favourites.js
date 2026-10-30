@@ -188,14 +188,32 @@
     guideBadge();
   }
   let shelfMode = 'saved';
+  /* Account-only pages stay out of sight for guests. Rated needs an account (ratings live in it). Following is kept on the device,
+     so it stays visible for a guest who already follows an author. A page that is no longer available falls back to Saved. */
+  function shelfChips() {
+    let signed = false, follows = false;
+    try { signed = acSignedIn(); } catch (e) { /* sign-in code not ready: treat as guest */ }
+    try { follows = folList().length > 0; } catch (e) { /* none */ }
+    const show = { fol: signed || follows, rt: signed };
+    $$('#shelf-seg .chip').forEach(b => { if (b.dataset.m in show) b.hidden = !show[b.dataset.m]; });
+    if (shelfMode in show && !show[shelfMode]) shelfMode = 'saved';
+  }
   function applyShelfMode() {
-    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
+    shelfChips();
+    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-fol').hidden = shelfMode !== 'fol'; $('#shelf-rt').hidden = shelfMode !== 'rt'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
     $('#shelf').dataset.mode = shelfMode;
-    /* Downloads is its own tab (no chip): same page, own title, no chips. My books keeps the Saved and Synced books chips. */
+    /* Downloads is its own tab (no chip): same page, own title, no chips. My books keeps the Saved, Following, Rated and Synced books chips. */
     $('#shelf-title').textContent = shelfMode === 'dl' ? 'Downloads' : 'My books';
     $('#shelf-seg').hidden = shelfMode === 'dl';
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
-    if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
+    if (shelfMode === 'fol') { $('#shelf-sub').textContent = ''; try { renderFollowing(); } catch (e) { /* authors list not ready */ } }
+    else if (shelfMode === 'rt') {
+      $('#shelf-sub').textContent = '';
+      try { renderMyRatings(); } catch (e) { /* ratings not ready */ }
+      const em = $('#shelf-rt-empty'); em.textContent = '';
+      em.append(h('h2', {}, 'No ratings yet'), h('p', {}, 'Rate a book when you finish it, and it will show up here.'));
+    }
+    else if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
     const hl = curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (OFF.on && curTab === 'library' ? 'downloads' : curTab);
@@ -276,6 +294,7 @@
       buzz(adding ? 'medium' : 'light');
       if (adding) $$('.heart').filter(x => x._wtId === id).forEach(x => { x.classList.remove('pop'); void x.offsetWidth; x.classList.add('pop'); });
       toast(adding ? 'Saved to My books' : 'Removed from My books', 3500, ['Undo', () => toggleFav(b, true)]);
+      if (adding && favs.length === 1) acFirstSavePrompt();
     }
     if (curTab === 'shelf' && !$('#shelf').hidden && shelfMode === 'saved') renderShelf();
   }

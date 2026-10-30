@@ -457,7 +457,7 @@
         chk[b.id] = 1; if (m.r) found = true;
         store.set('wt:rtchk', chk);
       }
-      if (found) { const a = $('#account'); if (a && !a.hidden) renderMyRatings(); }
+      if (found && curTab === 'shelf' && shelfMode === 'rt') renderMyRatings();
     } catch (e) { /* offline: try again next time */ }
     finally { myBack = false; }
   }
