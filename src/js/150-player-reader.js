@@ -547,8 +547,11 @@
     src.connect(lev); lev.connect(hp); hp.connect(lo); lo.connect(mid); mid.connect(pres); pres.connect(hs); hs.connect(lp); lp.connect(comp); comp.connect(gain); gain.connect(lim);
     const mix = c.createGain(); mix.channelCountMode = 'explicit'; mix.channelInterpretation = 'speakers'; mix.channelCount = 2;
     const pan = c.createStereoPanner ? c.createStereoPanner() : null;  // older browsers: no balance, mono still works
+    /* A listening-only analyser on what the listener really hears of the narrator (after the loudness evener, the EQ, the compressor,
+       the make-up gain and the limiter). Smart mix (sound/smart-mix.js) measures the voice here; vgraph sits before all of that. */
+    let mon = null; try { mon = c.createAnalyser(); mon.fftSize = 2048; mon.smoothingTimeConstant = 0; lim.connect(mon); } catch (e) { mon = null; }
     lim.connect(mix); if (pan) { mix.connect(pan); pan.connect(c.destination); } else mix.connect(c.destination);
-    enh = { mix, pan, lev, hp, lo, mid, pres, hs, lp, comp, gain, lim };
+    enh = { mix, pan, lev, hp, lo, mid, pres, hs, lp, comp, gain, lim, mon };
     enhApply();
   }
   function enhApply() {

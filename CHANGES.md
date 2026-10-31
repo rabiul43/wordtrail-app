@@ -1,5 +1,67 @@
 # Changes in this version
 
+## Smart mix: automatic checks
+- New `tools/smart_mix_check.js` (18 checks, no browser, no npm install): `node tools/smart_mix_check.js`. It runs the real `src/js/sound/smart-mix.js` inside a small pretend app, so it tests what ships. It covers the plan (dead-zone, 1.5 dB step, 6 dB first move, -15 .. +9 dB limits, slider offset, "both", dip lift), a closed loop that settles without swinging, the dip setting keeping its effect, the speech-band measure (a pretend analyser with a real spectrum), the trim of each scene and clip, learning from other books, saving, the 150-note limit and letting go of analysers.
+- Checked that the checks can fail: widening the band, dropping the dip lift, a 3 dB step, a 9 dB first move, a +12 dB limit, no disconnect, no note limit and remembering every source each make at least one check fail; the real file passes all 18. Exit code 1 on a failure, 2 if the file cannot be loaded.
+- Run it after any change to Smart mix, together with `build.py --no-min`, `unit_check.js` and `startup_check.js`.
+
+## Smart mix: a longer look at each reading
+- The analysers Smart mix reads (`smxTap` for the music and ambient buses in src/js/sound/smart-mix.js, `enh.mon` for the voice in src/js/150-player-reader.js) now use 2048 samples (about 43 ms) instead of 1024 (about 21 ms). Each reading is a little steadier and the speech band is cut out more cleanly. The analyser used by the sound-wave display (`vgraph`) is not changed.
+- Checked in headless Chromium with the speech-band measure: 1 kHz and 2 kHz still read exactly their RMS (-9 / -23 dB); 100 Hz now reads -81 dB and 8 kHz -140 dB (outside the band; before: -69 and -135). `build.py --no-min`, `unit_check.js` and `startup_check.js` pass.
+
+## Smart mix: the listener's own dip setting keeps its effect
+- Smart mix read the music and ambient level after the dip under the narrator and aimed it at a fixed distance under the voice, so a deeper or lighter "Music dip" setting was quietly undone (the music got quieter, Smart mix turned it up again). Now the dip is taken out of each reading (`smxDuckDb`, from the gain of `MUS.duck` / `AMB.duck`) and the target is raised by the dip the bus normally has (`SMX_NOM`: music 0.28 = the Normal setting, ambient 0.68). src/js/sound/smart-mix.js.
+- With the Normal dip the result is the same as before, so saved trims stay valid. A Quiet dip leaves the music about 4 dB louder under the voice while the narrator speaks, a Strong dip about 5 dB lower. With the duck switched off nothing is taken out or added.
+- For the ambient bus this also removes the wander caused by the scene-driven dip (dialogue dips deeper than description). The 800 Hz / 3 kHz carve that goes with the dip is not removed from the reading, only the gain part; that part is small next to the gain.
+- Checked in a closed-loop simulation with the pure function: the same trim (+6.1 dB) for Quiet, Normal and Strong dips and the level under the voice moves by +4.1 / 0 / -4.9 dB with the setting; duck off settles near the target. `build.py --no-min`, `unit_check.js` and `startup_check.js` pass. Not tested with real audio.
+
+## Smart mix: no analyser left behind
+- When a bus was rebuilt (`MUS.duck` or `AMB.master` became a new node), the listening-only analyser stayed attached to the old node, which kept feeding it. Now `smxTap` first lets go of the old one (`smxUntap`, src/js/sound/smart-mix.js), and switching Smart mix off removes both analysers.
+- Checked with stub nodes: the same node twice makes one connection; a rebuilt bus disconnects the old node and connects the new one; switching off disconnects and clears. `build.py --no-min`, `unit_check.js` and `startup_check.js` pass. Not tested on a phone.
+
+## Smart mix: old per-book notes are cleaned up
+- Every book left a note `wt:smx:<id>` in the phone's storage, forever. Now the ids are kept in a list (`wt:smxidx`, newest last) and only the last 150 books keep their note; older notes are removed (`smxIndexTouch`, src/js/sound/smart-mix.js). Notes written by older versions are added to the list once when the page starts (`smxIndexInit`); `wt:smx:global` is never removed.
+- These notes are not part of the account sync (its categories in src/js/295-account-sync.js do not match `wt:smx:`), so removing them cannot change anything in the cloud.
+- Checked with a stub storage: old notes adopted, 165 notes cut to 150 with the oldest removed, other keys (`wt:prefs`, `wt:smx:global`) untouched, a book heard again moves to the end. `build.py --no-min`, `unit_check.js` and `startup_check.js` pass.
+
+## Smart mix: what it learned is saved when the listener stops
+- The per-book trims were saved at most every 10 s, only right after a move. A listener who paused or closed the app a few seconds after a change lost it. Now `smxSave` (src/js/sound/smart-mix.js) also runs on a pause, when the page is hidden (`visibilitychange`) or closed (`pagehide`), and when another book opens, so the last seconds of learning are kept.
+- It saves only when something changed (`SMX.dirty`: a trim moved, or a remembered scene came back), so a pause with nothing new writes nothing. It saves under `SMX.book` (the book the trims belong to), not `S.book`, which may already be the next book.
+- Checked with a stub store: nothing saved when clean, saved once when dirty, no repeat write, saved under the old book's id. The `audio` element (src/js/040-worker-newreader.js) exists before the sound files load. Not tested with a real pause or page close.
+
+## Smart mix: the music and sound sliders stay free
+- Before, switching Smart mix on set the two sliders to their usual position and locked them, so a listener who wanted a little more music had to switch Smart mix off. Now the sliders work all the time as "a little more or less than balanced": the target of each bus already followed its slider (`smxPlan`), so only the lock was in the way.
+- Removed: `smxLock` (src/js/sound/smart-mix.js). Added: `smxFree`, which once puts back the slider values that the old version saved in `P.smxSaved` and removes that note, so nobody keeps a slider at a value they never chose. The sliders are no longer disabled or greyed by Smart mix.
+- Text: the two Smart mix descriptions in src/html/28-sheet-sound.html no longer say the sliders are locked ("It sets the balance by itself. The music and sound sliders still work: move one for a little more or less than balanced."). The Smart mix text was not in bn.json, so no translation changed.
+- Checked with the pure function: a slider at 20 / 40 / 60 / 80 % settles at about 6 dB lower / balanced / 3.5 dB higher / 6 dB higher than the balanced mix. Not tested with real audio.
+
+## Smart mix: every scene and clip has its own trim
+- One trim for the whole book was wrong for some scenes: a storm and a quiet forest are not equally loud. Smart mix now follows what is playing on each bus (`SMX.src`, src/js/sound/smart-mix.js): for the music the clip's file name, for the ambient sounds the (up to three) loudest sounds of the scene (so a change of intensity or night mode is not a new scene).
+- When a source ends, the trim it settled on is remembered (needs 3 decisions; at most 12 sources per bus, the oldest go first). When a remembered source comes back its trim is put back at once. A new source is re-read quickly: 2 s of the crossfade ignored, then 2 s of readings (8 instead of 16), with the larger first move allowed.
+- The trims are saved with the book (`wt:smx:<id>` gets `s: { mus: {...}, amb: {...} }`; `m` and `a` are now the average of them). The "learned from other books" average (`smxLearn`) uses that average too. Old saved books (only `m`, `a`) still load.
+- Finding while reading the code: the music clips are already levelled by their LUFS gain (music-bus.js, -18 LUFS), so the music needed little; the ambient scenes are where this helps. A pre-measurement of the ambient scenes was not added: they are mixed from several sounds and change with intensity, so a measurement at load would not stay true.
+- Checked with stubs: first entry keeps the book trim, a new scene gets a quick re-read, a returning scene gets its trim back at once, same scene at a slightly different level is not a change, a source left after fewer than 3 decisions is not remembered, the 12-entry limit. Not tested with real audio.
+
+## Smart mix: a new book starts from what other books settled on
+- A book Smart mix has never heard used to start at 0 dB trim and needed about 4-6 s of readings, then a first move of up to 6 dB, which was audible. Now it starts from `wt:smx:global`: a running average (last 8 books, each bus within +-6 dB) of the trims earlier books settled on. A book with its own saved trim (`wt:smx:<book id>`) still uses that.
+- A book is counted once, when the listener leaves it (another book, or `pagehide`), and a bus only counts if it had at least 5 decisions, so a bus that was off, or Smart mix switched off, teaches nothing. Functions: `smxGlobal`, `smxLearn` in src/js/sound/smart-mix.js.
+- Checked with a stub store: one count per book, a quiet bus ignored, an outlier held at the +-6 dB limit. Not tested with real audio.
+
+## Smart mix: music and sounds are balanced as a pair
+- When music and background sounds are both heard, each target sits a little lower (`SMX_BOTH`: music -2 dB, sounds -1 dB), so together they add up to about -18 dB under the voice, where one alone would sit. Before, each was aimed at its own distance and together they ended about 1.5 dB too loud.
+- `smxPlan` has a new last argument `both`. "Both" means both buses had enough readings at the moment of the decision (so a silent ambient scene does not lower the music).
+- Checked with the pure function: sum of the two targets = -18.2 dB under the voice. The 1.5 dB dead-zone means a start that is already within it moves only a little, so the effect shows mostly when the mix is off by more. Not tested with real audio.
+
+## Smart mix: levels are measured in the speech band
+- `smxDb` (src/js/sound/smart-mix.js) now reads the analyser's spectrum and counts only 300 - 4000 Hz (`SMX_BAND`), for the voice, the music and the ambient bus alike. Rumble and bass no longer count as much as the band that carries the consonants. The scale is calibrated to plain RMS, so the gates (-48 / -75 dB) keep their meaning. Without a float spectrum it falls back to the old whole-signal RMS.
+- Checked in headless Chromium: a sine at 1 kHz and 2 kHz reads exactly its RMS (-9 / -23 dB); 100 Hz reads -69 dB and 8 kHz reads -135 dB (outside the band).
+- Effect: bass-heavy music or ambient is turned up less aggressively to "keep up" and is no longer turned down for rumble the ear does not mind; hiss and mid-range noise now count in full. Because voice and background have different spectra, the distances `SMX_REL` (-18 / -22 dB) may need a small retune after listening on a phone. A rumble-only scene is lifted at most +9 dB (`SMX_LIM.hi`).
+
+## Smart mix: the voice is measured as the listener hears it
+- Smart mix used to read the narrator from `vgraph`, which taps the raw audio before the enhancement chain. The presets add make-up gain (clear +2 dB, restore +2.6 dB, lowq +3.5 dB, night +5.6 dB) and compression, so the voice was louder than Smart mix thought and the music sat too high.
+- `enhBuild` (src/js/150-player-reader.js) now adds a listening-only analyser `enh.mon` after the limiter. Smart mix (src/js/sound/smart-mix.js) reads the voice there, and no longer adds the evener's gain by hand, because the heard tap already contains it. If `enh.mon` is missing it falls back to the old way (vgraph + evener gain).
+- Effect: with an enhancement preset on, the music and sounds now settle lower (by about the preset's make-up gain). With the preset off nothing changes. Not tested with real audio on a phone.
+
 ## Opening tab: "Narration after the opening"
 - New switch in the Opening (Intro chime) tab, off by default (`P.openWait`). When on, and a book starts from the beginning with the opening on, the first `audio.play()` is held. The opening plays alone (title sound, then music); the narrator starts when the music is halfway down its fade (about 22 s with the chime, 21 s without), so the music sinks under the first words.
 - Tap play during the wait = skip the opening (it fades in 0.8 s) and start the narrator now. A pause, another book, no sound (volume 0, sound blocked) or a failed opening ends the wait; with no opening the narrator starts at once. A short toast says "Opening first. Tap play to skip."
