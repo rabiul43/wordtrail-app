@@ -189,7 +189,7 @@
       if (sc) rows.push(['Scene', AMB.lbl]);
       const b1 = $('#snd-now-amb'); if (b1) b1.hidden = !scOff;
       const b2 = $('#amb-scene-off'); if (b2) { b2.hidden = !scOff; const n = $('#amb-scene-off-n'); if (n) n.textContent = scOff ? AMB.lbl : ''; }
-      if (OSND.nodes) rows.push(['Opening', OSND.buf[OSND.mood] ? 'recorded clip' : 'made on the device']);
+      if (OSND.nodes) { const rec = !!OSND.buf[OSND.mood]; rows.push(['Opening', rec ? 'recorded clip' : 'made on the device'].concat(rec && OSND.cur ? [OSND.cur.title, OSND.cur.by] : [])); }
       box.textContent = ''; box.hidden = !rows.length;
       const bar = $('#snd-nowbar'); if (bar) bar.hidden = !rows.length;   // the pinned strip follows the status text
       const pp = $('#snd-now-pp');

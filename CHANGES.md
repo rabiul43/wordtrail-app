@@ -1,5 +1,43 @@
 # Changes in this version
 
+## Opening tab: "Narration after the opening"
+- New switch in the Opening (Intro chime) tab, off by default (`P.openWait`). When on, and a book starts from the beginning with the opening on, the first `audio.play()` is held. The opening plays alone (title sound, then music); the narrator starts when the music is halfway down its fade (about 22 s with the chime, 21 s without), so the music sinks under the first words.
+- Tap play during the wait = skip the opening (it fades in 0.8 s) and start the narrator now. A pause, another book, no sound (volume 0, sound blocked) or a failed opening ends the wait; with no opening the narrator starts at once. A short toast says "Opening first. Tap play to skip."
+- src/js/sound/opening-sound.js: `osGateInstall` wraps `audio.play` and `audio.pause`; `osHoldWanted`, `osHoldBegin`, `osHoldEnd`; `osOnEmptied` ignores the book's own source change while the narrator waits.
+- src/js/140-open-book.js: `osArm` now runs before `loadAudio` (it used to run after), because the autoplay `play()` inside `loadAudio` must already know the opening is armed. Nothing else in openBook changed.
+- sound-screen.js / sound-core.js: `openWait` joins the sound reset keys and the switch sync. bn.json: 3 new entries.
+- While the narrator waits, the play button still shows "play" (the audio really is paused); stats, sleep timer and the story music do not run yet.
+- Needs the browser to allow `play()` from a timer. Chrome on Android normally does after a tap; if refused, the app shows "Tap play to start." and a tap starts the narrator.
+- Test: `python build.py --no-min`, the three checks in tools/, `python tools/i18n_check.py bn`. Not tested on a real phone.
+
+## Opening tab: title sound (chime or page turn)
+- src/js/sound/opening-sound.js: a short sound plays just before the opening music: two soft bells (C6, G6) or a page turn (swish, paper, soft thud), both made on the device. The music starts 1.3 s (chime) or 0.9 s (page turn) after it. Everything that depends on the opening's length (the background music waiting, the final stop timer) moved by the same amount. Stopping or pausing fades the title sound too.
+- Choice in the Opening tab: "Title sound" = Chime (default) / Page turn / Off. Changing it plays a short try-out. Saved as `P.openChime`; reset with the other sound settings. Off = exactly the old behaviour.
+- The title sound is part of the opening, so it only plays when a book starts from the beginning and follows the Opening switch and volume. The "Hear each mood" previews leave it out; the "hear" button next to the switch includes it.
+- src/css/96-sound-tabs.css: 44 px select. src/i18n/bn.json: 4 new Bengali entries.
+- Test: `python build.py --no-min`, the three checks in tools/, `python tools/i18n_check.py bn`. Not heard on a phone.
+
+## Opening tab: "Hear each mood"
+- src/html/28-sheet-sound.html: a collapsed "Hear each mood" list under the Opening (Intro chime) note.
+- src/js/sound/opening-sound.js: one row per mood (Gothic, Mystery, Romance, Adventure, Fantasy, Children, Science fiction, Classic drama, Calm) with the clip title and artist this book would get, the current book's mood marked "This book", and a play/stop button. Tap again to stop; tapping another mood switches; two quick taps play only the last.
+- A preview does not mark the clip as played (the background music is not affected) and does not make the music wait. The old "hear" button next to the switch is also a preview now.
+- src/css/96-sound-tabs.css: 44 px buttons and summary. src/i18n/bn.json: 5 new Bengali words (Hear each mood, Gothic, Science fiction, Classic drama, Calm).
+- Test: `python build.py --no-min`, the three checks in tools/, `python tools/i18n_check.py bn`. Not seen on a phone.
+
+## Opening sound: smoother ending
+- src/js/sound/opening-sound.js: the opening now holds, then sinks over 6 s along a soft cosine curve (24 small steps), instead of 4.5 s along a straight line. New constant `OS_FADE = 6`.
+- Background music may now start halfway down the fade (about 3 s before the opening ends, never earlier than 6 s), so the two do not overlap loudly.
+- The fade is made of normal ramps, so pausing or stopping in the middle still cancels it cleanly. The fade-in (1.5 s) is unchanged.
+- Test: `python build.py --no-min`, then the three checks in tools/. Not heard on a phone yet.
+
+## Opening sound: real clips from the music library
+- src/js/sound/opening-sound.js: each book mood (Gothic, Mystery, Romance, Adventure, Fantasy, Children, Drama, Sci-fi, Calm) now plays a real clip. A clip listed in `openings.json` on the music host (optional) wins; otherwise a clip from `music.json` is taken from the calmer half of a matching library mood (Gothic = dread, Mystery = tension, Romance = romance, Adventure = danger/chase, Fantasy = wonder, Children = merry, Drama = sorrow, Calm = peace). The same book always gets the same clip. If nothing can be loaded, the old made-on-the-device sound plays.
+- `openings.json` is now read from `MUS_HOST` (Cloudflare), not GitHub. Saved copy key changed to `wt:osmap2`.
+- Only the first 24 s of a clip are kept in memory after decoding. Clips use the same `wt-music` cache as the background music, so offline music downloads also cover openings.
+- The opening clip is marked as just played, so the background music does not start with the same song.
+- src/js/sound/music-playback.js: the Now playing "Opening" row also shows title and artist (CC BY credit).
+- Test: `python build.py --no-min`, `node tools/unit_check.js`, `node tools/startup_check.js`, `node tools/music_mood_check.js`. Not tested on a phone with the real Cloudflare music list: open a book from the start with Sound on and Opening on.
+
 ## One AudioContext for the whole app (audit P13)
 - 150-player-reader.js (`vizPrime`): the sound wave and Audio enhancer made their own `AudioContext`. They now take the shared one, `audioCtx()` from ambient-engine.js, the same context ambient, music and the opening sound use. Two contexts meant two audio threads and double wakeups, which costs most battery on iOS.
 - Needed so the narrator is not cut off: `audioSuspendSoon` (ambient-engine.js) stops the shared context when ambient is silent and music is idle. It now also asks `AMB.narr()`, which 150 sets to "the narrator is playing through the graph", so the context is not suspended under a playing narrator. A paused narrator lets it suspend; `play` already resumes it.

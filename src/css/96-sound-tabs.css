@@ -112,3 +112,11 @@
 .snd-play:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
 /* four tab labels: at most two lines, even on a 360px phone and in Bengali */
 .snd-tab span { display: block; max-width: 100%; text-align: center; font-size: .78rem; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
+
+/* Opening tab: "Hear each mood" list. 44px targets. */
+.snd-moods summary { min-height: 44px; display: flex; align-items: center; }
+.snd-moods .snd-lrow { min-height: 3rem; padding: .2rem 0; }
+.snd-moods .snd-play { width: 2.75rem; height: 2.75rem; }
+.snd-moods .snd-play[aria-pressed="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.snd-mn { display: block; font-size: 1rem; font-weight: 600; }
+.snd-lctl select { min-height: 44px; padding: .4rem .6rem; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); background: var(--bg); }

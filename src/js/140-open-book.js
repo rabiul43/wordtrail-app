@@ -87,8 +87,8 @@
     showView('player');
     rememberOpen(b);
     bookAccent(b);
+    try { osArm(b, saved); } catch (e) { /* the opening sound is optional */ }   // before loadAudio: its first play() may need to wait for the opening
     loadAudio(S.sec, resumeBack(b, saved.time || 0), autoplay);
-    try { osArm(b, saved); } catch (e) { /* the opening sound is optional */ }
     persist();
     attachText(saved);
   }

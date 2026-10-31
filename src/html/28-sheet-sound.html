@@ -62,7 +62,10 @@
       <div class="snd-panel" id="snd-p-open" role="tabpanel" aria-labelledby="snd-t-open" hidden>
         <div class="snd-lrow"><div class="snd-ltxt"><label for="amb-open">Intro chime</label><small>A short sound when a book starts from the beginning</small></div><div class="snd-lctl"><button id="amb-open-hear" class="snd-play" type="button" aria-label="Hear the intro chime"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><input type="checkbox" id="amb-open" class="snd-sw" role="switch"></div></div>
         <div class="amb-row snd-vrow" id="row-openvol"><label for="amb-open-vol">Intro chime volume</label><input id="amb-open-vol" type="range" min="0" max="100" step="1" aria-label="Intro chime volume"></div>
+        <div class="snd-lrow" id="row-opentc"><div class="snd-ltxt"><label for="amb-open-tc">Title sound</label><small>A soft sound just before the opening music</small></div><div class="snd-lctl"><select id="amb-open-tc" aria-label="Title sound"><option value="chime">Chime</option><option value="page">Page turn</option><option value="off">Off</option></select></div></div>
+        <div class="snd-lrow" id="row-openwait"><div class="snd-ltxt"><label for="amb-open-wait">Narration after the opening</label><small>The narrator waits until the music is fading. Tap play to skip.</small></div><div class="snd-lctl"><input type="checkbox" id="amb-open-wait" class="snd-sw" role="switch"></div></div>
         <p class="help amb-note" id="amb-open-note"></p>
+        <details class="amb-more snd-moods" id="amb-open-moods"><summary>Hear each mood</summary><div id="amb-open-list" role="group" aria-label="Intro chime moods"></div></details>
       </div>
 
       <div class="snd-panel" id="snd-p-story" role="tabpanel" aria-labelledby="snd-t-story" hidden>
