@@ -188,11 +188,13 @@
     guideBadge();
   }
   let shelfMode = 'saved';
+  /* Hooks into later files (account-sync, ratings), filled in when those files load, so this file does not name them. Until then: a guest, nothing to draw. */
+  const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {} };
   /* Account-only pages stay out of sight for guests. Rated needs an account (ratings live in it). Following is kept on the device,
      so it stays visible for a guest who already follows an author. A page that is no longer available falls back to Saved. */
   function shelfChips() {
     let signed = false, follows = false;
-    try { signed = acSignedIn(); } catch (e) { /* sign-in code not ready: treat as guest */ }
+    try { signed = shelfHooks.signedIn(); } catch (e) { /* sign-in code not ready: treat as guest */ }
     try { follows = folList().length > 0; } catch (e) { /* none */ }
     const show = { fol: signed || follows, rt: signed };
     $$('#shelf-seg .chip').forEach(b => { if (b.dataset.m in show) b.hidden = !show[b.dataset.m]; });
@@ -209,7 +211,7 @@
     if (shelfMode === 'fol') { $('#shelf-sub').textContent = ''; try { renderFollowing(); } catch (e) { /* authors list not ready */ } }
     else if (shelfMode === 'rt') {
       $('#shelf-sub').textContent = '';
-      try { renderMyRatings(); } catch (e) { /* ratings not ready */ }
+      try { shelfHooks.myRatings(); } catch (e) { /* ratings not ready */ }
       const em = $('#shelf-rt-empty'); em.textContent = '';
       em.append(h('h2', {}, 'No ratings yet'), h('p', {}, 'Rate a book when you finish it, and it will show up here.'));
     }
@@ -294,7 +296,7 @@
       buzz(adding ? 'medium' : 'light');
       if (adding) $$('.heart').filter(x => x._wtId === id).forEach(x => { x.classList.remove('pop'); void x.offsetWidth; x.classList.add('pop'); });
       toast(adding ? 'Saved to My books' : 'Removed from My books', 3500, ['Undo', () => toggleFav(b, true)]);
-      if (adding && favs.length === 1) acFirstSavePrompt();
+      if (adding && favs.length === 1) shelfHooks.firstSave();
     }
     if (curTab === 'shelf' && !$('#shelf').hidden && shelfMode === 'saved') renderShelf();
   }

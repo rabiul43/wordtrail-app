@@ -38,6 +38,7 @@
     try { AMB.ctx = new AC(); } catch (e) { return null; }
     return AMB.ctx;
   }
+  ctxHook.get = audioCtx;   // the player's sound wave (150) takes the same context through this
   function audioSuspendSoon(ms, key) {   // stop the engine to save battery, but only when ambient is silent, music is not playing AND the narrator is not running through it; ambient and music each keep their own timer
     clearTimeout(AMB[key]);
     AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive() && !(AMB.narr && AMB.narr())) AMB.ctx.suspend().catch(() => {}); }, ms);

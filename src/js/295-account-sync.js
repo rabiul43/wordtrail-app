@@ -560,6 +560,7 @@
   }
   /* One-time invitation for guests, shown a moment after their first saved book (called from toggleFav in 080).
      Dismissible, never repeated, and skipped while a book is open in the player. */
+  shelfHooks.signedIn = acSignedIn; shelfHooks.firstSave = acFirstSavePrompt;   // My books (080) asks through these
   function acFirstSavePrompt() {
     try {
       if (acInfo() || store.get('wt:signprompt', 0)) return;

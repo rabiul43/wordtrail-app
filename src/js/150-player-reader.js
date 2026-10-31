@@ -480,6 +480,7 @@
      if the first load fails with it, we retry once without and switch the visualizer off. The graph is
      only built once playback is already running and the AudioContext is running, so it cannot silence
      the narrator. "Off" never touches Web Audio. */
+  const ctxHook = { get: () => null };   // filled by ambient-engine.js: the ONE shared AudioContext (this file loads first)
   let vctx = null, vgraph = null, vdata = null, vlast = 0, vcol = '#17665F', vcolAt = 0;
   const vz = el.viz, v2d = vz.getContext('2d');
   const vizOn = () => P.viz !== 'off' && !S.vizFail;
@@ -493,7 +494,7 @@
     if (vctx) { if (vctx.state !== 'running') vctx.resume().catch(() => {}); return; }
     if (!wantGraph()) return;
     AMB.narr = narratorTapLive;
-    vctx = audioCtx();   // the ONE shared AudioContext (ambient-engine.js), not a second one: two contexts mean two audio threads and double wakeups (audit P13)
+    vctx = ctxHook.get();   // the ONE shared AudioContext (ambient-engine.js), not a second one: two contexts mean two audio threads and double wakeups (audit P13)
     if (!vctx) { S.vizFail = true; vizLayout(); return; }
     vctx.resume().catch(() => {});
   }

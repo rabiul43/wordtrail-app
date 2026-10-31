@@ -408,6 +408,7 @@
   /* the "Your ratings" and "Finished, not rated yet" lists on the Account tab (two sections); shown to signed-in users only.
      Each shows its first 3 books, with See all / Show less. */
   let myBack = false;
+  shelfHooks.myRatings = renderMyRatings;   // the Rated page in My books (080) draws through this
   function renderMyRatings() {
     const host = $('#acct-rt'), fhost = $('#acct-fin'); if (!host) return;
     host.textContent = ''; if (fhost) fhost.textContent = '';
