@@ -477,7 +477,7 @@
     { name: 'jina', f: u => 'https://r.jina.ai/' + u, jina: true },
     { name: 'corsproxy', f: u => 'https://corsproxy.io/?' + encodeURIComponent(u) }
   ];
-  const TEXT_ROUTE_KEY = 'wt:textRoute', TEXT_STAGGER = 1500;
+  const TEXT_ROUTE_KEY = 'wt:textRoute', TEXT_STAGGER = 1500, TEXT_BODY_WAIT = 5000;   // TEXT_BODY_WAIT: an answering route that then sends no bytes for this long no longer stops the next route being added
   function textRouteOrder() {   // the remembered route first, the others in their usual order (kept on this device only: it depends on the network)
     let best = ''; try { best = localStorage.getItem(TEXT_ROUTE_KEY) || ''; } catch (e) { /* storage unavailable */ }
     const hit = TEXT_ROUTES.find(r => r.name === best);
@@ -513,16 +513,17 @@
   function fetchTextRace(url, ms = 30000, cb, meta) {
     const order = textRouteOrder();
     let unv = null;   // the first middleman text that did not look like a Gutenberg book: used only if every route fails
-    let best = 0, bestTotal = 0, alive = false;
+    let best = 0, bestTotal = 0, alive = false, lastProgress = 0;   // lastProgress: when any route last answered or delivered bytes
     const onBytes = cb ? (n, total) => { if (total) bestTotal = Math.max(bestTotal, total); if (n > best) { best = n; cb({ type: 'bytes', n: best, total: bestTotal }); } } : null;
+    const ob = (n, total) => { lastProgress = Date.now(); if (onBytes) onBytes(n, total); };
     const ctrls = order.map(() => new AbortController());
     const attempt = async (r, i) => {
       const to = setTimeout(() => ctrls[i].abort(), ms);
       try {
         const resp = await fetch(r.f(url), { signal: ctrls[i].signal });
         if (!resp.ok) throw new Error(r.name + ' HTTP ' + resp.status);
-        alive = true;                                    // this route answered: no more routes are added just because it is slow
-        let t = await readBody(resp, onBytes);
+        alive = true; lastProgress = Date.now();         // this route answered: no more routes are added just because it is slow, unless its body then stops (see launch)
+        let t = await readBody(resp, ob);
         if (r.jina && typeof t === 'string') t = t.replace(/^[\s\S]{0,2000}?Markdown Content:\n/, '');
         if (typeof t !== 'string' || t.length < 4000 || /^\s*<(!doctype|html)/i.test(t)) throw new Error(r.name + ' returned no text');
         if (r.name !== 'direct' && !looksGutenberg(t)) { if (!unv) unv = { t, name: r.name }; throw new Error(r.name + ' returned text that is not a Gutenberg book'); }
@@ -537,7 +538,12 @@
         clearTimeout(timer);
         if (done || started >= order.length) return;
         const i = started++;
-        timer = setTimeout(() => { if (!alive) launch(); }, TEXT_STAGGER);
+        lastProgress = Date.now();
+        const tick = () => {   // add the next route if nothing answered, or if the answering route has sent no bytes for TEXT_BODY_WAIT
+          if (done || started >= order.length) return;
+          if (!alive || Date.now() - lastProgress > TEXT_BODY_WAIT) launch(); else timer = setTimeout(tick, 1000);
+        };
+        timer = setTimeout(tick, TEXT_STAGGER);
         attempt(order[i], i).then(t => {
           if (done) return;
           done = true; clearTimeout(timer); ctrls.forEach(c => c.abort());
@@ -595,7 +601,7 @@
     const cached = await idb.get(key);
     if (cached) { if (cb) cb({ type: 'cached' }); return cached; }
     const bt = bundleText.get(String(id));
-    if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bt; if (t) { textSrcCount('bundle'); return t; } } // null: the combined request failed, use the usual routes
+    if (bt) { if (cb) cb({ type: 'try', i: 0, N: 1 }); const t = await bundleWait(bt); if (t) { textSrcCount('bundle'); return t; } } // null: the combined request failed or went quiet for 10 s, use the usual routes
     if (cb) cb({ type: 'try', i: 0, N: 1 });
     const own = await getHfText(id);
     if (own) { idb.set(key, own); textSrcCount('own'); return own; }

@@ -262,6 +262,7 @@
     const b = S.book, id = String(b.id), m = osMood(b), hd = OSND.hold = { id, timer: 0 };
     OSND.armed = ''; OSND.until = Date.now() + 2500;   // music holds back
     toast('Opening first. Tap play to skip.', 2500);
+    hd.timer = setTimeout(() => { if (OSND.hold === hd) { OSND.until = 0; osHoldEnd(true); } }, 8000);   // safety: if anything below hangs (a suspended audio context never resumes), the narrator still starts
     try {
       if (!OSND.map[m[0]] && !MUS.manifest) await Promise.race([osManifest(), new Promise(r => setTimeout(r, 1500))]);
       await Promise.race([osLoad(osClip(m[0], b)), new Promise(r => setTimeout(r, 2000))]);
@@ -270,8 +271,8 @@
       const ok = await osPlay(m, b);
       if (OSND.hold !== hd) return;
       if (!ok) { OSND.until = 0; osHoldEnd(true); return; }   // no opening can play (volume 0, sound blocked): start the narrator at once
-      hd.timer = setTimeout(() => osHoldEnd(true), Math.max(1000, OSND.until - Date.now()));   // the narrator starts as the music is halfway down its fade
-    } catch (e) { OSND.until = 0; osHoldEnd(true); }
+      clearTimeout(hd.timer); hd.timer = setTimeout(() => osHoldEnd(true), Math.max(1000, OSND.until - Date.now()));   // the narrator starts as the music is halfway down its fade
+    } catch (e) { if (OSND.hold === hd) { OSND.until = 0; osHoldEnd(true); } }   // only this book's own wait: a newer book's wait is not ours to end
   }
   function osOnEmptied() { if (!OSND.hold) osStop(0.2); }   // a new source: stop the opening, except while the narrator is waiting for it (the book's own source change fires this just after play())
   function osGateInstall() {

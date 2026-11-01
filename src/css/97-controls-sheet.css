@@ -100,3 +100,9 @@
 .upd-x { min-width: 2.4rem; min-height: 2.4rem; border: 0; background: transparent; color: var(--muted); border-radius: 50%; cursor: pointer; }
 .wt-ver { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1.2rem; padding-top: .8rem; border-top: 1px solid var(--line); }
 .wt-ver .help { margin: 0; }
+
+/* Buffering ring on the play buttons (src/js/205-audio-stall.js): the audio is waiting for data, the icon stays as it is */
+.play.buffering, .mini-play.buffering, .nr-play.buffering { position: relative; }
+.play.buffering::after, .mini-play.buffering::after, .nr-play.buffering::after { content: ""; position: absolute; inset: -6px; border-radius: inherit; border: 3px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); animation: wtbuf .9s linear infinite; pointer-events: none; }
+@keyframes wtbuf { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .play.buffering::after, .mini-play.buffering::after, .nr-play.buffering::after { animation: none; } }

@@ -215,7 +215,15 @@
     if (u && audio.src !== u) { URL.revokeObjectURL(u); dlUrls.delete(k); }
     paintCards(); paintDl();
   }
-  let dlReady = adb.books().then(list => { list.forEach(m => dlMeta.set(String(m.id), m)); }).catch(() => { dlOk = false; }).then(() => { paintCards(); });
+  /* One failed open at start-up (a blocked or busy database, a storage hiccup) used to switch downloads off for the whole visit and leave the
+     saved-books list empty, so a saved book was fetched from the network. open() forgets a failed try, so a second try a moment later can succeed. */
+  let dlReady = (async () => {
+    for (let k = 0; k < 2; k++) {
+      try { (await adb.books()).forEach(m => dlMeta.set(String(m.id), m)); return; }
+      catch (e) { if (!window.indexedDB) break; if (k === 0) await new Promise(r => setTimeout(r, 1200)); }
+    }
+    dlOk = false;
+  })().then(() => { paintCards(); });
   guideDoc('offline', 'Offline badge and auto-delete', "Books saved on this device show a filled \"Available offline\" badge on cards and tiles. Settings > Audio > Auto-delete finished downloads removes a book's audio when you reach its end.");
   guideDoc('offline', 'Resume interrupted downloads', "A download that stops (closed page, lost connection) keeps what it already received. Retry, or the next start on Wi-Fi, continues each track where it stopped instead of starting over.");
   guideDoc('offline', 'Manage downloads', "Settings > Storage shows how much space each downloaded book uses, can remove one book, or delete finished books in one go.");

@@ -3,8 +3,13 @@
      and the highlight stay smooth while a track is being synced. It is the same Core code and gives the same
      answers. If the setting is off, or a worker cannot start or fails, the work runs here as before. */
   const BG = (() => {
-    let w = null, url = null, dead = false, seq = 0, idle = 0;
+    let w = null, url = null, dead = false, seq = 0, idle = 0, wd = 0;
     const pend = new Map();
+    /* Watchdog: the worker does one call at a time, so a call stuck on bad data would hold up everything queued behind it and no error ever comes.
+       If nothing is answered for WD_MS while calls are waiting, the worker is dropped and every waiting call runs here instead (the same
+       fallback as for an error). The clock restarts at each answer, so a long queue of normal calls is not cut off. */
+    const WD_MS = 30000;
+    const arm = () => { clearTimeout(wd); wd = pend.size ? setTimeout(() => { wd = 0; fail(); }, WD_MS) : 0; };
     const usable = () => !dead && typeof Worker === 'function' && typeof Blob === 'function' && !!(window.URL && URL.createObjectURL);
     const on = () => P.bgWorker !== false && usable();
     const stop = () => {
@@ -13,7 +18,7 @@
       w = null;
       if (url) { try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ } url = null; }
     };
-    const fail = () => { dead = true; stop(); pend.forEach(q => q.rej(new Error('worker'))); pend.clear(); };
+    const fail = () => { dead = true; clearTimeout(wd); wd = 0; stop(); pend.forEach(q => q.rej(new Error('worker'))); pend.clear(); };
     function start() {
       if (w) return w;
       const src = "'use strict';const Core=(" + makeCore.toString() + ")();" +
@@ -25,6 +30,7 @@
         const m = e.data, q = pend.get(m.id);
         if (!q) return;
         pend.delete(m.id);
+        arm();
         if (m.ok) q.res(m.r); else q.rej(new Error(m.e));
         if (!pend.size) { clearTimeout(idle); idle = setTimeout(stop, 60000); } // frees its memory when nothing is queued
       };
@@ -40,8 +46,8 @@
         try { wk = start(); } catch (e) { fail(); rej(e); return; }
         clearTimeout(idle);
         const id = ++seq;
-        pend.set(id, { res, rej });
-        try { wk.postMessage({ id, fn, args }); } catch (e) { pend.delete(id); rej(e); }
+        pend.set(id, { res, rej }); if (!wd) arm();
+        try { wk.postMessage({ id, fn, args }); } catch (e) { pend.delete(id); arm(); rej(e); }
       }).catch(() => here());
     }
     /* Same numbers as Core.envelope, but cut into slices with a pause between them, so a long track never

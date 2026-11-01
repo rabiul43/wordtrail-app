@@ -30,7 +30,7 @@
       if (told || !e.data || e.data.type !== 'wt-update') return;
       told = true;
       const bar = h('div', { class: 'upd-bar', role: 'status' }, h('span', {}, 'New version ready'),
-        h('button', { type: 'button', class: 'btn small', onclick: () => location.reload() }, 'Reload'),
+        h('button', { type: 'button', class: 'btn small', onclick: () => { try { persist(); } catch (e) { /* the page still reloads */ } location.reload(); } }, 'Reload'),
         h('button', { type: 'button', class: 'upd-x', 'aria-label': 'Later', onclick: () => bar.remove() }, '\u2715'));
       document.body.append(bar);   // the newer page is already saved: Reload opens it and keeps the open book
     });

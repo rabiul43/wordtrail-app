@@ -730,7 +730,7 @@
     const t = audio.currentTime, d = t - STAT_T.last; STAT_T.last = t;
     if (d > 0 && d < 1.5) { STAT_T.sec += d; if (STAT_T.sec >= 60) { STAT_T.done = id; statSend(id, 'start'); } }
   });
-  audio.addEventListener('error', () => { if (S.book && /^blob:/.test(audio.currentSrc || audio.src)) { dlBroken(S.sec); return; } if (vizCorsRetry()) return; S.loadingAudio = false; if (S.book) toast('This track could not be loaded. The file may be unavailable right now.', 4500); });
+  audio.addEventListener('error', () => { if (S.book && /^blob:/.test(audio.currentSrc || audio.src)) { try { dlBroken(S.sec); } catch (e) { S.loadingAudio = false; S.pendingSeek = 0; } return; } if (vizCorsRetry()) return; S.loadingAudio = false; if (S.book) toast('This track could not be loaded. The file may be unavailable right now.', 4500); });
 
   function sentTime(p, k) { return Math.max(0, p.starts[k] - P.nudge + 0.02); }
   function seekAudio(t) {

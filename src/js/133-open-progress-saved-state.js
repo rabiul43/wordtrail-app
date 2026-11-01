@@ -75,10 +75,22 @@
     }
     return { out, buf };
   }
+  /* The text of the combined request, or null when it is not coming. The text arrives as one line near the end of the stream, so the wait
+     is cut short only when the stream itself has gone quiet for BUNDLE_QUIET (a slow but moving stream is waited for), not at the 40 s abort. */
+  const BUNDLE_QUIET = 10000;
+  function bundleWait(p) {
+    return new Promise(res => {
+      let iv = 0;
+      const fin = v => { clearInterval(iv); res(v); };
+      iv = setInterval(() => { if (Date.now() - (p.seen || 0) > BUNDLE_QUIET) fin(null); }, 1000);
+      p.then(fin, () => fin(null));
+    });
+  }
   function fetchBundle(id, o) {
     const gidHint = o && o.gid ? String(o.gid) : '', wantText = !!(o && o.text);
     let gutRes, textRes;
     const gut = new Promise(r => { gutRes = r; }), text = new Promise(r => { textRes = r; });
+    text.seen = Date.now();   // when the stream last delivered anything (see bundleWait)
     bundles.set(id, { gut, text });
     let gid = gidHint;
     if (gid) { gutRes({ id: gid, label: 'Project Gutenberg #' + gid }); if (wantText) bundleText.set(gid, text); }
@@ -107,7 +119,7 @@
           };
           if (r.body && r.body.getReader) {
             const rd = r.body.getReader(), dec = new TextDecoder();
-            for (;;) { const { done, value } = await rd.read(); if (done) break; await feed(dec.decode(value, { stream: true })); }
+            for (;;) { const { done, value } = await rd.read(); if (done) break; text.seen = Date.now(); await feed(dec.decode(value, { stream: true })); }
             await feed(dec.decode() + '\n');
           } else await feed((await r.text()) + '\n');
           if (!first) reject(new Error('empty'));   // the stream ended without a usable track list: let the other routes answer

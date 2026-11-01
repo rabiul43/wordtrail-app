@@ -100,6 +100,7 @@ PARTS = [
     ('file', 'src/js/180-sync-alignment.js'),
     ('file', 'src/js/190-sync-finish-retry.js'),
     ('file', 'src/js/200-player-controls.js'),
+    ('file', 'src/js/205-audio-stall.js'),
     # --- Sound: music, ambient, opening chime, story sounds (src/js/sound/, one feature per file) ---
     ('file', 'src/js/sound/music-state.js'),
     ('file', 'src/js/sound/music-moods.js'),
