@@ -238,3 +238,9 @@
 ## P3: page header leftovers
 - Removed the unused `<link rel="preconnect" href="https://librivox.org">` (LibriVox is only a fallback; the catalog and lists come from the local catalog). The archive.org DNS prefetch stays (covers).
 - The saved settings (`wt:prefs`) were parsed five times by the inline scripts in `src/html/00-head.html`; now parsed once into `window.__wtP` and reused by the theme, nav/header, fonts, diagnostics and lite-graphics scripts. Same results, also with missing or broken settings.
+
+## Book colour stays after closing the book
+- The app keeps the accent colour of the last opened book on every screen (Home, Library, Stats, tab bar) after the book is closed, until another book is opened. Before, `showView` cleared it when leaving the player.
+- Remembered across restarts: `wt:accLast` (hue/saturation of the last book) and `wt:accCss` (ready-made colours + theme key). An early script in `src/html/00-head.html` paints `wt:accCss` before the app loads, only if the theme matches; `restoreAccent()` (`100`, called in `300`) repaints it exactly.
+- Settings "Book colors" off = default gold everywhere; on again = last book's colour returns.
+- The accent fades for 0.45 s when the book changes (`@property` + `html.acc-fade` in `10-base-layout.css`; off for reduced motion and calm mode).

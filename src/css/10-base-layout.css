@@ -104,3 +104,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 :root[data-theme="contrast"] a { color: #FFE600; text-decoration: underline; }
 :root[data-theme="contrast"] .prog .bar { background: #333; outline: 1px solid #FFF; }
 
+
+/* ---- Book colour: the accent fades when the book changes (class added after start-up by 300-wiring.js) ---- */
+@property --accent { syntax: '<color>'; inherits: true; initial-value: #E0B15A; }
+@property --accent-soft { syntax: '<color>'; inherits: true; initial-value: #2B2619; }
+@property --accent-ink { syntax: '<color>'; inherits: true; initial-value: #1A1405; }
+html.acc-fade { transition: --accent .45s ease, --accent-soft .45s ease, --accent-ink .45s ease; }
+@media (prefers-reduced-motion: reduce) { html.acc-fade { transition: none; } }

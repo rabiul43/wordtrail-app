@@ -67,7 +67,6 @@
   function showView(v) {
     if (v === 'home' && !BOOTING) rememberOpen(null);
     if (v !== 'player' && el.player.classList.contains('ro')) setReadOnly(false);
-    if (v !== 'player' && ACC.cur) clearAccent();
     const home = v === 'home';
     if (v === 'player' && el.player.hidden) { backTo = pendingBack || { tab: curTab, see: seeOpen }; pendingBack = null; }
     const det = home && !!(DET.book || DET.author);

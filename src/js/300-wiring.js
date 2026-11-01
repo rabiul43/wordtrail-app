@@ -291,7 +291,7 @@
     $$('#seg-theme button, #aa-themes button').forEach(b => b.addEventListener('click', () => { P.theme = b.dataset.v; applyTheme(); savePrefs(); }));
     $$('#seg-cover button').forEach(b => b.addEventListener('click', () => {
       P.coverStyle = b.dataset.v; savePrefs(); covSegSync(); coverRefresh();
-      if (P.bookColors !== false && S.book && !el.player.hidden) bookAccent(S.book);
+      if (P.bookColors !== false && S.book) bookAccent(S.book);
       toast('Cover style: ' + ({ modern: 'Modern', auto: 'Auto', se: 'Standard Ebooks', original: 'Original' }[covStyle()]));
     }));
     $('#size-up').addEventListener('click', () => { P.size = Math.min(SIZE_MAX, P.size + 0.08); applyTheme(); savePrefs(); });
@@ -333,7 +333,7 @@
     $('#in-nn').addEventListener('change', e => { P.foldSkipped = e.target.checked; savePrefs(); if (S.model) { S.curId = -1; replan(true); } toast(P.foldSkipped ? 'Not-narrated text is folded away' : 'Not-narrated text is shown in the reader'); });
     $('#in-smartcut').addEventListener('change', e => { P.smartCut = e.target.checked; savePrefs(); if (S.model) replan(false); if (e.target.checked && S.book) neKick(S.sec); toast(P.smartCut ? 'Smart detection is on' : 'Smart detection is off'); });
     $('#in-skipcuts').addEventListener('change', e => { P.skipCuts = e.target.checked; savePrefs(); if (S.model) replan(false); toast(P.skipCuts ? 'Intro and outro will be skipped' : 'Intro and outro skipping is off'); });
-    $('#in-bcol').addEventListener('change', e => { P.bookColors = e.target.checked; savePrefs(); if (e.target.checked && S.book && !el.player.hidden) bookAccent(S.book); else clearAccent(); });
+    $('#in-bcol').addEventListener('change', e => { P.bookColors = e.target.checked; savePrefs(); if (e.target.checked) { if (S.book) bookAccent(S.book); else restoreAccent(); } else clearAccent(); });
     $('#in-langs').addEventListener('change', e => { P.otherLangs = e.target.checked; savePrefs(); catPurge(); refreshHome(); toast(P.otherLangs ? 'Showing all languages' : 'Showing English only'); });
     $('#in-worker').addEventListener('change', e => { P.bgWorker = e.target.checked; savePrefs(); BG.reset(); SCP.reset(); });
     $('#in-layout').addEventListener('change', e => { P.layoutBatch = e.target.checked; savePrefs(); });
@@ -490,6 +490,8 @@
   }
   init();
   uiInit();
+  restoreAccent();   // the whole app wears the colour of the last book, also when no book is open
+  requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('acc-fade')));   // colour changes fade from now on (not at start-up)
   /* after a refresh, go straight back into the book that was open (paused, at the saved position).
      The player is shown at once with a loading note, so the library never flashes in between. */
   const unhideResume = () => document.documentElement.classList.remove('resuming');

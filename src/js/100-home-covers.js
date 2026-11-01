@@ -204,13 +204,15 @@
   }
   function paintAccent() {
     const root = document.documentElement, a = ACC.cur, ks = ['--accent', '--accent-ink', '--accent-soft'];
-    if (!a || P.bookColors === false) { ks.forEach(k => root.style.removeProperty(k)); return; }
+    if (!a || P.bookColors === false) { ks.forEach(k => root.style.removeProperty(k)); try { localStorage.removeItem('wt:accCss'); } catch (e) { /* storage unavailable */ } return; }
     const bg = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(getComputedStyle(root).getPropertyValue('--bg').trim());
     const dark = bg ? accLum(parseInt(bg[1], 16), parseInt(bg[2], 16), parseInt(bg[3], 16)) < .2 : false;
     const s = Math.max(45, Math.min(80, a.s));
     const acc = accHsl(a.h, s, dark ? 64 : 40), soft = accHsl(a.h, Math.min(s, dark ? 40 : 70), dark ? 19 : 90);
     const L = accLum(acc[0], acc[1], acc[2]), ink = (1.05 / (L + .05)) >= ((L + .05) / .05) ? '#FFFFFF' : '#111111';
     root.style.setProperty('--accent', accCss(acc)); root.style.setProperty('--accent-soft', accCss(soft)); root.style.setProperty('--accent-ink', ink);
+    /* ready-made colours for the next start: the early script in 00-head.html paints them before the app loads (only for the same theme) */
+    try { localStorage.setItem('wt:accCss', JSON.stringify({ k: (P.theme || 'auto') + '|' + (matchMedia('(prefers-color-scheme: light)').matches ? 'l' : 'd'), a: accCss(acc), s: accCss(soft), i: ink })); } catch (e) { /* storage unavailable */ }
   }
   async function bookAccent(b) {
     const mine = ++ACC.seq;
@@ -218,6 +220,15 @@
     const c = await coverColor(b);
     if (mine !== ACC.seq || !S.book || S.book.id !== b.id) return;
     ACC.cur = c; paintAccent();
+    try { localStorage.setItem('wt:accLast', JSON.stringify({ h: c.h, s: c.s, id: b.id })); } catch (e) { /* storage unavailable */ }   // the app keeps this colour after the book is closed
+  }
+  /* Start-up / switch on: use the colour of the last book that was opened (nothing to do if none yet). */
+  function restoreAccent() {
+    if (P.bookColors === false) return;
+    try {
+      const l = JSON.parse(localStorage.getItem('wt:accLast') || 'null');
+      if (l && typeof l.h === 'number') { ACC.cur = { h: l.h, s: typeof l.s === 'number' ? l.s : 52 }; paintAccent(); }
+    } catch (e) { /* no saved colour */ }
   }
   function clearAccent() { ACC.seq++; ACC.cur = null; paintAccent(); }
 
