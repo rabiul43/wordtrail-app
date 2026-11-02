@@ -100,6 +100,7 @@
       const ix = ambSceneIdx(m), pi = ix.pi[id];
       scenePrescore(m, ix, pi);   // (234) the worker scores the paragraphs ahead
       const A = AMB.auto || (AMB.auto = { place: '', wx: '', time: '', mood: '', L: null, hold: false, holdSig: '', pi: -9, model: null, memo: {}, sig: '' });
+      if (A.model && A.model !== m) { A.place = A.wx = A.time = A.mood = ''; A.wi = 1; A.ms = 0; A.L = null; A.fix = null; A.hold = false; A.holdSig = ''; A.memo = {}; A.sig = ''; A.look = -1; A.refix = false; A.pi = -9; A.model = null; }   // a different text (new book, or the text was replaced): nothing of the old scene carries over
       if (pi != null && ix.sents[id].ch != null) ambChapScan(ix, ix.sents[id].ch);   // (does nothing once the chapter has been scanned)
       const look = pi != null && A.model === m && A.pi === pi && !A.refix && A.look !== pi && P.ambLook !== false && ix.pa[pi].b === id && !!ix.pa[pi + 1];   // the last sentence of a paragraph: look at the next one
       if (pi == null || (A.model === m && A.pi === pi && !A.refix && !look)) return;

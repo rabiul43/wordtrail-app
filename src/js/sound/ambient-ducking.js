@@ -79,7 +79,7 @@
     let st = 'o';
     if (P.ambDuck !== false && ambPlaying()) st = ambVoiceState();
     if (P.ambSmart !== false && (S.curId !== AMB.sceneId || S.sec !== AMB.lastSec)) ambDuckScene();
-    if (P.ambAuto !== false && (S.curId !== AMB.autoId || S.sec !== AMB.autoSec)) ambAutoStep();
+    if (P.ambAuto !== false && (S.curId !== AMB.autoId || S.sec !== AMB.autoSec || (AMB.auto && AMB.auto.model !== S.model))) ambAutoStep();
     if (st !== AMB.duckS) { AMB.duckS = st; if (st === 'p') AMB.pauseSince = performance.now(); ambDuckSet(st); }
     else if ((st === 's' || st === 'p') && ambDuckVec(st).v.join() !== AMB.duckV) ambDuckSet(st, st === 's');   // the scene changed under a steady state: move there smoothly
   }

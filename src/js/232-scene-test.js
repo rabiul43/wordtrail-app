@@ -135,7 +135,7 @@
   }
   function ambBase() {   // the levels everything is built from: the scene being read, or the reader's own mix
     const A = AMB.auto;
-    if (P.ambAuto === false || !A || A.hold || !A.L) return ambLevels();
+    if (P.ambAuto === false || !A || A.hold || !A.L || A.model !== S.model || !S.model) return ambLevels();   // (a scene read from another text, e.g. the book just left, never plays: only the reader's own mix until this text has been read)
     return A.L;
   }
   /* "Wrong scene?": the reader's corrections, per book, in P.ambFix[bookId] = { n: sentences in the text, c: [[paragraph, scene key or '-', trigger words], ...] }.
