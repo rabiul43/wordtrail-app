@@ -100,7 +100,7 @@
 .snd-offbody { display: grid; gap: .6rem; padding: 0 .8rem .8rem; }
 .snd-offrow > summary:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); border-radius: var(--r-ctl, 12px); }
 
-/* Scene preview strip and the round play button beside the Intro chime switch */
+/* Scene preview strip and the round play button in the Opening tab */
 .amb-prev { display: flex; align-items: center; gap: .7rem; padding: .55rem .8rem; border: 1px solid var(--accent); border-radius: var(--r-ctl, 12px); background: var(--accent-soft); }
 .amb-prev[hidden] { display: none; }
 .amb-prev-t { flex: 1; min-width: 0; }
@@ -120,3 +120,15 @@
 .snd-moods .snd-play[aria-pressed="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
 .snd-mn { display: block; font-size: 1rem; font-weight: 600; }
 .snd-lctl select { min-height: 44px; padding: .4rem .6rem; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); background: var(--bg); }
+
+/* Opening tab: one switch on top; everything that depends on it sits in an indented group that is hidden while it is off */
+.snd-opensub { display: grid; gap: .7rem; padding-left: .8rem; border-left: 2px solid var(--line); }
+#snd-p-open[data-openoff] .snd-opensub { display: none; }
+#snd-p-open:not([data-openoff]) .snd-openoffnote { display: none; }
+.snd-vlab { display: block; font-size: 1rem; font-weight: 600; margin: 0 0 .1rem; }
+.snd-prevb { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding-left: 1rem; padding-right: 1rem; }
+.snd-prevb .ic { width: 1rem; height: 1rem; fill: currentColor; stroke: none; }
+.snd-moods summary { list-style: none; gap: .4rem; }
+.snd-moods summary::-webkit-details-marker { display: none; }
+.snd-moods summary::before { content: ""; flex: none; width: .45rem; height: .45rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform .15s; }
+.snd-moods[open] summary::before { transform: rotate(45deg); }

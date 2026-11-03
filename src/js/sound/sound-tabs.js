@@ -1,7 +1,7 @@
   /* ---------- Sound screen: tabs, layer dots and the "off" look ----------
      The four layer tabs (Ambient, Music, Opening, Story) show one panel at a time. A dot on a tab means that layer is on.
      While Sound is off the panel is dimmed and cannot be used (the saved settings are kept); flip the main switch first. */
-  const SND_TABS = [['amb', 'Ambient sound'], ['mus', 'Music'], ['open', 'Intro chime'], ['story', 'Sound effects']];
+  const SND_TABS = [['amb', 'Ambient sound'], ['mus', 'Music'], ['open', 'Opening'], ['story', 'Sound effects']];
   function sndTabSelect(k, focus) {
     SND_TABS.forEach(([x]) => {
       const t = $('#snd-t-' + x), p = $('#snd-p-' + x), on = x === k;
@@ -22,7 +22,8 @@
         if (t) t.setAttribute('aria-label', n + (live[k] ? ', on' : ', off'));
       });
       // each sound's own volume stays in place (so the panel does not jump) but is greyed out and locked while that sound is off
-      [['row-ambvol', 'amb'], ['row-musvol', 'mus'], ['row-openvol', 'open']].forEach(([id, k]) => { const r = $('#' + id); if (!r) return; r.toggleAttribute('data-hide', !live[k]); const i = r.querySelector('input'); if (i) i.disabled = !live[k]; });
+      [['row-ambvol', 'amb'], ['row-musvol', 'mus']].forEach(([id, k]) => { const r = $('#' + id); if (!r) return; r.toggleAttribute('data-hide', !live[k]); const i = r.querySelector('input'); if (i) i.disabled = !live[k]; });
+      const op = $('#snd-p-open'); if (op) op.toggleAttribute('data-openoff', !live.open);   // Opening: its own settings are hidden (not greyed out) while it is off
       const pn = $('#snd-panels'); if (pn) pn.inert = !on;   // the settings stay, but nothing can be changed while Sound is off
       ['#snd-vol', '#amb-sug-go'].forEach(id => { const e = $(id); if (e) e.disabled = !on; });
     } catch (e) { /* the tabs are cosmetic; the sound itself does not depend on them */ }

@@ -1,3 +1,13 @@
+## Sound > Opening tab made clearer for new users
+- The tab "Intro chime" is now "Opening". One switch, "Opening sound", controls everything on it; the title sound, volume, narration wait and preview sit in an indented group that is HIDDEN (not greyed out) while the switch is off, with one line saying why.
+- A one-line summary at the top gives the order of events: title sound, then opening music, then narrator. It also says nothing plays when a book is resumed.
+- The volume uses the same icon, filled track and % readout as the music volume (`osVolPaint`); its label no longer wraps.
+- "Title sound" explains itself; its "Off" choice is now "None". "Narration after the opening" is now "Start reading after the opening".
+- The round play button is now a labelled "Preview" button under "Try it now". The old "This book: Gothic (real clip, ...)" line reads "This book gets the Gothic mood . Music by Kevin MacLeod" (or "Made on your device").
+- "Hear each mood" is now "Compare all opening moods", with a chevron and a one-line explanation inside.
+- Files: `src/html/28-sheet-sound.html`, `src/css/96-sound-tabs.css`, `src/js/sound/opening-sound.js`, `sound-tabs.js`, `sound-core.js`.
+- Bengali: the changed English strings fall back to English until `src/i18n/bn.json` is updated (listed in BN-REVIEW.md style).
+
 # Changes in this version
 
 ## Download card: "Also save background music"

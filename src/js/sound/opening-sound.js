@@ -191,6 +191,13 @@
     if (OSND.armed && S.book && OSND.armed === String(S.book.id) && P.openOn !== false) return 1000;   // armed, narrator just started: the opening decides within a moment
     return 0;
   }
+  function osVolPaint() {   // opening volume: filled track, % readout, mute icon (same look as the music volume)
+    const r = $('#amb-open-vol'); if (!r) return;
+    const v = Math.max(0, Math.min(100, +r.value || 0));
+    r.style.setProperty('--fill', v + '%');
+    const o = $('#open-vpct'); if (o) o.textContent = v + '%';
+    const i = $('#open-vic'); if (i) i.classList.toggle('mute', v === 0);
+  }
   function osPaint() {
     const on = $('#amb-open'); if (!on) return;
     const tc = $('#amb-open-tc'); if (tc) tc.value = osChimeKind();
@@ -198,7 +205,8 @@
     sndNowPaint(); osListPaint(); osManifest().then(osListPaint);   // the list shows the clip each mood would play for this book
     on.checked = P.openOn !== false; $('#amb-open-vol').value = String(P.openVol == null ? 60 : P.openVol);
     const m = osMood(S.book), c = S.book ? osClip(m[0], S.book) : null, note = $('#amb-open-note');
-    if (note) note.textContent = (S.book ? 'This book: ' + m[1] + (c ? ' (real clip' + (c.by ? ', ' + c.by : '') + ').' : ' (made on the device).') : 'Open a book to hear its opening sound.') + ' Plays only when a book starts from the beginning.';
+    if (note) note.textContent = S.book ? 'This book gets the ' + m[1] + ' mood \u00b7 ' + (c ? (c.by ? 'Music by ' + c.by : 'Recorded clip') : 'Made on your device') : 'Open a book to see which opening it gets.';
+    osVolPaint();
   }
   /* ---- "Hear each mood": every mood's clip in a list, to play and compare ---- */
   const OS_ALL = OS_MOODS.map(m => [m[0], m[1]]).concat([OS_CALM]);
@@ -240,7 +248,7 @@
     if (OSND.pv !== k) return;
     const ok = await osPlay(m, S.book, true, true);
     if (ok) OSND.until = 0;   // a preview must not hold the background music back
-    else { OSND.pv = ''; toast('Turn the intro chime volume up to hear it.'); }
+    else { OSND.pv = ''; toast('Turn the opening volume up to hear it.'); }
     osListState();
   }
   /* ---- narration after the opening: audio.play() is held while the opening plays ---- */
@@ -288,7 +296,7 @@
   function osInit() {
     const on = $('#amb-open'); if (!on) return;
     on.addEventListener('change', e => { P.openOn = e.target.checked; savePrefs(); if (!P.openOn) { OSND.armed = ''; osStop(0.3); } });
-    $('#amb-open-vol').addEventListener('input', e => { P.openVol = +e.target.value; savePrefs(); });
+    $('#amb-open-vol').addEventListener('input', e => { P.openVol = +e.target.value; savePrefs(); osVolPaint(); });
     $('#amb-open-hear').addEventListener('click', async () => { const m = osMood(S.book); OSND.pv = ''; if (ambBuild()) { await osManifest(); await osLoad(osClip(m[0], S.book)); osPlay(m, S.book, true); } else toast('Sound is not available here.'); });
     const tc = $('#amb-open-tc'); if (tc) tc.addEventListener('change', e => { P.openChime = e.target.value; savePrefs(); osTitleHear(osChimeKind()); });
     const lb = $('#amb-open-list'); if (lb) lb.addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) osPreview(b.dataset.k); });
