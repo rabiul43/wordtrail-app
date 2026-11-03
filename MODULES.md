@@ -42,7 +42,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `110-collections.js` | 238 | Collections tab |
 | `120-search-recommendations.js` | 578 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `130-book-detail.js` | 194 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
-| `131-book-stats-share.js` | 162 | Book stats on the details page, start/finish sending, share button |
+| `131-book-stats-share.js` | 163 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 133 | Author page, large "pick up where you left off" card |
 | `133-open-progress-saved-state.js` | 251 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
@@ -65,7 +65,8 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `260-audio-effects.js` | 369 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
-| `280-downloads-progress.js` | 712 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
+| `280-downloads-progress.js` | 713 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
+| `281-book-download-card.js` | 97 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `290-backup-maintenance.js` | 393 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 583 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |

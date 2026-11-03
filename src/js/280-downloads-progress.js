@@ -504,6 +504,7 @@
     else { r.stat.removeAttribute('role'); r.stat.removeAttribute('tabindex'); r.stat.removeAttribute('aria-label'); r.stat.removeAttribute('title'); }
   }
   function paintDl() {
+    ddPaint();   // the card on the book page (281)
     const b = S.book, T = $('#dl-t'), Sx = $('#dl-s'), go = $('#dl-go'), rm = $('#dl-rm'), m = $('#dl-m');
     if (!b || !T) return;
     const n = b.secs.length, have = b.secs.filter((s, i) => isLocal(b.id, i, s.url)).length;

@@ -157,6 +157,7 @@
         h('div', { class: 'det-actions' },
           h('button', { class: 'det-btn', type: 'button', onclick: () => openBook(b, { play: true }) }, svgIcon('#i-play'), listenLabel),
           heartNode(b, 'on-detail'),
-          h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
+          h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share'))),
+        ddMake(b)),
       about, ratingsSection(b), bgrd, more);
   }

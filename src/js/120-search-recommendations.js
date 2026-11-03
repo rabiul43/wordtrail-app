@@ -62,7 +62,7 @@
     if (card._wtRate) { const rl = rtLineText(card._wtId); card._wtRate.textContent = rl; card._wtRate.hidden = !rl; }
     if (card._wtChip) card._wtChip.hidden = !Array.from(card._wtChip.children).some(c => !c.hidden && c.textContent);
   }
-  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); $$('[data-cv]').forEach(n => { if (n._wtDlHost && n._b && n._b.id) dlMarkPaint(n, n._b.id); }); offRefresh(); }   // marks: also the book page cover, which is not a tile or card
+  function paintCards() { $$('.card').forEach(c => { if (c._wtId) paintBadge(c); }); paintTiles(); $$('[data-cv]').forEach(n => { if (n._wtDlHost && n._b && n._b.id) dlMarkPaint(n, n._b.id); }); ddPaint(); offRefresh(); }   // marks: also the book page cover, which is not a tile or card
   async function checkReady(cards) {
     let ids = null;
     try { ids = await loadHFSyncedIds(); } catch (e) { return; }

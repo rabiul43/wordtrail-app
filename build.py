@@ -143,6 +143,7 @@ PARTS = [
     ('file', 'src/js/265-notice-engine.js'),
     ('file', 'src/js/270-sheets-nextup-back.js'),
     ('file', 'src/js/280-downloads-progress.js'),
+    ('file', 'src/js/281-book-download-card.js'),
     ('file', 'src/js/290-backup-maintenance.js'),
     ('file', 'src/js/295-account-sync.js'),
     ('file', 'src/js/296-desktop-bar.js'),
