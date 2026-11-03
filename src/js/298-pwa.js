@@ -46,6 +46,31 @@
     });
   }
 
+  /* Install button (Settings > Basics > Install Wordtrail).
+     Android / desktop Chrome and Edge: the browser's own install offer is kept (head script -> window.__wtIP) and shown by the button.
+     iPhone / iPad: there is no such offer, so the button explains Share > Add to Home Screen.
+     The row is hidden when the app is already installed (opened from the home screen) or when neither case applies. */
+  guideDoc('settings', 'Install Wordtrail', "Settings > Install Wordtrail adds the app to your home screen. It opens faster and works offline. The row is not shown once the app is installed.");
+  const INST = { ev: window.__wtIP || null, done: false };
+  const pwaStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+  const pwaIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const pwaCanInstall = () => !INST.done && !pwaStandalone() && /^https?:$/.test(location.protocol) && (!!INST.ev || pwaIOS());
+  async function pwaInstall() {
+    const ev = INST.ev;
+    if (!ev) { toast(pwaIOS() ? 'Tap Share, then Add to Home Screen.' : 'Use the browser menu: Install app.', 6000); return; }
+    INST.ev = null;   // the browser lets an offer be used once
+    try {
+      ev.prompt();
+      const c = await ev.userChoice;
+      if (c && c.outcome === 'accepted') { INST.done = true; toast('Installing Wordtrail\u2026', 3500); }
+      else toast('Not installed. You can still use the browser menu: Install app.', 5000);
+    } catch (e) { toast('Could not start the install. Try the browser menu: Install app.', 5000); }
+  }
+  try {
+    addEventListener('beforeinstallprompt', e => { e.preventDefault(); INST.ev = e; });
+    addEventListener('appinstalled', () => { INST.done = true; INST.ev = null; toast('Wordtrail is installed.', 3500); });
+  } catch (e) { /* no install events in this browser */ }
+
   /* Splash screen covers: keeps 24 real covers (title, author, image address) from the catalogue for the next launch, renewed every 3 days.
      Read by the splash script in 10-body-views.html. Kept in localStorage directly, so it is not synced to the account. */
   function splashRemember() {

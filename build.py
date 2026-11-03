@@ -149,6 +149,7 @@ PARTS = [
     ('file', 'src/js/296-desktop-bar.js'),
     ('file', 'src/js/298-pwa.js'),
     ('file', 'src/js/300-wiring.js'),
+    ('file', 'src/js/301-open-shared-link.js'),
     ('file', 'src/js/999-app-close.js'),
     ('file', 'src/html/90-end.html'),
 ]

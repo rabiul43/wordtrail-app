@@ -108,7 +108,7 @@
     const pct = Math.max(0, Math.min(100, Math.round((r.pct || 0) * 100)));
     const left = pct >= 100 ? 'Finished' : pct < 1 ? 'Just started' : pct + '% listened';
     const total = r.total || (CAT.books && (CAT.books.find(b => String(b.id) === String(r.id)) || {}).total) || 0;
-    const leftSec = total > 0 && pct < 100 ? Math.round(total * Math.max(0, 1 - (r.pct || 0)) / (P.speed || 1)) : 0;
+    const leftSec = total > 0 && pct < 100 ? Math.round(total * Math.max(0, 1 - (r.pct || 0)) / bspdOf(r)) : 0;
     const cov = coverNode({ id: r.id, title: r.title, authors: r.authors, cover: r.cover, ia: r.ia });
     /* desktop banner (only when this is the one book in progress, see 20-home-library.css): the cover, blurred, fills the right side */
     const back = h('div', { class: 'rs-bg', 'aria-hidden': 'true' });

@@ -564,7 +564,7 @@
     const done = pct >= 100;
     /* Time remaining: from the stored total or the catalog. */
     const total = r.total || (CAT.books && (CAT.books.find(b => String(b.id) === String(r.id)) || {}).total) || 0;
-    const leftSec = total > 0 && !done ? Math.round(total * Math.max(0, 1 - (r.pct || 0)) / (P.speed || 1)) : 0;
+    const leftSec = total > 0 && !done ? Math.round(total * Math.max(0, 1 - (r.pct || 0)) / bspdOf(r)) : 0;
     const leftTxt = leftSec >= 60 ? fmtLong(leftSec) + ' left' : '';
     const barLabel = done ? 'Finished' : pct < 1 ? 'Just started' : pct + '%' + (leftTxt ? ' · ' + leftTxt : '');
     const ariaLabel = (done ? 'Listen again: ' : 'Resume: ') + r.title + (r.authors ? ', ' + r.authors : '') + ', ' + (done ? 'finished' : pct < 1 ? 'just started' : pct + '% listened' + (leftTxt ? ', ' + leftTxt : ''));

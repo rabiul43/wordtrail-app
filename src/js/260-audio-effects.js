@@ -5,7 +5,7 @@
   function spdPaint() {
     $('#sp-val').textContent = spdFmt(P.speed); $('#sp-range').value = P.speed;
     $$('#sp-presets .chip').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === P.speed)));
-    $('#sp-lev').checked = !!P.level; $('#sp-sil').checked = !!P.silence; $('#sp-voice').checked = P.enh === 'voice';
+    $('#sp-each').checked = P.speedEach !== false; $('#sp-lev').checked = !!P.level; $('#sp-sil').checked = !!P.silence; $('#sp-voice').checked = P.enh === 'voice';
   }
   let silT = 0, silQuiet = 0, silOn = false, silBuf = null;
   function silTick() {
@@ -126,6 +126,7 @@
     $('#sp-range').addEventListener('input', e => { setSpeed(+e.target.value); spdPaint(); });
     $('#sp-minus').addEventListener('click', () => { setSpeed(P.speed - 0.05); spdPaint(); });
     $('#sp-plus').addEventListener('click', () => { setSpeed(P.speed + 0.05); spdPaint(); });
+    $('#sp-each').addEventListener('change', e => { P.speedEach = e.target.checked; if (P.speedEach && S.book) bspdSet(S.book, P.speed); savePrefs(); });
     $('#sp-sil').addEventListener('change', e => silSet(e.target.checked));
     $('#sp-lev').addEventListener('change', e => levSet(e.target.checked));
     $('#sp-voice').addEventListener('change', e => { enhSet(e.target.checked ? 'voice' : 'off'); silSync(); spdPaint(); });
@@ -244,8 +245,33 @@
     audio.addEventListener('play', () => { silSync(); levSync(); }); audio.addEventListener('pause', () => { silSync(); levSync(); });
     silSync(); levSync(); chInit(); hlCount();
   }
-  function setSpeed(v) {
+  /* ---------- speed for each book ----------
+     P.bspd = { bookId: { s: speed, t: time } } (inside the settings, so it is backed up and synced with them).
+     A speed the LISTENER picks (auto is not set) is remembered for the open book and becomes the start speed for books with none (P.speedDef).
+     Opening a book applies its own speed, or P.speedDef; that is not a pick, so it changes neither. Switch: P.speedEach (Playback sheet). */
+  const BSPD_MAX = 200, bspdOk = k => /^[A-Za-z0-9._-]{1,40}$/.test(k) && k !== '__proto__';
+  const bspdMap = () => (P.bspd && typeof P.bspd === 'object' && !Array.isArray(P.bspd)) ? P.bspd : (P.bspd = {});
+  function bspdGet(b) {
+    const k = b && b.id != null ? String(b.id) : '', m = P.bspd;   // reading never creates the map
+    if (!m || typeof m !== 'object' || Array.isArray(m) || !bspdOk(k) || !Object.prototype.hasOwnProperty.call(m, k) || !m[k] || !(+m[k].s > 0)) return 0;
+    return spdClamp(m[k].s);
+  }
+  const bspdOf = b => P.speedEach === false ? (+P.speed || 1) : (bspdGet(b) || +P.speedDef || +P.speed || 1);   // the speed this book plays at (used for "time left" on other books)
+  guideDoc('audio', 'Speed for each book', "Playback > Remember speed for each book: a book keeps the speed you chose for it, and other books start at the speed you picked last. Switch it off to use one speed everywhere.");
+  function bspdSet(b, v) {
+    const k = b && b.id != null ? String(b.id) : ''; if (!bspdOk(k)) return;
+    const m = bspdMap(); m[k] = { s: v, t: Date.now() };
+    const ks = Object.keys(m); if (ks.length > BSPD_MAX) ks.sort((x, y) => ((m[x] && m[x].t) || 0) - ((m[y] && m[y].t) || 0)).slice(0, ks.length - BSPD_MAX).forEach(x => { delete m[x]; });
+  }
+  function bspdApply(b) {   // called when a book opens
+    if (P.speedEach === false) return;
+    if (!(+P.speedDef > 0)) P.speedDef = P.speed;
+    const v = bspdGet(b) || spdClamp(P.speedDef);
+    if (v !== P.speed) setSpeed(v, true);
+  }
+  function setSpeed(v, auto) {
     v = spdClamp(v); silOn = false; P.speed = v; audio.defaultPlaybackRate = v; audio.playbackRate = v;
+    if (!auto && P.speedEach !== false) { P.speedDef = v; if (S.book) bspdSet(S.book, v); }
     el.speed.querySelector('.ub-sp').textContent = nrSpd(v) + '×'; el.speed.dataset.on = String(v !== 1);
     el.speed.setAttribute('aria-label', 'Playback speed: ' + spdFmt(v) + '. Open playback settings'); savePrefs();
     nrSpeedUI();

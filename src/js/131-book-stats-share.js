@@ -67,9 +67,11 @@
         .then(r => { if (!r.ok && r.status !== 429) undo(); }).catch(undo);
     } catch (e) { undo(); }
   }
+  /* A shared link looks like https://site/?book=1234. DEEP_ID is that number ('' when the page was opened normally); 301-open-shared-link.js opens the book. */
+  const DEEP_ID = (() => { try { const v = new URLSearchParams(location.search).get('book'); return /^\d{1,9}$/.test(v || '') ? v : ''; } catch (e) { return ''; } })();
   /* Share button at the top of the book page: the phone share sheet with the title, author and the app link; copies the text when sharing is not available */
   async function shareBook(b) {
-    const by = String(b.authors || '').split(',')[0].trim(), url = location.origin + location.pathname;
+    const by = String(b.authors || '').split(',')[0].trim(), url = location.origin + location.pathname + (/^\d{1,9}$/.test(String(b.id || '')) ? '?book=' + b.id : '');   // the link opens THIS book (see 301-open-shared-link.js)
     const text = '\u201c' + b.title + '\u201d' + (by && !/^unknown/i.test(by) ? ' by ' + by : '') + ' \u2013 listen and read along free on Wordtrail.';
     try { if (navigator.share) { await navigator.share({ title: b.title, text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
     try { await navigator.clipboard.writeText(text + ' ' + url); toast('Link copied.', 2000); } catch (e) { toast('Could not share on this device.', 3000); }

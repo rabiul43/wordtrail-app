@@ -272,6 +272,7 @@
   }
   /* [section, key, icon, name, description, value, search words, action, 'dev' when it needs Developer unlocked] */
   const smRows = () => [
+    ['basics', 'install', 'i-m-download', 'Install Wordtrail', 'Add it to your home screen. Opens faster, works offline', '', 'install app home screen add shortcut pwa', () => pwaInstall(), 'install'],
     ['basics', 'theme', 'i-m-contrast', 'Theme', 'Auto, Light, Dark, Sepia, High contrast', smTheme(), 'dark light sepia contrast colour color night', () => smOpenTab('reading', () => smH3('reading', 'Theme'))],
     ['basics', 'text', 'i-m-texts', 'Text', 'Size, line spacing, reading font', '', 'font size line spacing dyslexia lexend atkinson opendyslexic bigger larger', () => smOpenTab('reading', () => smH3('reading', 'Text size'))],
     ['basics', 'speed', 'i-m-zap', 'Speed', 'Playback speed and finer steps', +(+P.speed).toFixed(2) + 'x', 'faster slower pace skip silence voice boost mono balance volume', () => { SMH.from = true; spdPaint(); openSheet('sheet-speed'); }],
@@ -289,7 +290,7 @@
     ['help', 'keys', 'i-m-kbd', 'Keyboard shortcuts', 'Space, arrows, N and P. Press ? anywhere', '', 'help keys keyboard shortcuts', () => { SMH.from = true; openSheet('sheet-keys'); }, 'kbd']
   ];
   /* Developer rows need Developer unlocked; Keyboard shortcuts needs a mouse or trackpad */
-  const smShow = r => r[8] === 'dev' ? smDev() : r[8] === 'kbd' ? !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) : true;
+  const smShow = r => r[8] === 'dev' ? smDev() : r[8] === 'install' ? pwaCanInstall() : r[8] === 'kbd' ? !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) : true;
   const smSecName = { basics: 'Basics', advanced: 'Advanced', help: 'Help' };
   const smRow = (name, desc, icon, val, pill, go) => h('button', { class: 'mrow sh-row', type: 'button', onclick: () => go() },
     h('span', { class: 'mr-i', 'aria-hidden': 'true' }, svgIcon('#' + icon)),

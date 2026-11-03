@@ -11,7 +11,7 @@
     applyTheme();
     applyTidy();
     applyQuick();
-    setSpeed(P.speed);
+    setSpeed(P.speed, true);
     speedInit();
     renderRecents();
     initMediaSession();
@@ -496,7 +496,7 @@
      The player is shown at once with a loading note, so the library never flashes in between. */
   const unhideResume = () => document.documentElement.classList.remove('resuming');
   try {
-    if (RESUME_OPEN && RESUME_OPEN.id && store.get('wt:onboarded', 0) && el.player.hidden) {
+    if (RESUME_OPEN && RESUME_OPEN.id && !DEEP_ID && store.get('wt:onboarded', 0) && el.player.hidden) {   // a shared link wins over "back into the book that was open"
       rememberOpen(RESUME_OPEN); // keep it saved while the book loads
       el.title.textContent = RESUME_OPEN.title || ''; el.sub.textContent = RESUME_OPEN.authors || '';
       el.page.textContent = ''; el.page.append(loadingNote());
@@ -754,6 +754,7 @@
       P.readerLvl = chosenLvl;
       savePrefs();
       store.set('wt:onboarded', 1);
+      setTimeout(() => { try { sharedOpen(); } catch (e) { /* no shared link waiting */ } }, 300);   // a shared link that arrived on the first run opens now
       ov.style.transition = 'opacity .22s ease';
       ov.style.opacity = '0';
       setTimeout(() => { ov.hidden = true; ov.style.transition = ''; ov.style.opacity = ''; }, 240);

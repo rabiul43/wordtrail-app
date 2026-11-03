@@ -74,7 +74,7 @@
     audio.pause();
     dlClearUrls(dlKey(b.id, first));
     hideDlHint(); // new book — clear any previous download nudge
-    S.book = b; S.secs = b.secs; S.durs = b.secs.map(s => s.dur); try { clStop(); CL.ed = null; clPaintCount(); } catch (e) { /* clips not ready yet */ }
+    S.book = b; S.secs = b.secs; S.durs = b.secs.map(s => s.dur); try { bspdApply(b); } catch (e) { /* speed stays as it is */ } try { clStop(); CL.ed = null; clPaintCount(); } catch (e) { /* clips not ready yet */ }
     setReaderLang(b.lang);
     S.sec = Math.min(Math.max(0, saved.sec || 0), S.secs.length - 1);
     S.anchors = saved.anchors || {}; S.ranges = saved.ranges || {}; S.autoSrc = saved.auto || {};
