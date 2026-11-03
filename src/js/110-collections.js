@@ -162,7 +162,7 @@
   /* ------ Library: when nothing could be loaded, say so and offer a retry, instead of an empty page ------
      'content' = something real is on screen, 'loading' = placeholders are still showing, 'empty' = nothing came. A section that
      already shows its own error card counts as a message, so the two are never stacked. */
-  const HOME_IDS = ['recents', 'sec-short', 'sec-botd', 'sec-tod', 'sec-picks', 'sec-newweek', 'sec-collections'];   // the sections on the Library tab itself (Featured and Recently added live in Collections)
+  const HOME_IDS = ['recents', 'sec-botd', 'sec-tod', 'sec-picks', 'sec-newweek', 'sec-collections'];   // the sections on the Library tab itself (Featured and Recently added live in Collections)
   const HS = { start: Date.now(), obs: null, timer: 0 };
   function homeStatus() {
     let loading = false, skipped = false;
@@ -229,8 +229,7 @@
 
   /* Hide homepage rows when a search is active; restore when search is cleared */
   function syncHomeRows(searching) {
-    const home = $('#home'); if (home) home.classList.toggle('is-searching', !!searching);
-    const ids = ['recents', 'sec-short', 'sec-tod', 'sec-picks', 'sec-genre', 'sec-newweek', 'sec-collections'];   // 'recents' = the Continue listening card: it has nothing to do with a search
+    const ids = ['recents', 'sec-tod', 'sec-picks', 'sec-genre', 'sec-newweek', 'sec-collections'];   // 'recents' = the Continue listening card: it has nothing to do with a search
     ids.forEach(id => {
       const el = $('#' + id);
       if (el) el.style.display = searching ? 'none' : '';
