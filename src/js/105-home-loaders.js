@@ -167,6 +167,7 @@
   const HC_ROWS = 3;
   const HC_ITEMS = [
     ['recents', 'recents', 'Continue listening', 'Your books in progress'],
+    ['short', 'sec-short', 'Short for tonight', 'A row of short listens'],
     ['tod', 'sec-tod', 'Time-of-day card', 'Morning review or bedtime story'],
     ['botd', 'sec-botd', 'Book of the day', 'Shown when there is no time-of-day card'],
     ['picks', 'sec-picks', 'Picked for you', 'Suggestions from your listening'],

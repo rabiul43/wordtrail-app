@@ -238,7 +238,7 @@
     store.set('wt:book:' + id, S.heavyFail === id ? Object.assign(rec, heavy) : rec);
     const rd = S.book.secs && S.book.secs[0] && S.book.secs[0].reader;
     if (rd) store.set('wt:rdr:' + S.book.id, rd);
-    const entry = { id: S.book.id, title: S.book.title, authors: S.book.authors, cover: S.book.cover, ia: S.book.ia || '', pct: bookPct(), ts: Date.now(), total: S.book.total || 0 };
+    const entry = { id: S.book.id, title: S.book.title, authors: S.book.authors, cover: S.book.cover, ia: S.book.ia || '', pct: bookPct(), ts: Date.now(), total: S.book.total || 0, ch: (S.sec || 0) + 1, chn: (S.durs || []).length };
     P.recents = [entry, ...P.recents.filter(r => r.id !== entry.id)].slice(0, 10);
     savePrefs();
     if (entry.pct >= 0.02) { // a longer listening history than the 8 recents, used for recommendations

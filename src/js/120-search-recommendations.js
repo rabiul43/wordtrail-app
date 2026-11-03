@@ -529,10 +529,45 @@
     draw(src.find(x => x.key === PK.sel) || src[0]);
     sec.hidden = false;
   }
+  /* ---------- home "A": greeting and the Short enough for tonight row ---------- */
+  function hgGreet(has) {
+    const k = $('#hg-k'), t = $('#hg-t'); if (!k || !t) return;
+    const hr = new Date().getHours();
+    k.textContent = hr < 5 ? 'Good night' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    t.textContent = has ? 'Pick up your trail' : 'Start your trail';
+  }
+  const SHORT = { seq: 0 };
+  function shortPool() {
+    const now = new Date(), day = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+    const seen = new Set(listenedList().map(r => String(r.id)));
+    const okLang = b => P.otherLangs || !b.lang || /^english$/i.test(b.lang);
+    const pool = (CAT.books || []).filter(b => b.total >= 600 && b.total <= 2700 && !seen.has(String(b.id)) && okLang(b));
+    const score = b => (b.ia ? 1 : 0) + moodHash(day + 'short' + b.id);
+    return pool.map(b => [score(b), b]).sort((a, b) => b[0] - a[0]).map(x => nxPub(x[1]));
+  }
+  async function loadShort() {
+    const sec = $('#sec-short'), row = $('#short-row'); if (!sec || !row) return;
+    const my = ++SHORT.seq;
+    try {
+      await catLoad();
+      if (my !== SHORT.seq) return;
+      const list = shortPool();
+      if (!list.length) { sec.hidden = true; row.textContent = ''; return; }
+      const hr = new Date().getHours();
+      $('#short-h').textContent = (hr >= 17 || hr < 5) ? 'Short enough for tonight' : 'Short enough for today';
+      fillRow(row, list, null, 8);
+      sec.hidden = false;
+    } catch (e) { if (my === SHORT.seq) sec.hidden = true; }
+  }
+  function shortAll() { openSeeAll({ title: $('#short-h').textContent, sub: 'Under 45 minutes', key: 'wt:seeall:short', ttl: 6 * 3600e3, fetch: async () => { await catLoad(); return shortPool().slice(0, 60); } }); }
+  { const a = $('#short-all'); if (a) a.addEventListener('click', shortAll); }
+  { const a = $('#newweek-all'); if (a) a.addEventListener('click', () => openSeeAll({ title: 'New this week', sub: 'Added in the last 7 days', key: 'wt:seeall:newweek', ttl: TTL_RECENT, fetch: () => lvGet({ since: Math.floor((Date.now() - 7 * 24 * 3600e3) / 1000), limit: 60 }, { light: true }) })); }
   function renderRecents() {
     loadPicks();
+    loadShort();
+    hgGreet(!!P.recents.length);
     el.recentList.textContent = '';
-    const recs = OFF.on ? recs.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played
+    const recs = OFF.on ? P.recents.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played
     if (!recs.length) { el.recents.hidden = true; return; }
     el.recents.hidden = false;
     const want = Math.max(1, Math.min(5, parseInt(P.resumeCount, 10) || 3));
