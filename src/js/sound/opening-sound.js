@@ -191,6 +191,10 @@
     if (OSND.armed && S.book && OSND.armed === String(S.book.id) && P.openOn !== false) return 1000;   // armed, narrator just started: the opening decides within a moment
     return 0;
   }
+  function osTcPaint() {   // title sound choice: the pressed button follows the saved choice
+    const k = osChimeKind();
+    $$('#amb-open-tc button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === k)));
+  }
   function osVolPaint() {   // opening volume: filled track, % readout, mute icon (same look as the music volume)
     const r = $('#amb-open-vol'); if (!r) return;
     const v = Math.max(0, Math.min(100, +r.value || 0));
@@ -200,7 +204,7 @@
   }
   function osPaint() {
     const on = $('#amb-open'); if (!on) return;
-    const tc = $('#amb-open-tc'); if (tc) tc.value = osChimeKind();
+    osTcPaint();
     const wt = $('#amb-open-wait'); if (wt) wt.checked = P.openWait === true;
     sndNowPaint(); osListPaint(); osManifest().then(osListPaint);   // the list shows the clip each mood would play for this book
     on.checked = P.openOn !== false; $('#amb-open-vol').value = String(P.openVol == null ? 60 : P.openVol);
@@ -298,7 +302,7 @@
     on.addEventListener('change', e => { P.openOn = e.target.checked; savePrefs(); if (!P.openOn) { OSND.armed = ''; osStop(0.3); } });
     $('#amb-open-vol').addEventListener('input', e => { P.openVol = +e.target.value; savePrefs(); osVolPaint(); });
     $('#amb-open-hear').addEventListener('click', async () => { const m = osMood(S.book); OSND.pv = ''; if (ambBuild()) { await osManifest(); await osLoad(osClip(m[0], S.book)); osPlay(m, S.book, true); } else toast('Sound is not available here.'); });
-    const tc = $('#amb-open-tc'); if (tc) tc.addEventListener('change', e => { P.openChime = e.target.value; savePrefs(); osTitleHear(osChimeKind()); });
+    $$('#amb-open-tc button').forEach(b => b.addEventListener('click', () => { P.openChime = b.dataset.v; savePrefs(); osTcPaint(); osTitleHear(osChimeKind()); }));   // picking one also plays it once
     const lb = $('#amb-open-list'); if (lb) lb.addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if (b) osPreview(b.dataset.k); });
     osGateInstall();
     const wt = $('#amb-open-wait'); if (wt) wt.addEventListener('change', e => { P.openWait = e.target.checked; savePrefs(); });

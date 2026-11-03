@@ -69,7 +69,7 @@
     set('#in-scenelabel', e => { e.checked = P.sceneLabel === true; });
     set('#snd-balance', e => { e.checked = P.sndBalance !== false; });
     try { smxPaint(); } catch (e) { /* optional */ }
-    set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); if (typeof osVolPaint === 'function') osVolPaint(); }); set('#amb-open-wait', e => { e.checked = P.openWait === true; }); set('#amb-open-tc', e => { e.value = P.openChime === 'page' || P.openChime === 'off' ? P.openChime : 'chime'; });
+    set('#amb-open', e => { e.checked = P.openOn !== false; }); set('#amb-open-vol', e => { e.value = String(P.openVol == null ? 60 : P.openVol); if (typeof osVolPaint === 'function') osVolPaint(); }); set('#amb-open-wait', e => { e.checked = P.openWait === true; }); if (typeof osTcPaint === 'function') osTcPaint();
     set('#amb-dev', e => { e.hidden = P.sndDev !== true; });
     sndNowPaint(); sndTabsPaint(); musOffPaint();
     try { sndBalSync(); } catch (e) { /* the balance is a help */ }
