@@ -61,41 +61,46 @@
       }).catch(() => { /* the numbers are a help only */ });
     } catch (err) { /* the offline panel must never break the sound screen */ }
   }
+  async function musSaveClips(list, ctl, step) {   // saves each clip in the 'wt-music' cache and on the keep list; step(done + failed, bytes) after each one
+    const c = await caches.open('wt-music');
+    let done = 0, bytes = 0, failed = 0, full = false;
+    for (const clip of list) {
+      if (ctl.signal.aborted) break;
+      const url = musClipUrl(clip.f);
+      try {
+        if (!(await c.match(url))) {   // a clip that already played once is in the cache: only mark it as kept
+          const resp = await fetch(url, { signal: ctl.signal });
+          if (!resp.ok) throw new Error('http ' + resp.status);
+          const buf = await resp.arrayBuffer();
+          await c.put(url, new Response(buf, { headers: { 'content-type': 'audio/mpeg', 'content-length': String(buf.byteLength) } }));
+          bytes += buf.byteLength;
+        }
+        const keep = sndKeepSet(); keep.add(new Request(url).url); sndKeepSave(keep); sndTouch(url); done++;   // read again each time: two saves must not overwrite each other
+        if (MUS.have) MUS.have.add(new Request(url).url);
+      } catch (err) {
+        if (ctl.signal.aborted) break;
+        if (err && err.name === 'QuotaExceededError') { full = true; break; }
+        failed++;
+      }
+      if (step) step(done + failed, bytes);
+    }
+    return { done, bytes, failed, full };
+  }
   async function musOffRun() {
     if (MUS.dl) return;
     if (MUS_LOCAL) { musOffMsg('Offline music is not available in local test mode.'); return; }
     if (!self.caches) { musOffMsg('This browser cannot save music for offline.'); return; }
     if (navigator.onLine === false) { musOffMsg('You are offline. Connect to the internet to download music.'); return; }
     const ctl = new AbortController(); MUS.dl = { ctl }; musOffPaint();
-    let c = null, done = 0, bytes = 0, failed = 0, full = false, list = [];
+    let r = { done: 0, bytes: 0, failed: 0, full: false }, list = [];
     try {
       musOffMsg('Checking the music list…');
       await musFetchManifest(true);   // a fresh list first, so new clips are included
       const moods = musOffMoods().filter(k => MUS.dlPick && MUS.dlPick.has(k));
       list = musOffClips(moods);
-      c = await caches.open('wt-music');
-      const keep = sndKeepSet();
-      for (const clip of list) {
-        if (ctl.signal.aborted) break;
-        const url = musClipUrl(clip.f);
-        try {
-          if (!(await c.match(url))) {   // a clip that already played once is in the cache: only mark it as kept
-            const resp = await fetch(url, { signal: ctl.signal });
-            if (!resp.ok) throw new Error('http ' + resp.status);
-            const buf = await resp.arrayBuffer();
-            await c.put(url, new Response(buf, { headers: { 'content-type': 'audio/mpeg', 'content-length': String(buf.byteLength) } }));
-            bytes += buf.byteLength;
-          }
-          keep.add(new Request(url).url); sndKeepSave(keep); sndTouch(url); done++;
-        } catch (err) {
-          if (ctl.signal.aborted) break;
-          if (err && err.name === 'QuotaExceededError') { full = true; break; }
-          failed++;
-        }
-        musOffMsg('Saving music: ' + (done + failed) + ' of ' + list.length + ' clips (' + musMB(bytes) + ' MB)');
-      }
-    } catch (err) { failed++; }
-    const cancelled = ctl.signal.aborted;
+      r = await musSaveClips(list, ctl, (n, bytes) => musOffMsg('Saving music: ' + n + ' of ' + list.length + ' clips (' + musMB(bytes) + ' MB)'));
+    } catch (err) { r.failed++; }
+    const cancelled = ctl.signal.aborted, failed = r.failed, full = r.full;
     MUS.dl = null;
     musOffMsg(cancelled ? 'Download cancelled. Music already saved stays on this device.'
       : full ? 'Not enough space on this device. Remove some files and try again.'
@@ -103,6 +108,69 @@
       : 'Music saved. It now plays without a connection.');
     try { await sndCachePrune(true); } catch (err) { /* best effort */ }
     musOffPaint(); sndCacheSizePaint();
+  }
+  /* ---------- Music for one book (the "Also save background music" box on the book's download card, 281) ----------
+     The moods a book will use are decided paragraph by paragraph from its text, and that text is not read until the book is opened. So the
+     card saves the moods the book is LIKELY to use: neutral, what its mood tags in moods.json suggest, and its genre. A mood that was not
+     saved is covered offline by musOfflineMood (music-library.js). Only a few clips per mood are saved, spread over quiet to busy,
+     so one book adds at most MUS_BOOK_CAP; clips another book already saved cost nothing. */
+  const MUS_BOOK_CAP = 40 * 1048576;
+  const MUS_FROM_LIB = { cozy: ['peace', 'merry'], spooky: ['dread', 'tension'], adventurous: ['danger', 'chase', 'wonder'], romantic: ['romance', 'peace', 'sorrow'], mysterious: ['tension', 'dread'], funny: ['merry'], thoughtful: ['peace', 'sorrow'] };
+  function musBookMoods(b) {   // music moods that have clips, most general first
+    const out = [], add = k => { const r = k ? musResolve(k) : ''; if (r && musHas(r) && out.indexOf(r) < 0) out.push(r); };
+    add('neutral');
+    let tags = null; try { tags = MOODS.ready ? MOODS.data.b[String(b.id)] : null; } catch (e) { tags = null; }
+    (tags || []).forEach(i => { const m = MOODS.data.moods[i]; (MUS_FROM_LIB[m && m[0]] || []).forEach(add); });
+    add(musGenreMood(b));
+    if (out.length < 2) add('peace');
+    return out;
+  }
+  function musSpread(n) {   // 0..n-1 in an order where every prefix is spread out: both ends, the middle, then the gaps
+    if (n <= 2) return Array.from({ length: n }, (x, i) => i);
+    const out = [0, n - 1], q = [[0, n - 1]];
+    while (q.length) { const [a, z] = q.shift(), m = (a + z) >> 1; if (m > a && m < z) { out.push(m); q.push([a, m], [m, z]); } }
+    return out;
+  }
+  function musBookPlan(b) {   // { moods, todo: clips still to save, need: their bytes, have: clips already saved, free: false when the keep list is full }
+    const moods = musBookMoods(b), all = (MUS.manifest && MUS.manifest.moods) || {}, keep = sndKeepSet(), urlOf = c => new Request(musClipUrl(c.f)).url;
+    const cl = {}; Object.keys(all).forEach(k => (all[k] || []).forEach(c => { if (c && c.f) cl[c.f] = c; }));
+    let kept = 0; Object.keys(cl).forEach(f => { if (keep.has(urlOf(cl[f]))) kept += Math.round((+cl[f].dur || 90) * MUS_BYTES_PER_SEC); });   // an estimate, like the Music panel's
+    const limit = Math.min(MUS_BOOK_CAP, SND_KEEP_CAP - kept);
+    const lists = moods.map(k => (all[k] || []).filter(c => c && c.f).slice().sort((x, y) => (typeof x.e === 'number' ? x.e : 0.5) - (typeof y.e === 'number' ? y.e : 0.5)));
+    const order = lists.map(l => musSpread(l.length)), seen = new Set(), todo = [];
+    let need = 0, have = 0, used = 0;   // used: the bytes this book's music takes in all, clips saved earlier included, so a second tap adds nothing
+    for (let r = 0, more = true; more; r++) {
+      more = false;
+      for (let i = 0; i < lists.length; i++) {
+        const j = order[i][r]; if (j == null) continue;
+        more = true;
+        const c = lists[i][j]; if (seen.has(c.f)) continue;
+        const bytes = Math.round((+c.dur || 90) * MUS_BYTES_PER_SEC);
+        if (used + bytes > MUS_BOOK_CAP) continue;
+        if (keep.has(urlOf(c))) { seen.add(c.f); have++; used += bytes; continue; }
+        if (need + bytes > limit) continue;
+        seen.add(c.f); todo.push({ f: c.f, bytes }); need += bytes; used += bytes;
+      }
+    }
+    return { moods, todo, need, have, free: limit > 0 };
+  }
+  async function musBookRun(b, step) {   // saves the plan; resolves { done, failed, full, cancelled, total } (busy / unsupported when it cannot start)
+    if (MUS.dl) return { busy: true };
+    if (MUS_LOCAL || !self.caches) return { unsupported: true };
+    const ctl = new AbortController(), id = String(b.id); MUS.dl = { ctl, book: id, n: 0, total: 0, bytes: 0 };
+    if (step) step();   // the card shows "Saving music" at once
+    let r = { done: 0, bytes: 0, failed: 0, full: false }, total = 0;
+    try {
+      await musFetchManifest(true);   // a fresh list first, so new clips are included
+      try { await MOODS.load(); } catch (e) { /* the genre is used */ }
+      const plan = musBookPlan(b); total = plan.todo.length; MUS.dl.total = total; if (step) step();
+      r = await musSaveClips(plan.todo, ctl, (n, bytes) => { if (MUS.dl) { MUS.dl.n = n; MUS.dl.bytes = bytes; } if (step) step(); });
+    } catch (err) { r.failed++; }
+    const cancelled = ctl.signal.aborted;
+    MUS.dl = null;
+    try { await sndCachePrune(true); } catch (err) { /* best effort */ }
+    musOffPaint(); sndCacheSizePaint();
+    return Object.assign({ total, cancelled }, r);
   }
   async function musOffClear() {
     if (!await askConfirm({ title: 'Remove offline music?', text: 'It downloads again when needed.', ok: 'Remove' })) return;
@@ -114,6 +182,7 @@
     musOffMsg(''); musOffPaint(); sndCacheSizePaint(); toast('Saved music removed.');
   }
   function musOffInit() {
+    musCacheScan();   // which clips are on the device, for musOfflineMood
     const go = $('#mus-off-go'); if (!go) return;
     go.addEventListener('click', musOffRun);
     $('#mus-off-cancel').addEventListener('click', () => { if (MUS.dl) MUS.dl.ctl.abort(); });
@@ -131,6 +200,6 @@
         }
       } catch (err) { /* a help only */ }
     });
-    window.addEventListener('offline', () => { musWarnPaint(); musOffPaint(); });
+    window.addEventListener('offline', () => { musCacheScan(); musWarnPaint(); musOffPaint(); });
   }
 

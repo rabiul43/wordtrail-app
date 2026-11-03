@@ -51,6 +51,7 @@
 
   /* Build a shuffled clip queue for a mood. Rotates if first clip equals the last-played one. */
   function musQueue(mood) {
+    mood = musOfflineMood(mood);   // offline: a mood with no saved clip borrows the nearest one that has some
     const clips = (MUS.manifest && MUS.manifest.moods && MUS.manifest.moods[mood]) || [];
     if (!clips.length) return [];
     const skip = MUS.recent.slice(-2).concat(MUS.playing ? [MUS.playing._file] : []);   // never the clip now playing or the one before it
@@ -103,6 +104,25 @@
     return (MUS.base || MUS_HOST) + 'music/' + f;
   }
 
+  /* Offline, a clip that is not on the device cannot play. Music for a mood nobody saved would stay silent, so while offline a mood with no
+     saved clip uses the nearest mood that has some (its finer fallback, then neutral, then peace, then any). MUS.have is filled by musCacheScan
+     (at start, when the connection drops, and as clips are saved); until it is filled nothing changes. */
+  async function musCacheScan() {
+    try {
+      if (!self.caches) return;
+      const c = await caches.open('wt-music'), set = new Set();
+      for (const req of await c.keys()) set.add(req.url);
+      MUS.have = set;
+    } catch (e) { /* best effort */ }
+  }
+  function musOfflineMood(mood) {
+    if (navigator.onLine !== false || !MUS.have || !MUS.manifest || !MUS.manifest.moods) return mood;
+    const all = MUS.manifest.moods, has = k => (all[k] || []).some(c => c && MUS.have.has(new Request(musClipUrl(c.f)).url));
+    if (has(mood)) return mood;
+    for (const k of [MUS_FALLBACK[mood], 'neutral', 'peace'].concat(Object.keys(all))) if (k && has(k)) return k;
+    return mood;
+  }
+
   /* Fetch a clip, cache it in the Cache API, decode it. Returns AudioBuffer or null. */
   async function musFetch(f) {
     const url = musClipUrl(f);
@@ -113,7 +133,7 @@
       } else try {
         const c = await caches.open('wt-music');
         resp = await c.match(url);
-        if (!resp) { resp = await fetch(url); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); } }
+        if (!resp) { resp = await fetch(url); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); if (MUS.have) MUS.have.add(new Request(url).url); } }
         else sndTouch(url);
       } catch (e) { resp = await fetch(url); }
       if (!resp || !resp.ok) return null;

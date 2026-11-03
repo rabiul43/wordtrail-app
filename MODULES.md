@@ -66,7 +66,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
 | `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 713 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
-| `281-book-download-card.js` | 97 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
+| `281-book-download-card.js` | 170 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `290-backup-maintenance.js` | 393 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 583 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |
@@ -82,12 +82,12 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 
 | File | Lines | What is inside |
 |---|---|---|
-| `sound/music-state.js` | 48 | Music: the `MUS` state object, local test mode |
+| `sound/music-state.js` | 49 | Music: the `MUS` state object, local test mode |
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
 | `sound/music-bus.js` | 70 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
-| `sound/music-library.js` | 123 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
+| `sound/music-library.js` | 143 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
 | `sound/music-playback.js` | 274 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
-| `sound/music-offline.js` | 136 | Music: "Download music for offline" |
+| `sound/music-offline.js` | 205 | Music: "Download music for offline" |
 | `sound/music-wiring.js` | 77 | Music: engine health, the Music switch, first-time hint, quick controls, `musicInit` |
 | `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |
 | `sound/ambient-scenes.js` | 77 | Ambient: `AMB` state, `AMB_SOUNDS` (the list of sounds), groups, scenes and rules from `amb-map.json`, book suggestion, scene cards |

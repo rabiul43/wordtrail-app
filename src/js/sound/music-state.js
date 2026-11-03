@@ -36,6 +36,7 @@
     offBusy: false, // the offline panel is fetching the music list
     dl: null,       // { ctl } while "Download music for offline" runs
     dlPick: null,   // Set of moods chosen for the offline download
+    have: null,     // Set of the clip addresses saved in the 'wt-music' cache, read by musCacheScan; used only to pick a saved mood while offline
     slow: false,    // the pause comes from the sleep timer: fade the music out slowly, like the ambient sounds (set in 200 and 150)
     rs: null,       // where a pause left the music: { clip, pos, mood, book, t }, used by the next play to carry on (musResumeSave / musResumeTake)
     tail: null,     // the nodes of the last stop, still fading: cut short if the same clip carries on

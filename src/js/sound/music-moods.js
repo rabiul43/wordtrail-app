@@ -73,9 +73,9 @@
       return t.toLowerCase();
     } catch (e) { return ''; }
   }
-  function musGenreMood() {   // a book's own default mood, used only when the text itself shows none
+  function musGenreMood(b0) {   // a book's own default mood, used only when the text itself shows none (b0: another book than the open one)
     try {
-      const b = S.book; if (!b) return '';
+      const b = b0 || S.book; if (!b) return '';
       const row = String(b.genres || ((typeof CAT !== 'undefined' && CAT.books || []).find(x => x.id === String(b.id)) || {}).genres || '');
       if (!row.trim()) return '';
       const text = (row + ' ' + (b.title || '')).toLowerCase();
