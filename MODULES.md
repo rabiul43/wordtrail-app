@@ -10,7 +10,7 @@ The app is ONE closure: every file in `src/js/` (from `020` to `999`) is a slice
 | `storeHook` | called after every `store.set` (used by account sync) | `030-helpers-offline-audio.js` |
 | `P` | saved preferences (Settings) | `030-helpers-offline-audio.js` |
 | `store` | safe localStorage wrapper | `030-helpers-offline-audio.js` |
-| `el` | the main screen elements | `031-virtual-list.js` | 0 | `vlist(host, items, make, opts)`: keeps only the rows near the screen in the page (padding stands in for the rest, heights are measured). Used by search results (`120`), My books (`080`) and the Synced list (`090`); lists shorter than `opts.min` are drawn in full |
+| `el` | the main screen elements | `031-virtual-list.js` | 0 | `vlist(host, items, make, opts)`: keeps only the rows near the screen in the page (padding stands in for the rest, heights are measured). Used by search results (`120`), My Library (`080`) and the Synced list (`090`); lists shorter than `opts.min` are drawn in full |
 | `040-worker-newreader.js` |
 | `S` | state of the book that is open | `060-position-bookmarks.js` |
 | `LVL`, `LF` | reading-level data and the home filters | `070-network-data.js`, `103-browse-filters.js` |

@@ -229,7 +229,7 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
   #recent-list.rc-solo .resume-left:not(:empty)::before { content: "\00b7"; margin-right: 1.2rem; }
 }
 
-/* ---------- Phase 6: hearts, My books, tab bar ---------- */
+/* ---------- Phase 6: hearts, My Library, tab bar ---------- */
 .home { padding-bottom: calc(var(--tabbar-h, calc(4.2rem + env(safe-area-inset-bottom))) + var(--mini-h, 0px) + 1.5rem); padding-top: max(.9rem, env(safe-area-inset-top)); gap: 1.25rem; }
 .tile-wrap, .card-wrap { position: relative; }
 .tile-wrap { flex: none; width: 6.9rem; scroll-snap-align: start; }

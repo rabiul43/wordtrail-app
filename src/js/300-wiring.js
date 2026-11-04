@@ -28,7 +28,7 @@
       const t = b.dataset.tab;
       if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
       if (t === 'downloads') { closeSheets(); showTab('downloads'); return; }
-      if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My books never opens on the Downloads page
+      if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My Library never opens on the Downloads page
       pendingBack = null; showTab(t);
     }));
     $('#shelf-browse').addEventListener('click', () => showTab('library'));

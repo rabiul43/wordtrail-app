@@ -194,7 +194,7 @@
   /* ---------- offline mode: banner, books that are not on this device are hidden ----------
      OFF.on is true while offline or in Downloads only (see 030). #offbar says how many books are on this device (OFF/offHave/offBooks, 030).
      Every tile and card whose book is not saved gets .off-hide (display:none; offDim in 030 and offHide below), in the Library, See all,
-     search, collections, author page and My books. A row or section whose books are all hidden is hidden too (.off-empty), and each view
+     search, collections, author page and My Library. A row or section whose books are all hidden is hidden too (.off-empty), and each view
      shows one short note. Nothing is removed or reordered, so going online only has to take the classes off. */
   let offMo = null, offTimer = 0;
   const OFF_VIEWS = ['#home', '#seeall', '#detail', '#collections', '#shelf'];
@@ -265,7 +265,7 @@
     if (cb) cb.addEventListener('click', () => { if (OFF.on) setTimeout(offGridDraw, 0); });
   }
   function offRecentsRefresh() { try { if (typeof renderRecents === 'function') renderRecents(); } catch (e) { /* home not drawn yet */ } }
-  /* ---------- Downloads page (tab "downloads" = My books page in mode dl; drawn from dlMeta only, so it works online and offline) ----------
+  /* ---------- Downloads page (tab "downloads" = My Library page in mode dl; drawn from dlMeta only, so it works online and offline) ----------
      Summary card (size of everything saved here, share of the browser's quota when the Storage API tells), then one row per book
      with its cover, a download mark, the chapters saved and a Remove button. shelfDlDraw runs from offRefresh (paintCards: a
      download started, finished or was removed) and skips the redraw when nothing changed. */

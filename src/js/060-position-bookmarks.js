@@ -120,7 +120,7 @@
     toast('Bookmark: ' + at(old) + (old.note ? ' — “' + (old.note.length > 80 ? old.note.slice(0, 80).trim() + '…' : old.note) + '”' : ''), 6000, ['Go there', () => { if (old.sec === S.sec) seekAudio(old.time); else goTrack(old.sec, old.time, !audio.paused); }]);
     el.toast.append(h('button', { type: 'button', onclick: () => { el.toast.hidden = true; bmOpen(); } }, old.note ? 'Edit note' : 'Add note'), h('button', { type: 'button', onclick: () => { el.toast.hidden = true; if (S.book) bmRemoveAny(S.book, old, null); } }, 'Remove'));
   }
-  /* ---- My books > Saved: a bookmark chip under each book that has one. Tap the time to go there, tap x to remove (with Undo). ---- */
+  /* ---- My Library > Saved: a bookmark chip under each book that has one. Tap the time to go there, tap x to remove (with Undo). ---- */
   const BMG = { id: '', sec: 0, time: 0 };
   const bmAt = r => 'Track ' + (r.sec + 1) + ' \u00b7 ' + hms(r.time).replace(/^00:/, '');
   function bmRemoveAny(b, r, after) {

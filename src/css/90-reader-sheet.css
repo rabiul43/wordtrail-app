@@ -66,7 +66,7 @@
 .rc-alt { flex: 1; min-height: 48px; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--surface-2); color: var(--ink); font: 500 .95rem var(--font-ui); cursor: pointer; }
 .rc-go:active, .rc-alt:active { transform: scale(var(--press)); }
 
-/* bookmark chip under a book on My books > Saved (060-position-bookmarks.js) */
+/* bookmark chip under a book on My Library > Saved (060-position-bookmarks.js) */
 .bm-row { margin: -.4rem 0 .85rem 5.5rem; }
 .bm-row[hidden] { display: none; }
 .bm-chip { display: inline-flex; align-items: stretch; height: 1.65rem; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: var(--r-pill); background: var(--accent-soft); }

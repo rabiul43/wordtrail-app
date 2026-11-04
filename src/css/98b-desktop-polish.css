@@ -5,7 +5,7 @@
    Fixes found by rendering the build at 1280 / 1440 / 1920 / 2560:
      1. Page headings sat flush against the top edge on every non-Library tab
      2. Account was a lone 54rem column (864px) floating in dead space,
-        while Collections / My books used the full 82-92rem container
+        while Collections / My Library used the full 82-92rem container
      3. Sheets (Settings etc.) were still bottom-anchored mobile sheets with a
         drag-grip, and Settings was one long single-column scroll
      4. Centred content jumped sideways when a tab gained a scrollbar

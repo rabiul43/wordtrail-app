@@ -104,7 +104,7 @@ html[data-hdr="new"] .searchbar .rq { left: 1.1rem; right: 1.1rem; }
 /* ==========================================================================
    Slim app bar (#appbar): logo (home link), search icon, account button
    --------------------------------------------------------------------------
-   showView() (080) shows it on every Home-area screen except the Library, which keeps its own header above (Collections, My books,
+   showView() (080) shows it on every Home-area screen except the Library, which keeps its own header above (Collections, My Library,
    Account, the book page, See all), never in the player, and sets <html data-appbar> at the same time. Sticky like the Library header.
    Its content uses the same column as the pages (.home), so the logo and the account button stay in the same place on every screen.
    The account button is the same `.sb-avatar` as in the Library header (acAvatar in 295 paints both).

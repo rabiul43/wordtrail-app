@@ -28,7 +28,7 @@
   const GUIDE_SECS = [
     ['home', '\u{1F3E0}', 'Home and Library', 'Find a book and pick up where you left off'],
     ['collections', '\u{1F4DA}', 'Collections', 'Curated shelves'],
-    ['mybooks', '\u{1F516}', 'My books', 'Saved books and synced books'],
+    ['mybooks', '\u{1F516}', 'My Library', 'Saved books and synced books'],
     ['account', '\u{1F464}', 'Account', 'Your numbers, history and help'],
     ['player', '\u25B6\uFE0F', 'Player', 'Listening controls'],
     ['reading', '\u{1F4D6}', 'Reading along', 'Text that follows the narrator'],

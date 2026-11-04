@@ -87,7 +87,7 @@
     histSoon();
   }
   /* ------ slim app bar (#appbar) and the logo as a Home link ------
-     The Library has its own header (logo, search, account). Collections, My books, Account, the book page and See all get the slim bar
+     The Library has its own header (logo, search, account). Collections, My Library, Account, the book page and See all get the slim bar
      (logo, search icon, account button) so the logo and the account button are on every screen except the player. */
   function appBarShow(on) {
     const b = $('#appbar'); if (!b) return;
@@ -203,8 +203,8 @@
     shelfChips();
     $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-fol').hidden = shelfMode !== 'fol'; $('#shelf-rt').hidden = shelfMode !== 'rt'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
     $('#shelf').dataset.mode = shelfMode;
-    /* Downloads is its own tab (no chip): same page, own title, no chips. My books keeps the Saved, Following, Rated and Synced books chips. */
-    $('#shelf-title').textContent = shelfMode === 'dl' ? 'Downloads' : 'My books';
+    /* Downloads is its own tab (no chip): same page, own title, no chips. My Library keeps the Saved, Following, Rated and Synced books chips. */
+    $('#shelf-title').textContent = shelfMode === 'dl' ? 'Downloads' : 'My Library';
     $('#shelf-seg').hidden = shelfMode === 'dl';
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
     if (shelfMode === 'fol') { $('#shelf-sub').textContent = ''; try { renderFollowing(); } catch (e) { /* authors list not ready */ } }
@@ -279,7 +279,7 @@
   }
 
   guideDoc('mybooks', 'Saved', "Every book you hearted. Tap one to open it. Tap the heart again to remove it.");
-  /* ---------- favourites ("My books") ---------- */
+  /* ---------- favourites ("My Library") ---------- */
   const FAV_KEY = 'wt:favs';
   const getFavs = () => { const f = store.get(FAV_KEY, []); return Array.isArray(f) ? f : []; };
   const isFav = id => getFavs().some(f => f.id === String(id));
@@ -294,7 +294,7 @@
     if (!quiet) {
       buzz(adding ? 'medium' : 'light');
       if (adding) $$('.heart').filter(x => x._wtId === id).forEach(x => { x.classList.remove('pop'); void x.offsetWidth; x.classList.add('pop'); });
-      toast(adding ? 'Saved to My books' : 'Removed from My books', 3500, ['Undo', () => toggleFav(b, true)]);
+      toast(adding ? 'Saved to My Library' : 'Removed from My Library', 3500, ['Undo', () => toggleFav(b, true)]);
       if (adding && favs.length === 1) shelfHooks.firstSave();
     }
     if (curTab === 'shelf' && !$('#shelf').hidden && shelfMode === 'saved') renderShelf();
@@ -302,14 +302,14 @@
   function paintHeart(btn) {
     const on = isFav(btn._wtId);
     btn.setAttribute('aria-pressed', String(on));
-    btn.setAttribute('aria-label', (on ? 'Remove from My books: ' : 'Save to My books: ') + btn._wtTitle);
+    btn.setAttribute('aria-label', (on ? 'Remove from My Library: ' : 'Save to My Library: ') + btn._wtTitle);
   }
   function paintHearts() { $$('.heart').forEach(paintHeart); paintPlayerHeart(); }
   function paintPlayerHeart() {
     const b = $('#btn-fav'); if (!b) return;
     const on = !!(S.book && isFav(S.book.id));
     b.setAttribute('aria-pressed', String(on));
-    b.setAttribute('aria-label', on ? 'Remove from My books' : 'Save to My books');
+    b.setAttribute('aria-label', on ? 'Remove from My Library' : 'Save to My Library');
   }
   function heartNode(b, cls) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
