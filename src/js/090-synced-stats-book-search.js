@@ -208,6 +208,7 @@
   function renderAccount() {
     ensureAccount();
     if (!$('#acct-act-row').onclick) { $('#acct-act-row').onclick = () => acctView(true); $('#acct-back').onclick = () => acctView(false); }
+    { const sr = $('#acct-settings-row'); if (sr && !sr.onclick) sr.onclick = () => { closeSheets(); openSheet('sheet-settings'); }; }   // phones have no Settings tab (hidden in 98-desktop-layout.css), so Settings opens from here
     acctView(false);
     renderAcctSync();
     guideBadge();
