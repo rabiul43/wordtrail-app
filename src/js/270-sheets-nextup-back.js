@@ -152,7 +152,7 @@
       } else sec.append(h('p', { class: 'help' }, 'No close matches at this level or one step up yet. Use the level buttons below to look wider.'));
       body.append(sec);
     }
-    if (!pool.length && !more.length && !(lv && lv.cands.length)) { body.append(h('p', { class: 'help' }, 'No close matches for this book yet. Try a genre from the Library tab.')); return; }
+    if (!pool.length && !more.length && !(lv && lv.cands.length)) { body.append(h('p', { class: 'help' }, 'No close matches for this book yet. Try a genre from the Home tab.')); return; }
     const pick = row => row.addEventListener('click', () => closeSheets());
     const lvIds = lv && finished ? new Set([lv.harder, lv.same].filter(Boolean).map(x => x.b.id)) : new Set();
     const feat = finished ? ([...more, ...pool].find(x => !lvIds.has(x.id)) || null) : null;

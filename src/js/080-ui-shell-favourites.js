@@ -52,7 +52,7 @@
     if (action) el.status.append(h('button', { class: 'btn small ghost', onclick: action[1] }, action[0]));
   }
   let BOOTING = true;
-  let curTab = 'library', seeOpen = false;
+  let curTab = 'library', seeOpen = false, srchTab = false;   // srchTab: the Search tab was the last tab tapped (it lights up while Home shows)
   const DET = { book: null, author: null, rv: false, y: 0, stale: false, stack: [] };   // book detail page: open while DET.book is set
   let backTo = null, pendingBack = null;
   function restoreBack() {
@@ -118,6 +118,9 @@
       e.preventDefault(); goHome();
     });
     const s = $('#ab-search'); if (s) s.addEventListener('click', appBarSearch);
+    /* The Search tab: the same as the search icon in the slim bar (Home, cursor in the search field), and the tab lights up. */
+    const st = document.querySelector('#tabbar .tab[data-tab="search"]');
+    if (st) st.addEventListener('click', () => { pendingBack = null; appBarSearch(); srchTab = true; tabHlPaint(); });
     const b = $('#appbar');
     if (b) addEventListener('scroll', () => { b.classList.toggle('stuck', window.scrollY > 2); }, { passive: true });
   }
@@ -217,13 +220,14 @@
     else if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
-    const hl = curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (OFF.on && curTab === 'library' ? 'downloads' : curTab);
+    const hl = srchTab && curTab === 'library' ? 'search' : curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (OFF.on && curTab === 'library' ? 'downloads' : curTab);
     $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
   function showTab(t, keep) {
     if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; }
     if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
+    srchTab = false;
     curTab = t; seeOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
     tabHlPaint();
     if (t === 'shelf') applyShelfMode();

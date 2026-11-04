@@ -31,7 +31,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 241 | position recovery |
 | `070-network-data.js` | 638 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
-| `080-ui-shell-favourites.js` | 337 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
+| `080-ui-shell-favourites.js` | 341 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 729 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 311 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
@@ -72,7 +72,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |
 | `296-desktop-bar.js` | 64 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 86 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 789 | wiring |
+| `300-wiring.js` | 790 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

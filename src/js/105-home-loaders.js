@@ -140,7 +140,7 @@
     try {
       const d = await curBuild(20); if (!d) return;
       RW.nw = d.nw; newWeekPaint();   // New this week skips books already in Picked for you
-      // Home keeps one compact card that opens the Collections tab.
+      // Home keeps one compact card that opens the Explore tab.
       const wrap = $('#sec-collections'); wrap.textContent = '';
       const shelves = colShelves(d);
       if (shelves.length) {
@@ -171,7 +171,7 @@
     ['botd', 'sec-botd', 'Book of the day', 'Shown when there is no time-of-day card'],
     ['picks', 'sec-picks', 'Picked for you', 'Suggestions from your listening'],
     ['newweek', 'sec-newweek', 'New this week', 'Fresh arrivals in the library'],
-    ['collections', 'sec-collections', 'Collections', 'Curated shelves']
+    ['collections', 'sec-collections', 'Explore', 'Curated shelves']
   ];
   const hcOff = () => new Set(Array.isArray(P.homeOff) ? P.homeOff : []);
   function homeApply() {
@@ -204,6 +204,6 @@
       box.append(h('div', { class: 'row hc-row' }, h('label', { for: id }, h('span', { class: 'hc-n' }, name), h('small', { id: id + '-d', class: 'hc-s' }, note)), cb));
     });
   }
-  guideDoc('home', 'Customise home', "Settings > Reading > Customise home has a switch for each part of the Library tab. Continue listening always comes first, then one card (the time-of-day card when it has something for you, otherwise Book of the day), then up to three rows: Picked for you, New this week and Collections. Turn a part off and it disappears from Home; the next one moves up.", '2026-10-19');
+  guideDoc('home', 'Customise home', "Settings > Reading > Customise home has a switch for each part of the Home tab. Continue listening always comes first, then one card (the time-of-day card when it has something for you, otherwise Book of the day), then up to three rows: Picked for you, New this week and Collections. Turn a part off and it disappears from Home; the next one moves up.", '2026-10-19');
 
-  guideDoc('collections', 'Browse shelves', "Collections are curated shelves such as Trending and New this week, rebuilt daily. Tap See all for a whole shelf, then sort it, hide books you have heard, or tap Surprise me.");
+  guideDoc('collections', 'Browse shelves', "Explore has curated shelves such as Trending and New this week, rebuilt daily. Tap See all for a whole shelf, then sort it, hide books you have heard, or tap Surprise me.");

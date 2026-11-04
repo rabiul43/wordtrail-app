@@ -1,4 +1,4 @@
-  /* ---------- Collections tab ----------
+  /* ---------- Explore tab (internal name: collections) ----------
      Index: a filter box, jump chips and every shelf as a row. Tap See all for one collection as a grid with
      sorting, "hide heard" and a random pick. "New this week" is the first shelf. */
   const COL = { open: null, q: '', sort: 'curated', hide: false, data: null, tok: 0 };
@@ -14,7 +14,7 @@
     if (my !== COL.tok) return;
     if (d) COL.data = d;
     d = COL.data; body.textContent = '';
-    if (!d) { $('#col-head').hidden = false; body.append(stateNode('error', "Couldn't load collections", 'They are rebuilt daily and appear once you are online.', 'Try again', renderCollections)); return; }
+    if (!d) { $('#col-head').hidden = false; body.append(stateNode('error', "Couldn't load Explore", 'They are rebuilt daily and appear once you are online.', 'Try again', renderCollections)); return; }
     const shelves = colShelves(d), cur = COL.open ? shelves.find(x => x.key === COL.open) : null;
     if (COL.open && !cur) COL.open = null;
     if (cur) drawCollection(body, cur); else drawCollections(body, shelves);
@@ -92,7 +92,7 @@
     const heard = new Set(listenedList().map(r => r.id)), nHeard = c.books.filter(b => heard.has(b.id)).length;
     const tot = c.books.reduce((a, b) => a + (b.total || 0), 0);
     const idx = COL.data ? colShelves(COL.data).findIndex(x => x.key === c.key) : 0;
-    const back = h('button', { class: 'ib', type: 'button', 'aria-label': 'Back to collections', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, svgIcon('#i-back'));
+    const back = h('button', { class: 'ib', type: 'button', 'aria-label': 'Back to Explore', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, svgIcon('#i-back'));
     const grid = h('div', { class: 'grid3' }), seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Sort' });
     const draw = () => {
       $$('button', seg).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === COL.sort)));
@@ -124,7 +124,7 @@
     const play = next ? h('button', { class: 'btn small', type: 'button', onclick: () => openBook(next) }, nHeard ? 'Next unheard' : 'Start with ' + (cleanCardTitle(next.title).length > 22 ? cleanCardTitle(next.title).slice(0, 21) + '\u2026' : cleanCardTitle(next.title))) : null;
     const pct = c.books.length ? Math.round(nHeard / c.books.length * 100) : 0;
     const mini = next ? h('button', { class: 'btn small col-mini-go', type: 'button', 'aria-label': 'Play next book', onclick: () => openBook(next) }, [svgIcon('#i-play'), 'Play']) : null;
-    const head = h('div', { class: 'seeall-head col-sticky' }, back, h('span', { class: 'col-crumb' }, h('button', { class: 'crumb-a', type: 'button', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, 'Collections'), h('span', { class: 'crumb-sep', 'aria-hidden': 'true' }, '\u203a'), h('span', { class: 'crumb-b' }, c.title)), mini);
+    const head = h('div', { class: 'seeall-head col-sticky' }, back, h('span', { class: 'col-crumb' }, h('button', { class: 'crumb-a', type: 'button', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, 'Explore'), h('span', { class: 'crumb-sep', 'aria-hidden': 'true' }, '\u203a'), h('span', { class: 'crumb-b' }, c.title)), mini);
     body.append(
       head,
       h('section', { class: 'col-banner', style: '--h:' + colHue(c.key, Math.max(idx, 0)) },
@@ -162,7 +162,7 @@
   /* ------ Library: when nothing could be loaded, say so and offer a retry, instead of an empty page ------
      'content' = something real is on screen, 'loading' = placeholders are still showing, 'empty' = nothing came. A section that
      already shows its own error card counts as a message, so the two are never stacked. */
-  const HOME_IDS = ['recents', 'sec-botd', 'sec-tod', 'sec-picks', 'sec-newweek', 'sec-collections'];   // the sections on the Library tab itself (Featured and Recently added live in Collections)
+  const HOME_IDS = ['recents', 'sec-botd', 'sec-tod', 'sec-picks', 'sec-newweek', 'sec-collections'];   // the sections on the Home tab itself (Featured and Recently added live in Explore)
   const HS = { start: Date.now(), obs: null, timer: 0 };
   function homeStatus() {
     let loading = false, skipped = false;

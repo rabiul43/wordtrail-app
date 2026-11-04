@@ -26,8 +26,8 @@
      in the same place. `since` is the day (YYYY-MM-DD) a feature was added; for 30 days it carries a "New" badge.
      A feature added without a guideDoc call simply does not appear in the guide. */
   const GUIDE_SECS = [
-    ['home', '\u{1F3E0}', 'Home and Library', 'Find a book and pick up where you left off'],
-    ['collections', '\u{1F4DA}', 'Collections', 'Curated shelves'],
+    ['home', '\u{1F3E0}', 'Home', 'Find a book and pick up where you left off'],
+    ['collections', '\u{1F4DA}', 'Explore', 'Curated shelves'],
     ['mybooks', '\u{1F516}', 'My Library', 'Saved books and synced books'],
     ['account', '\u{1F464}', 'Account', 'Your numbers, history and help'],
     ['player', '\u25B6\uFE0F', 'Player', 'Listening controls'],

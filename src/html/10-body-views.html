@@ -264,7 +264,7 @@
 <main id="detail" class="view home" hidden aria-label="Book details"></main>
 
 <main id="collections" class="view home" hidden>
-  <div id="col-head" class="tab-head"><h1>Collections</h1><p id="col-sub">Curated shelves, rebuilt daily.</p></div>
+  <div id="col-head" class="tab-head"><h1>Explore</h1><p id="col-sub">Curated shelves, rebuilt daily.</p></div>
   <div id="col-body"></div>
   <div id="col-extra" hidden>
   <section id="sec-trending" class="home-section" hidden>
@@ -390,11 +390,14 @@
 <button id="nav-toggle" class="tb-toggle" type="button" aria-label="Expand the side bar" aria-expanded="false" aria-controls="tabbar"><svg class="tb-menu" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <a class="tb-home" href="./" data-home aria-label="Wordtrail home"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" rx="1.5" fill="currentColor" opacity=".3"/><rect x="2" y="10" width="14" height="4.4" rx="2.2" fill="currentColor"/><rect x="3" y="16" width="16" height="3" rx="1.5" fill="currentColor" opacity=".3"/></svg><span>Wordtrail</span></a>
 </div>
-  <button class="tab" type="button" data-tab="library" title="Library" aria-current="page">
-    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.4 5.4 8.2 5 5 5v12c3.2 0 5.4.4 7 1.5 1.6-1.1 3.8-1.5 7-1.5V5c-3.2 0-5.4.4-7 1.5z"/><path d="M12 6.5v12"/></svg></span><span>Library</span>
+  <button class="tab" type="button" data-tab="library" title="Home" aria-current="page">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.4 5.4 8.2 5 5 5v12c3.2 0 5.4.4 7 1.5 1.6-1.1 3.8-1.5 7-1.5V5c-3.2 0-5.4.4-7 1.5z"/><path d="M12 6.5v12"/></svg></span><span>Home</span>
   </button>
-  <button class="tab" type="button" data-tab="collections" title="Collections">
-    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h4v14H3zM9 5h4v14H9zM15.2 6.4l3.8-1 3 12.6-3.8 1z"/></svg></span><span>Collections</span>
+  <button class="tab" type="button" data-tab="search" title="Search">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></span><span>Search</span>
+  </button>
+  <button class="tab" type="button" data-tab="collections" title="Explore">
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h4v14H3zM9 5h4v14H9zM15.2 6.4l3.8-1 3 12.6-3.8 1z"/></svg></span><span>Explore</span>
   </button>
   <button class="tab" type="button" data-tab="shelf" title="My Library">
     <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></span><span>My Library</span>

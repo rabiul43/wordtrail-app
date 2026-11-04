@@ -26,6 +26,7 @@
     initClearButton();
     $$('#tabbar .tab').forEach(b => b.addEventListener('click', () => {
       const t = b.dataset.tab;
+      if (t === 'search') return;   // the Search tab has its own listener in appBarInit (080)
       if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
       if (t === 'downloads') { closeSheets(); showTab('downloads'); return; }
       if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My Library never opens on the Downloads page

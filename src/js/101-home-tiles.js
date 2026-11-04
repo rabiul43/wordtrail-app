@@ -71,8 +71,8 @@
     }
   }
 
-  guideDoc('home', 'Refresh Home', "Pull down at the top of the Library tab to refresh the shelves.");
-  /* ------ pull to refresh (Library tab, at the top of the page) ------ */
+  guideDoc('home', 'Refresh Home', "Pull down at the top of the Home tab to refresh the shelves.");
+  /* ------ pull to refresh (Home tab, at the top of the page) ------ */
   const PTR_TRIGGER = 70;
   let ptrBusy = false, ptrNote = 0;
   function markStale(key) { const c = store.get(key, null); if (c && Array.isArray(c.books)) store.set(key, Object.assign({}, c, { t: 0 })); }
