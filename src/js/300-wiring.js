@@ -352,6 +352,9 @@
     $('#in-calm').addEventListener('change', e => { P.calm = e.target.checked; applyTheme(); savePrefs(); toast(P.calm ? 'Calm mode is on.' : 'Calm mode is off.', 2000); try { renderStats(); } catch (x) {} });
     $('#nav-toggle').addEventListener('click', () => { P.navOpen = P.navOpen !== true; savePrefs(); applyNav(); });
     $('#in-hdr').addEventListener('change', e => { P.hdrNew = e.target.checked; savePrefs(); applyHdr(); });
+    $('#in-home').addEventListener('change', e => { P.homeNew = e.target.checked; savePrefs(); applyHome(); });
+    try { matchMedia('(min-width: 700px)').addEventListener('change', applyHome); } catch (e) { /* old browser: applies on the next start */ }
+    stHomeInit();   // New Home design: genre chips and the search / account buttons (090)
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyHdr); } catch (e) { /* old browser: the setting applies on the next start */ }
     $('#in-haptics').addEventListener('change', e => { P.haptics = e.target.checked; savePrefs(); if (P.haptics) buzz('medium'); });
     $('#in-shake').addEventListener('change', e => {

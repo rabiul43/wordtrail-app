@@ -131,6 +131,8 @@
   </div>
 
   <div id="searchbar" class="searchbar">
+  <!-- New Home design (99c-home-storytel.css, Settings > Appearance > New Home design): plain "Home" title with search and account buttons. Hidden unless <html data-home="st"> -->
+  <div id="st-head" class="st-head"><h1 class="st-title">Home</h1><div class="st-btns"><button id="st-search" class="st-btn" type="button" aria-label="Search" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></button><button id="st-acct" class="st-btn" type="button" aria-label="Account"><svg class="ic" aria-hidden="true"><use href="#i-m-person"/></svg></button></div></div>
   <!-- New header (see 99-home-header.css): logo + name, search, account button in one row. Hidden while the classic header is chosen (phone, Settings > Appearance) -->
   <a class="sb-brand" href="./" data-home aria-label="Wordtrail home"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="3" rx="1.5" fill="currentColor" opacity=".3"/><rect x="2" y="10" width="14" height="4.4" rx="2.2" fill="currentColor"/><rect x="3" y="16" width="16" height="3" rx="1.5" fill="currentColor" opacity=".3"/></svg><span class="sb-name" role="heading" aria-level="1">Wordtrail</span></a>
   <form id="search-form" role="search">
@@ -158,6 +160,7 @@
     <div id="sfilt-count" class="sfilt-count" hidden></div>
   </div>
   </div>
+  <div id="st-chips" class="st-chips" role="group" aria-label="Genres"></div>
   <div id="fchips" class="fchips" role="group" aria-label="Active filters" hidden></div>
   <div id="status" class="status" role="status" aria-live="polite"></div>
   <div id="prog" class="prog" hidden aria-hidden="true"><div class="bar"><i></i></div><span id="prog-t"></span></div>
@@ -341,7 +344,6 @@
   <div id="acct-home" class="acct-home">
   <section id="acct-sync" aria-label="Sign in and sync"></section>
   <button id="acct-act-row" class="acct-link" type="button" hidden><svg class="ic" aria-hidden="true"><use href="#i-m-clock"/></svg><span>Your activity<small id="acct-act-sub"></small></span><svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg></button>
-  <button id="acct-settings-row" class="acct-link" type="button" aria-haspopup="dialog"><svg class="ic" aria-hidden="true"><use href="#i-m-sliders"/></svg><span>Settings<small>Reading, audio, timing and storage</small></span><svg class="ic go" aria-hidden="true"><use href="#i-go"/></svg></button>
   <section id="acct-data" class="acct-data" aria-labelledby="acct-data-h" hidden></section>
   <section class="about" aria-labelledby="about-h">
     <h2 id="about-h">About</h2>

@@ -1,0 +1,48 @@
+/* New Home design (Settings > Appearance > New Home design). Phones only.
+   <html data-home="st"> is set by the script in 00-head.html and by applyHome() (090); P.homeNew === false turns it off.
+   Layout: plain "Home" title + search/account buttons, genre chips, big cover cards, chevron section titles,
+   floating mini player, tab bar with a pill behind the active icon. Colours and fonts are the app's own tokens. */
+.st-head, .st-chips { display: none; }
+
+html[data-home="st"] .brand { display: none; }
+html[data-home="st"] .searchbar { display: block; padding: max(.85rem, env(safe-area-inset-top)) 1.25rem .25rem; border-bottom: 0; }
+html[data-home="st"] .searchbar .sb-brand,
+html[data-home="st"] .searchbar .sb-avatar { display: none; }
+html[data-home="st"] .st-head { display: flex; align-items: center; justify-content: space-between; }
+html[data-home="st"] .st-title { margin: 0; font: 800 var(--h1)/1.1 var(--font-display); letter-spacing: -.01em; }
+html[data-home="st"] .st-btns { display: flex; margin-right: -.55rem; }
+html[data-home="st"] .st-btn { width: 2.75rem; height: 2.75rem; border: 0; border-radius: 50%; background: transparent; color: var(--ink); display: grid; place-items: center; }
+html[data-home="st"] .st-btn .ic { width: 1.5rem; height: 1.5rem; }
+html[data-home="st"] .st-btn:active { background: var(--surface-2); }
+html[data-home="st"]:not(.st-find) .searchbar #search-form,
+html[data-home="st"]:not(.st-find) .searchbar .sfilt { display: none; }
+html[data-home="st"] .searchbar #search-form { margin-top: .5rem; }
+
+/* Chips */
+html[data-home="st"] .st-chips { display: flex; gap: .5rem; overflow-x: auto; padding: .55rem 1.25rem .2rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+html[data-home="st"] .st-chips::-webkit-scrollbar { display: none; }
+html[data-home="st"] .st-chip { flex: none; min-height: 2.75rem; padding: 0 1.15rem; border-radius: var(--r-pill); border: 1.5px solid color-mix(in srgb, var(--ink) 55%, transparent); background: transparent; color: var(--ink); font: 600 .94rem var(--font-ui); }
+html[data-home="st"] .st-chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+/* Section titles with a chevron */
+html[data-home="st"] .home-section-head { align-items: center; margin: 1.5rem 0 .8rem; }
+html[data-home="st"] .home-section-head h2 { font: 800 1.4rem/1.15 var(--font-display); letter-spacing: -.01em; }
+html[data-home="st"] .home-section-head .mood-sub { display: none; }
+html[data-home="st"] .home-section-head::after { content: ""; flex: none; width: 1.4rem; height: 1.4rem; background: var(--ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+/* Cover cards: Featured is the big row, the others are the smaller one */
+html[data-home="st"] .hrow { gap: .75rem; padding-bottom: .25rem; }
+html[data-home="st"] .tile { width: 8.75rem; }
+html[data-home="st"] .tile .tile-cover { border-radius: 14px; }
+html[data-home="st"] #featured-row .tile { width: 12.5rem; }
+html[data-home="st"] #featured-row .tile .tile-cover { border-radius: 16px; box-shadow: var(--shadow-cover); }
+html[data-home="st"] #featured-row .tile .tile-t { font: 800 1rem/1.25 var(--font-display); }
+
+/* Mini player and tab bar */
+html[data-home="st"] .mini { border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-pop); }
+html[data-home="st"] .mini-txt strong { font: 800 1rem/1.25 var(--font-display); }
+html[data-home="st"] .mini-play { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+html[data-home="st"] .tabbar { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; }
+html[data-home="st"] .tab::before { display: none; }

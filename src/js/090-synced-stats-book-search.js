@@ -208,7 +208,6 @@
   function renderAccount() {
     ensureAccount();
     if (!$('#acct-act-row').onclick) { $('#acct-act-row').onclick = () => acctView(true); $('#acct-back').onclick = () => acctView(false); }
-    { const sr = $('#acct-settings-row'); if (sr && !sr.onclick) sr.onclick = () => { closeSheets(); openSheet('sheet-settings'); }; }   // phones have no Settings tab (hidden in 98-desktop-layout.css), so Settings opens from here
     acctView(false);
     renderAcctSync();
     guideBadge();
@@ -663,6 +662,34 @@
   /* Home header: 'new' = logo, search and account button in one row (always on tablets and computers, from 700px);
      'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */
   function applyHdr() { document.documentElement.setAttribute('data-hdr', (P.hdrNew === false && !matchMedia('(min-width: 700px)').matches) ? 'classic' : 'new'); }
+  /* New Home design (phones only): <html data-home="st"> turns on 99c-home-storytel.css. Saved as P.homeNew (default on). */
+  function applyHome() { document.documentElement.setAttribute('data-home', (P.homeNew !== false && !matchMedia('(min-width: 700px)').matches) ? 'st' : 'off'); }
+  function stHomeInit() {
+    const root = document.documentElement, row = $('#st-chips'), sb = $('#st-search'), ac = $('#st-acct');
+    if (!row || !sb || !ac) return;
+    const sync = () => $$('.st-chip', row).forEach(c => {
+      const g = c.dataset.g;
+      const on = g ? $$('#genre-chips .genre-chip').some(x => x.textContent.indexOf(g) > -1 && x.getAttribute('aria-pressed') === 'true') : !document.body.classList.contains('genre-on');
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    const mk = (label, g) => {
+      const c = document.createElement('button');
+      c.type = 'button'; c.className = 'st-chip'; c.textContent = label; if (g) c.dataset.g = g; c.setAttribute('aria-pressed', 'false');
+      c.addEventListener('click', () => {
+        if (!g) clearGenre();
+        else { const t = $$('#genre-chips .genre-chip').find(x => x.textContent.indexOf(g) > -1); if (t) t.click(); }
+        setTimeout(sync, 80);
+      });
+      row.appendChild(c);
+    };
+    mk('For you', '');
+    GENRES.slice(0, 6).forEach(g => mk(g.label, g.label));
+    sync();
+    sb.addEventListener('click', () => { const on = root.classList.toggle('st-find'); sb.setAttribute('aria-expanded', on ? 'true' : 'false'); if (on) setTimeout(() => { const q = $('#q'); if (q) q.focus(); }, 0); });
+    ac.addEventListener('click', () => { const a = $('#sb-avatar'); if (a) a.click(); });
+    document.addEventListener('focusin', e => { if (e.target && e.target.id === 'q') root.classList.add('st-find'); });
+    const q = $('#q'); if (q) q.addEventListener('input', () => { if (q.value) root.classList.add('st-find'); });
+  }
   /* Side rail (from 700px wide): narrow by default, the menu button at its top opens it into a sidebar. Saved as P.navOpen. */
   function applyNav() {
     const open = P.navOpen === true;
