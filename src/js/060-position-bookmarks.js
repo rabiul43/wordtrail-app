@@ -198,8 +198,6 @@
     nrEl.sleep.addEventListener('click', () => { buzz('medium'); setSleep(SLEEPS[(SLEEPS.indexOf(S.sleep) + 1) % SLEEPS.length]); toast(sleepLabel(S.sleep), 1800); });
     nrEl.spd.addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
     nrEl.next.addEventListener('click', () => { buzz('tick'); stepTrack(1); });
-    $('#nr-prevs').addEventListener('click', () => { buzz('light'); stepSentence(-1); });
-    $('#nr-nexts').addEventListener('click', () => { buzz('light'); stepSentence(1); });
     $('#b-tracks-dock').addEventListener('click', () => { buzz('tick'); openSheet('sheet-tracks'); });
     $('#b-nexttrack').addEventListener('click', () => { buzz('tick'); stepTrack(1); });
     nrEl.seek.addEventListener('input', () => {

@@ -194,3 +194,7 @@
 #sheet-quick.qk-searching .qk-opt { display: none; }
 /* room under the last line so the highlighted sentence can be scrolled above the sheet */
 body:has(#sheet-quick:not([hidden])) #reader { padding-bottom: 50dvh; }
+
+/* Player: Speed sits on the left and Sleep on the right of the main controls (they replaced the previous/next sentence chevrons). */
+.nr-ctl .nr-tool { width: 3.6rem; min-width: 3.6rem; max-width: 3.6rem; min-height: 3.4rem; flex: none; }
+.nr-dock .uc { grid-template-columns: repeat(3, minmax(0, 1fr)); }
