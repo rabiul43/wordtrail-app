@@ -18,7 +18,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `050-audio-clips.js` | 358 | 41 | 5 | 15 |
 | `060-position-bookmarks.js` | 241 | 36 | 8 | 36 |
 | `070-network-data.js` | 638 | 56 | 26 | 13 |
-| `080-ui-shell-favourites.js` | 352 | 52 | 34 | 34 |
+| `080-ui-shell-favourites.js` | 355 | 52 | 34 | 34 |
 | `090-synced-stats-book-search.js` | 729 | 63 | 21 | 47 |
 | `095-weekly-report.js` | 103 | 6 | 1 | 6 |
 | `100-home-covers.js` | 311 | 43 | 21 | 3 |
@@ -89,7 +89,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `281-book-download-card.js` | 170 | 12 | 2 | 31 |
 | `282-library-hub.js` | 45 | 7 | 3 | 13 |
 | `290-backup-maintenance.js` | 394 | 44 | 13 | 41 |
-| `295-account-sync.js` | 583 | 74 | 11 | 8 |
+| `295-account-sync.js` | 586 | 74 | 11 | 10 |
 | `296-desktop-bar.js` | 64 | 8 | 1 | 4 |
 | `298-pwa.js` | 86 | 7 | 3 | 4 |
 | `300-wiring.js` | 793 | 6 | 2 | 157 |
@@ -533,7 +533,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `030-helpers-offline-audio.js` (`fmtLong`, `guideDoc`, `store`); `050-audio-clips.js` (`clEdCleanup`); `060-position-bookmarks.js` (`nrClose`); `070-network-data.js` (`CAT`, `LVL`, `SIM`, `VER`, `catLoad`, `lvGet`, `lvlText`); `080-ui-shell-favourites.js` (`DET`, `curTab`, `seeOpen`, `shelfHub`, `shelfHubNext`, `showTab`, `spOpen`, `toast`); `100-home-covers.js` (`GENRES`); `101-home-tiles.js` (`fillRow`); `104-see-all-suggestions.js` (`closeSeeAll`); `110-collections.js` (`COL`, `clearSearch`, `renderCollections`); `120-search-recommendations.js` (`bookCard`, `listenedList`, `recoFor`); `121-search-page.js` (`spBack`); `130-book-detail.js` (`closeDetail`); `134-version-picker.js` (`renderVersions`); `140-open-book.js` (`openBook`, `shCleanup`); `160-learning-tools.js` (`ghHide`); `180-sync-alignment.js` (`ghCfg`, `toks`); `280-downloads-progress.js` (`renderTracks`); `282-library-hub.js` (`phoneUI`); `290-backup-maintenance.js` (`SMH`, `fillSettings`, `renderTextSheet`, `sheetBack`, `smBackSync`, `smHomeOpen`); `sound/ambient-scenes.js` (`AMB`); `sound/sound-screen.js` (`ambSync`)
 
-**Shared:** `LANG_CODES` (sound/music), `closeSheets` (17 files), `histInit` (300), `histSoon` (060, 080, 103, 110, 121, 282), `nextOpen` (150, 300), `nxPub` (120, 130, 132, 150), `nxScore` (090), `openSheet` (15 files), `psInit` (300), `setReaderLang` (140), `sheetOpen` (101, 150, 300)
+**Shared:** `LANG_CODES` (sound/music), `closeSheets` (18 files), `histInit` (300), `histSoon` (060, 080, 103, 110, 121, 282), `nextOpen` (150, 300), `nxPub` (120, 130, 132, 150), `nxScore` (090), `openSheet` (16 files), `psInit` (300), `setReaderLang` (140), `sheetOpen` (101, 150, 300)
 
 ### `280-downloads-progress.js`
 
@@ -561,7 +561,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `295-account-sync.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`store`, `storeHook`); `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`applyShelfMode`, `askConfirm`, `curTab`, `shelfHooks`, `toast`)
+**Needs:** `030-helpers-offline-audio.js` (`store`, `storeHook`); `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`applyShelfMode`, `askConfirm`, `curTab`, `shelfHooks`, `toast`); `270-sheets-nextup-back.js` (`closeSheets`, `openSheet`)
 
 **Shared:** `FB_CFG` (135), `acDb` (135), `acErr` (135), `acFb` (135), `acInfo` (135), `acLoad` (135), `acSignIn` (135), `acSignedIn` (135), `acStale` (135), `acUser` (135), `renderAcctSync` (090, 135)
 

@@ -95,7 +95,10 @@
     const b = $('#appbar'); if (!b) return;
     b.hidden = !on;
     document.documentElement.toggleAttribute('data-appbar', !!on);
-    $$('.sb-avatar').forEach(a => { if (curTab === 'account' && on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    /* On the Account page the account button becomes a Settings button (gear): see 99-home-header.css, html[data-acct] */
+    const acct = curTab === 'account' && !!on;
+    document.documentElement.toggleAttribute('data-acct', acct);
+    $$('.sb-avatar').forEach(a => { a.removeAttribute('aria-current'); a.setAttribute('aria-label', acct ? 'Settings' : 'Account'); });
   }
   /* The logo goes Home: from the book page, See all and the other tabs it returns to the Library (and drops an open search);
      on the Library it empties an open search, or scrolls to the top. */

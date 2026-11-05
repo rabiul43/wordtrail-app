@@ -25,3 +25,10 @@
 .lh-go { flex: none; width: 1.3rem; height: 1.3rem; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lh-row:active .lh-txt b { color: var(--accent); }
 [dir="rtl"] .lh-go { transform: scaleX(-1); }
+
+/* Account page: the account button in the header becomes a Settings (gear) button (appBarShow in 080, click in 295) */
+.sb-avatar .sb-gear { display: none; }
+html[data-acct] .sb-avatar { background: var(--surface-2); color: var(--ink); }
+html[data-acct] .sb-avatar::before { display: none; }
+html[data-acct] .sb-avatar > .ic:not(.sb-gear), html[data-acct] .sb-avatar .sb-ini, html[data-acct] .sb-avatar .sb-img { display: none; }
+html[data-acct] .sb-avatar .sb-gear { display: block; }

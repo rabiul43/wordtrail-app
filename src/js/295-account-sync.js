@@ -555,7 +555,7 @@
       b.classList.toggle('signed', !!i && !stale);
       b.classList.toggle('stale', !!i && !!stale);
       b.classList.toggle('guest', !i);
-      b.setAttribute('aria-label', !i ? 'Account: sign in' : stale ? 'Account: sign in again' : 'Account: ' + (i.email || i.name));
+      if (!document.documentElement.hasAttribute('data-acct')) b.setAttribute('aria-label', !i ? 'Account: sign in' : stale ? 'Account: sign in again' : 'Account: ' + (i.email || i.name));
     });
   }
   /* One-time invitation for guests, shown a moment after their first saved book (called from toggleFav in 080).
@@ -573,7 +573,10 @@
       }, 2200);
     } catch (e) { /* never break saving */ }
   }
-  document.querySelectorAll('.sb-avatar').forEach(b => b.addEventListener('click', () => { const t = document.querySelector('.tab[data-tab="account"]'); if (t) t.click(); }));
+  document.querySelectorAll('.sb-avatar').forEach(b => b.addEventListener('click', () => {
+    if (document.documentElement.hasAttribute('data-acct')) { closeSheets(); openSheet('sheet-settings'); return; }   // on the Account page the button is Settings
+    const t = document.querySelector('.tab[data-tab="account"]'); if (t) t.click();
+  }));
   acTabMark();
 
   /* start: signed-in users reconnect a few seconds after the app opens; guests never download the sign-in code */

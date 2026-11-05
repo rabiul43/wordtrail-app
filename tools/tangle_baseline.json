@@ -2,7 +2,7 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 82,
-  "dependencies": 719,
+  "dependencies": 720,
   "pointing_to_a_later_file": 229,
   "largest_cycle": 75
  },
@@ -487,6 +487,7 @@
   "295-account-sync.js -> 030-helpers-offline-audio.js",
   "295-account-sync.js -> 040-worker-newreader.js",
   "295-account-sync.js -> 080-ui-shell-favourites.js",
+  "295-account-sync.js -> 270-sheets-nextup-back.js",
   "296-desktop-bar.js -> 030-helpers-offline-audio.js",
   "296-desktop-bar.js -> 040-worker-newreader.js",
   "296-desktop-bar.js -> 150-player-reader.js",
