@@ -13,3 +13,6 @@ On the Account page the header account button becomes a gear and opens Settings 
 
 ## Phones: Search last, no header search icons
 Under 700 px the Search tab is the last tab and the search icons in the Home header (#st-search) and the slim bar (#ab-search) are hidden (99e-library-hub.css).
+
+## Phones: Settings is a full page
+Under 700 px #sheet-settings is full-screen with a back arrow (99e-library-hub.css; the header button in 30-sheets-settings.html has both icons). From 700 px it is still the centred window.

@@ -35,3 +35,17 @@ html[data-acct] .sb-avatar { background: var(--surface-2); color: var(--ink); }
 html[data-acct] .sb-avatar::before { display: none; }
 html[data-acct] .sb-avatar > .ic:not(.sb-gear), html[data-acct] .sb-avatar .sb-ini, html[data-acct] .sb-avatar .sb-img { display: none; }
 html[data-acct] .sb-avatar .sb-gear { display: block; }
+
+/* Settings opens as a full page on phones (not a pop-up sheet): the same full-screen look as .sheet.ced (80-progress-v10.css),
+   a back arrow at the left instead of the x, no grab handle. From 700px it stays the centred window (98b-desktop-polish.css). */
+#sheet-settings .sx-back { display: none; }
+@media (max-width: 699.98px) {
+  #sheet-settings { top: 0; left: 0; transform: none; width: 100%; max-width: none; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; animation: viewIn .28s var(--ease); }
+  #sheet-settings header { justify-content: flex-start; gap: .4rem; padding: max(.8rem, env(safe-area-inset-top)) .8rem .7rem .5rem; }
+  #sheet-settings header::before { display: none; }
+  #sheet-settings header .ib { order: -1; }
+  #sheet-settings .sx-x { display: none; }
+  #sheet-settings .sx-back { display: block; }
+  #sheet-settings .body { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) { #sheet-settings { animation: none; } }
