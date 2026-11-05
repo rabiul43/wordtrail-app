@@ -3,6 +3,9 @@
 @media (max-width: 699.98px) {
   .tab[data-tab="downloads"] { display: none; }
   .tabbar { grid-template-columns: repeat(4, 1fr); }
+  /* Search is the last tab (it still opens the Search page), so the search icons in the headers are not needed on phones */
+  .tab[data-tab="search"] { order: 9; }
+  #st-search, #ab-search { display: none; }
 
   /* the page header gets a back arrow when a page was opened from the list */
   #shelf .tab-head { display: flex; flex-wrap: wrap; align-items: center; column-gap: .25rem; }

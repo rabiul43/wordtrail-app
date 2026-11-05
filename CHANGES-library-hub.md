@@ -10,3 +10,6 @@ src/js/080 (shelfHub, applyShelfMode, tabHlPaint, showTab, uiInit), 270 (Back), 
 
 ## Account page: Settings button
 On the Account page the header account button becomes a gear and opens Settings (080 appBarShow sets html[data-acct]; 295 click; CSS at the end of 99e-library-hub.css).
+
+## Phones: Search last, no header search icons
+Under 700 px the Search tab is the last tab and the search icons in the Home header (#st-search) and the slim bar (#ab-search) are hidden (99e-library-hub.css).
