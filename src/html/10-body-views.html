@@ -318,7 +318,9 @@
 </main>
 
 <main id="shelf" class="view home" hidden>
-  <div class="tab-head"><h1 id="shelf-title">My Library</h1><p id="shelf-sub"></p></div>
+  <div class="tab-head"><button id="shelf-back" class="ib shelf-back" type="button" aria-label="Back to My Library" hidden><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button><h1 id="shelf-title">My Library</h1><p id="shelf-sub"></p></div>
+  <!-- Phones: My Library opens on this list (Saved, Downloads, ...); each row opens its page. Filled by libHubDraw (282-library-hub.js) -->
+  <div id="shelf-hub" class="lh" hidden></div>
   <div id="shelf-seg" class="shelf-seg" role="group" aria-label="My Library view">
     <button type="button" class="chip" data-m="saved" aria-pressed="true">Saved</button>
     <button type="button" class="chip" data-m="fol" aria-pressed="false">Following</button>

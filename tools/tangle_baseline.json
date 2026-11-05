@@ -1,10 +1,10 @@
 {
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
-  "files": 81,
-  "dependencies": 711,
-  "pointing_to_a_later_file": 227,
-  "largest_cycle": 74
+  "files": 82,
+  "dependencies": 719,
+  "pointing_to_a_later_file": 229,
+  "largest_cycle": 75
  },
  "dependencies": [
   "030-helpers-offline-audio.js -> 040-worker-newreader.js",
@@ -58,6 +58,7 @@
   "080-ui-shell-favourites.js -> 200-player-controls.js",
   "080-ui-shell-favourites.js -> 270-sheets-nextup-back.js",
   "080-ui-shell-favourites.js -> 280-downloads-progress.js",
+  "080-ui-shell-favourites.js -> 282-library-hub.js",
   "090-synced-stats-book-search.js -> 030-helpers-offline-audio.js",
   "090-synced-stats-book-search.js -> 031-virtual-list.js",
   "090-synced-stats-book-search.js -> 040-worker-newreader.js",
@@ -429,6 +430,7 @@
   "270-sheets-nextup-back.js -> 160-learning-tools.js",
   "270-sheets-nextup-back.js -> 180-sync-alignment.js",
   "270-sheets-nextup-back.js -> 280-downloads-progress.js",
+  "270-sheets-nextup-back.js -> 282-library-hub.js",
   "270-sheets-nextup-back.js -> 290-backup-maintenance.js",
   "270-sheets-nextup-back.js -> sound/ambient-scenes.js",
   "270-sheets-nextup-back.js -> sound/sound-screen.js",
@@ -456,6 +458,12 @@
   "281-book-download-card.js -> sound/music-playback.js",
   "281-book-download-card.js -> sound/music-state.js",
   "281-book-download-card.js -> sound/sound-cache.js",
+  "282-library-hub.js -> 030-helpers-offline-audio.js",
+  "282-library-hub.js -> 080-ui-shell-favourites.js",
+  "282-library-hub.js -> 102-home-sections.js",
+  "282-library-hub.js -> 130-book-detail.js",
+  "282-library-hub.js -> 135-ratings.js",
+  "282-library-hub.js -> 270-sheets-nextup-back.js",
   "290-backup-maintenance.js -> 030-helpers-offline-audio.js",
   "290-backup-maintenance.js -> 070-network-data.js",
   "290-backup-maintenance.js -> 080-ui-shell-favourites.js",

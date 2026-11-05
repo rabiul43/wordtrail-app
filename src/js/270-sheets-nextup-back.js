@@ -227,7 +227,8 @@
   function histLayers() {
     return OB.layers() + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
       ((DET.book || DET.author) ? 1 + (DET.stack || []).length : 0) + (seeOpen ? 1 : 0) +
-      (spOpen ? 1 : 0) + (spOpen && SP.mode === 'results' ? 1 : 0) +   // the Search page, and its result list on top of it
+      (spOpen ? 1 : 0) + (spOpen && SP.mode === 'results' ? 1 : 0) + (curTab === 'shelf' && phoneUI() && !shelfHub ? 1 : 0) +   // a My Library page opened from its list (phones)
+        // the Search page, and its result list on top of it
       ((curTab === 'collections' && COL.open) ? 1 : 0) + (searchOn() ? 1 : 0) + (curTab !== 'library' ? 1 : 0);
   }
   function histBack() {
@@ -239,6 +240,7 @@
       else if (DET.book || DET.author) closeDetail();
       else if (seeOpen) closeSeeAll();
       else if (spOpen) spBack();
+      else if (curTab === 'shelf' && phoneUI() && !shelfHub) { shelfHubNext = true; showTab('shelf'); }
       else if (curTab === 'collections' && COL.open) { COL.open = null; renderCollections(); window.scrollTo(0, 0); }
       else if (searchOn()) clearSearch(false);
       else if (curTab !== 'library') showTab('library');

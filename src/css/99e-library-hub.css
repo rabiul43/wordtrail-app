@@ -1,0 +1,27 @@
+/* My Library on phones (under 700px): the Downloads tab leaves the bottom bar, and My Library opens on a list of pages.
+   Code: 282-library-hub.js (rows), 080 (applyShelfMode). Must come after 98-desktop-layout.css, which sets the bar to five columns. */
+@media (max-width: 699.98px) {
+  .tab[data-tab="downloads"] { display: none; }
+  .tabbar { grid-template-columns: repeat(4, 1fr); }
+
+  /* the page header gets a back arrow when a page was opened from the list */
+  #shelf .tab-head { display: flex; flex-wrap: wrap; align-items: center; column-gap: .25rem; }
+  #shelf .tab-head p { flex-basis: 100%; }
+  #shelf .tab-head p:empty { display: none; }
+  .shelf-back { flex: none; margin-inline-start: -.7rem; }
+  .shelf-back[hidden] { display: none; }
+  .shelf-back .ic { width: 1.5rem; height: 1.5rem; }
+}
+
+/* The list: icon tile, title, "N Titles", chevron */
+.lh { display: flex; flex-direction: column; gap: .35rem; margin-top: .4rem; }
+.lh[hidden] { display: none; }
+.lh-row { display: flex; align-items: center; gap: 1rem; width: 100%; min-height: 4.6rem; padding: .35rem 0; border: 0; background: none; color: inherit; text-align: left; font: inherit; }
+.lh-ic { flex: none; width: 3rem; height: 3rem; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); }
+.lh-ic svg { width: 1.45rem; height: 1.45rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.lh-txt { flex: 1; min-width: 0; }
+.lh-txt b { display: block; font-size: 1.05rem; font-weight: 700; line-height: 1.25; color: var(--ink); }
+.lh-txt small { display: block; margin-top: .1rem; font-size: .9rem; color: var(--muted); }
+.lh-go { flex: none; width: 1.3rem; height: 1.3rem; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lh-row:active .lh-txt b { color: var(--accent); }
+[dir="rtl"] .lh-go { transform: scaleX(-1); }

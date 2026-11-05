@@ -30,9 +30,11 @@
       if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
       if (t === 'downloads') { closeSheets(); showTab('downloads'); return; }
       if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My Library never opens on the Downloads page
+      if (t === 'shelf') shelfHubNext = true;   // phones: the list of pages
       pendingBack = null; showTab(t);
     }));
     $('#shelf-browse').addEventListener('click', () => showTab('library'));
+    $('#shelf-back').addEventListener('click', () => { shelfHubNext = true; showTab('shelf'); });
     $$('#shelf-seg .chip').forEach(b => b.addEventListener('click', () => { shelfMode = b.dataset.m; applyShelfMode(); }));
     $('#seeall-back').addEventListener('click', closeSeeAll);
     initPullToRefresh();

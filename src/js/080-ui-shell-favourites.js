@@ -190,6 +190,7 @@
     guideBadge();
   }
   let shelfMode = 'saved';
+  let shelfHub = false, shelfHubNext = false;   // phones: My Library shows its list of pages (shelfHub); shelfHubNext asks the next showTab('shelf') to open on that list
   /* Hooks into later files (account-sync, ratings), filled in when those files load, so this file does not name them. Until then: a guest, nothing to draw. */
   const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {} };
   /* Account-only pages stay out of sight for guests. Rated needs an account (ratings live in it). Following is kept on the device,
@@ -204,11 +205,19 @@
   }
   function applyShelfMode() {
     shelfChips();
+    const phone = phoneUI(), hub = phone && shelfHub;
+    $('#shelf-hub').hidden = !hub; $('#shelf-back').hidden = !(phone && !hub);
+    if (hub) {   // phones: the list of pages (282) and nothing else
+      ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });
+      $('#shelf-seg').hidden = true; $('#shelf-title').textContent = 'My Library'; $('#shelf-sub').textContent = '';
+      $('#shelf').dataset.mode = 'hub'; libHubDraw();
+      return;
+    }
     $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-fol').hidden = shelfMode !== 'fol'; $('#shelf-rt').hidden = shelfMode !== 'rt'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
     $('#shelf').dataset.mode = shelfMode;
     /* Downloads is its own tab (no chip): same page, own title, no chips. My Library keeps the Saved, Following, Rated and Synced books chips. */
-    $('#shelf-title').textContent = shelfMode === 'dl' ? 'Downloads' : 'My Library';
-    $('#shelf-seg').hidden = shelfMode === 'dl';
+    $('#shelf-title').textContent = phone ? libHubTitle(shelfMode) : shelfMode === 'dl' ? 'Downloads' : 'My Library';
+    $('#shelf-seg').hidden = shelfMode === 'dl' || phone;   // on phones the list of pages replaces the chips
     $$('#shelf-seg .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === shelfMode)));
     if (shelfMode === 'fol') { $('#shelf-sub').textContent = ''; try { renderFollowing(); } catch (e) { /* authors list not ready */ } }
     else if (shelfMode === 'rt') {
@@ -220,7 +229,8 @@
     else if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
-    const hl = srchTab && curTab === 'library' ? 'search' : curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (OFF.on && curTab === 'library' ? 'downloads' : curTab);
+    const dlTab = !phoneUI();   // on phones Downloads is a page inside My Library, not a tab
+    const hl = srchTab && curTab === 'library' ? 'search' : dlTab && curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (dlTab && OFF.on && curTab === 'library' ? 'downloads' : curTab);
     $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
   function showTab(t, keep) {
@@ -228,6 +238,7 @@
     if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
     srchTab = false;
+    shelfHub = t === 'shelf' && shelfHubNext && phoneUI(); shelfHubNext = false;
     curTab = t; seeOpen = false; spOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
     tabHlPaint();
     if (t === 'shelf') applyShelfMode();
@@ -255,7 +266,7 @@
     window.addEventListener('pagehide', () => { clearTimeout(uiT); uiSave(); });
     const s = store.get(UI_KEY, null);
     if (!s || typeof s.tab !== 'string') { uiBusy = false; return; }
-    try { if (s.tab !== 'library' && ['collections', 'shelf', 'account', 'synced', 'downloads'].includes(s.tab)) showTab(s.tab); } catch (e) { /* stay on the library */ }
+    try { if (s.tab !== 'library' && ['collections', 'shelf', 'account', 'synced', 'downloads'].includes(s.tab)) { if (s.tab === 'shelf') shelfHubNext = true; showTab(s.tab); } } catch (e) { /* stay on the library */ }
     /* an open collection and a search are brought back too (search results come from the saved cache when they can) */
     try { if (s.col && s.tab === 'collections') openCollection(s.col); } catch (e) { /* stay on the shelves */ }
     let again = false;
