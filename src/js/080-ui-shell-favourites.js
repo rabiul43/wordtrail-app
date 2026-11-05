@@ -52,7 +52,7 @@
     if (action) el.status.append(h('button', { class: 'btn small ghost', onclick: action[1] }, action[0]));
   }
   let BOOTING = true;
-  let curTab = 'library', seeOpen = false, srchTab = false;   // srchTab: the Search tab was the last tab tapped (it lights up while Home shows)
+  let curTab = 'library', seeOpen = false, srchTab = false, spOpen = false;   // srchTab: the Search tab was the last tab tapped (it lights up while Home shows)
   const DET = { book: null, author: null, rv: false, y: 0, stale: false, stack: [] };   // book detail page: open while DET.book is set
   let backTo = null, pendingBack = null;
   function restoreBack() {
@@ -70,7 +70,9 @@
     const home = v === 'home';
     if (v === 'player' && el.player.hidden) { backTo = pendingBack || { tab: curTab, see: seeOpen }; pendingBack = null; }
     const det = home && !!(DET.book || DET.author);
-    el.home.hidden = !(home && curTab === 'library' && !seeOpen && !det);
+    el.home.hidden = !(home && curTab === 'library' && !seeOpen && !det && !spOpen);
+    $('#sp').hidden = !(home && spOpen && !seeOpen && !det);   // the Search page (121)
+    { const fs = $('#sp-fs'); if (fs && $('#sp').hidden) fs.hidden = true; }
     $('#seeall').hidden = !(home && seeOpen && !det);
     $('#collections').hidden = !(home && curTab === 'collections' && !seeOpen && !det);
     $('#shelf').hidden = !(home && curTab === 'shelf' && !seeOpen && !det);
@@ -78,7 +80,7 @@
     $('#detail').hidden = !det;
     if (det && DET.stale && DET.book) { DET.stale = false; detDraw(); }
     $('#tabbar').hidden = !home;
-    appBarShow(home && el.home.hidden);   // every Home-area screen except the Library (which has its own header)
+    appBarShow(home && el.home.hidden && !spOpen);   // every Home-area screen except the Library and the Search page (which have their own header)
     el.player.hidden = v !== 'player';
     if (home) window.scrollTo(0, 0);
     wakeSync();
@@ -99,7 +101,7 @@
      on the Library it empties an open search, or scrolls to the top. */
   function goHome() {
     if (!el.player.hidden) return;
-    const here = curTab === 'library' && !seeOpen && !DET.book && !DET.author;
+    const here = curTab === 'library' && !seeOpen && !DET.book && !DET.author && !spOpen;
     if (el.results && !el.results.hidden) clearSearch(false);
     if (here) { window.scrollTo({ top: 0, behavior: motionOk() }); return; }
     showTab('library');
@@ -107,9 +109,7 @@
   /* The search icon in the slim bar: to the Library with the cursor in the search field (focus runs inside the tap, so phones open the keyboard). */
   function appBarSearch() {
     if (!el.player.hidden) return;
-    if (curTab !== 'library' || seeOpen || DET.book || DET.author) showTab('library');
-    window.scrollTo(0, 0);
-    el.q.focus();
+    spShow();   // the Search page (121-search-page.js)
   }
   function appBarInit() {
     document.addEventListener('click', e => {
@@ -228,7 +228,7 @@
     if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
     srchTab = false;
-    curTab = t; seeOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
+    curTab = t; seeOpen = false; spOpen = false; DET.book = null; DET.author = null; DET.rv = false; DET.stack = [];
     tabHlPaint();
     if (t === 'shelf') applyShelfMode();
     if (t === 'collections') renderCollections();

@@ -252,6 +252,35 @@
 
 </main>
 
+<!-- Search page (the Search tab and the search icons). Styles: 99d-search-page.css. Code: 121-search-page.js, which fills #sp-body with one of three looks:
+     empty (recent searches, quick picks, genres), typing (did you mean, books, authors) and results (filter chips, Books / Authors, count, sort). -->
+<main id="sp" class="view sp" data-mode="empty" hidden>
+  <header class="sp-top">
+    <form id="sp-form" class="sp-field" role="search">
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <label class="sr-only" for="sp-q">Search LibriVox audiobooks</label>
+      <input id="sp-q" type="search" placeholder="Search a title or author" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <button id="sp-x" class="sp-x" type="button" aria-label="Clear search" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </form>
+    <button id="sp-cancel" class="sp-cancel" type="button">Cancel</button>
+  </header>
+  <div id="sp-body" class="sp-body" aria-live="polite"></div>
+</main>
+<div id="sp-fs" class="sp-fs" hidden>
+  <div class="sp-fs-scrim" id="sp-fs-scrim"></div>
+  <section class="sp-fs-card" role="dialog" aria-modal="true" aria-labelledby="sp-fs-h">
+    <div class="sp-fs-head"><h2 id="sp-fs-h">Filters</h2><button id="sp-fs-reset" class="sp-link" type="button">Reset</button></div>
+    <h3 class="sp-fs-l">Length</h3>
+    <div id="sp-fs-len" class="sp-opts"></div>
+    <h3 class="sp-fs-l">Reading level</h3>
+    <div id="sp-fs-lvl" class="sp-opts"></div>
+    <p class="sp-fs-note">Books without a reading level are left out while one is chosen.</p>
+    <h3 class="sp-fs-l">Read-along</h3>
+    <div id="sp-fs-ra" class="sp-opts"></div>
+    <button id="sp-fs-done" class="sp-done" type="button">Done</button>
+  </section>
+</div>
+
 <main id="seeall" class="view home" hidden>
   <div class="seeall-head">
     <button id="seeall-back" class="ib" type="button" aria-label="Back to library"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button>

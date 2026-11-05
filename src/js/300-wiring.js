@@ -38,6 +38,7 @@
     initPullToRefresh();
     initRecentSearches();
     initSearchFilters();
+    spInit();
     appBarInit();
     $('#mini-open').addEventListener('click', () => { showView('player'); requestAnimationFrame(() => { try { resnap(); } catch (e) { /* not ready */ } }); });
     $('#mini-play').addEventListener('click', togglePlay);

@@ -685,7 +685,7 @@
     mk('For you', '');
     GENRES.slice(0, 6).forEach(g => mk(g.label, g.label));
     sync();
-    sb.addEventListener('click', () => { const on = root.classList.toggle('st-find'); sb.setAttribute('aria-expanded', on ? 'true' : 'false'); if (on) setTimeout(() => { const q = $('#q'); if (q) q.focus(); }, 0); });
+    sb.addEventListener('click', () => spShow());   // the Search page (121-search-page.js)
     ac.addEventListener('click', () => { const a = $('#sb-avatar'); if (a) a.click(); });
     document.addEventListener('focusin', e => { if (e.target && e.target.id === 'q') root.classList.add('st-find'); });
     const q = $('#q'); if (q) q.addEventListener('input', () => { if (q.value) root.classList.add('st-find'); });

@@ -41,6 +41,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
 | `110-collections.js` | 238 | Collections tab |
 | `120-search-recommendations.js` | 578 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
+| `121-search-page.js` | 318 | The Search page (Search tab and search icons): `#sp` markup in `10-body-views.html`, styles `99d-search-page.css`. Three looks (empty: recent, quick picks, genres; typing: did-you-mean, books, authors; results: filter chips, Books/Authors, count, sort) plus the filter sheet. Reads `SX` and `CAT`, no new network calls. `spShow()` opens it, `spBack()` is its Back step, `spOpen` (080) says it is on screen |
 | `130-book-detail.js` | 194 | Book detail page, Follow an author, Wikipedia bio and background, similar books |
 | `131-book-stats-share.js` | 165 | Book stats on the details page, start/finish sending, share button |
 | `132-author-page-resume-card.js` | 133 | Author page, large "pick up where you left off" card |
@@ -64,7 +65,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 395 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
-| `270-sheets-nextup-back.js` | 276 | sheets, Pre-sync, Next up, Back button / swipe-back |
+| `270-sheets-nextup-back.js` | 278 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 713 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `281-book-download-card.js` | 170 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `290-backup-maintenance.js` | 394 | Backup and restore, sync dashboard |
@@ -72,7 +73,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |
 | `296-desktop-bar.js` | 64 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 86 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 790 | wiring |
+| `300-wiring.js` | 791 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)
