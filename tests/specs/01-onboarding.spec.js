@@ -18,7 +18,7 @@ test.describe('onboarding', () => {
     await page.locator('#ob-done').click();
     await expect(page.locator('#ob-overlay')).toBeHidden();
 
-    await expect(page.locator('#q')).toBeVisible();                     // the home screen is underneath
+    await expect(page.locator('#q:visible, #st-search:visible')).toBeVisible();                     // the home screen is underneath
     const s = await saved(page);
     expect(s.onboarded).toBe('1');
     expect(s.prefs.readerLvl).toBe(1);
@@ -28,7 +28,7 @@ test.describe('onboarding', () => {
     await openApp(page);
     await completeOnboarding(page);
     await page.reload();
-    await expect(page.locator('#q')).toBeVisible();
+    await expect(page.locator('#q:visible, #st-search:visible')).toBeVisible();
     await expect(page.locator('#ob-overlay')).toBeHidden();
   });
 

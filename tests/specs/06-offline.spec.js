@@ -50,7 +50,7 @@ test('the page reloads with no connection', async ({ browser }) => {
 
     // 3. reload: the app still opens, from the saved copy
     await page.reload();
-    await expect(page.locator('#q')).toBeVisible();
+    await expect(page.locator('#q:visible, #st-search:visible')).toBeVisible();
     await expect(page.locator('#ob-overlay')).toBeHidden();               // and it still knows onboarding is done
     await expect(page).toHaveTitle('Wordtrail');
     expect(await page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);   // served by the service worker

@@ -25,6 +25,7 @@ async function startApp(page) {
 
 // Types in the search box and waits for real result cards (not the grey loading placeholders).
 async function search(page, term) {
+  /* wt-home-fix */ if (!(await page.locator('#q').isVisible())) await page.locator('#st-search').click();
   await page.locator('#q').fill(term);
   await page.locator('#q').press('Enter');
   await expect(page.locator('#result-list .card:not(.sk)').first()).toBeVisible();

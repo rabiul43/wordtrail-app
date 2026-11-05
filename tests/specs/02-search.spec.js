@@ -25,6 +25,7 @@ test.describe('search (network mocked)', () => {
 
   test('a search with no match says so', async ({ page }) => {
     await startApp(page);
+    if (!(await page.locator('#q').isVisible())) await page.locator('#st-search').click();
     await page.locator('#q').fill('zzzzqqqq');
     await page.locator('#q').press('Enter');
     await expect(page.getByText('No results for')).toBeVisible();
