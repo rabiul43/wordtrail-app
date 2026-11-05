@@ -9,7 +9,7 @@ on:
 jobs:
   tests:
     name: Browser tests + Firestore rules
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned: ubuntu-latest moved to 26.04, which this Playwright version cannot install Chromium on
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
