@@ -46,3 +46,9 @@ html[data-home="st"] .mini-txt strong { font: 800 1rem/1.25 var(--font-display);
 html[data-home="st"] .mini-play { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
 html[data-home="st"] .tabbar { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; }
 html[data-home="st"] .tab::before { display: none; }
+
+/* The shared account button in the Home header: same look as in the bar of the other tabs (see 99-home-header.css) */
+html[data-home="st"] .searchbar .st-head .sb-avatar { display: grid; width: 2.2rem; height: 2.2rem; margin: .275rem; }
+html[data-home="st"] .searchbar .st-head .sb-avatar.guest { background: transparent; color: var(--ink); }
+html[data-home="st"] .searchbar .st-head .sb-avatar.guest .ic { width: 1.5rem; height: 1.5rem; }
+html[data-home="st"] .searchbar .st-head .sb-avatar.guest::before { display: none; }

@@ -182,3 +182,54 @@ html[data-appbar] .seeall-head.col-sticky { top: var(--ab-h); }
 .sb-avatar.signed::before { background: #3FB871; }
 .sb-avatar.stale::before { background: var(--warn); }
 :root[data-theme="contrast"] .sb-avatar::before { border-color: #000; }
+
+/* ==========================================================================
+   One header on every tab (phones, under 700px)
+   --------------------------------------------------------------------------
+   The Home look everywhere: ONE row with the page title on the left and the buttons on the right. The "Wordtrail" logo is gone on phones
+   (the app name is in the window title and on the home-screen icon). The title and the Back button are filled by appBarSync() in
+   080 from the page's own heading, which is hidden here so the title is not shown twice. The search icon is only on Explore.
+   The account button is the same everywhere: photo (or letter) with the sync dot, or a plain person icon when signed out.
+   Tablets and computers (700px and up) keep the bar above unchanged.
+   ========================================================================== */
+.ab-title, .ab-back { display: none; }
+@media (max-width: 699px) {
+  .ab-brand { display: none; }
+  html[data-appbar] { --ab-h: calc(2.75rem + max(.85rem, env(safe-area-inset-top, 0px)) + .25rem + 1px); }
+  .ab-in { height: calc(2.75rem + max(.85rem, env(safe-area-inset-top, 0px)) + .25rem); padding: max(.85rem, env(safe-area-inset-top, 0px)) 1.25rem .25rem; gap: 0; }
+  .appbar { border-bottom-color: transparent; }
+  .appbar.stuck { border-bottom-color: var(--line); }
+  .ab-title { display: block; flex: 1; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 var(--h1)/1.1 var(--font-display); letter-spacing: -.01em; color: var(--ink); }
+  .ab-back { display: grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; margin-inline: -.75rem .1rem; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ab-back[hidden] { display: none; }
+  .ab-back .ic { width: 1.5rem; height: 1.5rem; }
+  .ab-back:active { background: var(--surface-2); }
+  .ab-back:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+  [dir="rtl"] .ab-back .ic { transform: scaleX(-1); }
+
+  /* the search icon: Explore only (hidden on phones everywhere else by 99e) */
+  html[data-ab-page="collections"] #ab-search { display: grid; }   /* 99e hides the header search icons on phones (the Search tab is in the bar); Explore gets it back */
+  .ab-search { width: 2.75rem; height: 2.75rem; color: var(--ink); }
+  .ab-search .ic { width: 1.5rem; height: 1.5rem; }
+  .appbar .ab-search { margin-inline-end: 0; }
+
+  /* the page's own heading (and Back) is now in the bar */
+  html[data-appbar] #collections > .tab-head > h1,
+  html[data-appbar] #shelf > .tab-head > #shelf-title,
+  html[data-appbar] #shelf > .tab-head > .shelf-back,
+  html[data-appbar] #account > .tab-head > h1,
+  html[data-appbar] #acct-activity > .tab-head > h1,
+  html[data-appbar] #acct-activity > .acct-back,
+  html[data-appbar] #seeall-title,
+  html[data-appbar] #seeall-back { display: none; }
+  html[data-appbar] #seeall-sub:empty { display: none; }
+  html[data-appbar] .home { padding-top: .35rem; }
+}
+
+/* the shared account button in the phone headers (the bar and Home): person icon when signed out, photo or letter with the dot when signed in */
+@media (max-width: 699px) {
+  .appbar .sb-avatar { width: 2.2rem; height: 2.2rem; margin-inline: .275rem -.275rem; }   /* same spot as the button in the Home header */
+  html:not([data-acct]) .appbar .sb-avatar.guest { background: transparent; color: var(--ink); }
+  html:not([data-acct]) .appbar .sb-avatar.guest .ic { width: 1.5rem; height: 1.5rem; }
+  .appbar .sb-avatar.guest::before { display: none; }
+}

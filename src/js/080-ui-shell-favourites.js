@@ -80,7 +80,7 @@
     $('#detail').hidden = !det;
     if (det && DET.stale && DET.book) { DET.stale = false; detDraw(); }
     $('#tabbar').hidden = !home;
-    appBarShow(home && el.home.hidden && !spOpen);   // every Home-area screen except the Library and the Search page (which have their own header)
+    appBarShow(home && el.home.hidden && !spOpen && !(det && abPhone.matches));   // every Home-area screen except the Library, the Search page and (phones) book/author pages: they have their own header row
     el.player.hidden = v !== 'player';
     if (home) window.scrollTo(0, 0);
     wakeSync();
@@ -95,10 +95,46 @@
     const b = $('#appbar'); if (!b) return;
     b.hidden = !on;
     document.documentElement.toggleAttribute('data-appbar', !!on);
+    if (on) { appBarWatch(); appBarSync(); } else document.documentElement.removeAttribute('data-ab-page');
     /* On the Account page the account button becomes a Settings button (gear): see 99-home-header.css, html[data-acct] */
     const acct = curTab === 'account' && !!on;
     document.documentElement.toggleAttribute('data-acct', acct);
     $$('.sb-avatar').forEach(a => { a.removeAttribute('aria-current'); a.setAttribute('aria-label', acct ? 'Settings' : 'Account'); });
+  }
+  /* Phones (< 700px): the bar is the ONE header of the screen. Its title (and its Back button, when the page has one) mirrors the page's own
+     heading, which 99-home-header.css hides while the bar is showing. Following the heading means translations and sub-pages (My Library >
+     Saved, Account > Your activity) need no extra code. data-ab-page tells the CSS which page it is (the search icon is only on Explore). */
+  const abPhone = matchMedia('(max-width: 699px)');
+  function abSource() {
+    const open = sel => { const n = $(sel); return !!n && !n.hidden; };
+    if (open('#collections')) return { page: 'collections', h: $('#collections > .tab-head > h1') };
+    if (open('#shelf')) return { page: 'shelf', h: $('#shelf-title'), back: $('#shelf-back') };
+    if (open('#seeall')) return { page: 'seeall', h: $('#seeall-title'), back: $('#seeall-back') };
+    if (open('#account')) {
+      const act = $('#acct-activity');
+      if (act && !act.hidden) return { page: 'account', h: $('#acct-activity > .tab-head > h1'), back: $('#acct-back') };
+      return { page: 'account', h: $('#account > .tab-head > h1') };
+    }
+    return null;
+  }
+  let abRaf = 0, abMo = null, abMoAcct = null;
+  function appBarSync() {
+    abRaf = 0;
+    const b = $('#appbar'); if (!b || b.hidden) return;
+    const s = abSource(), t = $('#ab-title'), bk = $('#ab-back');
+    const text = s && s.h ? s.h.textContent.trim() : '';
+    if (t && t.textContent !== text) t.textContent = text;
+    if (bk) bk.hidden = !(s && s.back && !s.back.hidden);
+    document.documentElement.setAttribute('data-ab-page', s ? s.page : '');
+  }
+  function appBarWatch() {
+    if (typeof MutationObserver !== 'function') return;
+    const sched = () => { if (!abRaf) abRaf = requestAnimationFrame(appBarSync); };
+    if (!abMo) abMo = new MutationObserver(sched);
+    ['#collections', '#shelf', '#seeall', '#account'].forEach(sel => { const n = $(sel); if (n && !n._abw) { n._abw = 1; abMo.observe(n, { attributes: true, attributeFilter: ['hidden'], subtree: true }); } });
+    ['#collections > .tab-head > h1', '#shelf-title', '#seeall-title', '#account > .tab-head > h1', '#acct-activity > .tab-head > h1'].forEach(sel => { const n = $(sel); if (n && !n._abw) { n._abw = 1; abMo.observe(n, { childList: true, characterData: true, subtree: true }); } });
+    const a = $('#account');   // the Account page is built the first time it opens: watch for that
+    if (a && !abMoAcct) { abMoAcct = new MutationObserver(sched); abMoAcct.observe(a, { childList: true }); }
   }
   /* The logo goes Home: from the book page, See all and the other tabs it returns to the Library (and drops an open search);
      on the Library it empties an open search, or scrolls to the top. */
@@ -121,6 +157,7 @@
       e.preventDefault(); goHome();
     });
     const s = $('#ab-search'); if (s) s.addEventListener('click', appBarSearch);
+    const bk = $('#ab-back'); if (bk) bk.addEventListener('click', () => { const c = abSource(); if (c && c.back) c.back.click(); });   // the page's own Back button does the work
     /* The Search tab: the same as the search icon in the slim bar (Home, cursor in the search field), and the tab lights up. */
     const st = document.querySelector('#tabbar .tab[data-tab="search"]');
     if (st) st.addEventListener('click', () => { pendingBack = null; appBarSearch(); srchTab = true; tabHlPaint(); });
