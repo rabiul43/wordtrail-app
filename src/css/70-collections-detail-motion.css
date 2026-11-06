@@ -833,3 +833,9 @@ html[data-lite] .tile-rate { -webkit-backdrop-filter: none; backdrop-filter: non
 .dd-sb.p { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .dd-sb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .dd-back, .dd-sheet, .dd-pb i, .dd-btn { transition: none; } }
+
+.spd-adv { margin-top: 1.1rem; border-top: 1px solid var(--line, rgba(255,255,255,.12)); padding-top: .2rem; }
+.spd-adv > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: .8rem 0; font-weight: 650; color: var(--ink); }
+.spd-adv > summary::-webkit-details-marker { display: none; }
+.spd-adv > summary::after { content: ""; width: .55rem; height: .55rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .18s ease; margin-right: .3rem; }
+.spd-adv[open] > summary::after { transform: rotate(-135deg); }

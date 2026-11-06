@@ -93,6 +93,7 @@
 
     el.play.addEventListener('click', () => { buzz('medium'); togglePlay(); });
     $('#b-ctl-speed').addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
+    { const bv = $('#b-ctl-speed-v'); if (bv) bv.textContent = nrSpd(P.speed || 1) + '\u00d7'; const cs = $('#b-ctl-speed'); if (cs) cs.dataset.on = String((P.speed || 1) !== 1); }   // badge shows the saved speed on start
     { const SL_OPTS = [[0, 'Off'], [10, '10 min'], [15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hour'], [90, '1.5 hours'], ['chapter', 'End of track']];   // the small Sleep timer sheet (the button next to Play)
       const slBox = $('#sl-presets'), slNote = $('#sl-note');
       const slDraw = () => {

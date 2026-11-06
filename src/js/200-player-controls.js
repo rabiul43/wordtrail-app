@@ -172,7 +172,7 @@
     clearTimeout(S.sleepTimer); cancelFade(); S.sleep = v;
     el.sleep.querySelector('.ub-l').textContent = sleepShort(v);
     el.sleep.dataset.on = String(v !== 0);
-    { const cs = $('#b-ctl-sleep'); if (cs) { cs.dataset.on = String(v !== 0); cs.setAttribute('aria-label', sleepLabel(v)); cs.title = sleepLabel(v); } }
+    { const cs = $('#b-ctl-sleep'); if (cs) { cs.dataset.on = String(v !== 0); cs.setAttribute('aria-label', sleepLabel(v)); cs.title = sleepLabel(v); const bv = $('#b-ctl-sleep-v'); if (bv) { bv.hidden = v === 0; bv.textContent = v === 'chapter' ? 'end' : v === 60 ? '1h' : v === 90 ? '1.5h' : v + 'm'; } } }
     el.sleep.setAttribute('aria-label', sleepLabel(v));
     nrSleep(v);
     qkPaint();
