@@ -44,7 +44,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `170-sync-points-drift.js` | 344 | 24 | 13 | 14 |
 | `180-sync-alignment.js` | 468 | 22 | 9 | 17 |
 | `190-sync-finish-retry.js` | 645 | 33 | 7 | 18 |
-| `200-player-controls.js` | 505 | 87 | 29 | 23 |
+| `200-player-controls.js` | 506 | 87 | 29 | 23 |
 | `205-audio-stall.js` | 71 | 16 | 0 | 2 |
 | `sound/music-state.js` | 49 | 2 | 2 | 0 |
 | `sound/music-moods.js` | 98 | 14 | 5 | 3 |

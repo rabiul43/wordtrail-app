@@ -172,6 +172,7 @@
     clearTimeout(S.sleepTimer); cancelFade(); S.sleep = v;
     el.sleep.querySelector('.ub-l').textContent = sleepShort(v);
     el.sleep.dataset.on = String(v !== 0);
+    { const cs = $('#b-ctl-sleep'); if (cs) { cs.dataset.on = String(v !== 0); cs.setAttribute('aria-label', sleepLabel(v)); cs.title = sleepLabel(v); } }
     el.sleep.setAttribute('aria-label', sleepLabel(v));
     nrSleep(v);
     qkPaint();

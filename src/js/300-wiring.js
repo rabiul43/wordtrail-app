@@ -93,7 +93,7 @@
 
     el.play.addEventListener('click', () => { buzz('medium'); togglePlay(); });
     $('#b-ctl-speed').addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
-    $('#b-ctl-sleep').addEventListener('click', () => el.sleep.click());
+    $('#b-ctl-sleep').addEventListener('click', () => { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); const t = $('#qk-t-sleep'); if (t) t.click(); });   // opens the Controls sheet on its Sleep timer choices
     $('#b-prevtrack').addEventListener('click', () => { buzz('light'); stepTrack(-1); });
     $('#b-nexttrack').addEventListener('click', () => { buzz('light'); stepTrack(1); });
     $('#b-back15').addEventListener('click', () => { buzz('tick'); userSeek(nowT() - 15); });
