@@ -518,7 +518,7 @@
     const chips = h('div', { class: 'pk-chips', role: 'group', 'aria-label': 'Why these books' }), row = h('div', { class: 'hrow' }), line = h('p', { class: 'mood-sub' });
     const draw = x => {
       PK.sel = x.key;
-      ttl.textContent = x.key.startsWith('m:') ? (new Date().getHours() < 17 ? '\u2600\uFE0E ' : '\u263E ') + todWord() : 'Picked for you';
+      ttl.textContent = isModern() && x.key.startsWith('m:') ? (new Date().getHours() < 17 ? '\u2600\uFE0E ' : '\u263E ') + todWord() : 'Picked for you';
       $$('button', chips).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === x.key)));
       line.textContent = x.line; row.setAttribute('aria-label', x.line);
       fillRow(row, x.books, x.more || null, 12);
@@ -528,7 +528,7 @@
     src.forEach(x => { const b = h('button', { class: 'fchip', type: 'button', 'aria-pressed': 'false', onclick: () => draw(x) }, x.label); b.dataset.k = x.key; chips.append(b); });
     const ttl = h('h2', {}, 'Picked for you');
     sec.append(h('div', { class: 'home-section-head mood-head' }, h('div', {}, ttl, line)), ...(src.length > 1 ? [chips] : []), row);
-    draw(src.find(x => x.key === PK.sel) || src.find(x => x.key.startsWith('m:')) || src[0]);
+    draw(src.find(x => x.key === PK.sel) || (isModern() && src.find(x => x.key.startsWith('m:'))) || src[0]);
     sec.hidden = false;
   }
   /* ---------- Home: greeting and daily-goal strip (phone design) ---------- */
@@ -537,12 +537,13 @@
     const t = $('#st-title'), s = $('#st-hello'); if (!t || !s) return;
     const hr = new Date().getHours(), hello = hr < 5 ? 'Good night' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : hr < 21 ? 'Good evening' : 'Good night';
     let name = ''; try { name = String((acInfo() || {}).name || '').trim().split(/\s+/)[0].slice(0, 24); } catch (e) { /* signed out */ }
+    if (!isModern()) { s.hidden = true; t.textContent = 'Home'; return; }
     s.textContent = hello; s.hidden = !name; t.textContent = name || hello;
   }
   function homeGoal() {
     const sec = $('#ex-goal'); if (!sec) return;
     try {
-      if (P.calm === true || OFF.on) { sec.hidden = true; return; }
+      if (!isModern() || P.calm === true || OFF.on) { sec.hidden = true; return; }
       if (stDirty) stSave(); else ST = stLoad();
       const m = stSummary(), goalS = (ST.goal || 0) * 60;
       if (!goalS && !m.cur) { sec.hidden = true; return; }
@@ -560,8 +561,18 @@
       sec.hidden = false;
     } catch (e) { sec.hidden = true; }
   }
+  function homeDownloads() {
+    const sec = $('#ex-dl'); if (!sec) return;
+    const all = isModern() && !OFF.on ? [...dlMeta.values()].filter(m => m && m.tracks && Object.keys(m.tracks).length).sort((a, b) => (b.ts || 0) - (a.ts || 0)) : [];
+    if (!all.length) { sec.hidden = true; sec.textContent = ''; return; }
+    const row = h('div', { class: 'hrow', 'aria-label': 'Downloaded books' });
+    all.slice(0, 12).forEach(m => { const b = { id: m.id, title: m.title || '', authors: m.authors || '', cover: m.cover, total: m.total || 0 }; const t = tileNode(b, () => openDetail(b)); if (t._wtCv) t._wtCv.append(h('span', { class: 'ex-check', 'aria-hidden': 'true' })); row.append(t); });
+    sec.textContent = '';
+    sec.append(h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, 'Downloaded', h('span', { class: 'col-count' }, 'offline ready'))), h('button', { class: 'ex-link', type: 'button', onclick: () => showTab('downloads') }, 'See all \u2192')), row);
+    sec.hidden = false;
+  }
   function renderRecents() {
-    homeGreet(); homeGoal();
+    homeGreet(); homeGoal(); homeDownloads();
     loadPicks();
     el.recentList.textContent = '';
     const recs = OFF.on ? recs.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played

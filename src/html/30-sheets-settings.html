@@ -258,8 +258,12 @@
     <div class="row row-hdr">
       <label for="in-hdr" style="flex:1"><span style="display:block">New Home header</span><small style="color:var(--muted)">Logo, search and your account in one row. Turn off for the classic header with the big search bar. Phones only; tablets and computers always use the new one.</small></label><input id="in-hdr" type="checkbox" role="switch">
     </div>
-    <div class="row row-home">
-      <label for="in-home" style="flex:1"><span style="display:block">New Home design</span><small style="color:var(--muted)">A plain Home title, genre chips, big cover cards and chevron section titles. Turn off to go back to the previous Home. Phones only.</small></label><input id="in-home" type="checkbox" role="switch">
+    <div>
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-image"/></svg>App design</h3>
+      <div class="seg" id="seg-design">
+        <button data-v="classic">Classic</button><button data-v="storytel">Storytel-style</button><button data-v="modern">Modern</button>
+      </div>
+      <p class="help">Classic is the first Home. Storytel-style is a plain Home title with genre chips and big covers. Modern is the newest look: greeting, daily goal, Continue listening card, Book of the day and a redesigned Explore. Phones only; your choice is remembered.</p>
     </div>
     <div class="row">
       <label for="in-bcol" style="flex:1">Match app colors to the book cover</label><input id="in-bcol" type="checkbox">

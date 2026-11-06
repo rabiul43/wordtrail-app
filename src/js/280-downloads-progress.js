@@ -231,6 +231,7 @@
   let offGridKey = '', offQUsed = false;
   const offQ = () => (OFF.on && $('#q') ? $('#q').value.trim().toLowerCase() : '');
   function offGridDraw(force) {
+    try { homeDownloads(); } catch (e) { /* Home shelf is optional */ }
     const sec = $('#sec-off'), grid = $('#off-grid'); if (!sec || !grid) return;
     sec.hidden = !OFF.on;
     const q = $('#q'); if (q) { if (q.dataset.ph == null) q.dataset.ph = q.placeholder; const ph = OFF.on ? 'Search your downloads' : q.dataset.ph; if (q.placeholder !== ph) q.placeholder = ph; }

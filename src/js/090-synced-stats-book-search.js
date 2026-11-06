@@ -663,7 +663,21 @@
      'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */
   function applyHdr() { document.documentElement.setAttribute('data-hdr', (P.hdrNew === false && !matchMedia('(min-width: 700px)').matches) ? 'classic' : 'new'); }
   /* New Home design (phones only): <html data-home="st"> turns on 99c-home-storytel.css. Saved as P.homeNew (default on). */
-  function applyHome() { document.documentElement.setAttribute('data-home', (P.homeNew !== false && !matchMedia('(min-width: 700px)').matches) ? 'st' : 'off'); }
+  /* App design (Settings > Appearance): classic = the first Home, storytel = the plain "New Home design", modern = the newest concept.
+     <html data-home="st"> = storytel or modern (phones); <html data-design="modern"> = modern (phones). Saved as P.design; P.homeNew === false (older saves) means classic. */
+  const designOf = () => (P.design === 'classic' || P.design === 'storytel' || P.design === 'modern') ? P.design : (P.homeNew === false ? 'classic' : 'modern');
+  const isModern = () => document.documentElement.getAttribute('data-design') === 'modern';
+  function homeOrder() {   // modern: the time-of-day shelf sits above Book of the day; the other designs keep the original order
+    const p = $('#sec-picks'), b = $('#sec-botd'), nw = $('#sec-newweek'); if (!p || !b || !nw) return;
+    if (isModern()) { if (p.nextElementSibling !== b) b.before(p); } else if (p.nextElementSibling !== nw) nw.before(p);
+  }
+  function applyHome() {
+    const phone = !matchMedia('(min-width: 700px)').matches, d = designOf(), root = document.documentElement;
+    root.setAttribute('data-home', phone && d !== 'classic' ? 'st' : 'off');
+    root.setAttribute('data-design', phone && d === 'modern' ? 'modern' : 'off');
+    homeOrder();
+  }
+  function designSegSync() { const v = designOf(); $$('#seg-design button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
   function stHomeInit() {
     const root = document.documentElement, row = $('#st-chips'), sb = $('#st-search'), ac = $('#st-acct');
     if (!row || !sb || !ac) return;

@@ -48,21 +48,21 @@ html[data-home="st"] .ex-levels-wrap .home-section-head::after { display: none; 
 
 /* the screen has no filter box (the header search covers it); big headings in the display font */
 @media (max-width: 699px) {
-  #collections .col-field { display: none; }
-  #collections #col-head h1 { font-size: 2.1rem; letter-spacing: -.01em; }
-  #collections .col-list { gap: 1.25rem; }
-  #collections .home-section-head h2 { font-family: var(--font-display); font-size: 1.25rem; }
+  html[data-design="modern"] #collections .col-field { display: none; }
+  html[data-design="modern"] #collections #col-head h1 { font-size: 2.1rem; letter-spacing: -.01em; }
+  html[data-design="modern"] #collections .col-list { gap: 1.25rem; }
+  html[data-design="modern"] #collections .home-section-head h2 { font-family: var(--font-display); font-size: 1.25rem; }
 }
 @media (prefers-reduced-motion: reduce) { .ex-chip, .ex-play, .ex-save, .ex-lv, .ex-cov { transition: none; } }
 
 /* ---------- Home design (phones, New Home design on): greeting, goal strip, Continue listening card, time-of-day shelf ---------- */
 .ex-goal[hidden] { display: none; }
 @media (max-width: 699px) {
-  html[data-home="st"] .st-greet { display: flex; flex-direction: column; min-width: 0; }
-  html[data-home="st"] .st-hello { font: 400 .8rem var(--font-ui); color: var(--muted); }
-  html[data-home="st"] .st-greet .st-title { font-weight: 700; font-size: 1.9rem; letter-spacing: -.01em; }
+  html[data-design="modern"] .st-greet { display: flex; flex-direction: column; min-width: 0; }
+  html[data-design="modern"] .st-hello { font: 400 .8rem var(--font-ui); color: var(--muted); }
+  html[data-design="modern"] .st-greet .st-title { font-weight: 700; font-size: 1.9rem; letter-spacing: -.01em; }
 
-  html[data-home="st"] .ex-goal { padding: .85rem 0 0; }
+  html[data-design="modern"] .ex-goal { padding: .85rem 0 0; }
   .ex-goalcard { width: 100%; display: flex; align-items: center; gap: .9rem; text-align: left; padding: .85rem 1rem; border-radius: 22px; color: inherit; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line)); background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--surface)), var(--surface)); }
   .ex-ring { position: relative; flex: none; width: 60px; height: 60px; }
   .ex-ring svg { width: 60px; height: 60px; transform: rotate(-90deg); display: block; }
@@ -79,20 +79,53 @@ html[data-home="st"] .ex-levels-wrap .home-section-head::after { display: none; 
   .ex-flame svg { width: 1rem; height: 1rem; display: block; fill: currentColor; }
 
   /* Continue listening card */
-  html[data-home="st"] #recent-list .resume { --h: 195; grid-template-columns: 5.25rem minmax(0, 1fr); grid-template-areas: "cover body" "bar bar" "row row"; padding: 1rem; border-radius: 28px; overflow: hidden; border: 1px solid color-mix(in srgb, hsl(var(--h) 55% 50%) 22%, var(--line)); color: #F2EBDD;
+  html[data-design="modern"] #recent-list .resume { --h: 195; grid-template-columns: 5.25rem minmax(0, 1fr); grid-template-areas: "cover body" "bar bar" "row row"; padding: 1rem; border-radius: 28px; overflow: hidden; border: 1px solid color-mix(in srgb, hsl(var(--h) 55% 50%) 22%, var(--line)); color: #F2EBDD;
     background: radial-gradient(circle at 100% 0, rgba(224, 177, 90, .34), transparent 55%), linear-gradient(160deg, hsl(var(--h) 62% 18%) 0%, hsl(var(--h) 58% 11%) 55%, hsl(var(--h) 60% 6%) 100%); }
-  html[data-home="st"] .resume-cover .cover { width: 5.25rem; height: 7.9rem; border-radius: 10px; box-shadow: 0 12px 26px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .12); }
-  html[data-home="st"] .resume-k { font: 700 .66rem var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
-  html[data-home="st"] .resume-t { font-size: 1.25rem; line-height: 1.1; font-weight: 700; -webkit-line-clamp: 3; }
-  html[data-home="st"] .resume-a { color: rgba(255, 255, 255, .72); font-size: .78rem; }
+  html[data-design="modern"] .resume-cover .cover { width: 5.25rem; height: 7.9rem; border-radius: 10px; box-shadow: 0 12px 26px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .12); }
+  html[data-design="modern"] .resume-k { font: 700 .66rem var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+  html[data-design="modern"] .resume-t { font-size: 1.25rem; line-height: 1.1; font-weight: 700; -webkit-line-clamp: 3; }
+  html[data-design="modern"] .resume-a { color: rgba(255, 255, 255, .72); font-size: .78rem; }
   .resume-ra { font-size: .72rem; color: rgba(255, 255, 255, .75); margin-top: .35rem; }
-  html[data-home="st"] .resume-bar { background: rgba(255, 255, 255, .15); margin-top: 1rem; }
-  html[data-home="st"] .resume-row { margin-top: .7rem; justify-content: flex-start; gap: .8rem; }
-  html[data-home="st"] .resume-pct { order: 0; flex: 1; color: rgba(255, 255, 255, .78); font-size: .72rem; }
-  html[data-home="st"] .resume-left { display: inline; order: 1; color: rgba(255, 255, 255, .78); font-size: .72rem; white-space: nowrap; }
-  html[data-home="st"] .resume-btn { order: 2; font-size: 0; gap: 0; width: 48px; height: 48px; min-height: 0; padding: 0; border-radius: 50%; box-shadow: 0 6px 18px rgba(224, 177, 90, .4); }
-  html[data-home="st"] .resume-btn svg { width: 1rem; height: 1rem; }
+  html[data-design="modern"] .resume-bar { background: rgba(255, 255, 255, .15); margin-top: 1rem; }
+  html[data-design="modern"] .resume-row { margin-top: .7rem; justify-content: flex-start; gap: .8rem; }
+  html[data-design="modern"] .resume-pct { order: 0; flex: 1; color: rgba(255, 255, 255, .78); font-size: .72rem; }
+  html[data-design="modern"] .resume-left { display: inline; order: 1; color: rgba(255, 255, 255, .78); font-size: .72rem; white-space: nowrap; }
+  html[data-design="modern"] .resume-btn { order: 2; font-size: 0; gap: 0; width: 48px; height: 48px; min-height: 0; padding: 0; border-radius: 50%; box-shadow: 0 6px 18px rgba(224, 177, 90, .4); }
+  html[data-design="modern"] .resume-btn svg { width: 1rem; height: 1rem; }
 
   /* time-of-day shelf: the Picked for you reason chips stay, in the same chip style */
-  html[data-home="st"] #sec-picks .pk-chips .fchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  html[data-design="modern"] #sec-picks .pk-chips .fchip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 }
+
+/* ---------- Home design, screen 2: chips, Book of the day, Downloaded, New this week, mini player ---------- */
+.ex-botd-h { display: none; }
+html[data-design="modern"] .ex-botd-h { display: flex; }
+html[data-design="modern"] .st-chip { min-height: 2.4rem; padding: 0 .95rem; font: 500 .8rem var(--font-ui); border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); }
+html[data-design="modern"] .st-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+html[data-design="modern"] .home-section-head h2 { font-weight: 700; font-size: 1.25rem; }
+html[data-design="modern"] .home-section-head .col-count { margin-left: .45rem; font: 500 .7rem var(--font-ui); color: var(--muted); }
+@media (max-width: 699px) {
+  html[data-design="modern"] #sec-botd .botd-hero { --h: 340; position: relative; display: block; min-height: 186px; padding: 1.1rem 1.1rem 1rem; border-radius: 26px; overflow: hidden; color: #F2EBDD;
+    border: 1px solid color-mix(in srgb, hsl(var(--h) 45% 45%) 24%, var(--line)); background: linear-gradient(120deg, hsl(var(--h) 55% 14%), hsl(var(--h) 45% 7%) 70%); }
+  html[data-design="modern"] #sec-botd .botd-cover { position: absolute; right: 1rem; top: 1.1rem; transform: rotate(-4deg); border-radius: 10px; box-shadow: 0 14px 30px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .12); }
+  html[data-design="modern"] #sec-botd .botd-cover .cover { width: 6rem; height: 9rem; border-radius: 10px; }
+  html[data-design="modern"] #sec-botd .botd-body { width: calc(100% - 7.3rem); min-height: 150px; gap: .35rem; }
+  html[data-design="modern"] #sec-botd .botd-k { color: #ff9db0; font-size: .66rem; letter-spacing: .1em; }
+  html[data-design="modern"] #sec-botd .botd-t { font-size: 1.3rem; line-height: 1.1; font-weight: 700; -webkit-line-clamp: 3; }
+  html[data-design="modern"] #sec-botd .botd-a { color: rgba(255, 255, 255, .7); }
+  html[data-design="modern"] #sec-botd .botd-b { color: rgba(255, 255, 255, .72); -webkit-line-clamp: 3; }
+  html[data-design="modern"] #sec-botd .botd-go { margin-top: auto; padding-top: .4rem; background: var(--ink); color: #1a0a12; font-weight: 700; font-size: .78rem; min-height: 2.3rem; }
+  html[data-design="modern"] #sec-botd .botd-go .ic { fill: currentColor; }
+  html[data-design="modern"] #sec-botd .home-section-head { margin-top: 1.5rem; }
+  html[data-design="modern"] #sec-botd .home-section-head::after { display: none; }
+
+  .ex-check { position: absolute; right: .4rem; top: .4rem; z-index: 2; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .72); border: 1px solid rgba(255, 255, 255, .15); display: grid; place-items: center; }
+  .ex-check::after { content: ""; width: 5px; height: 9px; border: solid #B8E986; border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+  html[data-design="modern"] .ex-link { margin-left: auto; margin-right: .5rem; }
+  html[data-design="modern"] .mini { border-radius: 20px; background: color-mix(in srgb, var(--surface-2) 94%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  html[data-design="modern"] .mini-play { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+}
+
+/* Modern Home shows Book of the day under Continue listening too (the other designs hide it while a card is showing) */
+html[data-design="modern"] #recents:not([hidden]) ~ #sec-botd:not([hidden]),
+html[data-design="modern"] #sec-tod:not([hidden]) ~ #sec-botd:not([hidden]) { display: block; }

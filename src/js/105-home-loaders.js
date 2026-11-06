@@ -48,11 +48,11 @@
         card.append(h('button', { class: 'botd-hero', type: 'button', style: '--h:' + hue, 'aria-label': 'Book of the day: ' + b.title + (b.authors ? ', ' + b.authors : ''), onclick: () => openDetail(b) },
           h('span', { class: 'botd-cover', 'aria-hidden': 'true' }, coverNode(b)),
           h('span', { class: 'botd-body' },
-            h('span', { class: 'botd-k' }, 'Book of the day'),
+            h('span', { class: 'botd-k' }, isModern() ? '\u2726 Today\'s pick' : 'Book of the day'),
             h('span', { class: 'botd-t' }, b.title),
             h('span', { class: 'botd-a' }, b.authors || ''),
             blurb ? h('span', { class: 'botd-b' }, blurb) : null,
-            h('span', { class: 'botd-go' }, svgIcon('#i-play'), 'Listen'))));
+            h('span', { class: 'botd-go' }, svgIcon('#i-play'), 'Listen' + (isModern() && b.total ? ' \u00b7 ' + fmtShort(b.total) : '')))));
         bsec.hidden = false; RW.botd = b.id;
       } else { bsec.hidden = true; RW.botd = null; }
       newWeekPaint();

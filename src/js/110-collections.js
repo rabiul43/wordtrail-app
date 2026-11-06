@@ -103,12 +103,16 @@
         return;
       }
       if (!shelves.length) { list.append(stateNode('empty', 'No collections yet', 'Shelves are rebuilt every week. Check back soon.')); return; }
-      const [hero, ...rest] = shelves;
-      const pick = exPick(shelves);
-      const chipsAt = list.childNodes.length;   // the chip row goes here once the shelves are drawn
-      if (pick) list.append(exHero(pick));
-      list.append(exLevels());
-      list.append(rowBlock(hero, hero.books));
+      const [hero, ...rest] = shelves, modern = isModern();
+      const chipsAt = list.childNodes.length;   // modern: the chip row goes here once the shelves are drawn
+      if (modern) {
+        const pick = exPick(shelves);
+        if (pick) list.append(exHero(pick));
+        list.append(exLevels());
+        list.append(rowBlock(hero, hero.books));
+      } else list.append(h('button', { class: 'col-hero', type: 'button', style: '--h:' + colHue(hero.key, 0), onclick: () => go(hero.key) },
+        h('span', { class: 'col-hero-top' }, h('span', {}, h('span', { class: 'eyebrow' }, 'Start here'), h('h2', {}, hero.title), h('p', {}, hero.blurb || colStats(hero))), colFan(hero)),
+        h('span', { class: 'col-go' }, colStats(hero) + ' \u00b7 Open', svgIcon('#i-go'))));
       // Every other shelf goes under its section heading (Popular, Genres, Learn English...). Small sections are rows, big ones are tiles.
       const groups = new Map();
       rest.forEach(c => { const g = c.group || 'More collections'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(c); });
@@ -130,7 +134,9 @@
         blocks.has(hero.key) ? chip(hero.title, jump(blocks.get(hero.key))) : null,
         (groups.get('Browse by genre') || []).filter(c => blocks.has(c.key)).map(c => chip(c.title, jump(blocks.get(c.key)))),
         [...groups.keys()].filter(g => g !== 'Browse by genre' && heads.get(g) && heads.get(g).tagName === 'H2').map(g => chip(g, jump(heads.get(g)))));
-      list.insertBefore(chips, list.childNodes[chipsAt] || null);
+      if (modern) list.insertBefore(chips, list.childNodes[chipsAt] || null);
+      else if (groups.size > 1) list.append(h('div', { class: 'col-jump', role: 'group', 'aria-label': 'Jump to a section' },
+        [...groups.keys()].map(g => h('button', { class: 'col-toggle', type: 'button', onclick: () => heads.get(g).scrollIntoView({ behavior: motionOk(), block: 'start' }) }, g))));
       list.append(...secs);
     };
     q.addEventListener('input', () => { COL.q = q.value; clr.hidden = !q.value; draw(); });
