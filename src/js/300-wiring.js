@@ -93,7 +93,19 @@
 
     el.play.addEventListener('click', () => { buzz('medium'); togglePlay(); });
     $('#b-ctl-speed').addEventListener('click', () => { buzz('tick'); spdPaint(); openSheet('sheet-speed'); });
-    $('#b-ctl-sleep').addEventListener('click', () => { buzz('tick'); qkOpt(''); qkPaint(); openSheet('sheet-quick'); const t = $('#qk-t-sleep'); if (t) t.click(); });   // opens the Controls sheet on its Sleep timer choices
+    { const SL_OPTS = [[0, 'Off'], [10, '10 min'], [15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hour'], [90, '1.5 hours'], ['chapter', 'End of track']];   // the small Sleep timer sheet (the button next to Play)
+      const slBox = $('#sl-presets'), slNote = $('#sl-note');
+      const slDraw = () => {
+        slBox.textContent = '';
+        SL_OPTS.forEach(([v, lab]) => slBox.append(h('button', { type: 'button', class: 'chip', 'aria-pressed': String((S.sleep || 0) === v), onclick: () => {
+          buzz('tick'); setSleep(v); closeSheets();
+          if (P.shakeSleep === true && typeof v === 'number' && v > 0) shakeArm(true);
+          toast(v === 0 ? 'Sleep timer off' : v === 'chapter' ? 'Sleep at the end of this track' : sleepLabel(v), 2200);
+        } }, lab)));
+        const c = S.sleep || 0;
+        slNote.textContent = c === 0 ? 'The book keeps playing.' : c === 'chapter' ? 'Pauses at the end of this track.' : 'Pauses in ' + c + ' min.';
+      };
+      $('#b-ctl-sleep').addEventListener('click', () => { buzz('tick'); slDraw(); openSheet('sheet-sleep'); }); }
     $('#b-prevtrack').addEventListener('click', () => { buzz('light'); stepTrack(-1); });
     $('#b-nexttrack').addEventListener('click', () => { buzz('light'); stepTrack(1); });
     $('#b-back15').addEventListener('click', () => { buzz('tick'); userSeek(nowT() - 15); });
