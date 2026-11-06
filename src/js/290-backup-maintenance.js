@@ -254,7 +254,7 @@
      heading in the tabbed Settings, and the book tools of the More menu (marked "Book tool"; they need an open book).
      Developer and Diagnostics rows appear only after Developer is unlocked (7 taps on this title, as before). */
   var SMH = { from: false, q: '', idx: null, taps: 0, t: 0 };
-  const smTheme = () => ({ auto: 'Auto', light: 'Light', dark: 'Dark', black: 'Black', sepia: 'Sepia', contrast: 'High contrast' }[P.theme] || 'Auto');
+  const smTheme = () => ({ auto: 'Auto', light: 'Light', white: 'White', dark: 'Dark', black: 'Black', sepia: 'Sepia', contrast: 'High contrast' }[P.theme] || 'Auto');
   const smNorm = s => String(s || '').replace(/\s+/g, ' ').trim();
   const smDev = () => !!(window.wtDevOn && window.wtDevOn());
   function smMark(node) {   // scroll to a setting, outline it for a moment (no animation) and focus its control
@@ -273,7 +273,7 @@
   /* [section, key, icon, name, description, value, search words, action, 'dev' when it needs Developer unlocked] */
   const smRows = () => [
     ['basics', 'install', 'i-m-download', 'Install Wordtrail', 'Add it to your home screen. Opens faster, works offline', '', 'install app home screen add shortcut pwa', () => pwaInstall(), 'install'],
-    ['basics', 'theme', 'i-m-contrast', 'Theme', 'Auto, Light, Dark, Black, Sepia, High contrast', smTheme(), 'dark black amoled oled light sepia contrast colour color night', () => smOpenTab('reading', () => smH3('reading', 'Theme'))],
+    ['basics', 'theme', 'i-m-contrast', 'Theme', 'Auto, Light, White, Dark, Black, Sepia, High contrast', smTheme(), 'dark black amoled oled light white sepia contrast colour color night', () => smOpenTab('reading', () => smH3('reading', 'Theme'))],
     ['basics', 'text', 'i-m-texts', 'Text', 'Size, line spacing, reading font', '', 'font size line spacing dyslexia lexend atkinson opendyslexic bigger larger', () => smOpenTab('reading', () => smH3('reading', 'Text size'))],
     ['basics', 'speed', 'i-m-zap', 'Speed', 'Playback speed and finer steps', +(+P.speed).toFixed(2) + 'x', 'faster slower pace skip silence voice boost mono balance volume', () => { SMH.from = true; spdPaint(); openSheet('sheet-speed'); }],
     ['basics', 'sleep', 'i-m-clock', 'Sleep timer', 'Stop after a set time or at the end of a track', !S.sleep ? 'Off' : S.sleep === 'chapter' ? 'End of track' : S.sleep + ' min', 'bedtime timer stop night', () => {

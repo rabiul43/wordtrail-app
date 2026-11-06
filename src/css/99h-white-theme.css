@@ -1,0 +1,23 @@
+/* White theme: true #FFFFFF background with neutral grey panels (Light is the warm cream one). Same brown-gold accent as Light, which passes contrast on white.
+   Chosen in Settings > Reading > Theme, or in the reader's Aa sheet. Remove this file, the "White" buttons and the head-script entry to take it out again. */
+:root[data-theme="white"] {
+  --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
+  --bg: #FFFFFF; --surface: #F5F5F7; --surface-2: #EAEAEE; --line: #DCDCE2;
+  --ink: #111114; --muted: #5A5A64;
+  --accent: #865D0E; --accent-ink: #FFFFFF; --accent-soft: #F7ECD3; --sun: #E0B15A; --mark: #F6DC94;
+  --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #B03A2A; --err: #C0392B; --err-ink: #FFFFFF;
+  --scrim: rgba(15, 18, 32, .45); --glass: rgba(255, 255, 255, .88);
+  --shadow: 0 1px 2px rgba(17, 17, 20, .06), 0 10px 30px rgba(17, 17, 20, .09);
+  --shadow-sm: 0 2px 10px rgba(17, 17, 20, .10); --shadow-pop: 0 8px 30px rgba(17, 17, 20, .20);
+  --shadow-cover: 0 6px 16px rgba(17, 17, 20, .18); --shadow-up: 0 -6px 24px rgba(17, 17, 20, .08);
+  --focus-ring: #7A5409;
+  color-scheme: light;
+}
+/* Theme pickers: the layout follows the number of buttons, so any mix of the optional themes stays even */
+#seg-theme:has(button:nth-child(6)) button:nth-child(n+4) { grid-column: span 2; }
+#seg-theme:has(button:nth-child(7)) button:nth-child(-n+4) { grid-column: span 3; }
+#seg-theme:has(button:nth-child(7)) button:nth-child(n+5) { grid-column: span 4; }
+#seg-theme:has(button:nth-child(7)) { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.aa-themes:has(button:nth-child(6)) { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.aa-themes:has(button:nth-child(7)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.aa-themes button[data-v="white"] .aa-sw { --sw-bg: #FFFFFF; --sw-ink: #111114; border: 1px solid #CFCFD6; }

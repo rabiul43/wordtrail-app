@@ -630,7 +630,7 @@
     $('#fd-clear').addEventListener('click', () => { $('#fd-q').value = ''; $('#fd-q').focus(); fdRun(); });
   }
   guideDoc('reading', 'Line focus', "Dims everything except the sentence or paragraph being read (Settings > Reading).");
-  guideDoc('settings', 'Reading', "Theme (Auto, Light, Dark, Black, Sepia, High contrast), text size, line spacing, reading font (including Lexend, Atkinson and OpenDyslexic), highlight style and colour, dialogue style and cover style.");
+  guideDoc('settings', 'Reading', "Theme (Auto, Light, White, Dark, Black, Sepia, High contrast), text size, line spacing, reading font (including Lexend, Atkinson and OpenDyslexic), highlight style and colour, dialogue style and cover style.");
   /* Reading fonts: loaded only when picked, so they cost nothing for everyone else. */
   const READ_FONTS = {
     lexend: { stack: "'Lexend', 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap' },

@@ -3,7 +3,7 @@
      the app. Everything here is optional polish: if anything fails, the app works exactly as before. */
 
   /* theme-color follows the app's own background, so the phone's status bar / browser bar matches whichever theme
-     is on (auto, light, dark, black, sepia, high contrast). The head sets a first guess before the page paints. */
+     is on (auto, light, white, dark, black, sepia, high contrast). The head sets a first guess before the page paints. */
   function pwaThemeColor() {
     try {
       const m = document.querySelector('meta[name="theme-color"]'); if (!m) return;
