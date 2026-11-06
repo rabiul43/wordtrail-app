@@ -173,7 +173,7 @@
     if (S.sleep === 'chapter') { const d = audio.duration, c = audio.currentTime; return isFinite(d) && d > 0 ? Math.max(0, Math.round((d - c) / (audio.playbackRate || 1))) : -1; }
     return 0;
   };
-  const slLeftFmt = s => s < 0 ? 'end' : s < 60 ? Math.max(1, s) + 's' : s < 3600 ? Math.ceil(s / 60) + 'm' : Math.floor(s / 3600) + 'h' + (Math.floor(s / 60) % 60 ? String(Math.floor(s / 60) % 60).padStart(2, '0') : '');
+  const slLeftFmt = s => { if (s < 0) return 'end'; const p2 = n => String(n).padStart(2, '0'), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, sc = s % 60; return h ? h + ':' + p2(m) + ':' + p2(sc) : m + ':' + p2(sc); };   // 44:32 or 1:05:12
   let slBadgeLast = null;
   function sleepBadge() {
     const bv = $('#b-ctl-sleep-v'); if (!bv) return;
