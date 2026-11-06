@@ -196,6 +196,6 @@
 .ctl #b-ctl-speed[data-on="true"], .ctl #b-ctl-sleep[data-on="true"] { color: var(--accent); }
 
 .ctl #b-ctl-speed, .ctl #b-ctl-sleep { position: relative; }
-.ctl-badge { position: absolute; left: 50%; bottom: -.15rem; transform: translateX(-50%); font-size: .62rem; line-height: 1; font-weight: 700; letter-spacing: .01em; white-space: nowrap; color: var(--muted, var(--ink)); pointer-events: none; }
+.ctl-badge { position: absolute; top: .1rem; right: -.2rem; padding: .08rem .28rem; border-radius: 999px; font-size: .6rem; line-height: 1.15; font-weight: 700; letter-spacing: .01em; white-space: nowrap; background: var(--accent-soft); color: var(--muted, var(--ink)); pointer-events: none; }
 .ctl-badge[hidden] { display: none; }
-.ctl [data-on="true"] > .ctl-badge { color: var(--accent); }
+.ctl [data-on="true"] > .ctl-badge { background: var(--accent); color: var(--accent-ink); }

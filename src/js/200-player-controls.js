@@ -167,16 +167,32 @@
     ['#btn-player-settings'].forEach(id => { const b = $(id); if (b) b.classList.toggle('has-dot', dot); });
     { const mb = $('#btn-topmore'), td = $('#b-timing'); if (mb) mb.classList.toggle('has-dot', dot || !!(td && !td.hidden && td.dataset.state && td.dataset.state !== 'precise')); }   // the \u22ef menu hides these two, so it shows their dot
   }
+  /* Time left on the Sleep timer, shown on the little badge next to the moon (and counted down every few seconds). */
+  const slLeftSec = () => {
+    if (typeof S.sleep === 'number' && S.sleep > 0 && S.sleepEnd) return Math.max(0, Math.round((S.sleepEnd - Date.now()) / 1000));
+    if (S.sleep === 'chapter') { const d = audio.duration, c = audio.currentTime; return isFinite(d) && d > 0 ? Math.max(0, Math.round((d - c) / (audio.playbackRate || 1))) : -1; }
+    return 0;
+  };
+  const slLeftFmt = s => s < 0 ? 'end' : s < 60 ? Math.max(1, s) + 's' : s < 3600 ? Math.ceil(s / 60) + 'm' : Math.floor(s / 3600) + 'h' + (Math.floor(s / 60) % 60 ? String(Math.floor(s / 60) % 60).padStart(2, '0') : '');
+  let slBadgeLast = null;
+  function sleepBadge() {
+    const bv = $('#b-ctl-sleep-v'); if (!bv) return;
+    const on = !!S.sleep, txt = on ? slLeftFmt(slLeftSec()) : '';
+    if (txt === slBadgeLast && bv.hidden === !on) return;
+    slBadgeLast = txt; bv.hidden = !on; bv.textContent = txt;
+  }
+  setInterval(() => { if (S.sleep) sleepBadge(); }, 1000);
   function setSleep(v) {
     if (v !== 0 && S.book) trAdd({ sec: S.sec, time: nowT(), why: 'sleep' });
     clearTimeout(S.sleepTimer); cancelFade(); S.sleep = v;
     el.sleep.querySelector('.ub-l').textContent = sleepShort(v);
     el.sleep.dataset.on = String(v !== 0);
-    { const cs = $('#b-ctl-sleep'); if (cs) { cs.dataset.on = String(v !== 0); cs.setAttribute('aria-label', sleepLabel(v)); cs.title = sleepLabel(v); const bv = $('#b-ctl-sleep-v'); if (bv) { bv.hidden = v === 0; bv.textContent = v === 'chapter' ? 'end' : v === 60 ? '1h' : v === 90 ? '1.5h' : v + 'm'; } } }
+    { const cs = $('#b-ctl-sleep'); if (cs) { cs.dataset.on = String(v !== 0); cs.setAttribute('aria-label', sleepLabel(v)); cs.title = sleepLabel(v); } }
     el.sleep.setAttribute('aria-label', sleepLabel(v));
     nrSleep(v);
     qkPaint();
     S.sleepEnd = (typeof v === 'number' && v > 0) ? Date.now() + v * 60000 : 0;
+    sleepBadge();
     if (typeof v === 'number' && v > 0) S.sleepTimer = setTimeout(fadeAndPause, v * 60000);
   }
   /* Graceful fade: a smooth ease-out over FADE_SECS. Used when a timed sleep ends, and over the last

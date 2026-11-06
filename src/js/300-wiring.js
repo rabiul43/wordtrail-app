@@ -104,7 +104,7 @@
           toast(v === 0 ? 'Sleep timer off' : v === 'chapter' ? 'Sleep at the end of this track' : sleepLabel(v), 2200);
         } }, lab)));
         const c = S.sleep || 0;
-        slNote.textContent = c === 0 ? 'The book keeps playing.' : c === 'chapter' ? 'Pauses at the end of this track.' : 'Pauses in ' + c + ' min.';
+        slNote.textContent = c === 0 ? 'The book keeps playing.' : c === 'chapter' ? 'Pauses at the end of this track.' : 'Pauses in about ' + Math.max(1, Math.ceil(slLeftSec() / 60)) + ' min.';
       };
       $('#b-ctl-sleep').addEventListener('click', () => { buzz('tick'); slDraw(); openSheet('sheet-sleep'); }); }
     $('#b-prevtrack').addEventListener('click', () => { buzz('light'); stepTrack(-1); });
