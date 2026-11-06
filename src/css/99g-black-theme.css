@@ -1,0 +1,20 @@
+/* Black theme: true #000 background (saves power on OLED screens). Chosen in Settings > Reading > Theme, or in the reader's Aa sheet.
+   Same warm text and gold accent as Dark; surfaces step up from black in small, even steps and the lines carry the separation, since shadows do not show on black.
+   Remove this file, the "Black" buttons and the head-script entry to take the theme out again. */
+:root[data-theme="black"] {
+  --cv-a: 34% 30%; --cv-b: 36% 20%; --cv-ink: 55% 86%;
+  --bg: #000000; --surface: #0C0C0E; --surface-2: #17171B; --line: #2A2A30;
+  --ink: #F2EBDD; --muted: #B4B4BE;
+  --accent: #E0B15A; --accent-ink: #1A1405; --accent-soft: #1F1A0E; --sun: #E0B15A; --mark: #4A3A18;
+  --warn: #E9A23B; --warn-ink: #1A1405; --danger: #FF8F80; --err: #E5604F; --err-ink: #1A0805;
+  --scrim: rgba(0, 0, 0, .74); --glass: rgba(0, 0, 0, .86);
+  --shadow: 0 0 0 1px #1F1F24; --shadow-sm: 0 0 0 1px #1F1F24; --shadow-pop: 0 0 0 1px #2A2A30, 0 10px 30px rgba(0, 0, 0, .8);
+  --shadow-cover: 0 0 0 1px rgba(255, 255, 255, .06); --shadow-up: 0 -1px 0 #1F1F24;
+  --focus-ring: #E0B15A;
+  color-scheme: dark;
+}
+/* Settings theme picker: six choices fill two even rows of three */
+#seg-theme button:nth-child(n+4) { grid-column: span 2; }
+/* Reader "Aa" sheet: six swatches */
+.aa-themes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.aa-themes button[data-v="black"] .aa-sw { --sw-bg: #000000; --sw-ink: #F2EBDD; border: 1px solid #3A3A42; }

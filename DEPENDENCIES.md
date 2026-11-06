@@ -87,7 +87,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `270-sheets-nextup-back.js` | 280 | 31 | 11 | 47 |
 | `280-downloads-progress.js` | 714 | 75 | 25 | 53 |
 | `281-book-download-card.js` | 170 | 12 | 2 | 31 |
-| `282-library-hub.js` | 45 | 7 | 3 | 13 |
+| `282-library-hub.js` | 51 | 7 | 3 | 13 |
 | `290-backup-maintenance.js` | 394 | 44 | 13 | 41 |
 | `295-account-sync.js` | 586 | 74 | 11 | 10 |
 | `296-desktop-bar.js` | 64 | 8 | 1 | 4 |
