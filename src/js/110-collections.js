@@ -27,6 +27,47 @@
     const g = h('div', { class: 'col-grid', 'aria-busy': 'true', 'aria-label': 'Loading collections' }, [h('div', { class: 'col-sk hero' })].concat([1, 2, 3, 4].map(() => h('div', { class: 'col-sk' }))));
     body.append(g);
   }
+  /* ---------- Explore design (phones): Pick of the day, genre chips, Find your level ---------- */
+  function exPick(shelves) {   // one book per day, from every shelf (needs a cover and a length)
+    const seen = new Set(), pool = [];
+    shelves.forEach(c => c.books.forEach(b => { if (b && b.id && b.cover && b.total && !seen.has(String(b.id))) { seen.add(String(b.id)); pool.push(b); } }));
+    return pool.length ? pool[Math.floor(Date.now() / 864e5) % pool.length] : null;
+  }
+  function exHash(s) { let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 360; return x; }
+  function exIcon(path, cls) { const sp = h('span', { class: cls || 'ex-ic', 'aria-hidden': 'true' }); sp.innerHTML = '<svg viewBox="0 0 24 24">' + path + '</svg>'; return sp; }
+  function exHero(b) {
+    const lvl = h('span', { class: 'ex-pill ex-lvl', hidden: true });
+    const paintLvl = () => { const v = LVL.map.get(String(b.id)), c = v && LVL.cefr[v[1]]; if (c) { lvl.textContent = (LVL.tiers[v[0]] || '') + ' · ' + c[0]; lvl.dataset.t = v[0]; lvl.hidden = false; } };
+    paintLvl(); if (!LVL.ready) LVL.load().then(paintLvl).catch(() => {});
+    const save = h('button', { class: 'ex-save', type: 'button', 'aria-label': 'Save to My Library', onclick: () => { toggleFav(b); paintSave(); } }, exIcon('<path d="M6 4h12v17l-6-4-6 4z"/>'));
+    const paintSave = () => { const on = isFav(b.id); save.classList.toggle('on', on); save.setAttribute('aria-pressed', String(on)); };
+    paintSave();
+    const bars = [8, 14, 10, 20, 12, 18, 7, 16, 22, 11, 15, 9, 19, 13, 8, 17, 12, 21, 10, 14, 9, 16];
+    const wave = h('div', { class: 'ex-wave', 'aria-hidden': 'true' }, bars.map(n => h('b', { style: 'height:' + n + 'px' })), h('span', {}, lfReadAlong(b) ? 'Read along · synced highlighting' : 'Audiobook'));
+    return h('section', { class: 'ex-hero', style: '--h:' + exHash(String(b.id)), 'aria-label': 'Pick of the day' },
+      h('span', { class: 'ex-glow', 'aria-hidden': 'true' }),
+      h('span', { class: 'ex-tag' }, '✦ Pick of the day'),
+      h('button', { class: 'ex-txt', type: 'button', onclick: () => openBook(b) }, h('h2', {}, b.title), h('span', { class: 'ex-au' }, b.authors || ''),
+        h('span', { class: 'ex-meta' }, lvl, b.total ? h('span', { class: 'ex-pill' }, fmtShort(b.total)) : null)),
+      h('button', { class: 'ex-cov', type: 'button', 'aria-label': 'Open ' + b.title, onclick: () => openBook(b) }, tileCoverNode(b)),
+      wave,
+      h('div', { class: 'ex-cta' }, h('button', { class: 'ex-play', type: 'button', onclick: () => openBook(b, { play: true }) }, exIcon('<path d="M6 4l14 8-14 8z"/>', 'ex-ic fill'), 'Start listening'), save));
+  }
+  function exLevels() {
+    const defs = [[0, 'B1', 'Easy'], [1, 'B2', 'Medium'], [2, 'C1', 'Challenge']];
+    const nodes = defs.map(([t, code, name]) => {
+      const n = h('span', { class: 'ex-n' }, ' ');
+      const btn = h('button', { class: 'ex-lv t' + t, type: 'button', onclick: () => { LF.lvl.clear(); LF.lvl.add(t); lfPaint(); showTab('search'); } },
+        h('span', { class: 'ex-big' }, code), n, h('span', { class: 'ex-b' }, name));
+      btn._n = n; return btn;
+    });
+    const count = () => { const c = [0, 0, 0]; LVL.map.forEach(v => { if (c[v[0]] !== undefined) c[v[0]]++; }); nodes.forEach((b, i) => { b._n.textContent = c[i] ? c[i].toLocaleString() + ' books' : ' '; }); };
+    if (LVL.ready) count(); else LVL.load().then(() => { if (LVL.ready) count(); }).catch(() => {});
+    return h('section', { class: 'ex-levels-wrap' },
+      h('div', { class: 'home-section-head' }, h('h2', {}, 'Find your level'),
+        h('button', { class: 'ex-link', type: 'button', onclick: () => toast('Easy = A2–B1 · Medium = B2 · Challenge = C1–C2', 4200) }, 'How levels work')),
+      h('div', { class: 'ex-levels' }, nodes));
+  }
   function drawCollections(body, shelves) {
     $('#col-head').hidden = false;
     $('#col-sub').textContent = shelves.length ? shelves.length + ' shelves, rebuilt daily.' : 'No collections yet. Check back soon.';
@@ -34,12 +75,14 @@
     const clr = h('button', { class: 'btn-clear', type: 'button', 'aria-label': 'Clear search', hidden: !COL.q, onclick: () => { q.value = ''; COL.q = ''; clr.hidden = true; draw(); q.focus(); } }, svgIcon('#i-x'));
     const field = h('div', { class: 'col-field' }, svgIcon('#i-search'), q, clr), list = h('div', { class: 'col-list' });
     const go = key => { COL.open = key; renderCollections(); window.scrollTo(0, 0); };
+    const blocks = new Map();
     const rowBlock = (c, books) => {
       const row = h('div', { class: 'hrow', 'aria-label': c.title });
       const block = h('section', { class: 'col-block' },
         h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, c.title, h('span', { class: 'col-count' }, String(books === c.books ? (c.tot || books.length) : books.length))), c.blurb ? h('p', { class: 'mood-sub' }, c.blurb) : null), h('button', { class: 'sec-more', type: 'button', onclick: () => go(c.key) }, 'See all \u2192')),
         row);
       fillRow(row, books, () => go(c.key), 12);
+      if (books === c.books) blocks.set(c.key, block);
       return block;
     };
     const tile = c => h('button', { class: 'col-tile', type: 'button', style: '--h:' + colHue(c.key, shelves.indexOf(c)), onclick: () => go(c.key) },
@@ -61,9 +104,11 @@
       }
       if (!shelves.length) { list.append(stateNode('empty', 'No collections yet', 'Shelves are rebuilt every week. Check back soon.')); return; }
       const [hero, ...rest] = shelves;
-      list.append(h('button', { class: 'col-hero', type: 'button', style: '--h:' + colHue(hero.key, 0), onclick: () => go(hero.key) },
-        h('span', { class: 'col-hero-top' }, h('span', {}, h('span', { class: 'eyebrow' }, 'Start here'), h('h2', {}, hero.title), h('p', {}, hero.blurb || colStats(hero))), colFan(hero)),
-        h('span', { class: 'col-go' }, colStats(hero) + ' \u00b7 Open', svgIcon('#i-go'))));
+      const pick = exPick(shelves);
+      const chipsAt = list.childNodes.length;   // the chip row goes here once the shelves are drawn
+      if (pick) list.append(exHero(pick));
+      list.append(exLevels());
+      list.append(rowBlock(hero, hero.books));
       // Every other shelf goes under its section heading (Popular, Genres, Learn English...). Small sections are rows, big ones are tiles.
       const groups = new Map();
       rest.forEach(c => { const g = c.group || 'More collections'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(c); });
@@ -78,8 +123,14 @@
         heads.set(g, head || sec);
         secs.push(sec);
       });
-      if (groups.size > 1) list.append(h('div', { class: 'col-jump', role: 'group', 'aria-label': 'Jump to a section' },
-        [...groups.keys()].map(g => h('button', { class: 'col-toggle', type: 'button', onclick: () => heads.get(g).scrollIntoView({ behavior: motionOk(), block: 'start' }) }, g))));
+      const chip = (label, fn, on) => h('button', { class: 'ex-chip' + (on ? ' on' : ''), type: 'button', onclick: fn }, label);
+      const jump = el => () => { if (el) el.scrollIntoView({ behavior: motionOk(), block: 'start' }); };
+      const chips = h('div', { class: 'ex-chips', role: 'group', 'aria-label': 'Jump to a shelf' },
+        chip('\u2726 For you', () => window.scrollTo({ top: 0, behavior: motionOk() }), true),
+        blocks.has(hero.key) ? chip(hero.title, jump(blocks.get(hero.key))) : null,
+        (groups.get('Browse by genre') || []).filter(c => blocks.has(c.key)).map(c => chip(c.title, jump(blocks.get(c.key)))),
+        [...groups.keys()].filter(g => g !== 'Browse by genre' && heads.get(g) && heads.get(g).tagName === 'H2').map(g => chip(g, jump(heads.get(g)))));
+      list.insertBefore(chips, list.childNodes[chipsAt] || null);
       list.append(...secs);
     };
     q.addEventListener('input', () => { COL.q = q.value; clr.hidden = !q.value; draw(); });

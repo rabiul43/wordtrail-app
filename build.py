@@ -49,6 +49,7 @@ PARTS = [
     ('file', 'src/css/99f-library-polish.css'),
     ('file', 'src/css/99g-black-theme.css'),
     ('file', 'src/css/99h-white-theme.css'),
+    ('file', 'src/css/99i-explore-design.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

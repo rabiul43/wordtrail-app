@@ -1,0 +1,56 @@
+/* Explore design (phones): genre chips, Pick of the day hero, Find your level tiles.
+   Built from the approved concept. Remove this file (and its line in build.py) plus the ex* code in 110-collections.js to go back. */
+#collections { --ex-easy: #B8E986; --ex-med: #F2C46B; --ex-hard: #F59A8B; }
+.ex-chips { display: flex; gap: .5rem; overflow-x: auto; margin: 0 -1.1rem; padding: .1rem 1.1rem .15rem; scrollbar-width: none; }
+.ex-chips::-webkit-scrollbar { display: none; }
+.ex-chip { flex: none; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); border-radius: var(--r-pill); padding: .5rem .9rem; font: 500 .8rem var(--font-ui); white-space: nowrap; }
+.ex-chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.ex-chip:active { transform: scale(var(--press, .97)); }
+
+.ex-hero { --h: 195; position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 7.25rem; grid-template-areas: "tag tag" "txt cov" "wave wave" "cta cta"; column-gap: .9rem; row-gap: .5rem; padding: 1rem 1.1rem 1rem; border-radius: 28px; overflow: hidden; border: 1px solid color-mix(in srgb, hsl(var(--h) 55% 50%) 22%, var(--line));
+  background: linear-gradient(160deg, hsl(var(--h) 62% 18%) 0%, hsl(var(--h) 58% 11%) 55%, hsl(var(--h) 60% 6%) 100%); color: #F2EBDD; }
+.ex-glow { position: absolute; right: -60px; top: -70px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(224, 177, 90, .5), transparent 65%); pointer-events: none; }
+.ex-tag { grid-area: tag; position: relative; font: 700 .66rem var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.ex-txt { grid-area: txt; position: relative; display: block; text-align: left; border: 0; background: none; color: inherit; padding: 0; align-self: center; min-width: 0; }
+.ex-txt h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.32rem; line-height: 1.08; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.ex-au { display: block; margin-top: .5rem; font-size: .8rem; color: rgba(255, 255, 255, .72); }
+.ex-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
+.ex-pill { font: 700 .66rem var(--font-ui); padding: .25rem .55rem; border-radius: var(--r-pill); background: rgba(0, 0, 0, .45); border: 1px solid rgba(255, 255, 255, .14); }
+.ex-pill[hidden] { display: none; }
+.ex-lvl[data-t="0"] { color: var(--ex-easy); } .ex-lvl[data-t="1"] { color: var(--ex-med); } .ex-lvl[data-t="2"] { color: var(--ex-hard); }
+.ex-cov { grid-area: cov; position: relative; align-self: center; justify-self: end; width: 7.25rem; aspect-ratio: 2 / 3; padding: 0; border: 0; background: none; border-radius: 12px; transform: rotate(4deg); box-shadow: 0 18px 36px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .12); }
+.ex-cov .tile-cover { width: 100%; height: 100%; border-radius: 12px; }
+.ex-wave { grid-area: wave; position: relative; display: flex; align-items: flex-end; gap: 3px; height: 22px; margin-top: .3rem; }
+.ex-wave b { width: 3px; border-radius: 2px; background: var(--accent); opacity: .9; }
+.ex-wave span { margin-left: .5rem; align-self: center; font-size: .66rem; color: rgba(255, 255, 255, .75); white-space: nowrap; }
+.ex-cta { grid-area: cta; position: relative; display: flex; gap: .65rem; align-items: center; margin-top: .3rem; }
+.ex-play { flex: 1; height: 46px; border: 0; border-radius: var(--r-pill); background: var(--accent); color: var(--accent-ink); font: 700 .88rem var(--font-ui); display: flex; align-items: center; justify-content: center; gap: .5rem; }
+.ex-ic svg { width: 18px; height: 18px; display: block; stroke: currentColor; fill: none; stroke-width: 2; stroke-linejoin: round; }
+.ex-ic.fill svg { width: 14px; height: 14px; fill: currentColor; stroke: none; }
+.ex-save { flex: none; width: 46px; height: 46px; border-radius: 50%; background: rgba(0, 0, 0, .4); border: 1px solid rgba(255, 255, 255, .2); color: #F2EBDD; display: grid; place-items: center; }
+.ex-save.on { color: var(--accent); border-color: var(--accent); } .ex-save.on svg { fill: currentColor; }
+.ex-play:active, .ex-save:active, .ex-lv:active, .ex-cov:active { transform: scale(var(--press, .97)); }
+.ex-play:focus-visible, .ex-save:focus-visible, .ex-lv:focus-visible, .ex-cov:focus-visible, .ex-txt:focus-visible, .ex-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.ex-levels-wrap .home-section-head { align-items: baseline; }
+html[data-home="st"] .ex-levels-wrap .home-section-head::after { display: none; }
+.ex-levels-wrap .home-section-head { justify-content: space-between; }
+.ex-link { border: 0; background: none; color: var(--accent); font: 600 .8rem var(--font-ui); padding: 0; }
+.ex-levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; }
+.ex-lv { text-align: left; border: 1px solid var(--line); border-radius: 20px; padding: .85rem .75rem; min-height: 96px; background: var(--surface); color: inherit; display: block; }
+.ex-big { display: block; font: 700 1.65rem/1 var(--font-display); }
+.ex-n { display: block; margin-top: .3rem; font-size: .7rem; color: var(--muted); }
+.ex-b { display: flex; align-items: center; gap: .35rem; margin-top: .6rem; font: 700 .66rem var(--font-ui); }
+.ex-b::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.ex-lv.t0 { background: linear-gradient(160deg, rgba(184, 233, 134, .16), var(--surface) 70%); } .ex-lv.t0 .ex-big, .ex-lv.t0 .ex-b { color: var(--ex-easy); }
+.ex-lv.t1 { background: linear-gradient(160deg, rgba(242, 196, 107, .18), var(--surface) 70%); } .ex-lv.t1 .ex-big, .ex-lv.t1 .ex-b { color: var(--ex-med); }
+.ex-lv.t2 { background: linear-gradient(160deg, rgba(245, 154, 139, .16), var(--surface) 70%); } .ex-lv.t2 .ex-big, .ex-lv.t2 .ex-b { color: var(--ex-hard); }
+
+/* the screen has no filter box (the header search covers it); big headings in the display font */
+@media (max-width: 699px) {
+  #collections .col-field { display: none; }
+  #collections #col-head h1 { font-size: 2.1rem; letter-spacing: -.01em; }
+  #collections .col-list { gap: 1.25rem; }
+  #collections .home-section-head h2 { font-family: var(--font-display); font-size: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) { .ex-chip, .ex-play, .ex-save, .ex-lv, .ex-cov { transition: none; } }
