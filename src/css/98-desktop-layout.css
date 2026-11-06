@@ -237,8 +237,8 @@
   }
   .dock > .seek, .dock.slim > .seek { grid-area: seek; align-self: end; grid-template-columns: auto minmax(0, 1fr) auto; gap: 1rem; font-size: .78rem; }
   .dock > .ctl, .dock.slim > .ctl { gap: 1.1rem; align-items: center; }
-  .dock #b-prevsent, .dock #b-nextsent, .dock.slim #b-prevsent, .dock.slim #b-nextsent { display: grid; width: 2rem; height: 2rem; color: var(--ink); }
-  .dock #b-prevsent .ic, .dock #b-nextsent .ic { width: 1.1rem; height: 1.1rem; }
+  .dock #b-ctl-speed, .dock #b-ctl-sleep, .dock.slim #b-ctl-speed, .dock.slim #b-ctl-sleep { display: grid; width: 2rem; height: 2rem; color: var(--ink); }
+  .dock #b-ctl-speed .ic, .dock #b-ctl-sleep .ic { width: 1.1rem; height: 1.1rem; }
   /* -15 / +15 as bold text instead of the circular arrow icons */
   .dock #b-back15 .ic, .dock #b-fwd15 .ic { display: none; }
   .dock #b-back15, .dock #b-fwd15 { width: auto; min-width: 2.6rem; padding: 0 .3rem; font: 700 .9rem/1 var(--font-ui); color: var(--ink); font-variant-numeric: tabular-nums; }

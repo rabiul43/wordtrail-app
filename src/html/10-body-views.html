@@ -59,6 +59,7 @@
     <symbol id="i-fwd15" viewBox="0 0 24 24"><path d="M12 5a8 8 0 1 0 8 8"/><path d="M12 2l3 3-3 3"/><text x="12" y="16.4" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">15</text></symbol>
     <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
     <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-speed" viewBox="0 0 24 24"><path d="M4.2 17.5a8.5 8.5 0 1 1 15.6 0"/><path d="M12 14l4-4.5"/><circle cx="12" cy="14.5" r="1.2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
     <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.7l7.4-4.4M8.3 13.3l7.4 4.4"/></symbol>
     <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
@@ -489,11 +490,11 @@
     </div>
     <div id="book-prog" class="bookprog" role="progressbar" aria-label="Book progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="bp-bar"><i></i></span><span class="bp-t"></span></div>
     <div class="ctl">
-      <button id="b-prevsent" class="ib" aria-label="Previous sentence" title="Previous sentence"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+      <button id="b-ctl-speed" class="ib" aria-label="Playback speed" title="Playback speed"><svg class="ic" aria-hidden="true"><use href="#i-speed"/></svg></button>
       <button id="b-back15" class="ib" aria-label="Back 15 seconds" title="Back 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-back15"/></svg></button>
       <button id="b-play" class="play" aria-label="Play"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></button>
       <button id="b-fwd15" class="ib" aria-label="Forward 15 seconds" title="Forward 15 seconds"><svg class="ic" aria-hidden="true"><use href="#i-fwd15"/></svg></button>
-      <button id="b-nextsent" class="ib" aria-label="Next sentence" title="Next sentence"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+      <button id="b-ctl-sleep" class="ib" aria-label="Sleep timer" title="Sleep timer"><svg class="ic" aria-hidden="true"><use href="#n-moon"/></svg></button>
     </div>
     <div class="dright">
     <div class="uc" role="group" aria-label="Playback tools"><button id="b-speed" class="ub" type="button" aria-label="Playback speed"><b class="ub-sp">1.0×</b><span class="ub-l">Speed</span></button><button id="b-sleep" class="ub" type="button" aria-label="Sleep timer"><svg class="uic" aria-hidden="true"><use href="#n-moon"/></svg><span class="ub-l">Sleep</span></button><button id="b-tracks-dock" class="ub" type="button" aria-label="Tracks"><svg class="uic" aria-hidden="true"><use href="#n-queue"/></svg><span class="ub-l">Tracks</span></button><button id="b-bm-dock" class="ub" type="button" aria-label="Bookmark" aria-pressed="false"><svg class="uic" aria-hidden="true"><use href="#n-bm"/></svg><span class="ub-l">Bookmark</span></button><button id="b-nexttrack" class="ub" type="button" aria-label="Next track"><svg class="uic" aria-hidden="true"><use href="#i-nexttrack"/></svg><span class="ub-l">Next track</span></button></div>
