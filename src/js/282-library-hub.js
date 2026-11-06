@@ -40,6 +40,12 @@
     } }, h('span', { class: 'lh-ic', 'aria-hidden': 'true' }, lhSvg(LH_ICONS[m])),
       h('span', { class: 'lh-txt' }, h('b', {}, LH_TITLES[m]), h('small', {}, sub)),
       lhSvg(['M9 5l7 7-7 7'], 'lh-go'))));
+    try {
+      const nSaved = getFavs().length, nDl = [...dlMeta.values()].filter(m => m && m.tracks && Object.keys(m.tracks).length).length;
+      if (!nSaved && !nDl) host.append(h('div', { class: 'lh-empty' }, lhSvg(LH_ICONS.saved), h('b', {}, 'Your library is empty'),
+        h('p', {}, 'Tap the bookmark on any book to save it here, or download one to listen offline.'),
+        h('button', { type: 'button', onclick: () => { const t = [...document.querySelectorAll('#tabbar button')].find(x => x.dataset.tab === 'collections'); t && t.click(); } }, 'Find a book')));
+    } catch (e) { /* the empty hint is optional */ }
     /* the downloads count is known only after the saved list has loaded: draw again then */
     if (!libHubDraw.hooked) { libHubDraw.hooked = true; Promise.resolve(dlReady).then(() => { libHubDraw.ready = true; if (shelfHub && curTab === 'shelf') libHubDraw(); }); }
   }

@@ -197,3 +197,14 @@
 .cc-t strong { font-size: 1rem; }
 .cc-t small { color: var(--muted); font-size: var(--label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+
+.ptitle { position: relative; z-index: 3; margin-top: 1rem; }
+.note { margin: 1rem auto; padding: .9rem 1rem; gap: .6rem; }
+.note strong { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+.note-act { align-items: center; gap: .9rem; }
+.note-link { background: none; border: 0; padding: .5rem .4rem; min-height: 2.5rem; font: inherit; font-size: .9rem; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.note-d { font-size: .78rem; color: var(--muted); }
+.note-d > summary { cursor: pointer; list-style: none; }
+.note-d > summary::-webkit-details-marker { display: none; }
+.note-d > small { display: block; margin-top: .3rem; }
+.bookprog .bp-t { color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }

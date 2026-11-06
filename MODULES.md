@@ -54,7 +54,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
-| `200-player-controls.js` | 505 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
+| `200-player-controls.js` | 522 | how sure the highlight is, sleep timer, speed, media session, shake to extend the sleep timer, lock screen, keep the screen on while a book is open, Highlights, notes and quote cards, app language and right-to-left layout (words live in `src/i18n/<code>.json`, one file per language (joined into `#i18n-data` by `build.py`; check with `python tools/i18n_check.py xx`); engine also translates numbers with units (`units` in the language file: "5h 10m", "45 min ago"), optional native digits (`digits`, Settings > Reading), placeholder/aria-label/title and loads Noto Sans Bengali lazily for bn; Bengali review list in `BN-REVIEW.md`) |
 | `230-scene-words.js` | 353 | scene detection: places, weather, time and mood tables, the word lists |
 | `231-scene-scoring.js` | 340 | negation and endings, weather strength, quoted speech, genre priors, choosing and keeping a place/name |
 | `232-scene-test.js` | 233 | Scene test (Settings > Developer) |
@@ -66,7 +66,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `260-audio-effects.js` | 395 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
 | `270-sheets-nextup-back.js` | 280 | sheets, Pre-sync, Next up, Back button / swipe-back |
-| `280-downloads-progress.js` | 713 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
+| `280-downloads-progress.js` | 714 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `281-book-download-card.js` | 170 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `282-library-hub.js` | 45 | My Library on phones (under 700px): the Downloads tab is not in the bottom bar; My Library opens on a list of pages (Saved, Downloads, Following, Rated, Synced books) with counts, `libHubDraw`, `phoneUI`, `libHubTitle`. State `shelfHub` / `shelfHubNext` is in `080`; styles `99e-library-hub.css` |
 | `290-backup-maintenance.js` | 394 | Backup and restore, sync dashboard |
@@ -74,7 +74,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |
 | `296-desktop-bar.js` | 64 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 86 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 793 | wiring |
+| `300-wiring.js` | 806 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)

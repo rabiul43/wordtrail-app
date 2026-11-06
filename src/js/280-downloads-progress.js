@@ -566,12 +566,13 @@
     if (sum) sum.hidden = !b;
     if (!b) return;
     const txt0 = b.pct + '% \u00b7 ' + bpLeftText(b.left), txt = txt0;
-    const dtxt = P.tidyPlayer !== false ? b.pct + '% of book \u00b7 ' + bpLeftText(b.left) : txt;
+    const dtxt = P.tidyPlayer !== false ? bpLeftText(b.left) + ' in book' : txt;
     [dock, nr].forEach(x => {
       if (!x) return;
       const txt = x === dock ? dtxt : txt0;
       const t = x.querySelector('.bp-t');
-      if (t.textContent !== txt) { t.textContent = txt; x.querySelector('.bp-bar > i').style.width = b.pct + '%'; }
+      if (t.textContent !== txt) t.textContent = txt;
+      x.querySelector('.bp-bar > i').style.width = b.pct + '%';
     });
     if (dock) dock.setAttribute('aria-valuenow', String(b.pct));
     if (sum && !sum.closest('[hidden]')) {

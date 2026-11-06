@@ -93,7 +93,7 @@
     attachText(saved);
   }
   function noteNode(msg, actions, detail) {
-    return h('div', { class: 'note' }, h('strong', {}, msg), detail ? h('small', { style: 'overflow-wrap:anywhere' }, String(detail).slice(0, 220)) : null, actions && actions.length ? h('div', { class: 'row', style: 'justify-content:center' }, actions.map(([label, fn]) => h('button', { class: 'btn small ghost', type: 'button', onclick: fn }, label))) : null);
+    return h('div', { class: 'note' }, h('strong', {}, msg), actions && actions.length ? h('div', { class: 'row note-act', style: 'justify-content:center' }, actions.map(([label, fn], i) => h('button', { class: i ? 'note-link' : 'btn small', type: 'button', onclick: fn }, label))) : null, detail ? h('details', { class: 'note-d' }, h('summary', {}, 'Details'), h('small', { style: 'overflow-wrap:anywhere' }, String(detail).slice(0, 220))) : null);
   }
   /* ---------- parsed-book cache ----------
      Splitting a whole book into chapters and sentences takes a moment, and the result never changes for
@@ -162,7 +162,7 @@
       if (raw && !parsed) parsed = await loadParsed(parsedKey(src, raw)); // an own text, or a text first met here
     } catch (e) {
       console.error('Wordtrail: text download failed', e);
-      note('The book text could not be downloaded. You can still listen.', [['Use my own text', () => openSheet('sheet-text')], ['Try again', () => attachText(saved)]], e && e.message);
+      note('Couldn\'t load the book text. You can still listen.', [['Retry', () => attachText(saved)], ['Use my own text', () => openSheet('sheet-text')]], e && e.message);
       return;
     }
     if (token !== S.textToken) return;

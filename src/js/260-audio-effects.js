@@ -272,7 +272,7 @@
   function setSpeed(v, auto) {
     v = spdClamp(v); silOn = false; P.speed = v; audio.defaultPlaybackRate = v; audio.playbackRate = v;
     if (!auto && P.speedEach !== false) { P.speedDef = v; if (S.book) bspdSet(S.book, v); }
-    el.speed.querySelector('.ub-sp').textContent = nrSpd(v) + '×'; el.speed.dataset.on = String(v !== 1); { const cs = $('#b-ctl-speed'); if (cs) { cs.dataset.on = String(v !== 1); cs.title = 'Playback speed: ' + spdFmt(v); } const bv = $('#b-ctl-speed-v'); if (bv) bv.textContent = nrSpd(v) + '\u00d7'; }
+    el.speed.querySelector('.ub-sp').textContent = nrSpd(v) + '×'; el.speed.dataset.on = String(v !== 1); { const cs = $('#b-ctl-speed'); if (cs) { cs.dataset.on = String(v !== 1); cs.title = 'Playback speed: ' + spdFmt(v); } const bv = $('#b-ctl-speed-v'); if (bv) { bv.textContent = nrSpd(v) + '\u00d7'; bv.hidden = v === 1; } }
     el.speed.setAttribute('aria-label', 'Playback speed: ' + spdFmt(v) + '. Open playback settings'); savePrefs();
     nrSpeedUI();
     qkPaint();
