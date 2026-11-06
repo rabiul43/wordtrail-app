@@ -86,8 +86,11 @@
     const map = new Map(CAT.books.map(b => [b.id, b]));
     const pub = ({ _t, _a, _l, _g, ...b }) => b;
     const okLang = b => P.otherLangs || !b.lang || /^english$/i.test(b.lang);
-    const pick = ids => (ids || []).map(i => map.get(String(i))).filter(b => b && okLang(b)).slice(0, max).map(pub);
-    const cols = (d.collections || []).map((c, i) => ({ key: String(c.id || c.slug || i), title: c.title || '', blurb: c.blurb || '', group: c.group || '', books: pick(c.ids) })).filter(c => c.title && c.books.length >= 3);
+    const pickAll = ids => (ids || []).map(i => map.get(String(i))).filter(b => b && okLang(b));
+    const pick = ids => pickAll(ids).slice(0, max).map(pub);
+    /* Every shelf shows its first `max` books (books) but also knows its real size (tot) and can hand out more of them (more(n)): the row
+       badge shows the real size and See all in Explore loads the whole shelf. */
+    const cols = (d.collections || []).map((c, i) => { const all = pickAll(c.ids); return { key: String(c.id || c.slug || i), title: c.title || '', blurb: c.blurb || '', group: c.group || '', books: all.slice(0, max).map(pub), tot: all.length, more: n => all.slice(0, n).map(pub) }; }).filter(c => c.title && c.books.length >= 3);
     const lowT = c => c.title.toLowerCase();
     const gs = genreShelves(max, okLang, pub, new Set(cols.map(c => genreTopic(c.title))));
     const shown = new Set(); gs.main.forEach(m => (GEN_MAIN.find(g => g.key === m.key).tp || []).forEach(t => shown.add(t)));   // topics the "Browse by genre" rows already cover
@@ -111,10 +114,11 @@
     if (GEN.k === k && GEN.v) return GEN.v;
     const pool = CAT.books.filter(b => b._g && okLang(b));
     const sep = /[,;|\/]+/, title = t => t.replace(/(^|[\s&(-])[a-z]/g, m => m.toUpperCase());
-    const take = (test, key) => pool.filter(b => test(b._g))
+    const rank = (test, key) => pool.filter(b => test(b._g))
       .map(b => [b, (b.ia ? 1 : 0) + (b.textUrl ? 1 : 0) + (b.total >= 1800 ? .5 : 0) + (covHash(day + key + b.id) % 1000) / 1000])
-      .sort((x, y) => y[1] - x[1]).slice(0, max).map(x => pub(x[0]));
-    const main = GEN_MAIN.map(g => ({ key: g.key, title: g.title, blurb: g.blurb, group: 'Browse by genre', books: take(g.test, g.key) })).filter(c => c.books.length >= 3);
+      .sort((x, y) => y[1] - x[1]).map(x => x[0]);
+    const sized = r => ({ books: r.slice(0, max).map(pub), tot: r.length, more: n => r.slice(0, n).map(pub) });   // first `max`, the real size, and a way to get more
+    const main = GEN_MAIN.map(g => Object.assign({ key: g.key, title: g.title, blurb: g.blurb, group: 'Browse by genre' }, sized(rank(g.test, g.key)))).filter(c => c.books.length >= 3);
     /* Every genre becomes one tile, except: topics the six rows above already cover (by name), genres whose name
        is the same as another once words like "fiction" are ignored, genres already shown as a curated shelf, and
        genres that are mostly the same books as a bigger one ("Mystery & Detection" next to "Detective Fiction"). */
@@ -128,10 +132,10 @@
       if (all.length >= 30 || covered.test(t)) return;
       const n = norm(t); if (!n || seen.has(n)) return;
       for (const o of kept) { let hit = 0; st.forEach(id => { if (o.has(id)) hit++; }); if (hit / st.size >= .85) return; }
-      const books = take(g => g.split(sep).some(x => x.trim() === t), 'all' + t);
-      if (books.length < 3) return;
+      const r = rank(g => g.split(sep).some(x => x.trim() === t), 'all' + t);
+      if (r.length < 3) return;
       seen.add(n); kept.push(st);
-      all.push({ key: 'g-' + seSlug(t), title: title(t), blurb: '', group: 'All genres', n: st.size, books });
+      all.push(Object.assign({ key: 'g-' + seSlug(t), title: title(t), blurb: '', group: 'All genres', n: st.size }, sized(r)));
     });
     GEN.k = k; GEN.v = { main, all };
     return GEN.v;

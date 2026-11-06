@@ -26,8 +26,8 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `102-home-sections.js` | 215 | 17 | 12 | 24 |
 | `103-browse-filters.js` | 250 | 30 | 13 | 28 |
 | `104-see-all-suggestions.js` | 137 | 18 | 13 | 17 |
-| `105-home-loaders.js` | 209 | 18 | 9 | 21 |
-| `110-collections.js` | 238 | 21 | 11 | 39 |
+| `105-home-loaders.js` | 213 | 18 | 9 | 21 |
+| `110-collections.js` | 242 | 21 | 11 | 39 |
 | `120-search-recommendations.js` | 578 | 64 | 23 | 63 |
 | `121-search-page.js` | 318 | 44 | 3 | 35 |
 | `130-book-detail.js` | 194 | 30 | 18 | 20 |

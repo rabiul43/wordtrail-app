@@ -38,8 +38,8 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
 | `103-browse-filters.js` | 250 | browse filters (length, mood, language, narrator, level, sort, minimum rating), filter panel. Declares `LF` |
 | `104-see-all-suggestions.js` | 137 | "See all" button and page, empty/error states, recent searches, live suggestions while typing |
-| `105-home-loaders.js` | 209 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
-| `110-collections.js` | 238 | Collections tab |
+| `105-home-loaders.js` | 213 | home loaders (book of the day, trending, new this week, collections shelves), genre shelves, Customise home |
+| `110-collections.js` | 242 | Collections tab |
 | `120-search-recommendations.js` | 578 | home search and recents, search filters, Search by meaning, "Because you listened to ...", mood rows, time-of-day card |
 | `121-search-page.js` | 318 | The Search page (Search tab and search icons): `#sp` markup in `10-body-views.html`, styles `99d-search-page.css`. Three looks (empty: recent, quick picks, genres; typing: did-you-mean, books, authors; results: filter chips, Books/Authors, count, sort) plus the filter sheet. Reads `SX` and `CAT`, no new network calls. `spShow()` opens it, `spBack()` is its Back step, `spOpen` (080) says it is on screen |
 | `130-book-detail.js` | 194 | Book detail page, Follow an author, Wikipedia bio and background, similar books |

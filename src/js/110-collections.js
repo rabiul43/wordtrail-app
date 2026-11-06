@@ -20,7 +20,7 @@
     if (cur) drawCollection(body, cur); else drawCollections(body, shelves);
   }
   const colHue = (k, i) => (i * 47 + 28) % 360;
-  const colStats = c => { const tot = c.books.reduce((a, b) => a + (b.total || 0), 0); return c.books.length + ' books' + (tot ? ' \u00b7 ' + Math.max(1, Math.round(tot / 3600)) + ' h' : ''); };
+  const colStats = c => { const tot = c.books.reduce((a, b) => a + (b.total || 0), 0); return (c.tot || c.books.length) + ' books' + (tot && !(c.tot > c.books.length) ? ' \u00b7 ' + Math.max(1, Math.round(tot / 3600)) + ' h' : ''); };
   const colFan = c => h('span', { class: 'col-fan', 'aria-hidden': 'true' }, c.books.slice(0, 3).map(b => coverNode(b)));
   function colSkeleton(body) {
     body.textContent = '';
@@ -37,7 +37,7 @@
     const rowBlock = (c, books) => {
       const row = h('div', { class: 'hrow', 'aria-label': c.title });
       const block = h('section', { class: 'col-block' },
-        h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, c.title, h('span', { class: 'col-count' }, String(books.length))), c.blurb ? h('p', { class: 'mood-sub' }, c.blurb) : null), h('button', { class: 'sec-more', type: 'button', onclick: () => go(c.key) }, 'See all \u2192')),
+        h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, c.title, h('span', { class: 'col-count' }, String(books === c.books ? (c.tot || books.length) : books.length))), c.blurb ? h('p', { class: 'mood-sub' }, c.blurb) : null), h('button', { class: 'sec-more', type: 'button', onclick: () => go(c.key) }, 'See all \u2192')),
         row);
       fillRow(row, books, () => go(c.key), 12);
       return block;
@@ -87,6 +87,8 @@
   }
   function drawCollection(body, c) {
     $('#col-head').hidden = true;
+    if (c.more && c.tot > c.books.length) c = Object.assign({}, c, { books: c.more(c.tot) });   // See all: the whole shelf (the rows on Explore only carry the first 60); sorting and Hide heard work on all of it, the grid is drawn a page at a time
+    let lim = 120;
     const cleanCardTitle = t => { const x = String(t || '').replace(/\s*[\(\[](?:version|ver\.?|v\.?|vol\.?|volume|dramatic reading|librivox recording)[^\)\]]*[\)\]]\s*/ig, ' ').replace(/\s{2,}/g, ' ').trim(); return x || String(t || ''); };
     const heardRec = new Map(listenedList().map(r => [r.id, r]));
     const heard = new Set(listenedList().map(r => r.id)), nHeard = c.books.filter(b => heard.has(b.id)).length;
@@ -94,6 +96,7 @@
     const idx = COL.data ? colShelves(COL.data).findIndex(x => x.key === c.key) : 0;
     const back = h('button', { class: 'ib', type: 'button', 'aria-label': 'Back to Explore', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, svgIcon('#i-back'));
     const grid = h('div', { class: 'grid3' }), seg = h('div', { class: 'seg', role: 'group', 'aria-label': 'Sort' });
+    const more = h('button', { class: 'btn ghost col-more', type: 'button', hidden: true, onclick: () => { lim += 120; draw(); } });
     const draw = () => {
       $$('button', seg).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === COL.sort)));
       hide.setAttribute('aria-pressed', String(COL.hide));
@@ -105,8 +108,9 @@
       else if (COL.sort === 'rated' && !rtCalm()) arr.sort(rtCmp);
       else if (COL.sort === 'az') arr.sort((a, b) => String(a.title).localeCompare(String(b.title)));
       grid.textContent = '';
-      if (!arr.length) { grid.append(h('p', { class: 'help' }, 'You have heard everything on this shelf.')); return; }
-      arr.forEach(b => {
+      if (!arr.length) { more.hidden = true; grid.append(h('p', { class: 'help' }, 'You have heard everything on this shelf.')); return; }
+      more.hidden = arr.length <= lim; more.textContent = 'Show more (' + Math.max(0, arr.length - lim) + ' left)';
+      arr.slice(0, lim).forEach(b => {
         const t = tileNode(b, () => openDetail(b));
         // Clean card text: no "(Version 2)"-style subtitles, then duration and listening progress under the author
         const tt = t.querySelector('.tile-t'); if (tt) { const ct = cleanCardTitle(b.title); tt.textContent = ct; tt.title = b.title; }
@@ -132,7 +136,7 @@
         h('div', { class: 'col-prog' }, h('span', {}, [c.books.length + ' books', tot ? fmtLong(tot) : ''].filter(Boolean).join(' \u00b7 ') + (nHeard ? ' \u00b7 ' + nHeard + ' heard' : '')), nHeard ? h('i', {}, h('b', { style: 'width:' + pct + '%' })) : null),
         h('div', { class: 'col-acts' }, play, rnd)),
       h('div', { class: 'col-bar' }, seg, hide),
-      grid);
+      grid, more);
     draw();
     // Collapse the header into a slim title bar once the banner has scrolled away
     const ban = body.querySelector('.col-banner');
