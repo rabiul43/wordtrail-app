@@ -85,9 +85,71 @@
     q.addEventListener('input', () => { COL.q = q.value; clr.hidden = !q.value; draw(); });
     body.append(field, list); draw();
   }
+  // "New this week" only: one big cover you swipe through (design: dark carousel). Other shelves keep the grid.
+  function drawNewWeek(body, c) {
+    const heard = new Set(listenedList().map(r => r.id)), nHeard = c.books.filter(b => heard.has(b.id)).length;
+    const idx = COL.data ? colShelves(COL.data).findIndex(x => x.key === c.key) : 0;
+    let arr = [], cur = 0;
+    const back = h('button', { class: 'ib', type: 'button', 'aria-label': 'Back to Explore', onclick: () => { COL.open = null; renderCollections(); window.scrollTo(0, 0); } }, svgIcon('#i-back'));
+    const glow = h('div', { class: 'nw-glow', 'aria-hidden': 'true' });
+    const stage = h('div', { class: 'nw-stage' });
+    const kick = h('div', { class: 'nw-k' }), title = h('h2', { class: 'nw-t' }), sub = h('div', { class: 'nw-a' }), dots = h('div', { class: 'nw-dots', 'aria-hidden': 'true' });
+    const upList = h('div', { class: 'nw-up' });
+    const sorts = [['curated', 'Curated'], ['short', 'Shortest'], ['long', 'Longest'], ['rated', 'Top rated'], ['az', 'A\u2013Z']].filter(s => s[0] !== 'rated' || !rtCalm());
+    const sel = h('select', { class: 'nw-sort', 'aria-label': 'Sort' }, sorts.map(([v, t]) => h('option', { value: v }, t)));
+    const hide = h('button', { class: 'col-toggle', type: 'button', onclick: () => { COL.hide = !COL.hide; cur = 0; stage.scrollLeft = 0; draw(); } }, 'Hide heard');
+    const listen = h('button', { class: 'btn nw-listen', type: 'button', onclick: () => { const b = arr[cur]; if (b) openBook(b); } }, [svgIcon('#i-play'), 'Listen now']);
+    const rnd = h('button', { class: 'btn ghost', type: 'button', onclick: () => { const pool = c.books.filter(b => !heard.has(b.id)), from = pool.length ? pool : c.books; const b = from[Math.floor(Math.random() * from.length)]; if (b) openBook(b); } }, 'Surprise me');
+    const go = i => { const el = stage.children[i]; if (el) stage.scrollTo({ left: el.offsetLeft - (stage.clientWidth - el.offsetWidth) / 2, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
+    const info = () => {
+      const b = arr[cur]; if (!b) return;
+      const lab = (sorts.find(s => s[0] === COL.sort) || sorts[0])[1];
+      kick.textContent = (cur + 1) + ' of ' + arr.length + ' \u00b7 ' + lab;
+      title.textContent = b.title; sub.textContent = [b.authors, b.total ? fmtShort(b.total) : '', heard.has(b.id) ? 'Heard' : ''].filter(Boolean).join(' \u00b7 ');
+      $$('i', dots).forEach((d, i) => d.classList.toggle('on', i === cur));
+      glow.style.setProperty('--h', colHue(c.key, Math.max(idx, 0) + cur));
+      upList.textContent = '';
+      arr.slice(cur + 1, cur + 4).forEach((u, k) => upList.append(h('button', { class: 'nw-row', type: 'button', onclick: () => go(cur + 1 + k) }, h('span', { class: 'nw-rc', 'aria-hidden': 'true' }, coverNode(u)), h('span', { class: 'nw-rt' }, h('b', {}, u.title), h('small', {}, u.total ? fmtShort(u.total) : (u.authors || ''))))));
+    };
+    const fx = () => {
+      const mid = stage.scrollLeft + stage.clientWidth / 2; let best = 0, bd = 1e9;
+      Array.prototype.forEach.call(stage.children, (el, i) => {
+        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid), k = Math.min(1, d / (el.offsetWidth * 1.1));
+        el.style.transform = 'scale(' + (1 - .12 * k).toFixed(3) + ')'; el.style.opacity = (1 - .45 * k).toFixed(2);
+        if (d < bd) { bd = d; best = i; }
+      });
+      if (best !== cur) { cur = best; info(); }
+    };
+    let nwFrame = 0; stage.addEventListener('scroll', () => { if (!nwFrame) nwFrame = requestAnimationFrame(() => { nwFrame = 0; fx(); }); }, { passive: true });
+    const draw = () => {
+      sel.value = sorts.some(s => s[0] === COL.sort) ? COL.sort : 'curated';
+      hide.setAttribute('aria-pressed', String(COL.hide)); hide.textContent = COL.hide && nHeard ? '\u2713 Hiding ' + nHeard : 'Hide heard';
+      hide.disabled = !nHeard; hide.title = nHeard ? '' : 'Nothing heard yet';
+      arr = c.books.filter(b => !(COL.hide && heard.has(b.id)));
+      if (COL.sort === 'short') arr.sort((a, b) => (a.total || 1e12) - (b.total || 1e12));
+      else if (COL.sort === 'long') arr.sort((a, b) => (b.total || -1) - (a.total || -1));
+      else if (COL.sort === 'rated' && !rtCalm()) arr.sort(rtCmp);
+      else if (COL.sort === 'az') arr.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+      stage.textContent = ''; dots.textContent = ''; upList.textContent = '';
+      if (!arr.length) { kick.textContent = ''; title.textContent = ''; sub.textContent = 'You have heard everything on this shelf.'; listen.disabled = true; return; }
+      listen.disabled = false; cur = Math.min(cur, arr.length - 1);
+      arr.forEach((b, i) => stage.append(h('button', { class: 'nw-card', type: 'button', 'aria-label': b.title + (b.authors ? ', ' + b.authors : ''), onclick: () => { if (i === cur) openDetail(b); else go(i); } }, coverNode(b))));
+      if (arr.length <= 12) arr.forEach(() => dots.append(h('i')));
+      fx(); info();
+    };
+    sel.addEventListener('change', () => { COL.sort = sel.value; cur = 0; stage.scrollLeft = 0; draw(); if (COL.sort === 'rated') rtSumLoad().then(draw); });
+    body.append(h('section', { class: 'nw' }, glow,
+      h('div', { class: 'nw-head' }, back, h('div', { class: 'nw-mid' }, h('small', {}, 'Explore'), h('b', {}, c.title)), h('span', { class: 'nw-sp', 'aria-hidden': 'true' })),
+      stage, h('div', { class: 'nw-info' }, kick, title, sub, dots),
+      h('div', { class: 'nw-act' }, listen, rnd),
+      h('div', { class: 'nw-bar' }, h('span', {}, 'Up next'), h('span', { class: 'nw-ctl' }, h('label', {}, 'Sort ', sel), hide)),
+      upList));
+    draw();
+  }
   function drawCollection(body, c) {
     $('#col-head').hidden = true;
     if (c.more && c.tot > c.books.length) c = Object.assign({}, c, { books: c.more(c.tot) });   // See all: the whole shelf (the rows on Explore only carry the first 60); sorting and Hide heard work on all of it, the grid is drawn a page at a time
+    if (c.key === 'new') { drawNewWeek(body, c); return; }
     let lim = 120;
     const cleanCardTitle = t => { const x = String(t || '').replace(/\s*[\(\[](?:version|ver\.?|v\.?|vol\.?|volume|dramatic reading|librivox recording)[^\)\]]*[\)\]]\s*/ig, ' ').replace(/\s{2,}/g, ' ').trim(); return x || String(t || ''); };
     const heardRec = new Map(listenedList().map(r => [r.id, r]));
