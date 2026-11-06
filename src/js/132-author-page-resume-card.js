@@ -116,13 +116,14 @@
       const fillBack = () => { const im = cov.querySelector('img.loaded'); if (!im) return false; back.style.backgroundImage = 'url("' + (im.currentSrc || im.src) + '")'; back.classList.add('on'); return true; };
       if (!fillBack()) { const mo = new MutationObserver(() => { if (fillBack()) mo.disconnect(); }); mo.observe(cov, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'src'] }); setTimeout(() => mo.disconnect(), 15000); }
     } catch (e) { /* no blurred backdrop */ }
-    return h('div', { class: 'resume' },
+    return h('div', { class: 'resume', style: '--h:' + exHash(String(r.id)) },
       back,
       h('div', { class: 'resume-cover', 'aria-hidden': 'true' }, cov),
       h('div', { class: 'resume-body' },
         h('div', { class: 'resume-k' }, pct >= 100 ? 'Finished' : 'Continue listening'),
         h('div', { class: 'resume-t' }, r.title),
-        h('div', { class: 'resume-a' }, r.authors || '')),
+        h('div', { class: 'resume-a' }, r.authors || ''),
+        lfReadAlong(r) ? h('div', { class: 'resume-ra' }, 'Read along is on') : null),
       h('div', { class: 'resume-bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(pct), 'aria-label': 'Listening progress' }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'resume-row' },
           h('span', { class: 'resume-pct' }, left),

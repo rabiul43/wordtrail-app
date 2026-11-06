@@ -518,6 +518,7 @@
     const chips = h('div', { class: 'pk-chips', role: 'group', 'aria-label': 'Why these books' }), row = h('div', { class: 'hrow' }), line = h('p', { class: 'mood-sub' });
     const draw = x => {
       PK.sel = x.key;
+      ttl.textContent = x.key.startsWith('m:') ? (new Date().getHours() < 17 ? '\u2600\uFE0E ' : '\u263E ') + todWord() : 'Picked for you';
       $$('button', chips).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === x.key)));
       line.textContent = x.line; row.setAttribute('aria-label', x.line);
       fillRow(row, x.books, x.more || null, 12);
@@ -525,11 +526,42 @@
       if (x.fresh) $$('.tile', row).forEach(t => { const c = t.querySelector('.tile-cover'); if (c && x.fresh.has(String(t._wtId))) c.append(h('span', { class: 'tile-new' }, 'New')); });
     };
     src.forEach(x => { const b = h('button', { class: 'fchip', type: 'button', 'aria-pressed': 'false', onclick: () => draw(x) }, x.label); b.dataset.k = x.key; chips.append(b); });
-    sec.append(h('div', { class: 'home-section-head mood-head' }, h('div', {}, h('h2', {}, 'Picked for you'), line)), ...(src.length > 1 ? [chips] : []), row);
-    draw(src.find(x => x.key === PK.sel) || src[0]);
+    const ttl = h('h2', {}, 'Picked for you');
+    sec.append(h('div', { class: 'home-section-head mood-head' }, h('div', {}, ttl, line)), ...(src.length > 1 ? [chips] : []), row);
+    draw(src.find(x => x.key === PK.sel) || src.find(x => x.key.startsWith('m:')) || src[0]);
     sec.hidden = false;
   }
+  /* ---------- Home: greeting and daily-goal strip (phone design) ---------- */
+  const todWord = now => { const hr = (now || new Date()).getHours(); return hr < 5 ? 'Tonight' : hr < 12 ? 'This morning' : hr < 17 ? 'This afternoon' : hr < 21 ? 'This evening' : 'Tonight'; };
+  function homeGreet() {
+    const t = $('#st-title'), s = $('#st-hello'); if (!t || !s) return;
+    const hr = new Date().getHours(), hello = hr < 5 ? 'Good night' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : hr < 21 ? 'Good evening' : 'Good night';
+    let name = ''; try { name = String((acInfo() || {}).name || '').trim().split(/\s+/)[0].slice(0, 24); } catch (e) { /* signed out */ }
+    s.textContent = hello; s.hidden = !name; t.textContent = name || hello;
+  }
+  function homeGoal() {
+    const sec = $('#ex-goal'); if (!sec) return;
+    try {
+      if (P.calm === true || OFF.on) { sec.hidden = true; return; }
+      if (stDirty) stSave(); else ST = stLoad();
+      const m = stSummary(), goalS = (ST.goal || 0) * 60;
+      if (!goalS && !m.cur) { sec.hidden = true; return; }
+      const pct = goalS ? Math.min(1, m.today / goalS) : 0, C = 2 * Math.PI * 25, kids = [];
+      if (goalS) {
+        const ring = h('span', { class: 'ex-ring', 'aria-hidden': 'true' });
+        ring.innerHTML = '<svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="25"/><circle class="fg" cx="30" cy="30" r="25" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - pct)).toFixed(1) + '"/></svg>';
+        ring.append(h('b', {}, Math.floor(m.today / 60) + 'm'));
+        kids.push(ring, h('span', { class: 'ex-gm' }, h('strong', {}, 'Daily goal: ' + ST.goal + ' min'),
+          h('span', {}, m.today >= goalS ? 'Goal reached today. Nice.' : Math.max(1, Math.ceil((goalS - m.today) / 60)) + ' more min to reach your goal')));
+      } else kids.push(h('span', { class: 'ex-gm' }, h('strong', {}, 'Your listening'), h('span', {}, 'Tap to see your week')));
+      if (m.cur) { const fl = h('span', { class: 'ex-flame', 'aria-hidden': 'true' }); fl.innerHTML = FLAME; kids.push(h('span', { class: 'ex-streak' }, h('b', {}, fl, String(m.cur)), h('small', {}, 'day streak'))); }
+      sec.textContent = '';
+      sec.append(h('button', { class: 'ex-goalcard', type: 'button', 'aria-label': 'Your listening: ' + Math.floor(m.today / 60) + ' minutes today' + (m.cur ? ', ' + m.cur + '-day streak' : ''), onclick: () => showTab('account') }, kids));
+      sec.hidden = false;
+    } catch (e) { sec.hidden = true; }
+  }
   function renderRecents() {
+    homeGreet(); homeGoal();
     loadPicks();
     el.recentList.textContent = '';
     const recs = OFF.on ? recs.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played
