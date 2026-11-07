@@ -57,7 +57,7 @@
     const defs = [[0, 'B1', 'Easy'], [1, 'B2', 'Medium'], [2, 'C1', 'Challenge']];
     const nodes = defs.map(([t, code, name]) => {
       const n = h('span', { class: 'ex-n' }, ' ');
-      const btn = h('button', { class: 'ex-lv t' + t, type: 'button', onclick: () => { LF.lvl.clear(); LF.lvl.add(t); lfPaint(); showTab('search'); } },
+      const btn = h('button', { class: 'ex-lv t' + t, type: 'button', onclick: () => { LF.lvl.clear(); LF.lvl.add(t); lfPaint(); spShow(); spRun('', { f: { lvl: [t] } }); } },
         h('span', { class: 'ex-big' }, code), n, h('span', { class: 'ex-b' }, name));
       btn._n = n; return btn;
     });
