@@ -192,6 +192,36 @@
     } catch (e) { /* no pixel access: use the placeholder hue below */ }
     return { h: coverHue(b.title), s: 52 };
   }
+  /* Draws a cover into its box (and redraws it when the style changes): the tinted placeholder first (first letter .gc-i, title .gc-t,
+     author .gc-a; the Modern style adds .mc and a pattern), then the real picture on top once it has loaded. A picture that fails
+     tries the next source, then Open Library. The download mark (dlMarkPaint in 120) is kept. */
+  function coverFill(box, b) {
+    const tok = box._cvT = (box._cvT || 0) + 1, mark = box._wtMk;
+    box.textContent = '';
+    box.style.setProperty('--ch', String(coverHue(b.title)));
+    box.classList.remove('mc', 'mc-0', 'mc-1', 'mc-2', 'mc-3');
+    if (covStyle() === 'modern') box.classList.add('mc', 'mc-' + coverVariant(b.title));
+    const title = String(b.title || '').trim(), au = String(b.authors || '').split(',')[0].trim();
+    const ini = (title.replace(/^(the|a|an)\s+/i, '').charAt(0) || '?').toUpperCase();
+    box.append(h('span', { class: 'gc-i' }, ini), h('span', { class: 'gc-t' }, title), h('span', { class: 'gc-a' }, au));
+    const srcs = coverSources(b);
+    let i = 0, olTried = false;
+    const img = h('img', { alt: '', loading: 'lazy', decoding: 'async' });
+    const next = () => {
+      if (tok !== box._cvT) return;
+      if (i < srcs.length) { img.src = srcs[i++]; return; }
+      if (olTried) { img.remove(); return; }
+      olTried = true;
+      let pr; try { pr = openLibraryCover(b); } catch (e) { pr = null; }
+      if (!pr || !pr.then) { img.remove(); return; }
+      pr.then(u => { if (tok !== box._cvT) return; if (u) img.src = u; else img.remove(); }, () => img.remove());
+    };
+    img.addEventListener('load', () => { if (tok === box._cvT) img.classList.add('loaded'); });
+    img.addEventListener('error', next);
+    box.append(img);
+    if (mark) box.append(mark);
+    next();
+  }
   function coverBox(b, cls) {
     const box = h('div', { class: cls, 'aria-hidden': 'true', 'data-cv': '' });
     box._cls = cls; box._b = b;
