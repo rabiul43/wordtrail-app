@@ -414,6 +414,7 @@
     if (autoplay && opGate()) { S.playWhenReady = true; autoplay = false; }   // the text is still opening: play the moment it is ready
     S.pendingSeek = time || 0;
     S.loadingAudio = true; S.resnap = true; driftHold();
+    audio.preload = (navigator.connection && navigator.connection.saveData) ? 'metadata' : 'auto';   // buffer the start now (while the text opens), so Play is instant, like a video
     audio.defaultPlaybackRate = P.speed;
     if (wantGraph()) audio.crossOrigin = 'anonymous'; else if (!vgraph) audio.removeAttribute('crossorigin');
     S.vizSrc = audio.crossOrigin === 'anonymous';
@@ -462,7 +463,7 @@
     tick(false); if (!el.player.hidden) vizFrame();
     const q = Math.floor(audio.currentTime * 4);
     if (q !== lastSeekTick && !S.seeking) { lastSeekTick = q; updateSeekUI(audio.currentTime); if (el.player.hidden) miniProgress(); }
-    if (audio.currentTime > (audio.duration || 1e9) - 25) preloadNext();
+    if (audio.currentTime > (audio.duration || 1e9) - 60) preloadNext();
     /* Lower power: when the sound wave is not being drawn, check the highlight about 20 times a second instead of 60 (the screen never needs more). Hidden page: unchanged (frames pause). */
     if (P.lowPower !== false && !document.hidden && !(vgraph && vizOn() && !el.player.hidden)) rafT = setTimeout(loop, 50);
     else raf = requestAnimationFrame(loop);
