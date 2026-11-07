@@ -84,6 +84,7 @@
     S.seg = {}; S.ainfo = {}; S.refining = false; S.undo = null;
     S.lp = store.get('wt:lp:' + b.id, {}) || {}; S.lpLast = null; S.lpSaved = 0;
     S.calibrate = false; syncCalUI();
+    S.playWhenReady = false;
     showView('player');
     rememberOpen(b);
     try { osArm(b, saved); } catch (e) { /* the opening sound is optional */ }   // before loadAudio: its first play() may need to wait for the opening

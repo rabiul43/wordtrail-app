@@ -1,0 +1,27 @@
+/* "Opening the book": while the text loads, the play button is the progress ring (no big card), the cover glows,
+   calm placeholder lines mark where the text will appear, and the text fades in when ready.
+   Logic: opGate / opPaintBtn / opRelease in 133-open-progress-saved-state.js. Remove this file and its build.py line to take it out (the card then looks plain). */
+.play.opening, .mini-play.opening, .nr-play.opening { position: relative; background: var(--surface-2); color: var(--accent); box-shadow: none; cursor: progress; }
+.play.opening .ic, .mini-play.opening .ic, .nr-play.opening .ic { opacity: 0; }
+.play.opening::before, .mini-play.opening::before, .nr-play.opening::before { content: ""; position: absolute; inset: 0; border-radius: 50%; padding: 4px; background: conic-gradient(var(--accent) calc(var(--op, 0) * 1%), var(--line) 0); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); transition: background .3s; }
+.play.opening::after, .mini-play.opening::after, .nr-play.opening::after { content: attr(data-pct); position: absolute; inset: 0; display: grid; place-items: center; border: 0; animation: none; font: 700 .95rem var(--font-ui); letter-spacing: .01em; color: var(--accent); }
+.mini-play.opening::after, .nr-play.opening::after { font-size: .62rem; }
+/* the skip-intro chip and speed/sleep stay quiet until the book is open */
+.player.opening .skipintro { display: none; }
+.player.opening .ctl .ib, .player.opening #dock .ub { opacity: .45; }
+/* cover glow */
+.player.opening .pcover-poster { animation: wtopglow 2.4s ease-in-out infinite; }
+@keyframes wtopglow { 0%, 100% { box-shadow: 0 10px 34px color-mix(in srgb, var(--accent) 14%, transparent); } 50% { box-shadow: 0 14px 54px color-mix(in srgb, var(--accent) 38%, transparent); } }
+/* the note: one quiet line and placeholder lines, no box */
+.note.op-note { border: 0; background: none; padding: .4rem 1.25rem; gap: .9rem; }
+.note.op-note strong { font-size: .8rem; font-weight: 600; letter-spacing: .06em; color: var(--accent); text-transform: uppercase; }
+.note.op-note small { min-height: 1em; font-size: .74rem; color: var(--muted); }
+.op-sk { display: grid; gap: .8rem; width: 100%; max-width: 24rem; }
+.op-sk i { display: block; height: .8rem; border-radius: 6px; background: linear-gradient(90deg, var(--surface), var(--surface-2), var(--surface)); background-size: 220% 100%; animation: wtopsk 1.6s ease-in-out infinite; }
+.op-sk i:nth-child(1) { width: 92%; } .op-sk i:nth-child(2) { width: 100%; animation-delay: .12s; } .op-sk i:nth-child(3) { width: 84%; animation-delay: .24s; } .op-sk i:nth-child(4) { width: 58%; animation-delay: .36s; }
+@keyframes wtopsk { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+/* text fades in when ready */
+.page.op-in { animation: wtopin .6s ease both; }
+@keyframes wtopin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .player.opening .pcover-poster, .op-sk i, .page.op-in { animation: none; } }
+html[data-lite] .player.opening .pcover-poster { animation: none; }

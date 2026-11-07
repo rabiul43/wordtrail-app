@@ -155,11 +155,9 @@
 .aa-themes .aa-n { font-size: .72rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
 .aa-sw { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1 / 1; max-width: 3.4rem; border-radius: 50%; border: 1px solid var(--line); background: var(--sw-bg); color: var(--sw-ink); box-shadow: inset 0 0 0 3px var(--sw-bg), inset 0 0 0 4px transparent; overflow: hidden; }
 .aa-sw b { font: 600 1.05rem/1 var(--font-read); position: relative; }
-.aa-themes button[data-v="light"] .aa-sw { --sw-bg: #FAF7F2; --sw-ink: #1B1A22; }
 .aa-themes button[data-v="sepia"] .aa-sw { --sw-bg: #EFE6D0; --sw-ink: #3A3227; }
-.aa-themes button[data-v="dark"] .aa-sw { --sw-bg: #0F1220; --sw-ink: #F2EBDD; }
 .aa-themes button[data-v="contrast"] .aa-sw { --sw-bg: #000000; --sw-ink: #FFE600; border: 2px solid #FFFFFF; }
-.aa-themes button[data-v="auto"] .aa-sw { --sw-bg: #FAF7F2; --sw-ink: #1B1A22; background: linear-gradient(135deg, #FAF7F2 0 50%, #0F1220 50% 100%); }
+.aa-themes button[data-v="auto"] .aa-sw { --sw-bg: #FFFFFF; --sw-ink: #111114; background: linear-gradient(135deg, #FFFFFF 0 50%, #000000 50% 100%); }
 .aa-themes button[data-v="auto"] .aa-sw b { background: linear-gradient(135deg, #1B1A22 0 50%, #F2EBDD 50% 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .aa-themes button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
 .aa-themes button[aria-pressed="true"] .aa-n { font-weight: 700; }

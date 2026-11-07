@@ -630,7 +630,7 @@
     $('#fd-clear').addEventListener('click', () => { $('#fd-q').value = ''; $('#fd-q').focus(); fdRun(); });
   }
   guideDoc('reading', 'Line focus', "Dims everything except the sentence or paragraph being read (Settings > Reading).");
-  guideDoc('settings', 'Reading', "Theme (Auto, Light, White, Dark, Black, Sepia, High contrast), text size, line spacing, reading font (including Lexend, Atkinson and OpenDyslexic), highlight style and colour, dialogue style and cover style.");
+  guideDoc('settings', 'Reading', "Theme (Auto, White, Black, Sepia, High contrast), text size, line spacing, reading font (including Lexend, Atkinson and OpenDyslexic), highlight style and colour, dialogue style and cover style.");
   /* Reading fonts: loaded only when picked, so they cost nothing for everyone else. */
   const READ_FONTS = {
     lexend: { stack: "'Lexend', 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif", css: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&display=swap' },
@@ -716,7 +716,9 @@
   }
   function applyTheme() {
     const r = document.documentElement;
-    if (P.theme === 'auto') r.removeAttribute('data-theme'); else r.setAttribute('data-theme', P.theme);
+    /* Light and Dark were removed: White is the light theme, Black is the dark one. Auto follows the device between them. */
+    if (P.theme === 'light') P.theme = 'white'; else if (P.theme === 'dark') P.theme = 'black';
+    r.setAttribute('data-theme', (P.theme === 'auto' || !P.theme) ? (matchMedia('(prefers-color-scheme: light)').matches ? 'white' : 'black') : P.theme);
     r.toggleAttribute('data-calm', P.calm === true);
     r.style.setProperty('--read-size', P.size.toFixed(2) + 'rem');
     if (P.lh) r.style.setProperty('--read-lh', String(P.lh)); else r.style.removeProperty('--read-lh');

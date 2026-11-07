@@ -7,6 +7,7 @@
     if (!b || !b.id) { openBook(b); return; }
     detPush();
     DET.book = b; DET.author = null; DET.rv = false;
+    try { prefetchText(b); } catch (e) { /* the text is fetched again on Play */ }   // start getting the text now, so Play is often ready at once
     drawDetail(b);
     showView('home');
   }

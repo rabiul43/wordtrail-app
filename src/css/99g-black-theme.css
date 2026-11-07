@@ -13,8 +13,4 @@
   --focus-ring: #E0B15A;
   color-scheme: dark;
 }
-/* Settings theme picker: six choices fill two even rows of three */
-#seg-theme button:nth-child(n+4) { grid-column: span 2; }
-/* Reader "Aa" sheet: six swatches */
-.aa-themes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .aa-themes button[data-v="black"] .aa-sw { --sw-bg: #000000; --sw-ink: #F2EBDD; border: 1px solid #3A3A42; }

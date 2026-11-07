@@ -52,6 +52,7 @@ PARTS = [
     ('file', 'src/css/99i-explore-design.css'),
     ('file', 'src/css/99j-player-style-clean.css'),
     ('file', 'src/css/99k-player-style-glass.css'),
+    ('file', 'src/css/99l-opening.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

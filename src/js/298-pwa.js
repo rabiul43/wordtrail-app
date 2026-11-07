@@ -3,7 +3,7 @@
      the app. Everything here is optional polish: if anything fails, the app works exactly as before. */
 
   /* theme-color follows the app's own background, so the phone's status bar / browser bar matches whichever theme
-     is on (auto, light, white, dark, black, sepia, high contrast). The head sets a first guess before the page paints. */
+     is on (auto, white, black, sepia, high contrast). The head sets a first guess before the page paints. */
   function pwaThemeColor() {
     try {
       const m = document.querySelector('meta[name="theme-color"]'); if (!m) return;
@@ -13,7 +13,7 @@
   }
   pwaThemeColor();
   try { new MutationObserver(pwaThemeColor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) { /* not supported */ }
-  try { const mq = matchMedia('(prefers-color-scheme: light)'); if (mq.addEventListener) mq.addEventListener('change', pwaThemeColor); else if (mq.addListener) mq.addListener(pwaThemeColor); } catch (e) { /* not supported */ }
+  try { const mq = matchMedia('(prefers-color-scheme: light)'), onMq = () => { if (P.theme === 'auto') applyTheme(); pwaThemeColor(); }; if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq); } catch (e) { /* not supported */ }
 
   /* Service worker: registered after the page has finished loading, so it never competes with the first paint.
      Needs https (or localhost); a page opened from a file just skips it. */

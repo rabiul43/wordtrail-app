@@ -38,34 +38,6 @@
   --focus-ring: #E0B15A; --focus-w: 2px; --focus-off: 2px; /* keyboard focus ring: >= 3:1 against --bg and --surface-2 on every theme */
   color-scheme: dark; --tile-w: 8rem; --tile-ratio: 2 / 3; --gold: var(--sun); --hl-wash: color-mix(in srgb, var(--sun) 26%, transparent); --hl-edge: color-mix(in srgb, var(--sun) 70%, transparent); --hl-glow: color-mix(in srgb, var(--sun) 45%, transparent); --gold-ink: #1A1405; --row-gap: 1rem; --sec-space: 1.75rem;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    --bg: #FAF7F2; --surface: #F1ECE2; --surface-2: #E7E0D2; --line: #E3DBCB;
-    --ink: #1B1A22; --muted: #66625A;
-    --accent: #865D0E; --accent-ink: #FFFFFF; --accent-soft: #F3E5C4; --sun: #E0B15A; --mark: #F6DC94;
-    --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #B03A2A; --err: #C0392B; --err-ink: #FFFFFF;
-    --scrim: rgba(15, 18, 32, .45); --glass: rgba(250, 247, 242, .86);
-    --shadow: 0 1px 2px rgba(26, 22, 40, .07), 0 10px 30px rgba(26, 22, 40, .10);
-    --shadow-sm: 0 2px 10px rgba(26, 22, 40, .12); --shadow-pop: 0 8px 30px rgba(26, 22, 40, .22);
-    --shadow-cover: 0 6px 16px rgba(26, 22, 40, .20); --shadow-up: 0 -6px 24px rgba(26, 22, 40, .10);
-    --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
-    --focus-ring: #7A5409;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
-  --bg: #FAF7F2; --surface: #F1ECE2; --surface-2: #E7E0D2; --line: #E3DBCB;
-  --ink: #1B1A22; --muted: #66625A;
-  --accent: #865D0E; --accent-ink: #FFFFFF; --accent-soft: #F3E5C4; --sun: #E0B15A; --mark: #F6DC94;
-  --warn: #9C5C08; --warn-ink: #FFFFFF; --danger: #B03A2A; --err: #C0392B; --err-ink: #FFFFFF;
-  --scrim: rgba(15, 18, 32, .45); --glass: rgba(250, 247, 242, .86);
-  --shadow: 0 1px 2px rgba(26, 22, 40, .07), 0 10px 30px rgba(26, 22, 40, .10);
-  --shadow-sm: 0 2px 10px rgba(26, 22, 40, .12); --shadow-pop: 0 8px 30px rgba(26, 22, 40, .22);
-  --shadow-cover: 0 6px 16px rgba(26, 22, 40, .20); --shadow-up: 0 -6px 24px rgba(26, 22, 40, .10);
-  --focus-ring: #7A5409;
-  color-scheme: light;
-}
 :root[data-theme="sepia"] {
   --cv-a: 42% 86%; --cv-b: 38% 74%; --cv-ink: 45% 22%;
   --bg: #EFE6D0; --surface: #F8F1DE; --surface-2: #E6DBC1; --line: #D7C9A8;

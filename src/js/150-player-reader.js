@@ -411,6 +411,7 @@
   function loadAudio(i, time, autoplay) {
     S.sec = i; S.outroHit = false;
     if (!time) { const c = cutFor(i); if (c && c[0] > 0) time = c[0]; } // fresh start: skip the spoken intro
+    if (autoplay && opGate()) { S.playWhenReady = true; autoplay = false; }   // the text is still opening: play the moment it is ready
     S.pendingSeek = time || 0;
     S.loadingAudio = true; S.resnap = true; driftHold();
     audio.defaultPlaybackRate = P.speed;

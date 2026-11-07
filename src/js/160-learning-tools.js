@@ -316,7 +316,7 @@
     document.documentElement.style.setProperty('--dock-h', (on ? 0 : el.dock.offsetHeight) + 'px');
   }
   function roPlayLabel() { const b = $('#ro-play'); if (b) b.textContent = audio.paused ? 'Play' : 'Pause'; }
-  function togglePlay() { if (!S.book) return; if (audio.paused) audio.play().catch(onPlayFail); else audio.pause(); }
+  function togglePlay() { if (!S.book) return; if (audio.paused && opGate()) { S.playWhenReady = !S.playWhenReady; return; } if (audio.paused) audio.play().catch(onPlayFail); else audio.pause(); }
   /* ---------- gesture hint: a small card the first times a book plays, until "Got it" ---------- */
   const GH = { t: 0 };
   function ghHide() { const c = $('#gesture-hint'); if (c) c.hidden = true; }

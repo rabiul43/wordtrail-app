@@ -12,11 +12,25 @@
     const sec = Math.floor((Date.now() - OP.t0) / 1000);
     const extra = OP.detail || (OP.timed && sec >= 3 ? sec + 's' : '');
     if (OP.home) { progress(true, OP.f, pct); setStatus('Opening "' + OP.title + '": ' + st[1].toLowerCase() + '…' + (extra ? ' (' + extra + ')' : '')); }
-    if (OP.ui) {
-      OP.ui.head.textContent = st[1];
-      OP.ui.bar.style.width = pct; OP.ui.pct.textContent = pct;
-      OP.ui.lbl.textContent = ['Step ' + st[0] + ' of 4', extra].filter(Boolean).join(' · ');
-    }
+    if (OP.ui) OP.ui.lbl.textContent = sec >= 6 || OP.detail ? (extra || '') : '';   // one calm line; details only when it is slow
+    opPaintBtn(pct, Math.round(OP.f * 100));
+  }
+  /* Opening the book: the text is not ready yet, so Play waits. The play buttons turn into the progress ring (see 99l-opening.css),
+     a press is remembered and starts the narration the moment the text is ready (or when it fails, so listening is never blocked). */
+  const opGate = () => !!(OP.active && !OP.home && S.book && !S.model);
+  function opPaintBtn(pct, n) {
+    const on = opGate();
+    $$('#b-play, #mini-play, #nr-play').forEach(b => {
+      b.classList.toggle('opening', on);
+      if (on) { b.style.setProperty('--op', String(n)); b.dataset.pct = pct; b.setAttribute('aria-busy', 'true'); b.setAttribute('aria-label', 'Opening the book ' + pct); }
+      else if (b.classList.contains('opening') || b.dataset.pct) { b.classList.remove('opening'); delete b.dataset.pct; b.style.removeProperty('--op'); b.removeAttribute('aria-busy'); b.setAttribute('aria-label', audio.paused ? 'Play' : 'Pause'); }
+    });
+    if (el.player) el.player.classList.toggle('opening', on);
+  }
+  function opRelease() {
+    opPaintBtn('0%', 0);
+    el.page.classList.add('op-in'); setTimeout(() => el.page.classList.remove('op-in'), 700);
+    if (S.playWhenReady) { S.playWhenReady = false; if (S.book && audio.paused) audio.play().catch(onPlayFail); }
   }
   function startOpen(title, home) {
     clearInterval(OP.timer);
@@ -28,6 +42,7 @@
     clearInterval(OP.timer);
     if (OP.active && OP.home) progress(false);
     OP.active = false; OP.home = false; OP.ui = null;
+    try { opRelease(); } catch (e) { /* cosmetic */ }
   }
   function setOpen(f, key, detail, timed) {
     if (!OP.active) return;
@@ -36,9 +51,9 @@
     paintOpen();
   }
   function loadingNote() {
-    const head = h('strong', {}, 'Loading the book text…'), bar = h('i'), pct = h('span'), lbl = h('small');
-    const n = h('div', { class: 'note', role: 'status' }, head, h('div', { class: 'prog', style: 'width:100%;max-width:20rem' }, h('div', { class: 'bar' }, bar), pct), lbl);
-    OP.ui = { head, bar, pct, lbl };
+    const head = h('strong', {}, 'Opening the book…'), lbl = h('small');
+    const n = h('div', { class: 'note op-note', role: 'status' }, head, h('div', { class: 'op-sk', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')), lbl);
+    OP.ui = { head, lbl };
     paintOpen();
     return n;
   }

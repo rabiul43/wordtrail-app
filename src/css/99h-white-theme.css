@@ -14,10 +14,4 @@
   color-scheme: light;
 }
 /* Theme pickers: the layout follows the number of buttons, so any mix of the optional themes stays even */
-#seg-theme:has(button:nth-child(6)) button:nth-child(n+4) { grid-column: span 2; }
-#seg-theme:has(button:nth-child(7)) button:nth-child(-n+4) { grid-column: span 3; }
-#seg-theme:has(button:nth-child(7)) button:nth-child(n+5) { grid-column: span 4; }
-#seg-theme:has(button:nth-child(7)) { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-.aa-themes:has(button:nth-child(6)) { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.aa-themes:has(button:nth-child(7)) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .aa-themes button[data-v="white"] .aa-sw { --sw-bg: #FFFFFF; --sw-ink: #111114; border: 1px solid #CFCFD6; }
