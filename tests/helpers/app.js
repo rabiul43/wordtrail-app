@@ -23,18 +23,30 @@ async function startApp(page) {
   await completeOnboarding(page);
 }
 
-// Types in the search box and waits for real result cards (not the grey loading placeholders).
+// Opens the Search page: taps the Search tab in the bottom bar (the box #sp-q lives on that page, not on Home).
+async function openSearchPage(page) {
+  const box = page.locator('#sp-q');
+  if (!(await box.isVisible())) await page.locator('#tabbar .tab[data-tab="search"]').click();
+  await expect(box).toBeVisible();
+}
+
+// Types a term in the Search page and presses Enter (does not wait for anything).
+async function submitSearch(page, term) {
+  await openSearchPage(page);
+  await page.locator('#sp-q').fill(term);
+  await page.locator('#sp-q').press('Enter');
+}
+
+// Searches and waits for real result rows (.sp-row inside #sp-list; the grey loading blocks are .sp-sk, so they never match).
 async function search(page, term) {
-  /* wt-home-fix */ if (!(await page.locator('#q').isVisible())) await page.locator('#st-search').click();
-  await page.locator('#q').fill(term);
-  await page.locator('#q').press('Enter');
-  await expect(page.locator('#result-list .card:not(.sk)').first()).toBeVisible();
+  await submitSearch(page, term);
+  await expect(page.locator('#sp-list .sp-row').first()).toBeVisible();
 }
 
 // Search, tap the first result: the book's page.
 async function openBookPage(page, book = BOOK) {
   await search(page, book.query);
-  await page.locator('#result-list .card:not(.sk)', { hasText: book.title }).first().click();
+  await page.locator('#sp-list .sp-row', { hasText: book.title }).first().click();
   await expect(page.getByRole('button', { name: 'Read and listen' })).toBeVisible();
 }
 
@@ -52,4 +64,4 @@ const audioState = page => page.evaluate(() => {
   return { paused: a.paused, time: a.currentTime, duration: a.duration, ready: a.readyState, error: a.error ? a.error.code : null, src: a.currentSrc };
 });
 
-module.exports = { BOOK, openApp, completeOnboarding, startApp, search, openBookPage, openPlayer, audioState };
+module.exports = { BOOK, openApp, completeOnboarding, startApp, openSearchPage, submitSearch, search, openBookPage, openPlayer, audioState };
