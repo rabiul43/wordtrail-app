@@ -190,7 +190,7 @@
       stage.textContent = ''; dots.textContent = ''; upList.textContent = '';
       if (!arr.length) { kick.textContent = ''; title.textContent = ''; sub.textContent = 'You have heard everything on this shelf.'; listen.disabled = true; return; }
       listen.disabled = false; cur = Math.min(cur, arr.length - 1);
-      arr.forEach((b, i) => stage.append(h('button', { class: 'nw-card', type: 'button', 'aria-label': b.title + (b.authors ? ', ' + b.authors : ''), onclick: () => { if (i === cur) openDetail(b); else go(i); } }, coverNode(b))));
+      arr.forEach((b, i) => stage.append(h('button', { class: 'nw-card', type: 'button', 'aria-label': b.title + (b.authors ? ', ' + b.authors : ''), onclick: () => { openDetail(b); } }, coverNode(b))));
       if (arr.length <= 12) arr.forEach(() => dots.append(h('i')));
       fx(); info();
     };
