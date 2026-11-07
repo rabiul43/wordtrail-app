@@ -658,6 +658,8 @@
   function applyQuick() {   // the Controls sheet is the only player menu, so the old bottom chips (Text only, More) stay hidden
     document.documentElement.setAttribute('data-quick', '');
   }
+  /* New book page design (phones only): <html data-det="new"> turns on 99n-detail-modern.css. Saved as P.detNew (default on). */
+  function applyDet() { document.documentElement.setAttribute('data-det', P.detNew !== false && !matchMedia('(min-width: 700px)').matches ? 'new' : 'off'); }
   function applyTidy() { document.documentElement.toggleAttribute('data-tidy', P.tidyPlayer !== false); }
   /* Home header: 'new' = logo, search and account button in one row (always on tablets and computers, from 700px);
      'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */
@@ -665,7 +667,7 @@
   /* New Home design (phones only): <html data-home="st"> turns on 99c-home-storytel.css. Saved as P.homeNew (default on). */
   /* App design (Settings > Appearance): classic = the first Home, storytel = the plain "New Home design", modern = the newest concept.
      <html data-home="st"> = storytel or modern (phones); <html data-design="modern"> = modern (phones). Saved as P.design; P.homeNew === false (older saves) means classic. */
-  const designOf = () => (P.design === 'classic' || P.design === 'storytel' || P.design === 'modern') ? P.design : (P.homeNew === false ? 'classic' : 'modern');
+  const designOf = () => (P.design === 'classic' || P.design === 'storytel' || P.design === 'modern') ? P.design : (P.homeNew === false ? 'classic' : 'storytel');
   const isModern = () => document.documentElement.getAttribute('data-design') === 'modern';
   function homeOrder() {   // modern: the time-of-day shelf sits above Book of the day; the other designs keep the original order
     const p = $('#sec-picks'), b = $('#sec-botd'), nw = $('#sec-newweek'); if (!p || !b || !nw) return;
@@ -678,7 +680,7 @@
     homeOrder();
   }
   /* Player style (Settings > Reading): <html data-player-style="clean|glass"> picks the look of the Playback and Sleep timer sheets (99j / 99k css). Saved as P.playerStyle (synced with the rest of wt:prefs). CSS only, so it applies at once, even to an open sheet. */
-  const playerStyleOf = () => P.playerStyle === 'glass' ? 'glass' : 'clean';
+  const playerStyleOf = () => P.playerStyle === 'clean' ? 'clean' : 'glass';
   function applyPlayerStyle() { document.documentElement.setAttribute('data-player-style', playerStyleOf()); }
   function pstyleSegSync() { const v = playerStyleOf(); $$('#seg-pstyle button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
   function designSegSync() { const v = designOf(); $$('#seg-design button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }

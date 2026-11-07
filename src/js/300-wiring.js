@@ -10,6 +10,7 @@
     } catch (e) { /* storage unavailable */ }
     applyTheme();
     applyTidy();
+    applyDet();
     applyQuick();
     setSpeed(P.speed, true);
     speedInit();
@@ -428,6 +429,8 @@
     }); }
     $('#in-lite').addEventListener('change', e => { P.liteGfx = e.target.checked; savePrefs(); applyLite(); });
     $('#in-liteforce').addEventListener('change', e => { P.liteForce = e.target.checked; savePrefs(); applyLite(); });
+    $('#in-detnew').addEventListener('change', e => { P.detNew = e.target.checked; savePrefs(); applyDet(); });
+    try { matchMedia('(min-width: 700px)').addEventListener('change', applyDet); } catch (e) { /* old browser: applies on the next start */ }
     $('#in-tidy').addEventListener('change', e => { P.tidyPlayer = e.target.checked; savePrefs(); applyTidy(); paintBookProg(); });
     $('#in-load').addEventListener('change', e => { P.fastLoad = e.target.checked; savePrefs(); });
     $('#in-resume').addEventListener('change', e => { P.resumeCount = parseInt(e.target.value, 10) || 3; savePrefs(); renderRecents(); });

@@ -137,6 +137,50 @@
     Promise.resolve(dlReady).then(ddPaint, ddPaint);   // after the page is drawn (the node is not on screen yet), and again once the saved books are known
     return node;
   }
+  /* ---------- New book page design: download icon + options sheet ----------
+     With <html data-det="new"> (phones, Settings switch) the card above is hidden on the page. The round download icon next to the
+     heart shows its state (idle / ring while downloading / check when saved) and opens a bottom sheet that holds the SAME card node
+     (moved into the sheet, moved back when it closes), so all the download code above keeps working unchanged. */
+  function ddBtn(b) {
+    const ib = h('button', { class: 'det-dl', type: 'button', 'aria-label': 'Download for offline listening', 'aria-haspopup': 'dialog' });
+    ib.append(h('span', { class: 'det-dl-i', 'aria-hidden': 'true' }));
+    ib.addEventListener('click', () => ddSheet(b));
+    DD.ib = ib;
+    return ib;
+  }
+  function ddIconPaint(k, frac) {   // called at the end of ddPaint
+    const ib = DD.ib; if (!ib || !ib.isConnected) return;
+    const ic = k === 'full' ? 'ok' : 'dl', i = ib.firstChild;
+    ib.dataset.s = k;
+    if (i.dataset.k !== ic) { i.dataset.k = ic; i.innerHTML = DD_IC[ic]; }
+    ib.style.setProperty('--p', frac >= 0 ? String(Math.round(frac * 100)) : '0');
+    const lbl = k === 'full' ? 'Downloaded. Open offline options' : k === 'run' ? 'Downloading. Open offline options' : 'Download for offline listening';
+    if (ib.getAttribute('aria-label') !== lbl) ib.setAttribute('aria-label', lbl);
+  }
+  function ddSheet(b) {
+    const n = DD.node, host = n && n.parentNode;
+    if (!n || DD.b !== b || !host || document.querySelector('.dd-opts')) return;
+    const prev = document.activeElement;
+    const body = h('div', { class: 'dd-in' });
+    const sheet = h('div', { class: 'dd-sheet dd-opts', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Listen offline' }, h('div', { class: 'dd-grab', 'aria-hidden': 'true' }), body);
+    const back = h('div', { class: 'dd-back' }, sheet);
+    let done = false;
+    const end = () => {
+      if (done) return; done = true;
+      document.removeEventListener('keydown', onKey, true);
+      back.classList.remove('on');
+      setTimeout(() => { if (host.isConnected) host.append(n); back.remove(); try { ddPaint(); } catch (e) { /* the page was closed */ } }, 200);
+      try { if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) { /* element gone */ }
+    };
+    const onKey = e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); end(); } };
+    body.append(n);
+    body.addEventListener('click', e => { if (e.target.closest('.dd-btn')) setTimeout(end, 150); });   // Download / Cancel / Remove: the sheet closes, the icon shows the state
+    back.addEventListener('click', e => { if (e.target === back) end(); });
+    document.addEventListener('keydown', onKey, true);
+    document.body.append(back);
+    ddPaint();
+    requestAnimationFrame(() => { back.classList.add('on'); try { const f = n.querySelector('.dd-btn:not(:disabled)') || sheet; if (f === sheet) sheet.tabIndex = -1; f.focus({ preventScroll: true }); } catch (e) { /* no focus */ } });
+  }
   function ddPaint() {
     const n = DD.node, b = DD.b;
     if (!n || !n.isConnected || !b || DET.book !== b) return;
@@ -167,4 +211,5 @@
     q.btn.classList.toggle('ghost', ghost); q.btn.disabled = off;
     q.pb.hidden = frac < 0;
     if (frac >= 0) { const w = Math.round(frac * 100); q.bar.style.width = w + '%'; q.pb.setAttribute('aria-valuenow', String(w)); }
+    ddIconPaint(k, frac);
   }
