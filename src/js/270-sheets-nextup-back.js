@@ -265,12 +265,27 @@
     /* These screens are shown and hidden from many places; watching them keeps the history entries in step. */
     const mo = new MutationObserver(() => histSoon());
     ['results', 'fpanel', 'ob-overlay', 'ob-step-0', 'ob-step-1', 'ob-quiz'].forEach(id => { const n = document.getElementById(id); if (n) mo.observe(n, { attributes: true, attributeFilter: ['hidden'] }); });
+    /* Press Back again to exit (phones and the installed app): a base history entry sits under the app's own entries.
+       Back with nothing open lands on it; the first time we show a message and put the app's entry back, the second
+       press within 2 seconds really leaves. */
+    HIST.exit = phoneUI() || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
     addEventListener('popstate', e => {
+      if (HIST.exit && !HIST.busy && e.state && e.state.wtBase) {
+        if (HIST.leave && Date.now() - HIST.leave < 2000) { HIST.leave = 0; history.back(); return; }
+        HIST.leave = Date.now(); HIST.n = 0;
+        try { history.pushState({ wt: 0 }, ''); } catch (x) { /* stay */ }
+        toast('Press Back again to exit', 2000);
+        return;
+      }
       if (HIST.busy) { HIST.busy = false; histSync(); return; }
       HIST.n = (e.state && e.state.wt) || 0;
       if (histLayers() > HIST.n) histBack();
       histSync();
     });
+    const st0 = history.state;
+    if (HIST.exit && !(st0 && st0.wt !== undefined)) {   // first load (or reopened at the base): make the base entry, then the app's own entry on top
+      try { if (!(st0 && st0.wtBase)) history.replaceState({ wtBase: 1 }, ''); history.pushState({ wt: 0 }, ''); } catch (x) { HIST.exit = false; }
+    }
     const w = history.state && history.state.wt;
     if (w) { HIST.busy = true; history.go(-w); setTimeout(() => { if (HIST.busy) { HIST.busy = false; histSync(); } }, 800); }
     else histSoon();
