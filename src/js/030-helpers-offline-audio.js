@@ -326,6 +326,8 @@
 
   const P = Object.assign({ theme: 'auto', size: 1.24, speed: 1, nudge: 0.15, recents: [], viz: (reduceMotion || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'off' : 'bars' }, store.get('wt:prefs', {}));
   const savePrefs = () => store.set('wt:prefs', P);
+  /* Player style (Playback + Sleep timer sheets): 'clean' | 'glass'. Settings saved before this existed keep 'clean'; a fresh install (nothing saved yet) gets 'glass'. The first-paint script in 00-head.html uses the same rule. */
+  if (P.playerStyle !== 'clean' && P.playerStyle !== 'glass') P.playerStyle = Object.keys(window.__wtP || {}).length ? 'clean' : 'glass';
   /* Haptics: one small vocabulary of vibrations, used the same way everywhere. Off switch: Settings > Audio. */
   guideDoc('audio', 'Haptic feedback', "Small vibrations when you tap play, skip, change speed and reach your goal. Turn them off in Settings > Audio.");
   const HAPTIC = { tick: 6, light: 10, medium: 16, heavy: 26, success: [16, 50, 28], goal: [20, 60, 20, 60, 44] };

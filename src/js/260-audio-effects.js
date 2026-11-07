@@ -2,9 +2,23 @@
   const SPD_PRE = [0.75, 1, 1.25, 1.5, 2, 2.5, 3];
   const spdFmt = v => +v.toFixed(2) + 'x';
   const spdClamp = v => Math.round(Math.min(3, Math.max(0.5, +v || 1)) * 20) / 20;
+  /* Caption under the Glass dial, from the speed (same words as the quick-controls card, plus "Relaxed pace"). */
+  const spdCaption = v => v < 0.8 ? 'Taking it slow' : v < 1 ? 'Relaxed pace' : v === 1 ? 'Normal speed' : v <= 1.3 ? 'Slightly faster' : v <= 1.6 ? 'Crisp pace' : v <= 2 ? 'Quick listen' : 'Full speed ahead';
+  /* The Playback sheet's number, slider fill, Glass dial and caption, all drawn from P.speed. Called by setSpeed (the one speed setter) and by spdPaint (when the sheet opens).
+     Dial: f = (speed - 0.5) / 2.5, angle = 180 + 180 f degrees on a semicircle of radius 120 around (150,150). The arc is the full half circle with its dash offset set to f; the thumb group is turned by (angle - 180) around the centre, so it follows the arc. */
+  function spdDial() {
+    const v = spdClamp(P.speed), f = (v - 0.5) / 2.5, ang = 180 + 180 * f, out = $('#sp-val');
+    if (!out) return;
+    out.textContent = ''; out.append(spdFmt(v).slice(0, -1), h('span', { class: 'ps-x' }, 'x'));
+    const rg = $('#sp-range'); if (rg) { rg.value = String(v); rg.style.setProperty('--fill', (f * 100) + '%'); }
+    const arc = $('#sheet-speed .ps-arc'), th = $('#sheet-speed .ps-thumb'), cap = $('#sheet-speed .ps-cap');
+    if (arc) arc.style.strokeDashoffset = String(100 - f * 100);
+    if (th) th.style.transform = 'rotate(' + (ang - 180) + 'deg)';
+    if (cap) cap.textContent = spdCaption(v);
+  }
   function spdPaint() {
-    $('#sp-val').textContent = spdFmt(P.speed); $('#sp-range').value = P.speed;
-    $$('#sp-presets .chip').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === P.speed)));
+    spdDial();
+    $$('#sp-presets .chip[data-v]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === P.speed)));
     $('#sp-each').checked = P.speedEach !== false; $('#sp-lev').checked = !!P.level; $('#sp-sil').checked = !!P.silence; $('#sp-voice').checked = P.enh === 'voice';
   }
   let silT = 0, silQuiet = 0, silOn = false, silBuf = null;
@@ -123,7 +137,17 @@
   function speedInit() {
     const pre = $('#sp-presets');
     SPD_PRE.forEach(v => pre.append(h('button', { class: 'chip', type: 'button', 'data-v': String(v), 'aria-pressed': 'false', onclick: () => { setSpeed(v); spdPaint(); } }, spdFmt(v))));
+    pre.append(h('button', { class: 'chip ps-reset', type: 'button', 'aria-label': 'Reset speed to 1x', onclick: () => { setSpeed(1); spdPaint(); } }, 'Reset'));
     $('#sp-range').addEventListener('input', e => { setSpeed(+e.target.value); spdPaint(); });
+    { const dial = $('#sheet-speed .ps-dial'), pick = e => {   // Glass: drag the dial (the slider stays the keyboard / screen reader control)
+        const r = dial.getBoundingClientRect(); if (!r.width) return;
+        const x = (e.clientX - r.left) * 300 / r.width - 150, y = (e.clientY - r.top) * 170 / r.height - 150;
+        let a = Math.atan2(y, x) * 180 / Math.PI; if (a > 0) a = x < 0 ? -180 : 0;   // below the baseline: nearest end
+        const v = spdClamp(0.5 + ((a + 180) / 180) * 2.5); if (v !== P.speed) { setSpeed(v); spdPaint(); }
+      };
+      if (dial) { dial.addEventListener('pointerdown', e => { try { dial.setPointerCapture(e.pointerId); } catch (x) { /* ok */ } dial.dataset.drag = '1'; pick(e); });
+        dial.addEventListener('pointermove', e => { if (dial.dataset.drag) pick(e); });
+        const end = () => { delete dial.dataset.drag; }; dial.addEventListener('pointerup', end); dial.addEventListener('pointercancel', end); } }
     $('#sp-minus').addEventListener('click', () => { setSpeed(P.speed - 0.05); spdPaint(); });
     $('#sp-plus').addEventListener('click', () => { setSpeed(P.speed + 0.05); spdPaint(); });
     $('#sp-each').addEventListener('change', e => { P.speedEach = e.target.checked; if (P.speedEach && S.book) bspdSet(S.book, P.speed); savePrefs(); });
@@ -276,6 +300,7 @@
     el.speed.setAttribute('aria-label', 'Playback speed: ' + spdFmt(v) + '. Open playback settings'); savePrefs();
     nrSpeedUI();
     qkPaint();
+    spdDial();
   }
   /* ---------- lock screen / notification artwork ----------
      Android draws the media card itself and tints it from the artwork image, so the artwork is the one place we

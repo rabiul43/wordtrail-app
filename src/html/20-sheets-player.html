@@ -131,19 +131,41 @@
   </div>
 </section>
 
-<section id="sheet-sleep" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-sleep">
-  <header><h2 id="h-sleep">Sleep timer</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+<section id="sheet-sleep" class="sheet ps-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-sleep">
+  <header><div class="ps-ttl"><span class="ps-eyebrow" aria-hidden="true">Good night</span><h2 id="h-sleep">Sleep timer</h2></div><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body">
+    <div class="ps-scene" aria-hidden="true">
+      <svg viewBox="0 0 170 170" focusable="false">
+        <defs>
+          <linearGradient id="ps-moon-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B7A6FF"/><stop offset="1" stop-color="#8CC0DA"/></linearGradient>
+          <radialGradient id="ps-halo-g"><stop offset="0" stop-color="#8CC0DA" stop-opacity=".5"/><stop offset="1" stop-color="#6D5BFF" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle class="ps-halo" cx="85" cy="85" r="62" fill="url(#ps-halo-g)"/>
+        <circle class="ps-orbit" cx="85" cy="85" r="70"/>
+        <path class="ps-moon" d="M86 54.2A34 34 0 1 0 113.7 100.3A27 27 0 0 1 86 54.2Z"/>
+        <g class="ps-stars"><circle cx="128" cy="40" r="2.2"/><circle cx="144" cy="70" r="1.5"/><circle cx="32" cy="52" r="1.8"/><circle cx="46" cy="126" r="1.4"/><circle cx="124" cy="132" r="2"/><circle cx="104" cy="22" r="1.3"/></g>
+      </svg>
+    </div>
     <p id="sl-note" class="spd-s" aria-live="polite">The book keeps playing.</p>
     <div id="sl-presets" class="spd-pre" role="group" aria-label="Sleep timer choices"></div>
   </div>
 </section>
 
-<section id="sheet-speed" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-speed">
-  <header><h2 id="h-speed">Playback</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+<section id="sheet-speed" class="sheet ps-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-speed">
+  <header><div class="ps-ttl"><span class="ps-eyebrow" aria-hidden="true">Now reading</span><h2 id="h-speed">Playback</h2></div><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body">
-    <div class="spd-read"><button id="sp-minus" class="ib" type="button" aria-label="Slower by 0.05">&minus;</button><output id="sp-val" for="sp-range" aria-live="polite">1x</output><button id="sp-plus" class="ib" type="button" aria-label="Faster by 0.05">+</button></div>
+    <div class="spd-read">
+      <svg class="ps-dial" viewBox="0 0 300 170" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="ps-arc-g" gradientUnits="userSpaceOnUse" x1="30" y1="0" x2="270" y2="0"><stop offset="0" stop-color="#2FD4C0"/><stop offset="1" stop-color="#B7A6FF"/></linearGradient></defs>
+        <path class="ps-track" d="M30 150A120 120 0 0 1 270 150" pathLength="100"/>
+        <path class="ps-arc" d="M30 150A120 120 0 0 1 270 150" pathLength="100"/>
+        <g class="ps-thumb"><circle class="ps-thumb-halo" cx="30" cy="150" r="21"/><circle class="ps-thumb-knob" cx="30" cy="150" r="11"/></g>
+      </svg>
+      <button id="sp-minus" class="ib" type="button" aria-label="Slower by 0.05">&minus;</button><output id="sp-val" for="sp-range" aria-live="polite">1x</output><button id="sp-plus" class="ib" type="button" aria-label="Faster by 0.05">+</button>
+      <span class="ps-cap" aria-hidden="true">Normal speed</span>
+    </div>
     <input id="sp-range" class="spd-range" type="range" min="0.5" max="3" step="0.05" value="1" aria-label="Playback speed">
+    <div class="ps-scale" aria-hidden="true"><span>0.5x</span><span>1x</span><span>2x</span><span>3x</span></div>
     <div id="sp-presets" class="spd-pre" role="group" aria-label="Speed presets"></div>
     <details id="sp-adv" class="spd-adv"><summary>Advanced</summary>
     <div class="row" style="margin-top:1rem"><label for="sp-each" style="flex:1">Remember speed for each book<small class="spd-s">A book you slowed down or sped up keeps its own speed. Other books start at the speed you picked last</small></label><input id="sp-each" type="checkbox"></div>

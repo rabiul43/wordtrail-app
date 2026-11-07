@@ -1,0 +1,105 @@
+/* Player style: GLASS (Playback #sheet-speed and Sleep timer #sheet-sleep).
+   Active when <html data-player-style="glass"> (see 99j for how it is set and how to remove both styles).
+   Applies at every width: the sheets are already a centred bottom sheet on desktop, Glass just floats it 10px in from the edges.
+   Inner controls use translucent fills, not backdrop-filter: a blur inside the blurred sheet would show nothing.
+   Dark, Black and High contrast use the dark glass; Light, White and Sepia use a light glass (tokens --pg-*). */
+
+html[data-player-style="glass"] {
+  --pg-bg: rgba(24, 26, 38, .62); --pg-bd: rgba(255, 255, 255, .14); --pg-ink: #F3EEE4; --pg-muted: #B4B8C6;
+  --pg-fill: rgba(255, 255, 255, .08); --pg-fill-bd: rgba(255, 255, 255, .16); --pg-dim: rgba(8, 9, 16, .55);
+  --pg-shadow: 0 30px 80px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .12);
+  --pg-track: rgba(255, 255, 255, .38); --pg-acc: #8CC0DA; --pg-grad: linear-gradient(135deg, #8CC0DA, #B7A6FF);
+  --pg-orb1: .55; --pg-orb2: .4;
+}
+html[data-player-style="glass"][data-theme="light"], html[data-player-style="glass"][data-theme="white"], html[data-player-style="glass"][data-theme="sepia"] {
+  --pg-bg: rgba(255, 255, 255, .66); --pg-bd: rgba(255, 255, 255, .75); --pg-ink: #1B1A22; --pg-muted: #55525C;
+  --pg-fill: rgba(255, 255, 255, .55); --pg-fill-bd: rgba(27, 26, 34, .12); --pg-dim: rgba(40, 42, 60, .35);
+  --pg-shadow: 0 30px 80px rgba(26, 22, 40, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --pg-track: rgba(27, 26, 34, .35); --pg-acc: #3F7F9E; --pg-orb1: .38; --pg-orb2: .3;
+}
+@media (prefers-color-scheme: light) {
+  html[data-player-style="glass"]:not([data-theme]) {
+    --pg-bg: rgba(255, 255, 255, .66); --pg-bd: rgba(255, 255, 255, .75); --pg-ink: #1B1A22; --pg-muted: #55525C;
+    --pg-fill: rgba(255, 255, 255, .55); --pg-fill-bd: rgba(27, 26, 34, .12); --pg-dim: rgba(40, 42, 60, .35);
+    --pg-shadow: 0 30px 80px rgba(26, 22, 40, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
+    --pg-track: rgba(27, 26, 34, .35); --pg-acc: #3F7F9E; --pg-orb1: .38; --pg-orb2: .3;
+  }
+}
+
+/* ---- backdrop: dim + blur the reader, plus two glow orbs (only while one of the two sheets is open) ---- */
+html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop { background: var(--pg-dim); -webkit-backdrop-filter: blur(14px) saturate(1.15); backdrop-filter: blur(14px) saturate(1.15); overflow: hidden; }
+html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::before,
+html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; width: min(120vw, 620px); height: min(120vw, 620px); }
+html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::before { left: -30%; top: -8%; background: radial-gradient(circle, rgba(109, 91, 255, var(--pg-orb1)) 0, rgba(109, 91, 255, 0) 66%); }
+html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::after { right: -34%; bottom: -10%; background: radial-gradient(circle, rgba(47, 212, 192, var(--pg-orb2)) 0, rgba(47, 212, 192, 0) 66%); }
+
+/* ---- floating glass sheet ---- */
+html[data-player-style="glass"] .ps-sheet { bottom: max(10px, env(safe-area-inset-bottom, 0px)); width: min(calc(100% - 20px), 42rem); border-radius: 36px; background: var(--pg-bg); -webkit-backdrop-filter: blur(28px) saturate(1.4); backdrop-filter: blur(28px) saturate(1.4); border: 1px solid var(--pg-bd); box-shadow: var(--pg-shadow); color: var(--pg-ink); font-family: var(--font-ui); }
+html[data-player-style="glass"] .ps-sheet header { background: transparent; border-bottom: 0; padding: 1.7rem 1.1rem .3rem 1.6rem; align-items: flex-start; }
+html[data-player-style="glass"] .ps-sheet header::before { background: var(--pg-fill-bd); top: .55rem; }
+html[data-player-style="glass"] .ps-sheet .ps-eyebrow { display: block; font: 600 .72rem/1 var(--font-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--pg-muted); margin-bottom: .45rem; }
+html[data-player-style="glass"] .ps-sheet header h2 { font: 600 30px/1.1 var(--font-display); letter-spacing: -.015em; color: var(--pg-ink); }
+html[data-player-style="glass"] .ps-sheet header .ib { width: 44px; height: 44px; background: var(--pg-fill); border: 1px solid var(--pg-fill-bd); color: var(--pg-ink); }
+html[data-player-style="glass"] .ps-sheet .body { padding: .6rem 1.3rem max(1.5rem, env(safe-area-inset-bottom)); gap: 1.1rem; }
+html[data-player-style="glass"] .ps-sheet .spd-s { color: var(--pg-muted); }
+
+/* shared pill look + selected gradient (an overlay fades in, because a gradient cannot be transitioned) */
+html[data-player-style="glass"] .ps-sheet .chip { position: relative; isolation: isolate; overflow: hidden; border-radius: 999px; border: 1px solid var(--pg-fill-bd); background: var(--pg-fill); color: var(--pg-ink); font: 600 1rem var(--font-ui); font-variant-numeric: tabular-nums; }
+html[data-player-style="glass"] .ps-sheet .chip::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--pg-grad); opacity: 0; transition: opacity .28s var(--ease); }
+html[data-player-style="glass"] .ps-sheet .chip:hover { border-color: var(--pg-acc); }
+html[data-player-style="glass"] .ps-sheet .chip[aria-pressed="true"] { color: #0B0C0E; border-color: transparent; box-shadow: 0 0 24px rgba(140, 192, 218, .55), 0 0 10px rgba(183, 166, 255, .45); background: transparent; transition: box-shadow .28s var(--ease); }
+html[data-player-style="glass"] .ps-sheet .chip[aria-pressed="true"]::before { opacity: 1; }
+
+/* ---- Playback: half-circle dial ---- */
+html[data-player-style="glass"] #sheet-speed .spd-read { display: grid; grid-template-columns: 1fr 1fr; direction: ltr; width: 100%; max-width: 300px; margin: 0 auto; justify-items: center; row-gap: .1rem; }
+html[data-player-style="glass"] #sheet-speed .ps-dial { display: block; grid-column: 1 / -1; grid-row: 1; width: 100%; height: auto; overflow: visible; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+html[data-player-style="glass"] .ps-track { fill: none; stroke: var(--pg-track); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0 2.6; }
+html[data-player-style="glass"] .ps-arc { fill: none; stroke: url(#ps-arc-g); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 80; filter: drop-shadow(0 0 7px rgba(47, 212, 192, .45)); transition: stroke-dashoffset .35s var(--ease); }
+html[data-player-style="glass"] .ps-thumb { transform-origin: 150px 150px; transition: transform .35s var(--ease); }
+html[data-player-style="glass"] .ps-thumb-halo { fill: rgba(255, 255, 255, .22); }
+html[data-player-style="glass"] .ps-thumb-knob { fill: #fff; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .35)); }
+html[data-player-style="glass"] #sheet-speed .body:has(#sp-range:focus-visible) .ps-thumb-halo { fill: rgba(140, 192, 218, .55); }
+html[data-player-style="glass"] #sheet-speed .spd-read output { grid-column: 1 / -1; grid-row: 1; align-self: end; margin-bottom: 1%; pointer-events: none; min-width: 0; text-align: center; font: 600 min(76px, 21vw)/1 var(--font-display); letter-spacing: -.02em; color: var(--pg-ink); }
+html[data-player-style="glass"] #sheet-speed .ps-x { font-size: .46em; color: var(--pg-acc); margin-inline-start: 2px; letter-spacing: 0; }
+html[data-player-style="glass"] #sheet-speed .ps-cap { display: block; grid-column: 1 / -1; grid-row: 2; font-size: .95rem; color: var(--pg-muted); margin-bottom: .7rem; text-align: center; }
+html[data-player-style="glass"] #sheet-speed .spd-read .ib { grid-row: 3; width: 56px; height: 56px; background: var(--pg-fill); border: 1px solid var(--pg-fill-bd); color: var(--pg-ink); font-size: 1.8rem; line-height: 1; }
+html[data-player-style="glass"] #sp-minus { grid-column: 1; justify-self: end; margin-inline-end: 12px; }
+html[data-player-style="glass"] #sp-plus { grid-column: 2; justify-self: start; margin-inline-start: 12px; }
+/* the real slider stays in the page for keyboard and screen readers; the dial is its picture */
+html[data-player-style="glass"] #sp-range { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); pointer-events: none; }
+html[data-player-style="glass"] #sheet-speed .ps-scale { display: none; }
+html[data-player-style="glass"] #sp-presets { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem; margin-top: .2rem; }
+html[data-player-style="glass"] #sp-presets .chip { min-height: 44px; padding: .2rem 1.05rem; }
+html[data-player-style="glass"] #sp-presets .ps-reset { border-style: dashed; color: var(--pg-muted); }
+html[data-player-style="glass"] #sheet-speed .spd-adv { margin-top: 0; padding: 0 1.1rem; border: 1px solid var(--pg-fill-bd); background: var(--pg-fill); border-radius: 22px; }
+html[data-player-style="glass"] #sheet-speed .spd-adv > summary { min-height: 56px; padding: 0; color: var(--pg-ink); }
+html[data-player-style="glass"] #sheet-speed .spd-adv[open] { padding-bottom: 1rem; }
+
+/* ---- Sleep timer: night scene ---- */
+html[data-player-style="glass"] #sheet-sleep .ps-scene { display: block; width: 170px; height: 170px; margin: 0 auto; }
+html[data-player-style="glass"] #sheet-sleep .ps-scene svg { width: 100%; height: 100%; display: block; overflow: visible; }
+html[data-player-style="glass"] #sheet-sleep .ps-orbit { fill: none; stroke: var(--pg-track); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 0 8.5; }
+html[data-player-style="glass"] #sheet-sleep .ps-moon { fill: url(#ps-moon-g); filter: drop-shadow(0 0 12px rgba(183, 166, 255, .6)); }
+html[data-player-style="glass"] #sheet-sleep .ps-stars circle { fill: #fff; opacity: .85; }
+html[data-player-style="glass"][data-theme="light"] #sheet-sleep .ps-stars circle, html[data-player-style="glass"][data-theme="white"] #sheet-sleep .ps-stars circle, html[data-player-style="glass"][data-theme="sepia"] #sheet-sleep .ps-stars circle { fill: #6D5BFF; }
+@media (prefers-color-scheme: light) { html[data-player-style="glass"]:not([data-theme]) #sheet-sleep .ps-stars circle { fill: #6D5BFF; } }
+html[data-player-style="glass"] #sl-note { text-align: center; color: var(--pg-muted); font-size: 1rem; margin: -.3rem 0 .1rem; }
+html[data-player-style="glass"] #sl-presets { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 0; }
+html[data-player-style="glass"] #sl-presets .ps-opt { min-height: 52px; padding: .2rem 1.25rem; display: inline-flex; align-items: center; justify-content: center; gap: .35rem; }
+html[data-player-style="glass"] #sl-presets .ps-n { font: 600 1.2rem/1 var(--font-display); }
+html[data-player-style="glass"] #sl-presets .ps-u { font-size: .92rem; font-weight: 500; opacity: .8; }
+html[data-player-style="glass"] #sl-presets .ps-wide { flex: 1 1 100%; justify-content: flex-start; gap: .8rem; padding-inline: 1.1rem; min-height: 56px; border-radius: 28px; }
+html[data-player-style="glass"] #sl-presets .ps-wide .ps-ic { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--pg-fill); border: 1px solid var(--pg-fill-bd); color: var(--pg-ink); }
+html[data-player-style="glass"] #sl-presets .ps-wide .ps-ic .ic { width: 14px; height: 14px; fill: currentColor; }
+html[data-player-style="glass"] #sl-presets .ps-wide[aria-pressed="true"] .ps-ic { background: rgba(11, 12, 14, .12); border-color: rgba(11, 12, 14, .2); color: #0B0C0E; }
+
+/* ---- motion: subtle, and off for people who ask for less (and in Calm mode) ---- */
+@media (prefers-reduced-motion: reduce) {
+  html[data-player-style="glass"] .ps-arc, html[data-player-style="glass"] .ps-thumb, html[data-player-style="glass"] .ps-sheet .chip, html[data-player-style="glass"] .ps-sheet .chip::before { transition: none; }
+}
+html[data-player-style="glass"][data-calm] .ps-arc, html[data-player-style="glass"][data-calm] .ps-thumb, html[data-player-style="glass"][data-calm] .ps-sheet .chip, html[data-player-style="glass"][data-calm] .ps-sheet .chip::before { transition: none; }
+
+/* ---- desktop (>= 900px): keep the centred dialog of 98b (top:0, bottom:0, auto margins); the glass is the same ---- */
+@media (min-width: 900px) {
+  html[data-player-style="glass"] .ps-sheet { bottom: 0; width: min(44rem, calc(100% - 4rem)); }
+}

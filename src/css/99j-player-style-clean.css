@@ -1,0 +1,113 @@
+/* Player style: CLEAN (Playback #sheet-speed and Sleep timer #sheet-sleep).
+   <html data-player-style="clean"> is set by the first-paint script (00-head.html) and applyPlayerStyle() (090). Saved as P.playerStyle.
+   Everything that changes a sheet is scoped under that attribute and under .ps-sheet, so no other sheet is touched.
+   The unscoped rules in the first block only style NEW classes (the Glass-only parts, hidden here, and the Settings picker).
+   Dark and Black themes use the Clean palette below; Light, White, Sepia and High contrast borrow the theme's own colours.
+   To take the redesign out: delete 99j + 99k, their two build.py lines, and the markup marked .ps-* in the sheets. */
+
+/* ---- new parts: hidden until a style shows them ---- */
+.ps-eyebrow, .ps-dial, .ps-cap { display: none; }
+.ps-ttl { min-width: 0; display: grid; }
+.ps-scene { display: none; }
+.ps-scale { display: none; }
+
+/* ---- Settings > Reading > Player style (works with every theme and both styles) ---- */
+.ps-pick-sec { display: grid; gap: .2rem; }
+.ps-pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; margin-top: .5rem; }
+.ps-pick button { position: relative; min-height: 44px; display: grid; gap: .15rem; align-content: start; text-align: start; padding: .55rem .55rem .75rem; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); cursor: pointer; font: inherit; }
+.ps-pick button[aria-pressed="true"] { border-color: transparent; box-shadow: 0 0 0 2px var(--accent); }
+.ps-pick button:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 3px; }
+.ps-pick .ps-pk-t { font-weight: 650; margin-top: .45rem; }
+.ps-pick small { color: var(--muted); font-size: .8rem; line-height: 1.35; }
+.ps-pick .ps-th { height: 76px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; align-content: center; gap: .35rem; }
+.ps-pick .ps-th-clean { background: #121418; border: 1px solid #2A2E36; }
+.ps-pick .ps-th-clean b { font: 600 1.5rem/1 var(--font-display); color: #F3EEE4; }
+.ps-pick .ps-th-clean i { font-style: normal; color: #8CC0DA; font-size: .95rem; margin-inline-start: 1px; }
+.ps-pick .ps-th-sl { width: 72%; height: 4px; border-radius: 4px; background: #2A2E36; position: relative; }
+.ps-pick .ps-th-sl span { position: absolute; inset: 0 auto 0 0; width: 55%; border-radius: 4px; background: #8CC0DA; }
+.ps-pick .ps-th-sl span::after { content: ""; position: absolute; inset-inline-end: -5px; top: -3px; width: 10px; height: 10px; border-radius: 50%; background: #8CC0DA; box-shadow: 0 0 0 3px rgba(140, 192, 218, .25); }
+.ps-pick .ps-th-glass { background: radial-gradient(circle at 18% 20%, rgba(109, 91, 255, .7), transparent 55%), radial-gradient(circle at 85% 90%, rgba(47, 212, 192, .55), transparent 55%), #181A26; }
+.ps-pick .ps-th-glass svg { width: 74%; height: auto; direction: ltr; }
+.ps-pick .ps-th-glass path { fill: none; stroke-linecap: round; }
+.ps-pick .ps-th-glass .a { stroke: rgba(255, 255, 255, .4); stroke-width: 1.6; stroke-dasharray: 0 2.4; }
+.ps-pick .ps-th-glass .b { stroke: #7FE6D8; stroke-width: 3.4; stroke-dasharray: 100 100; stroke-dashoffset: 45; }
+.ps-pick .ps-th-glass circle { fill: #fff; filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
+.ps-pick .ps-chk { display: none; position: absolute; top: .4rem; inset-inline-end: .4rem; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); place-items: center; }
+.ps-pick button[aria-pressed="true"] .ps-chk { display: grid; }
+.ps-pick .ps-chk svg { width: 12px; height: 12px; fill: none; stroke: var(--accent-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- Clean palette ---- */
+html[data-player-style="clean"] {
+  --ps-ground: #0B0C0E; --ps-sheet: #121418; --ps-line: #2A2E36; --ps-surf: #1A1D23;
+  --ps-acc: #8CC0DA; --ps-acc-ink: #0B0C0E; --ps-ink: #F3EEE4; --ps-muted: #A3AAB5;
+}
+html[data-player-style="clean"][data-theme="light"], html[data-player-style="clean"][data-theme="white"],
+html[data-player-style="clean"][data-theme="sepia"], html[data-player-style="clean"][data-theme="contrast"] {
+  --ps-sheet: var(--surface); --ps-line: var(--line); --ps-surf: var(--surface-2);
+  --ps-acc: var(--accent); --ps-acc-ink: var(--accent-ink); --ps-ink: var(--ink); --ps-muted: var(--muted);
+}
+@media (prefers-color-scheme: light) {
+  html[data-player-style="clean"]:not([data-theme]) {
+    --ps-sheet: var(--surface); --ps-line: var(--line); --ps-surf: var(--surface-2);
+    --ps-acc: var(--accent); --ps-acc-ink: var(--accent-ink); --ps-ink: var(--ink); --ps-muted: var(--muted);
+  }
+}
+
+/* ---- sheet shell ---- */
+html[data-player-style="clean"] .ps-sheet { background: var(--ps-sheet); border: 1px solid var(--ps-line); border-bottom: 0; border-radius: 30px 30px 0 0; color: var(--ps-ink); font-family: var(--font-ui); }
+html[data-player-style="clean"] .ps-sheet header { background: transparent; border-bottom: 0; padding: 1.6rem 1rem .5rem 1.5rem; }
+html[data-player-style="clean"] .ps-sheet header::before { background: var(--ps-line); }
+html[data-player-style="clean"] .ps-sheet header h2 { font: 600 1.65rem/1.15 var(--font-display); letter-spacing: -.01em; color: var(--ps-ink); }
+html[data-player-style="clean"] .ps-sheet header .ib { width: 44px; height: 44px; background: var(--ps-surf); color: var(--ps-ink); border: 1px solid var(--ps-line); }
+html[data-player-style="clean"] .ps-sheet .body { padding: .5rem 1.3rem max(1.5rem, env(safe-area-inset-bottom)); gap: 1.2rem; }
+html[data-player-style="clean"] .ps-sheet .spd-s { color: var(--ps-muted); }
+
+/* ---- Playback ---- */
+html[data-player-style="clean"] #sheet-speed .spd-read { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin: .2rem 0 0; }
+html[data-player-style="clean"] #sheet-speed .spd-read .ib { flex: none; width: 52px; height: 52px; background: var(--ps-surf); border: 1px solid var(--ps-line); color: var(--ps-ink); font-size: 1.7rem; line-height: 1; }
+html[data-player-style="clean"] #sheet-speed .spd-read output { flex: 1; min-width: 0; text-align: center; font: 600 min(84px, 21vw)/1 var(--font-display); letter-spacing: -.02em; color: var(--ps-ink); }
+html[data-player-style="clean"] #sheet-speed .ps-x { font-size: min(40px, 10vw); color: var(--ps-acc); margin-inline-start: 2px; letter-spacing: 0; }
+html[data-player-style="clean"] #sp-range { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; margin: 0; background: transparent; accent-color: var(--ps-acc); --fill: 20%; --ps-to: right; }
+html[dir="rtl"][data-player-style="clean"] #sp-range { --ps-to: left; }
+html[data-player-style="clean"] #sp-range::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: linear-gradient(to var(--ps-to), var(--ps-acc) var(--fill), var(--ps-line) var(--fill)); }
+html[data-player-style="clean"] #sp-range::-moz-range-track { height: 6px; border-radius: 6px; background: linear-gradient(to var(--ps-to), var(--ps-acc) var(--fill), var(--ps-line) var(--fill)); }
+html[data-player-style="clean"] #sp-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -9px; border-radius: 50%; border: 0; background: var(--ps-acc); box-shadow: 0 0 0 6px color-mix(in srgb, var(--ps-acc) 26%, transparent); }
+html[data-player-style="clean"] #sp-range::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--ps-acc); box-shadow: 0 0 0 6px color-mix(in srgb, var(--ps-acc) 26%, transparent); }
+html[data-player-style="clean"] #sp-range:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 6px; border-radius: 8px; }
+html[data-player-style="clean"] #sheet-speed .ps-scale { display: flex; position: relative; height: 1.1rem; margin: -.85rem 12px 0; font-size: .78rem; color: var(--ps-muted); font-variant-numeric: tabular-nums; }
+html[data-player-style="clean"] #sheet-speed .ps-scale span { position: absolute; inset-inline-start: 0; transform: translateX(-50%); white-space: nowrap; }
+html[dir="rtl"][data-player-style="clean"] #sheet-speed .ps-scale span { transform: translateX(50%); }
+html[data-player-style="clean"] #sheet-speed .ps-scale span:nth-child(2) { inset-inline-start: 20%; }
+html[data-player-style="clean"] #sheet-speed .ps-scale span:nth-child(3) { inset-inline-start: 60%; }
+html[data-player-style="clean"] #sheet-speed .ps-scale span:nth-child(4) { inset-inline-start: 100%; }
+html[data-player-style="clean"] #sp-presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; margin-top: 0; }
+html[data-player-style="clean"] .ps-sheet .chip { min-height: 48px; border-radius: 16px; border: 1px solid var(--ps-line); background: var(--ps-surf); color: var(--ps-ink); font: 500 1rem var(--font-ui); padding: .2rem .4rem; font-variant-numeric: tabular-nums; }
+html[data-player-style="clean"] .ps-sheet .chip:hover { border-color: var(--ps-acc); }
+html[data-player-style="clean"] .ps-sheet .chip[aria-pressed="true"] { background: var(--ps-acc); border-color: var(--ps-acc); color: var(--ps-acc-ink); }
+html[data-player-style="clean"] #sp-presets .ps-reset { background: transparent; border-style: dashed; color: var(--ps-muted); }
+html[data-player-style="clean"] #sheet-speed .spd-adv { margin-top: 0; padding: 0 1rem; border: 1px solid var(--ps-line); border-radius: 16px; }
+html[data-player-style="clean"] #sheet-speed .spd-adv > summary { min-height: 56px; padding: 0; color: var(--ps-ink); }
+html[data-player-style="clean"] #sheet-speed .spd-adv[open] { padding-bottom: 1rem; }
+
+/* ---- Sleep timer ---- */
+html[data-player-style="clean"] #sheet-sleep .ps-scene { display: block; width: 132px; height: 132px; margin: .2rem auto 0; }
+html[data-player-style="clean"] #sheet-sleep .ps-scene svg { width: 100%; height: 100%; display: block; overflow: visible; }
+html[data-player-style="clean"] #sheet-sleep .ps-halo, html[data-player-style="clean"] #sheet-sleep .ps-stars { display: none; }
+html[data-player-style="clean"] #sheet-sleep .ps-orbit { fill: none; stroke: var(--ps-acc); stroke-opacity: .5; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 0 7.5; }
+html[data-player-style="clean"] #sheet-sleep .ps-moon { fill: var(--ps-acc); }
+html[data-player-style="clean"] #sl-note { text-align: center; font-size: 1.05rem; color: var(--ps-muted); margin: 0; }
+html[data-player-style="clean"] #sl-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin-top: 0; }
+html[data-player-style="clean"] #sl-presets .ps-opt { min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; border-radius: 18px; padding: .4rem; }
+html[data-player-style="clean"] #sl-presets .ps-n { font: 600 28px/1 var(--font-display); }
+html[data-player-style="clean"] #sl-presets .ps-u { font-size: .72rem; letter-spacing: .04em; color: var(--ps-muted); }
+html[data-player-style="clean"] #sl-presets .ps-opt[aria-pressed="true"] .ps-u { color: inherit; opacity: .78; }
+html[data-player-style="clean"] #sl-presets .ps-wide { grid-column: span 2; flex-direction: row; gap: .6rem; border-style: dashed; }
+html[data-player-style="clean"] #sl-presets .ps-wide .ps-ic { display: grid; width: 22px; height: 22px; color: var(--ps-acc); }
+html[data-player-style="clean"] #sl-presets .ps-wide .ps-ic .ic { width: 100%; height: 100%; fill: currentColor; }
+html[data-player-style="clean"] #sl-presets .ps-wide[aria-pressed="true"] .ps-ic { color: inherit; }
+html[data-player-style="clean"] #sl-presets .ps-t { font-weight: 550; }
+
+/* ---- desktop (>= 900px): the app centres sheets as dialogs (98b), so all four corners are round ---- */
+@media (min-width: 900px) {
+  html[data-player-style="clean"] .ps-sheet { border: 1px solid var(--ps-line); border-radius: 30px; }
+}

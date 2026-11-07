@@ -677,6 +677,10 @@
     root.setAttribute('data-design', phone && d === 'modern' ? 'modern' : 'off');
     homeOrder();
   }
+  /* Player style (Settings > Reading): <html data-player-style="clean|glass"> picks the look of the Playback and Sleep timer sheets (99j / 99k css). Saved as P.playerStyle (synced with the rest of wt:prefs). CSS only, so it applies at once, even to an open sheet. */
+  const playerStyleOf = () => P.playerStyle === 'glass' ? 'glass' : 'clean';
+  function applyPlayerStyle() { document.documentElement.setAttribute('data-player-style', playerStyleOf()); }
+  function pstyleSegSync() { const v = playerStyleOf(); $$('#seg-pstyle button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
   function designSegSync() { const v = designOf(); $$('#seg-design button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
   function stHomeInit() {
     const root = document.documentElement, row = $('#st-chips'), sb = $('#st-search'), ac = $('#st-acct');

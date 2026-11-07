@@ -376,6 +376,7 @@
   guideDoc('account', 'Settings home', "Settings opens one page with a search box and three sections. Basics: theme, text, speed and the sleep timer. Help: the Feature guide, How to use and Keyboard shortcuts. Advanced: precise timing, pre-sync, cinematic sound, and Developer and Diagnostics once Developer is unlocked. Each row opens the full panel, with a Back button to return. Search finds any setting, and the book tools in the More menu.", '2026-10-19');
   function fillSettings() {
     covSegSync();
+    pstyleSegSync();
     homeCustPaint();
     dmRender();
     devStartup();

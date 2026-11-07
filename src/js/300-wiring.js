@@ -96,13 +96,18 @@
     { const bv = $('#b-ctl-speed-v'); if (bv) { bv.textContent = nrSpd(P.speed || 1) + '\u00d7'; bv.hidden = (P.speed || 1) === 1; } const cs = $('#b-ctl-speed'); if (cs) cs.dataset.on = String((P.speed || 1) !== 1); }   // badge shows the saved speed on start
     { const SL_OPTS = [[0, 'Off'], [10, '10 min'], [15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hour'], [90, '1.5 hours'], ['chapter', 'End of track']];   // the small Sleep timer sheet (the button next to Play)
       const slBox = $('#sl-presets'), slNote = $('#sl-note');
+      const slFace = (v, lab) => {   // what is inside a choice: a big number over a small unit (Clean) or "10 min" in one line (Glass); same markup, the CSS decides
+        if (v === 0) return [h('b', { class: 'ps-n' }, lab)];
+        if (v === 'chapter') { const ic = h('span', { class: 'ps-ic', 'aria-hidden': 'true' }); ic.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><use href="#i-play"/></svg>'; return [ic, h('span', { class: 'ps-t' }, lab)]; }
+        const [n, u] = lab.split(' '); return [h('b', { class: 'ps-n' }, n), ' ', h('span', { class: 'ps-u' }, u)];
+      };
       const slDraw = () => {
         slBox.textContent = '';
-        SL_OPTS.forEach(([v, lab]) => slBox.append(h('button', { type: 'button', class: 'chip', 'aria-pressed': String((S.sleep || 0) === v), onclick: () => {
+        SL_OPTS.forEach(([v, lab]) => slBox.append(h('button', { type: 'button', class: 'chip ps-opt' + (v === 'chapter' ? ' ps-wide' : ''), 'data-v': String(v), 'aria-pressed': String((S.sleep || 0) === v), onclick: () => {
           buzz('tick'); setSleep(v); closeSheets();
           if (P.shakeSleep === true && typeof v === 'number' && v > 0) shakeArm(true);
           toast(v === 0 ? 'Sleep timer off' : v === 'chapter' ? 'Sleep at the end of this track' : sleepLabel(v), 2200);
-        } }, lab)));
+        } }, ...slFace(v, lab))));
         const c = S.sleep || 0;
         slNote.textContent = c === 0 ? 'The book keeps playing.' : c === 'chapter' ? 'Pauses at the end of this track.' : 'Pauses in about ' + Math.max(1, Math.ceil(slLeftSec() / 60)) + ' min.';
       };
@@ -373,6 +378,11 @@
       P.design = b.dataset.v; P.homeNew = P.design !== 'classic'; savePrefs(); applyHome(); designSegSync();
       renderRecents(); loadDaily(); if (curTab === 'collections') renderCollections();
       toast('App design: ' + ({ classic: 'Classic', storytel: 'Storytel-style', modern: 'Modern' }[P.design]));
+    }));
+    applyPlayerStyle(); pstyleSegSync();   // Player style (090): the first-paint script already set it; this keeps it in step with P
+    $$('#seg-pstyle button').forEach(b => b.addEventListener('click', () => {
+      P.playerStyle = b.dataset.v === 'glass' ? 'glass' : 'clean'; savePrefs(); applyPlayerStyle(); pstyleSegSync();
+      toast('Player style: ' + (P.playerStyle === 'glass' ? 'Glass' : 'Clean'), 2000);
     }));
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyHome); } catch (e) { /* old browser: applies on the next start */ }
     stHomeInit();   // New Home design: genre chips and the search / account buttons (090)
