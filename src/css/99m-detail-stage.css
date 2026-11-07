@@ -1,0 +1,45 @@
+/* Book details, "Cover stage" look (phones only; the desktop banner in 98-desktop-layout.css is unchanged).
+   Cover-coloured glow, other recordings fanned behind the cover, pills, one glass stats strip, one big Listen button
+   with round Save / Share buttons, a progress card for started books, and a floating Listen bar when the big button scrolls away.
+   Remove this file and its build.py line to go back to the old look (the pills, fan and bar markup stay harmless). */
+.det-fan, .det-float { display: none; }
+@media (max-width: 699px) {
+  .det-hero:has(.det-cover) { border: 0; border-radius: 0 0 var(--r-xl) var(--r-xl); margin-inline: -1.1rem; width: calc(100% + 2.2rem); max-width: none; box-sizing: border-box; padding: 1.6rem 1.4rem 1.2rem; gap: .7rem; background: radial-gradient(120% 80% at 50% 0%, hsl(var(--h) 55% 45% / .55), hsl(var(--h) 45% 30% / .22) 48%, transparent 100%); }
+  .det-hero:has(.det-cover) .det-cover { position: relative; z-index: 2; width: min(10rem, 46vw); border-radius: 14px; box-shadow: 0 26px 54px rgba(0, 0, 0, .5), 0 0 64px hsl(var(--h) 60% 55% / .35); margin-bottom: .6rem; }
+  .det-fan { display: block; position: absolute; z-index: 1; top: 2.2rem; left: 50%; width: min(10rem, 46vw) !important; height: auto !important; aspect-ratio: 2 / 3; border-radius: 12px; opacity: .5; overflow: hidden; pointer-events: none; box-shadow: 0 16px 36px rgba(0, 0, 0, .45); }
+  .det-fan.l { transform: translateX(-118%) rotate(-7deg) scale(.88); }
+  .det-fan.r { transform: translateX(18%) rotate(7deg) scale(.88); }
+  .det-fan.mc .gc-t, .det-fan.mc .gc-a { font-size: .7rem; }
+  .det-hero h1 { font-size: clamp(1.5rem, 7vw, 1.9rem); }
+  .det-hero .det-by, .det-hero .det-author { color: var(--accent); }
+  .det-hero .det-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; }
+  .det-pill { padding: .28rem .7rem; border-radius: var(--r-pill); background: color-mix(in srgb, var(--ink) 8%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); font-size: .74rem; color: var(--ink); }
+  .det-hero .det-chip { background: color-mix(in srgb, var(--ink) 8%, transparent); border-color: color-mix(in srgb, var(--ink) 12%, transparent); color: var(--ink); }
+  .det-hero .lvl:not([hidden]) { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); }
+  /* one glass strip for the numbers */
+  .det-hero .det-stats { display: flex; flex-wrap: nowrap; justify-content: stretch; gap: 0; max-width: none; width: 100%; padding: 0; margin-top: .3rem; border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--ink) 6%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .det-hero .det-stats[hidden] { display: none; }
+  .det-hero .det-stat { flex: 1; min-width: 0; padding: .7rem .2rem; border-inline-start: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }
+  .det-hero .det-stat:first-child { border: 0; }
+  .det-hero .det-stat b { font-size: 1.05rem; }
+  /* started books: progress card */
+  .det-hero .det-prog-w { padding: .9rem 1rem; border-radius: 20px; background: color-mix(in srgb, var(--ink) 7%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); gap: .5rem; }
+  .det-hero .det-prog { height: .4rem; }
+  /* one big button, round Save and Share */
+  .det-hero .det-actions { align-items: center; gap: .65rem; margin-top: .5rem; }
+  .det-hero .det-btn { min-height: 3.5rem; font-size: 1.02rem; font-weight: 700; box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 38%, transparent); }
+  .det-hero .det-btn .ic { width: 1.5rem; height: 1.5rem; padding: .3rem; border-radius: 50%; background: var(--accent-ink); color: var(--accent); box-sizing: content-box; }
+  .det-hero .det-actions .heart.on-detail, .det-hero .det-share { position: static; display: grid; place-items: center; flex: none; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: color-mix(in srgb, var(--ink) 8%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); color: var(--ink); cursor: pointer; }
+  .det-hero .det-actions .heart.on-detail[aria-pressed="true"] { color: var(--accent); }
+  /* floating Listen bar */
+  .det-float { display: flex; align-items: center; gap: .8rem; position: fixed; z-index: 7; left: .75rem; right: .75rem; bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + .5rem); padding: .55rem .6rem .55rem 1rem; border-radius: var(--r-pill); background: var(--glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid var(--line); box-shadow: var(--shadow-pop); animation: wtdfin .25s ease both; }
+  .det-float[hidden] { display: none; }
+  .df-t { flex: 1; min-width: 0; display: grid; font-size: .85rem; line-height: 1.3; }
+  .df-t b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .df-t small { color: var(--muted); font-size: .72rem; }
+  .df-go { display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; padding: 0 1.1rem; border: 0; border-radius: var(--r-pill); background: var(--accent); color: var(--accent-ink); font: 700 .9rem var(--font-ui); cursor: pointer; }
+  .df-go .ic { width: 1rem; height: 1rem; }
+  @keyframes wtdfin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
+@media (min-width: 700px) { .det-pill + .det-pill::before { content: " \00b7 "; white-space: pre; } }
+@media (prefers-reduced-motion: reduce) { .det-float { animation: none; } }

@@ -78,7 +78,7 @@
   }
   function drawDetail(b) {
     const d = $('#detail'); d.textContent = '';
-    const meta = [b.total ? fmtLong(b.total) : '', b.n ? b.n + (b.n === 1 ? ' track' : ' tracks') : '', b.lang || ''].filter(Boolean).join(' \u00b7 ');
+    const metaParts = [b.total ? fmtLong(b.total) : '', b.n ? b.n + (b.n === 1 ? ' track' : ' tracks') : '', b.lang || ''].filter(Boolean), meta = metaParts.length;
     const lvl = h('span', { class: 'lvl', hidden: true }), sync = h('span', { class: 'det-chip', hidden: true }), yr = h('span', { class: 'det-chip', hidden: true });
     const genres = h('div', { class: 'det-genres', hidden: true }), about = h('section', { class: 'det-about', hidden: true });
     const bgrd = h('section', { class: 'det-about wp-sec', hidden: true });
@@ -129,12 +129,14 @@
       const sec = (title, node) => h('section', { class: 'home-section' }, h('div', { class: 'home-section-head' }, h('div', {}, h('h2', {}, title))), node);
       const row = (books, label) => { const r = h('div', { class: 'hrow', 'aria-label': label }); fillRow(r, books, null, 12); return r; };
       if (x.similar.length >= 3) more.append(sec('More like this', row(x.similar, 'Similar books')));
+      if (x.others.length && !detFan.length) x.others.slice(0, 2).forEach((o, i) => { const fc = coverBox(o, 'det-fan ' + (i ? 'r' : 'l')); detFan.push(fc); detHero.insertBefore(fc, detCover); });   // other recordings fan out behind the cover
       if (x.others.length) more.append(sec('Other recordings', h('div', { class: 'list' }, x.others.map(o => bookCard(o, () => openDetail(o))))));
       if (x.author.length) more.append(sec('More by ' + first, row(x.author, 'More by ' + first)));
     })();
     /* desktop banner: the cover, blurred, fills the back of the hero (hidden on small screens, see 98-desktop-layout.css) */
     const detCover = coverBox(b, 'tile-cover det-cover'); if (b.id) dlMarkPaint(detCover, b.id);
-    const detBack = h('div', { class: 'det-bg', 'aria-hidden': 'true' });
+    const detBack = h('div', { class: 'det-bg', 'aria-hidden': 'true' }), detFan = [];
+    let detHero = null;
     try {
       const fillBack = () => { const im = detCover.querySelector('img.loaded'); if (!im) return false; detBack.style.backgroundImage = 'url("' + (im.currentSrc || im.src) + '")'; detBack.classList.add('on'); return true; };
       const mo = new MutationObserver(() => { if (fillBack()) mo.disconnect(); });
@@ -146,12 +148,12 @@
         h('button', { class: 'ib', type: 'button', 'aria-label': 'Back', onclick: closeDetail }, svgIcon('#i-back')),
         h('span', {}, 'Book details'),
         h('div', { class: 'det-tools' }, h('button', { class: 'ib', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')))),
-      h('section', { class: 'det-hero', style: '--h:' + colHue(0, (parseInt(b.id, 10) || 0) + 3) },
+      detHero = h('section', { class: 'det-hero', style: '--h:' + colHue(0, (parseInt(b.id, 10) || 0) + 3) },
         detBack,
         detCover,
         h('h1', {}, b.title),
         authorLine(b),
-        meta ? h('p', { class: 'det-meta' }, meta) : null,
+        meta ? h('p', { class: 'det-meta' }, ...metaParts.map(s => h('span', { class: 'det-pill' }, s))) : null,
         h('div', { class: 'det-chips' }, lvl, sync, yr),
         genres,
         stats,
@@ -162,4 +164,19 @@
           h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share'))),
         ddMake(b)),
       about, ratingsSection(b), bgrd, more);
+    /* floating Listen bar: shows when the big button has scrolled out of sight (phones only, see 99m-detail-stage.css) */
+    try {
+      const btn = d.querySelector('.det-btn');
+      const fl = h('div', { class: 'det-float', hidden: true },
+        h('div', { class: 'df-t' }, h('b', {}, b.title), h('small', {}, [b.total ? fmtLong(b.total) : '', b.n ? b.n + (b.n === 1 ? ' track' : ' tracks') : ''].filter(Boolean).join(' \u00b7 '))),
+        h('button', { class: 'df-go', type: 'button', onclick: () => openBook(b, { play: true }) }, svgIcon('#i-play'), pct >= 99 ? 'Again' : resuming ? 'Resume' : 'Listen'));
+      d.append(fl);
+      if (btn && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(es => {
+          if (DET.book !== b || !d.contains(fl)) { io.disconnect(); return; }
+          const e = es[es.length - 1]; fl.hidden = e.isIntersecting || e.boundingClientRect.top > 0;
+        });
+        io.observe(btn);
+      }
+    } catch (e) { /* no floating bar */ }
   }
