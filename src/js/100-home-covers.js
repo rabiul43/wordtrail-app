@@ -155,10 +155,6 @@
     olPending.set(key, pr);
     return pr;
   }
-  guideDoc('settings', 'Book colours', "The player can take its colour from the book's cover. Turn it off in Settings > Reading.");
-  /* ---------- per-book accent colour: the player takes its colour from the cover ---------- */
-  const ACC = { cur: null, seq: 0 };
-  const accLum = (r, g, b) => { const f = c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
   function accRgbToHsl(r, g, b) {
     r /= 255; g /= 255; b /= 255;
     const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
@@ -167,12 +163,6 @@
     const h = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
     return [h * 60, s, l];
   }
-  function accHsl(h, s, l) {
-    s /= 100; l /= 100;
-    const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-    return [Math.round(255 * f(0)), Math.round(255 * f(8)), Math.round(255 * f(4))];
-  }
-  const accCss = rgb => 'rgb(' + rgb.join(',') + ')';
   /* Dominant colourful hue of the cover; falls back to the same hue the placeholder cover uses. */
   async function coverColor(b) {
     if (covStyle() === 'modern' || covStyle() === 'se') return { h: coverHue(b.title), s: 52 };
@@ -201,102 +191,6 @@
       }
     } catch (e) { /* no pixel access: use the placeholder hue below */ }
     return { h: coverHue(b.title), s: 52 };
-  }
-  function paintAccent() {
-    const root = document.documentElement, a = ACC.cur, ks = ['--accent', '--accent-ink', '--accent-soft'];
-    if (!a || P.bookColors === false) { ks.forEach(k => root.style.removeProperty(k)); try { localStorage.removeItem('wt:accCss'); } catch (e) { /* storage unavailable */ } return; }
-    const bg = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(getComputedStyle(root).getPropertyValue('--bg').trim());
-    const dark = bg ? accLum(parseInt(bg[1], 16), parseInt(bg[2], 16), parseInt(bg[3], 16)) < .2 : false;
-    const s = Math.max(45, Math.min(80, a.s));
-    const acc = accHsl(a.h, s, dark ? 64 : 40), soft = accHsl(a.h, Math.min(s, dark ? 40 : 70), dark ? 19 : 90);
-    const L = accLum(acc[0], acc[1], acc[2]), ink = (1.05 / (L + .05)) >= ((L + .05) / .05) ? '#FFFFFF' : '#111111';
-    root.style.setProperty('--accent', accCss(acc)); root.style.setProperty('--accent-soft', accCss(soft)); root.style.setProperty('--accent-ink', ink);
-    /* ready-made colours for the next start: the early script in 00-head.html paints them before the app loads (only for the same theme) */
-    try { localStorage.setItem('wt:accCss', JSON.stringify({ k: (P.theme || 'auto') + '|' + (matchMedia('(prefers-color-scheme: light)').matches ? 'l' : 'd'), a: accCss(acc), s: accCss(soft), i: ink })); } catch (e) { /* storage unavailable */ }
-  }
-  async function bookAccent(b) {
-    const mine = ++ACC.seq;
-    if (P.bookColors === false) return;
-    const c = await coverColor(b);
-    if (mine !== ACC.seq || !S.book || S.book.id !== b.id) return;
-    ACC.cur = c; paintAccent();
-    try { localStorage.setItem('wt:accLast', JSON.stringify({ h: c.h, s: c.s, id: b.id })); } catch (e) { /* storage unavailable */ }   // the app keeps this colour after the book is closed
-  }
-  /* Start-up / switch on: use the colour of the last book that was opened (nothing to do if none yet). */
-  function restoreAccent() {
-    if (P.bookColors === false) return;
-    try {
-      const l = JSON.parse(localStorage.getItem('wt:accLast') || 'null');
-      if (l && typeof l.h === 'number') { ACC.cur = { h: l.h, s: typeof l.s === 'number' ? l.s : 52 }; paintAccent(); }
-    } catch (e) { /* no saved colour */ }
-  }
-  function clearAccent() { ACC.seq++; ACC.cur = null; paintAccent(); }
-
-  guideDoc('settings', 'Cover style', "Original shows the LibriVox cover art. Modern shows a clean designed cover instead.");
-  /* Cover style (Settings): auto (default) = Standard Ebooks cover, then real art if sharp and book-shaped, else designed cover; se = Standard Ebooks or designed cover; modern = designed cover only; original = real art first. */
-  function coverFill(box, b) {
-    const st = covStyle(), title = (b.title || '?').trim();
-    box.className = box._cls + (st === 'original' ? '' : ' mc mc-' + coverVariant(title));
-    box.style.setProperty('--ch', coverHue(title));
-    const keep = [...box.children].filter(c => c.classList.contains('dlmark'));   // the download mark survives a redraw
-    box.textContent = '';
-    box.append(h('span', { class: 'gc-i' }, title.charAt(0).toUpperCase()), h('span', { class: 'gc-t' }, title));
-    if (st !== 'original') {
-      const first = String(b.authors || '').split(/[,;&]| and /)[0].trim();
-      box.append(h('span', { class: 'gc-a' }, first && !/^unknown/i.test(first) ? first : ''));
-    }
-    if (keep.length) box.append(...keep);
-    const large = box._cls === 'pcover-art', tok = box._tok = (box._tok || 0) + 1;
-    if (large && box.parentNode && box.parentNode.style) box.parentNode.style.removeProperty('--ar');   // redrawn (style change): back to the default shape until the new image loads
-    const real = st === 'se' ? [] : coverSources(b);
-    const begin = (seList, gk) => {
-      if (box._tok !== tok) return;                       // style changed or box redrawn meanwhile
-      const srcs = seList.map(o => o.url).concat(real);
-      let i = 0, tried = false;
-      const img = h('img', { alt: '', decoding: 'async', loading: 'lazy', width: '200', height: '300', referrerpolicy: 'no-referrer' });   // width/height = the 2:3 shape (the CSS box already fixes the real size; the colour behind is the placeholder)
-      const isSe = () => img.dataset.se === '1';
-      const good = () => isSe() || st !== 'auto' || (img.naturalWidth >= 300 && img.naturalHeight >= img.naturalWidth * 1.25 && img.naturalHeight <= img.naturalWidth * 1.9);
-      /* A cover that neither loads nor fails (a stalled connection) never reaches the next source by itself.
-         So each try gets a time limit, counted only while the image is really on screen (a lazy image far below
-         has not started yet). A slow try then repeats once through the Worker (the same route the audio uses),
-         and only after that moves on to the next source. */
-      let cur = -1, viaPx = false, tm = 0;
-      const load = (u, o) => {
-        clearTimeout(tm); img.dataset.se = o ? '1' : ''; img.src = u;
-        const watch = () => {
-          if (box._tok !== tok || !img.isConnected || img.classList.contains('loaded')) return;
-          const r = img.getBoundingClientRect();
-          if (!r.width || r.bottom < -1500 || r.top > innerHeight + 1500) { tm = setTimeout(watch, 3000); return; }   // not shown or far away: not started yet
-          next();
-        };
-        tm = setTimeout(watch, 7000);
-      };
-      const next = (noRetry) => {
-        clearTimeout(tm);
-        if (box._tok !== tok) return;
-        if (!noRetry && cur >= 0 && !viaPx) { const p = px(srcs[cur]); if (p !== srcs[cur]) { viaPx = true; load(p, seList[cur]); return; } }   // same cover, through the Worker
-        viaPx = false;
-        if (gk && seList.length && i === seList.length) store.set(gk, { t: Date.now() });   // every guess failed
-        if (i < srcs.length) { cur = i; const o = seList[i]; load(srcs[i++], o); return; }
-        cur = -1;
-        if (st === 'se' || tried) return;
-        tried = true;
-        openLibraryCover(b).then(u => { if (u && !srcs.includes(u)) { img.dataset.se = ''; img.src = st === 'auto' ? u.replace('-M.jpg', '-L.jpg') : u; } });
-      };
-      img.addEventListener('load', () => { if (img.naturalWidth > 1 && good()) { clearTimeout(tm); img.classList.add('loaded'); if (large && img.naturalHeight) { const po = box.parentNode; if (po && po.classList && po.classList.contains('pcover-poster')) po.style.setProperty('--ar', String(Math.min(1.8, Math.max(.5, img.naturalWidth / img.naturalHeight)).toFixed(3))); } if (gk && isSe()) store.set(gk, { u: img.src }); } else next(true); });   // the player poster takes the cover's own shape, so a wide cover is shown whole instead of cropped
-      img.addEventListener('error', () => next());
-      box.append(img);   // attached straight away: a detached lazy image may never start loading
-      next();
-    };
-    if (st === 'modern') return;
-    if (st === 'original') return begin([]);
-    seLookup(b).then(id => {
-      if (id) return begin(seUrls(id, large));
-      const gk = 'wt:seg:' + (b.id || b.title), g = store.get(gk, null);   // a guessed Standard Ebooks cover: remember the hit or the miss
-      if (g && g.u) return begin([{ url: g.u }]);
-      if (g && g.t && Date.now() - g.t < 14 * 864e5) return begin([]);
-      begin(seGuess(b, large), gk);
-    });
   }
   function coverBox(b, cls) {
     const box = h('div', { class: cls, 'aria-hidden': 'true', 'data-cv': '' });
