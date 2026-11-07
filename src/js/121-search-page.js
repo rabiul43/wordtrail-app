@@ -232,6 +232,7 @@
     if (q) rememberQuery(q);
     spPaint();
   }
+  EXH.level = t => { spShow(); spRun('', { f: { lvl: [t] } }); };   // used by the Find your level tiles on Explore (110)
   const spGo = t => { const i = spInput(); if (i) i.value = t; spRun(t); };
   /* change a filter, show the new list at once, and again when the level or read-along data has arrived */
   async function spFilterSet(fn) {

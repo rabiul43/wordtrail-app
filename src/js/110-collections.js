@@ -27,6 +27,8 @@
     const g = h('div', { class: 'col-grid', 'aria-busy': 'true', 'aria-label': 'Loading collections' }, [h('div', { class: 'col-sk hero' })].concat([1, 2, 3, 4].map(() => h('div', { class: 'col-sk' }))));
     body.append(g);
   }
+  /* the Search page (121) fills this in: a Find your level tile opens Search with that level chosen */
+  const EXH = { level: null };
   /* ---------- Explore design (phones): Pick of the day, genre chips, Find your level ---------- */
   function exPick(shelves) {   // one book per day, from every shelf (needs a cover and a length)
     const seen = new Set(), pool = [];
@@ -57,7 +59,7 @@
     const defs = [[0, 'B1', 'Easy'], [1, 'B2', 'Medium'], [2, 'C1', 'Challenge']];
     const nodes = defs.map(([t, code, name]) => {
       const n = h('span', { class: 'ex-n' }, ' ');
-      const btn = h('button', { class: 'ex-lv t' + t, type: 'button', onclick: () => { LF.lvl.clear(); LF.lvl.add(t); lfPaint(); spShow(); spRun('', { f: { lvl: [t] } }); } },
+      const btn = h('button', { class: 'ex-lv t' + t, type: 'button', onclick: () => { LF.lvl.clear(); LF.lvl.add(t); lfPaint(); if (EXH.level) EXH.level(t); } },
         h('span', { class: 'ex-big' }, code), n, h('span', { class: 'ex-b' }, name));
       btn._n = n; return btn;
     });
