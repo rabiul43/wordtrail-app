@@ -62,7 +62,7 @@
     }
     let saved = await loadSaved(b.id);
     if (VER.carry) saved = verApply(saved, b);
-    await Promise.race([loadCuts(), new Promise(r => setTimeout(r, 2500))]);
+    await Promise.race([Promise.all([loadCuts(), loadExtras(b)]), new Promise(r => setTimeout(r, 2500))]);
     await dlReady; // which tracks are saved on this device; the first one's blob URL is made before it is needed
     if (OFF.on && b.secs.length) {   // offline with chapters missing: start at the first saved one at or after the saved position (else the nearest earlier one)
       const at = Math.min(Math.max(0, saved.sec || 0), b.secs.length - 1);
@@ -260,10 +260,59 @@
       if (CUTS.d && S.book && S.model) replan(false);
     })());
   }
+  /* ---------- extras: skip list per book, made by wt_extras.py from the timing pack (extras/extras-<id>.json on Hugging Face).
+     Test phase: only these books look for the file. Add an id here to try another book. ---------- */
+  const EX_BOOKS = ['104', '10054', '1113'];
+  const EX = { id: null, d: null, p: null };
+  function loadExtras(b) {
+    const id = String(b && b.id || '');
+    if (!EX_BOOKS.includes(id)) { EX.id = id; EX.d = null; EX.p = null; return Promise.resolve(); }
+    if (EX.id === id && EX.p) return EX.p;
+    EX.id = id; EX.d = null;
+    return EX.p = (async () => {
+      let c = store.get('wt:ex:' + id, null);
+      if (!(c && c.d && Date.now() - c.t < 600e3)) {
+        try {
+          const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+          const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/extras-' + encodeURIComponent(id) + '.json', { signal: ctl.signal }); clearTimeout(to);
+          if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.tracks) { c = { t: Date.now(), d: j.tracks }; store.set('wt:ex:' + id, c); } }
+        } catch (e) { /* missing or offline: use the saved copy, or behave as before */ }
+      }
+      if (EX.id === id) EX.d = c && c.d ? c.d : null;
+      if (EX.d && S.book && String(S.book.id) === id && S.model) replan(false);
+    })();
+  }
+  function exTrack(i) {
+    const x = EX.d && S.book && EX.id === String(S.book.id) ? EX.d[i] : null;
+    return Array.isArray(x) ? x : null;
+  }
+  /* [introEnd, outroStart|null] from the extras file, or null when the file has nothing for this track. */
+  function exCut(i) {
+    if (P.skipExtras === false) return null;   // TEST switch in the player menu (remove later)
+    const x = exTrack(i); if (!x) return null;
+    let a = 0, o = null;
+    for (const c of x) {
+      if (c[2] === 'head' && !(c[0] > 0)) a = +c[1] || 0;
+      else if (c[2] === 'tail' && c[0] != null) o = +c[0];
+    }
+    return [a, o];
+  }
+  /* TEST switch (player menu > Skip extras): the menu saves the setting and sends this event. Remove with the test. */
+  document.addEventListener('wt-exskip', () => { if (S.model) replan(false); toast('Skip extras (test): ' + (P.skipExtras === false ? 'Off' : 'On')); });
+  /* Where to jump when playback is inside a middle cut (or a head cut that keeps a spoken title), else null. */
+  function exSkipTo(i, t) {
+    if (P.skipCuts === false || P.skipExtras === false) return null;
+    const x = exTrack(i); if (!x) return null;
+    for (const c of x) {
+      const mid = c[2] === 'mid' || (c[2] === 'head' && c[0] > 0);
+      if (mid && c[1] != null && t >= c[0] - 0.05 && t < c[1] - 0.05) return +c[1];
+    }
+    return null;
+  }
   /* [introEnd, outroStart|null] for a track, or null (then the fixed lead/outro apply). */
   function cutFor(i) {
     if (P.skipCuts === false || !S.book) return null;
-    const b = CUTS.d && CUTS.d.b[S.book.id], e0 = b && b[i], e = Array.isArray(e0) ? e0 : neCut(i);   // cuts.json first, then what the notice engine heard (265-notice-engine.js)
+    const b = CUTS.d && CUTS.d.b[S.book.id], e0 = b && b[i], e = exCut(i) || (Array.isArray(e0) ? e0 : neCut(i));   // cuts.json first, then what the notice engine heard (265-notice-engine.js)
     if (!Array.isArray(e)) return null;
     const d = S.durs[i] || 0;
     let a = +e[0] || 0, o = e[1] == null ? null : +e[1];

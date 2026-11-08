@@ -29,7 +29,10 @@
   .det-hero .det-actions { align-items: center; gap: .65rem; margin-top: .5rem; }
   .det-hero .det-btn { min-height: 3.5rem; font-size: 1.02rem; font-weight: 700; box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 38%, transparent); }
   .det-hero .det-btn .ic { width: 1.5rem; height: 1.5rem; padding: .3rem; border-radius: 50%; background: var(--accent-ink); color: var(--accent); box-sizing: content-box; }
-  .det-hero .det-actions .heart.on-detail, .det-hero .det-share { position: static; display: grid; place-items: center; flex: none; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: color-mix(in srgb, var(--ink) 8%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); color: var(--ink); cursor: pointer; }
+  /* The heart must be position: relative, not static: its invisible tap-area (.heart::after, inset -.5rem, see 70) is positioned
+     against the nearest positioned ancestor. With static it stretched over the whole .det-hero and swallowed every tap meant for
+     the Read and listen button (it saved the book instead of opening it). */
+  .det-hero .det-actions .heart.on-detail, .det-hero .det-share { position: relative; display: grid; place-items: center; flex: none; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: color-mix(in srgb, var(--ink) 8%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); color: var(--ink); cursor: pointer; }
   .det-hero .det-actions .heart.on-detail[aria-pressed="true"] { color: var(--accent); }
   /* floating Listen bar */
   .det-float { display: flex; align-items: center; gap: .8rem; position: fixed; z-index: 7; left: .75rem; right: .75rem; bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + .5rem); padding: .55rem .6rem .55rem 1rem; border-radius: var(--r-pill); background: var(--glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid var(--line); box-shadow: var(--shadow-pop); animation: wtdfin .25s ease both; }

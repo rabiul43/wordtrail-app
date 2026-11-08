@@ -371,6 +371,10 @@
       if (isFinite(rem) && rem >= 0 && rem < FADE_SECS) { S.tailFade = true; setVol(fadeCurve(rem / FADE_SECS)); }
       else if (S.tailFade) { S.tailFade = false; setVol(1); }
     }
+    if (S.book && !audio.paused && !S.loadingAudio && !audio.seeking) {   // inside a middle cut from the extras file: jump over it
+      const to = exSkipTo(S.sec, audio.currentTime);
+      if (to != null) { seekAudio(to); return; }
+    }
     if (!S.outroHit && S.book && !audio.paused && !S.loadingAudio && !audio.seeking) {
       const c = cutFor(S.sec);
       if (c && c[1] != null && audio.currentTime >= c[1]) {
