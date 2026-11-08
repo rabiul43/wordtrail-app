@@ -48,6 +48,19 @@
     "Clean": "Limpio",
     "Glass": "Cristal",
     "Now reading": "Leyendo ahora",
-    "Good night": "Buenas noches"
+    "Good night": "Buenas noches",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "El texto de esta grabación no está en Project Gutenberg. Aun así puedes escuchar.",
+    "Open the text source": "Abrir la fuente del texto",
+    "Use my own text": "Usar mi propio texto",
+    "Retry": "Reintentar",
+    "Couldn't load the book text. You can still listen.": "No se pudo cargar el texto del libro. Aun así puedes escuchar.",
+    "Try the text from archive.org": "Probar el texto de archive.org",
+    "Text from archive.org, may have errors": "Texto de archive.org, puede tener errores",
+    "Switch text": "Cambiar texto",
+    "Downloading the text from archive.org…": "Descargando el texto de archive.org…",
+    "Try again": "Intentar de nuevo",
+    "Text made from speech recognition, may have errors.": "Texto creado con reconocimiento de voz, puede tener errores.",
+    "Choose another text": "Elegir otro texto",
+    "Text made from speech recognition": "Texto creado con reconocimiento de voz"
   }
 }

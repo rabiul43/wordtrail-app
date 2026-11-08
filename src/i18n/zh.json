@@ -48,6 +48,19 @@
     "Clean": "简洁",
     "Glass": "玻璃",
     "Now reading": "正在阅读",
-    "Good night": "晚安"
+    "Good night": "晚安",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "这段录音的文本不在 Project Gutenberg 上。你仍然可以收听。",
+    "Open the text source": "打开文本来源",
+    "Use my own text": "使用我自己的文本",
+    "Retry": "重试",
+    "Couldn't load the book text. You can still listen.": "无法加载书籍文本。你仍然可以收听。",
+    "Try the text from archive.org": "尝试使用 archive.org 的文本",
+    "Text from archive.org, may have errors": "来自 archive.org 的文本，可能有错误",
+    "Switch text": "更换文本",
+    "Downloading the text from archive.org…": "正在从 archive.org 下载文本…",
+    "Try again": "再试一次",
+    "Text made from speech recognition, may have errors.": "文本由语音识别生成，可能有错误。",
+    "Choose another text": "选择其他文本",
+    "Text made from speech recognition": "由语音识别生成的文本"
   }
 }

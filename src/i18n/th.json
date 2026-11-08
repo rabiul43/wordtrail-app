@@ -48,6 +48,19 @@
     "Clean": "เรียบง่าย",
     "Glass": "กระจก",
     "Now reading": "กำลังอ่าน",
-    "Good night": "ราตรีสวัสดิ์"
+    "Good night": "ราตรีสวัสดิ์",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "ข้อความของการบันทึกเสียงนี้ไม่มีใน Project Gutenberg แต่ยังฟังได้ตามปกติ",
+    "Open the text source": "เปิดแหล่งที่มาของข้อความ",
+    "Use my own text": "ใช้ข้อความของฉันเอง",
+    "Retry": "ลองอีกครั้ง",
+    "Couldn't load the book text. You can still listen.": "โหลดข้อความหนังสือไม่ได้ แต่ยังฟังได้ตามปกติ",
+    "Try the text from archive.org": "ลองใช้ข้อความจาก archive.org",
+    "Text from archive.org, may have errors": "ข้อความจาก archive.org อาจมีข้อผิดพลาด",
+    "Switch text": "เปลี่ยนข้อความ",
+    "Downloading the text from archive.org…": "กำลังดาวน์โหลดข้อความจาก archive.org…",
+    "Try again": "ลองอีกครั้ง",
+    "Text made from speech recognition, may have errors.": "ข้อความสร้างจากการรู้จำเสียงพูด อาจมีข้อผิดพลาด",
+    "Choose another text": "เลือกข้อความอื่น",
+    "Text made from speech recognition": "ข้อความที่สร้างจากการรู้จำเสียงพูด"
   }
 }

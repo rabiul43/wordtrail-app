@@ -26,7 +26,7 @@ function grab(src, name) {
 let Core, T, H;
 try {
   const sync = read('170-sync-points-drift.js'), align = read('180-sync-alignment.js'), tap = read('060-position-bookmarks.js');
-  const open = read('133-open-progress-saved-state.js'), net = read('070-network-data.js');
+  const open = read('133-open-progress-saved-state.js'), net = read('070-network-data.js'), book = read('140-open-book.js');
   /* 1. Core: a self-contained factory (it also runs inside a web worker), so the whole file loads as is. */
   const cctx = vm.createContext({});
   vm.runInContext(read('010-core.js') + '\nthis.Core = Core;', cctx);
@@ -44,7 +44,10 @@ try {
     grab(net, 'normBook'),
     'let GUT = async () => []; const gutendex = q => GUT(q), Core = this.Core;',
     grab(net, 'findGutenbergFor'),
-    'this.T = { findGutenbergFor, setGut: f => { GUT = f; }, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch: f => { FETCH = f; } };'
+    'let FT = async () => null; const fetchText = (n, sig) => FT(n, sig);',   // stands in for the data-file loader (Hugging Face, then GitHub)
+    grab(book, 'srcLinkMem'), grab(book, 'httpsLink'), grab(book, 'textSourceLink'),
+    grab(book, 'archiveIdOf'), grab(book, 'archiveCheck'),
+    'this.T = { findGutenbergFor, setGut: f => { GUT = f; }, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch: f => { FETCH = f; }, textSourceLink, setFT: f => { FT = f; }, archiveIdOf, archiveCheck };'
   ].join('\n'), ctx);
   T = ctx.T;
   /* 3. The tap / undo rules, run against a small fake of the app state (S, P, audio, toast ...). */
@@ -66,7 +69,7 @@ try {
     return a;
   };
 } catch (e) { console.error('Cannot load the code under test: ' + e.message + '\nA function was probably renamed or moved; update tools/unit_check.js.'); process.exit(2); }
-const { findGutenbergFor, setGut, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch } = T;
+const { findGutenbergFor, setGut, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch, textSourceLink, setFT, archiveIdOf, archiveCheck } = T;
 
 let failed = 0, total = 0;
 const test = (name, fn) => { total++; try { fn(); console.log('ok    ' + name); } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n').slice(0, 4).join('\n      ')); } };
@@ -372,6 +375,7 @@ queue.push(() => asyncTest('findGutenbergFor: a title-only retry never picks ano
   setGut(fakeGut);
   const r = await settle(findGutenbergFor({ id: 'x', title: 'Robin Hood (Dramatic Reading)', authorLast: 'Nobody', textUrl: '' }));
   assert.ok(r.e && r.e.message === 'No matching text', JSON.stringify(r));
+  assert.strictEqual(r.e.noGutenberg, true, 'a book that is not on Gutenberg is marked, so the card can say so instead of "couldn\'t load"');
 }));
 queue.push(() => asyncTest('findGutenbergFor: a number from the catalog is used at once, no search', async () => {
   let searched = 0; setGut(async () => { searched++; return []; });
@@ -382,12 +386,163 @@ queue.push(() => asyncTest('findGutenbergFor: a timed-out search says so in plai
   setGut(async () => { const e = new Error('signal is aborted without reason'); e.name = 'AbortError'; throw e; });
   const r = await settle(findGutenbergFor({ id: 'x', title: 'Emma', authorLast: 'Austen', textUrl: '' }));
   assert.ok(r.e && r.e.message === 'The Gutenberg search timed out', JSON.stringify(r));
+  assert.ok(!r.e.noGutenberg, 'a timeout is a real error (Retry), not "not on Gutenberg"');
 }));
 queue.push(() => asyncTest('findGutenbergFor: a network error from the search is passed on, not hidden', async () => {
   setGut(async () => { throw new Error('Failed to fetch'); });
   const r = await settle(findGutenbergFor({ id: 'x', title: 'Emma (version 2)', authorLast: 'Austen', textUrl: '' }));
   assert.ok(r.e && r.e.message === 'Failed to fetch', JSON.stringify(r));
+  assert.ok(!r.e.noGutenberg, 'a network error is a real error (Retry), not "not on Gutenberg"');
 }));
+
+/* Step 3: the checks an archive.org text must pass before it is used */
+const PROSE = 'The old man said that he was in the house with his friend and she had not been to the town. ';   // 21 words, English-looking
+const prose = words => PROSE.repeat(Math.ceil(words / 21));
+const hourBook = (extra) => Object.assign({ title: 'Emma', authorLast: 'Austen', lang: 'English', total: 3600 }, extra);   // 1 h = about 9000 words
+test('archiveIdOf: details, stream and download links give the item id; anything else gives nothing', () => {
+  assert.strictEqual(archiveIdOf('https://archive.org/details/historicalplaysf00macd'), 'historicalplaysf00macd');
+  assert.strictEqual(archiveIdOf('http://www.archive.org/stream/autobiographyofc01spur/autobiographyofc01spur_djvu.txt'), 'autobiographyofc01spur');
+  assert.strictEqual(archiveIdOf('https://archive.org/download/TheBlackCatV02no06189703/x.pdf'), 'TheBlackCatV02no06189703');
+  assert.strictEqual(archiveIdOf('https://www.hathitrust.org/details/abc'), ''); assert.strictEqual(archiveIdOf(''), '');
+});
+test('archiveCheck: a readable text with the title at the start and about the right length passes', () => {
+  assert.strictEqual(archiveCheck('EMMA\nby Jane Austen\n\n' + prose(9000), hourBook()).ok, true);
+});
+test('archiveCheck: the author alone near the start is enough (title or author)', () => {
+  assert.strictEqual(archiveCheck('JANE AUSTEN. A tale.\n' + prose(9000), hourBook({ title: 'A Different Name Entirely' })).ok, true);
+});
+test('archiveCheck: a web page, a tiny text and scan rubbish are refused with a reason', () => {
+  const h = archiveCheck('<!DOCTYPE html><html>' + prose(9000), hourBook()); assert.ok(!h.ok && /web page/.test(h.why));
+  const sh = archiveCheck('EMMA Jane Austen ' + prose(200), hourBook()); assert.ok(!sh.ok && /too short/.test(sh.why));
+  const junk = archiveCheck('EMMA Austen ' + 'xq~~ zzrk |l| #$%^ ,;;. qwrtp '.repeat(1500), hourBook()); assert.ok(!junk.ok && /unreadable/.test(junk.why), JSON.stringify(junk));
+});
+test('archiveCheck: a text whose start names neither the title nor the author is refused', () => {
+  const r = archiveCheck('CHAPTER ONE. Nothing here. ' + prose(9000), hourBook()); assert.ok(!r.ok && /different book/.test(r.why), JSON.stringify(r));
+});
+test('archiveCheck: another issue of a magazine is refused, the right one passes', () => {
+  const book = hourBook({ title: 'The Black Cat Vol. 02 No. 12 September 1897', authorLast: '' });
+  const other = archiveCheck('THE BLACK CAT. Vol. II. No. 6. MARCH, 1897.\n' + prose(9000), book); assert.ok(!other.ok && /different issue/.test(other.why), JSON.stringify(other));
+  assert.strictEqual(archiveCheck('THE BLACK CAT. Vol. II. No. 12. SEPTEMBER, 1897.\n' + prose(9000), book).ok, true);
+});
+test('archiveCheck: a book of several plays (far longer than the recording) is refused; a much shorter text too', () => {
+  const big = archiveCheck('HISTORICAL PLAYS. Emma by Austen\n' + prose(60000), hourBook()); assert.ok(!big.ok && /holds other books or plays/.test(big.why), JSON.stringify(big));
+  const small = archiveCheck('EMMA Austen\n' + prose(3600), hourBook({ total: 7200 })); assert.ok(!small.ok && /much shorter/.test(small.why), JSON.stringify(small));
+});
+test('archiveCheck: when the recording length is not known, length is not judged', () => {
+  assert.strictEqual(archiveCheck('EMMA Austen\n' + prose(60000), hourBook({ total: 0 })).ok, true);
+});
+
+/* Step 1: the text-source link shown on the "not on Gutenberg" card */
+queue.push(() => asyncTest('textSourceLink: the link the opened book already carries is used, nothing is fetched', async () => {
+  let asked = 0; setFT(async () => { asked++; return null; });
+  assert.strictEqual(await textSourceLink({ id: '9903', textUrl: 'http://archive.org/details/historicalplaysf00macd' }), 'https://archive.org/details/historicalplaysf00macd');
+  assert.strictEqual(asked, 0);
+}));
+queue.push(() => asyncTest('textSourceLink: with no link on the book, the details file for id div 1000 is read (key s)', async () => {
+  let name = ''; setFT(async n => { name = n; return { json: async () => ({ '9903': { s: 'https://archive.org/details/historicalplaysf00macd' }, '9904': { s: 'https://example.org/x' } }) }; });
+  assert.strictEqual(await textSourceLink({ id: '9903', textUrl: '' }), 'https://archive.org/details/historicalplaysf00macd');
+  assert.strictEqual(name, 'details/9.json');
+}));
+queue.push(() => asyncTest('textSourceLink: a missing file, a missing book or a bad link gives no button, never an error', async () => {
+  setFT(async () => null); assert.strictEqual(await textSourceLink({ id: '1001', textUrl: '' }), '');
+  setFT(async () => ({ json: async () => ({ '1002': { s: 'javascript:alert(1)' } }) })); assert.strictEqual(await textSourceLink({ id: '1002', textUrl: '' }), '');
+  setFT(async () => ({ json: async () => ({ '1003': {} }) })); assert.strictEqual(await textSourceLink({ id: '1003', textUrl: '' }), '');
+  setFT(async () => { throw new Error('Failed to fetch'); }); assert.strictEqual(await textSourceLink({ id: '1004', textUrl: '' }), '');
+  setFT(async () => ({ json: async () => { throw new Error('bad json'); } })); assert.strictEqual(await textSourceLink({ id: '1005', textUrl: '' }), '');
+}));
+queue.push(() => asyncTest('textSourceLink: a slow details file is given up after a few seconds (the card must not wait for ever)', async () => {
+  setFT((n, sig) => new Promise((res, rej) => { sig.addEventListener('abort', () => rej(new Error('aborted'))); }));
+  const t0 = Date.now(), r = await Promise.race([textSourceLink({ id: '2001', textUrl: '' }), new Promise(r => setTimeout(() => r('HUNG'), 6000))]);
+  assert.strictEqual(r, ''); assert.ok(Date.now() - t0 < 5500, 'took ' + (Date.now() - t0) + ' ms');
+}));
+
+/* Step 2: text made from the speech-recognition timing file (140-open-book.js: asrTrackText, asrTrackFor, asrBuild) */
+{
+  const zlib = require('zlib');
+  const bookSrc = read('140-open-book.js'), alignSrc = read('180-sync-alignment.js');
+  const a0 = bookSrc.indexOf('const ASR_LABEL'), a1 = bookSrc.indexOf('/* The intro/outro cut of a track, from the notice engine');
+  const actx = vm.createContext({ Core });
+  vm.runInContext([
+    bookSrc.slice(a0, a1),
+    grab(alignSrc, 'toks'), grab(alignSrc, 'alignTokens'), grab(alignSrc, 'bookIndex'), grab(alignSrc, 'alignTrackToBook'),
+    'const S = { model: null };',
+    'this.A = { asrTrackText, asrTrackFor, asrBuild, alignTrackToBook, S, toks };'
+  ].join('\n'), actx);
+  const A = actx.A;
+  /* words said at 0.4 s apart, with extra silence (seconds) after the words listed in gaps (index -> seconds) */
+  const say = (text, gaps = {}, t0 = 10) => { const w = text.split(' '), t = []; let x = t0; w.forEach((_, i) => { t.push(+x.toFixed(2)); x += 0.4 + (gaps[i] || 0); }); return { w, t }; };
+  test('asr text: a pause adds a full stop and a capital; a long pause starts a new paragraph', () => {
+    const s = say('the king rode out at dawn with his men and they came to the forest where the outlaws lived in peace', { 5: 1.2, 12: 2.6 });
+    const r = A.asrTrackText(s.w, s.t, 0, null);
+    assert.strictEqual(r.text, 'The king rode out at dawn. With his men and they came to.\n\nThe forest where the outlaws lived in peace.');
+  });
+  test('asr text: a spoken "Chapter eight." on its own line is joined to the next paragraph, not made a chapter', () => {
+    const s = say('chapter eight the sheriff rode out into the forest at dawn with all his men behind him', { 1: 2.5 });
+    const r = A.asrTrackText(s.w, s.t, 0, null);
+    assert.ok(!/\n\n/.test(r.text) && /^Chapter eight\. The sheriff/.test(r.text), r.text);
+  });
+  test('asr text: no pause means no invented full stop, and the last word always ends the text', () => {
+    const s = say('a quiet little story about nothing much at all really nothing');
+    const r = A.asrTrackText(s.w, s.t, 0, null);
+    assert.strictEqual(r.text, 'A quiet little story about nothing much at all really nothing.');
+  });
+  test('asr text: "\'S" joins the word before it; LibriVox is spelled one way; marks are kept as they are', () => {
+    const r = A.asrTrackText(['SHERIFF', "'S", 'men', 'Libra', 'Vox'.toLowerCase(), 'said', 'hello,', 'friend.'], [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4, 3.8], 0, null);
+    assert.ok(/^SHERIFF'S men/.test(r.text), r.text);
+    const r2 = A.asrTrackText(['a', 'Librivox', 'recording', 'of', 'the', 'LibriVoxx', 'thing.'], [1, 1.4, 1.8, 2.2, 2.6, 3, 3.4], 0, null);
+    assert.ok(/A LibriVox recording of the LibriVox thing\.$/.test(r2.text), r2.text);
+  });
+  test('asr text: words before the intro end and after the outro start are left out', () => {
+    const s = say('this is a librivox recording now the real story begins here and goes on a while end of chapter one', {}, 0);
+    const r = A.asrTrackText(s.w, s.t, 0.4 * 5, 0.4 * 16 - 0.1);
+    assert.strictEqual(r.text, 'Now the real story begins here and goes on a while.');
+  });
+  test('asr text: a run of words with no pause is still cut into sentences (not one endless line)', () => {
+    const w = [], t = []; for (let i = 0; i < 160; i++) { w.push('word' + (i % 7 ? 'x' : 'y')); t.push(i * 0.4 + (i % 9 === 0 ? 0.3 : 0)); }
+    const r = A.asrTrackText(w, t, 0, null);
+    const longest = Math.max(...r.text.split(/[.!?]\s/).map(x => x.split(/\s+/).length));
+    assert.ok(longest <= 90, 'longest sentence ' + longest);
+    const t2 = w.map((_, i) => i * 0.395), r2 = A.asrTrackText(w, t2, 0, null);   // no pause anywhere at all
+    assert.ok(Math.max(...r2.text.split(/[.!?]\s/).map(x => x.split(/\s+/).length)) <= 115, 'no pauses: still cut');
+  });
+  const mk = (url, nWords, dur) => { const s = say(Array.from({ length: nWords }, (_, i) => 'word' + (i % 11) + 'q').join(' '), {}, 5); return { u: url, w: s.w.join(' '), t: s.t }; };
+  test('asr file: only the same audio file is accepted; times past the recording length are refused', () => {
+    const sec = { url: 'https://archive.org/download/x/book_01_64kb.mp3', dur: 400 };
+    assert.ok(A.asrTrackFor(sec, 0, { 0: mk('https://www.archive.org/download/x/BOOK_01_64kb.mp3', 300) }), 'same file name, other host spelling');
+    assert.strictEqual(A.asrTrackFor(sec, 0, { 0: mk('https://archive.org/download/x/book_02_64kb.mp3', 300) }), null, 'another file');
+    assert.strictEqual(A.asrTrackFor({ url: sec.url, dur: 60 }, 0, { 0: mk(sec.url, 300) }), null, 'times far past the recording');
+    assert.strictEqual(A.asrTrackFor(sec, 0, { 0: mk(sec.url, 10) }), null, 'too few words');
+  });
+  test('asr build: one "Track N" heading per track with words, tracks without a file are skipped, too little text gives nothing', () => {
+    const secs = [1, 2, 3].map(n => ({ url: 'https://a.org/t' + n + '.mp3', dur: 400 }));
+    const tracks = { 0: mk(secs[0].url, 200), 2: mk(secs[2].url, 200) };
+    const r = A.asrBuild(secs, tracks, null);
+    assert.deepStrictEqual(arr(r.idx), [0, 2]);
+    const m = Core.parseBook(r.raw), real = m.chapters.filter(c => !c.front);
+    assert.deepStrictEqual(arr(real.map(c => c.title)), ['Track 1', 'Track 3']);
+    assert.strictEqual(A.asrBuild(secs, { 0: mk(secs[0].url, 40) }, null), null);
+    assert.strictEqual(A.asrBuild(secs, {}, null), null);
+  });
+  test('asr build: the intro/outro cut is passed per track and a failing cut keeps all words', () => {
+    const secs = [{ url: 'https://a.org/t1.mp3', dur: 400 }], tr = { 0: mk(secs[0].url, 400) };
+    const all = A.asrBuild(secs, tr, null).words;
+    assert.ok(A.asrBuild(secs, tr, () => [10, 160]).words < all);
+    assert.strictEqual(A.asrBuild(secs, tr, () => { throw new Error('x'); }).words, all);
+  });
+  test('asr build on a real timing file (Robin Hood, 22 tracks): the text lines up with every track again', () => {
+    const d = JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(root, 'tools/samples/timing-104.json.gz'))));
+    const secs = Object.keys(d.tracks).map(k => ({ url: d.tracks[k].u, dur: Math.ceil(d.tracks[k].t[d.tracks[k].t.length - 1]) + 8 }));
+    const r = A.asrBuild(secs, d.tracks, null);
+    assert.strictEqual(r.idx.length, 22);
+    const m = Core.parseBook(r.raw);
+    assert.strictEqual(m.chapters.filter(c => !c.front).length, 22);   // a spoken "Chapter eight" on its own line does not become a part of its own
+    A.S.model = m;
+    let low = 0;
+    secs.forEach((sec, i) => { const x = A.alignTrackToBook(d.tracks[i]); if (!x || A.alignTrackToBook.fit < 0.9) low++; });
+    assert.strictEqual(low, 0, low + ' tracks fit below 90%');
+  });
+}
+
 
 (async () => {
   for (const q of queue) await q();

@@ -641,7 +641,7 @@
       pick = hits.find(x => x.langs.includes('en')) || hits[0];
       if (pick) break;
     }
-    if (!pick) throw new Error('No matching text');
+    if (!pick) { const err = new Error('No matching text'); err.noGutenberg = true; throw err; }   // the book is simply not on Gutenberg (not a network problem): attachText shows its own message for this
     return { id: String(pick.id), label: pick.title + (pick.author ? ' - ' + pick.author : '') };
   }
 

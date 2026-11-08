@@ -48,6 +48,19 @@
     "Clean": "Sade",
     "Glass": "Cam",
     "Now reading": "Şimdi okunuyor",
-    "Good night": "İyi geceler"
+    "Good night": "İyi geceler",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "Bu kaydın metni Project Gutenberg'de yok. Yine de dinleyebilirsiniz.",
+    "Open the text source": "Metin kaynağını aç",
+    "Use my own text": "Kendi metnimi kullan",
+    "Retry": "Yeniden dene",
+    "Couldn't load the book text. You can still listen.": "Kitap metni yüklenemedi. Yine de dinleyebilirsiniz.",
+    "Try the text from archive.org": "archive.org metnini dene",
+    "Text from archive.org, may have errors": "archive.org metni, hatalar içerebilir",
+    "Switch text": "Metni değiştir",
+    "Downloading the text from archive.org…": "Metin archive.org'dan indiriliyor…",
+    "Try again": "Tekrar dene",
+    "Text made from speech recognition, may have errors.": "Metin konuşma tanımayla oluşturuldu, hatalar içerebilir.",
+    "Choose another text": "Başka bir metin seç",
+    "Text made from speech recognition": "Konuşma tanımayla oluşturulan metin"
   }
 }

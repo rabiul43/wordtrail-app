@@ -48,6 +48,19 @@
     "Clean": "نظيف",
     "Glass": "زجاجي",
     "Now reading": "تقرأ الآن",
-    "Good night": "ليلة سعيدة"
+    "Good night": "ليلة سعيدة",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "نص هذا التسجيل غير متوفر في Project Gutenberg. ما زال بإمكانك الاستماع.",
+    "Open the text source": "افتح مصدر النص",
+    "Use my own text": "استخدم نصي الخاص",
+    "Retry": "أعد المحاولة",
+    "Couldn't load the book text. You can still listen.": "تعذّر تحميل نص الكتاب. ما زال بإمكانك الاستماع.",
+    "Try the text from archive.org": "جرّب النص من archive.org",
+    "Text from archive.org, may have errors": "نص من archive.org، وقد يحتوي على أخطاء",
+    "Switch text": "غيّر النص",
+    "Downloading the text from archive.org…": "جارٍ تنزيل النص من archive.org…",
+    "Try again": "حاول مرة أخرى",
+    "Text made from speech recognition, may have errors.": "تم إنشاء النص بالتعرّف على الكلام وقد يحتوي على أخطاء.",
+    "Choose another text": "اختيار نص آخر",
+    "Text made from speech recognition": "نص تم إنشاؤه بالتعرّف على الكلام"
   }
 }

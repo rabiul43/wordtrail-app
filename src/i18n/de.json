@@ -48,6 +48,19 @@
     "Clean": "Schlicht",
     "Glass": "Glas",
     "Now reading": "Jetzt am Lesen",
-    "Good night": "Gute Nacht"
+    "Good night": "Gute Nacht",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "Der Text zu dieser Aufnahme ist nicht bei Project Gutenberg. Zuhören ist trotzdem möglich.",
+    "Open the text source": "Textquelle öffnen",
+    "Use my own text": "Eigenen Text verwenden",
+    "Retry": "Erneut versuchen",
+    "Couldn't load the book text. You can still listen.": "Der Buchtext konnte nicht geladen werden. Zuhören ist trotzdem möglich.",
+    "Try the text from archive.org": "Text von archive.org versuchen",
+    "Text from archive.org, may have errors": "Text von archive.org, kann Fehler enthalten",
+    "Switch text": "Text wechseln",
+    "Downloading the text from archive.org…": "Text von archive.org wird geladen…",
+    "Try again": "Noch einmal versuchen",
+    "Text made from speech recognition, may have errors.": "Text aus Spracherkennung erstellt, kann Fehler enthalten.",
+    "Choose another text": "Anderen Text wählen",
+    "Text made from speech recognition": "Text aus Spracherkennung erstellt"
   }
 }

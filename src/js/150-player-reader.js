@@ -102,6 +102,7 @@
     if (S.rb) { clearTimeout(S.rb.tid); S.rb = null; }
     el.page.textContent = ''; el.page.classList.remove('cv'); S.spans.clear(); S.curId = -1;
     S.wSp = null; S.wEls = null; S.wTimes = null; S.wId = -1; S.wIdx = -1;
+    if (S.model && S.textSrc && S.textSrc.from === 'archive.org') el.page.append(srcNoteNode());   // the text came from archive.org: say so, with a way to switch
     setTimeout(() => enqueueAlign(S.sec, true), 0);
     setTimeout(() => backfillSkip(i), 0);
     if (!S.model) { el.page.append(S.note || loadingNote()); return; }
@@ -120,6 +121,7 @@
       el.page.append(noteNode('No text is lined up with this track.', [['Choose text', () => openSheet('sheet-text')]]));
       updateHeader(); return;
     }
+    if (S.textSrc && S.textSrc.asr) el.page.append(asrBanner());   // the text was made from speech recognition
     const useCv = p.ids.length > 150 && typeof CSS !== 'undefined' && CSS.supports && CSS.supports('content-visibility', 'auto');
     const nn = P.foldSkipped === true && S.nn ? S.nn : new Set(), nnWords = new Map();   // off by default: the text stays in the reader
     { let st = -1, w = 0; for (const id of p.ids) { const x = S.model.sents[id]; if (nn.has(id) && !x.h) { if (st < 0) { st = id; w = 0; } w += (x.t.match(/\S+/g) || []).length; nnWords.set(st, w); } else st = -1; } }

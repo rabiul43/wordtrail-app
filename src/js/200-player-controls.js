@@ -399,6 +399,7 @@
     return I18N_LOADING[c];
   }
   const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results, #ob-q-hd, #ob-q-opts';   // book text and the placement-test questions are English on purpose
+  const I18N_UI = '.wt-ui';   // app messages that sit inside the book area (such as the "text not found" card) are translated even there
   const I18N_REC = new WeakMap();   // text node -> { o: original text, tr: text we put there }
   let i18nObs = null;
   const I18N_NODIGIT = '.tile-t, .tile-a, .gc-t, .card .t, .rm-t, .mini-txt strong, .track .tt, .col-tile strong, .vp-name, h1';   // book titles keep their own digits
@@ -425,7 +426,7 @@
     return out === null ? src : src.replace(key, () => out);
   }
   function i18nNode(n, dict) {
-    if (!n.parentElement || n.parentElement.closest(I18N_SKIP)) return;
+    if (!n.parentElement || (n.parentElement.closest(I18N_SKIP) && !n.parentElement.closest(I18N_UI))) return;
     const rec = I18N_REC.get(n);
     const src = rec && n.nodeValue === rec.tr ? rec.o : n.nodeValue;   // still our text: go back to the original. Changed by the app: it is new
     if (!src.trim()) return;
@@ -436,7 +437,7 @@
   /* placeholder, aria-label and title are attributes, not text nodes, so they get their own pass (same rules, same restore) */
   const I18N_ATTRS = ['placeholder', 'aria-label', 'title'], I18N_AREC = new WeakMap();   // element -> { attr: { o, tr } }
   function i18nAttr(e, dict) {
-    if (e.closest && e.closest(I18N_SKIP)) return;
+    if (e.closest && e.closest(I18N_SKIP) && !e.closest(I18N_UI)) return;
     for (const a of I18N_ATTRS) {
       if (!e.hasAttribute(a)) continue;
       const cur = e.getAttribute(a), recs = I18N_AREC.get(e) || {}, rec = recs[a];

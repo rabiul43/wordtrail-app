@@ -96,7 +96,7 @@
     attachText(saved);
   }
   function noteNode(msg, actions, detail) {
-    return h('div', { class: 'note' }, h('strong', {}, msg), actions && actions.length ? h('div', { class: 'row note-act', style: 'justify-content:center' }, actions.map(([label, fn], i) => h('button', { class: i ? 'note-link' : 'btn small', type: 'button', onclick: fn }, label))) : null, detail ? h('details', { class: 'note-d' }, h('summary', {}, 'Details'), h('small', { style: 'overflow-wrap:anywhere' }, String(detail).slice(0, 220))) : null);
+    return h('div', { class: 'note wt-ui' }, h('strong', {}, msg), actions && actions.length ? h('div', { class: 'row note-act', style: 'justify-content:center' }, actions.map(([label, fn], i) => h('button', { class: i ? 'note-link' : 'btn small', type: 'button', onclick: fn }, label))) : null, detail ? h('details', { class: 'note-d' }, h('summary', {}, 'Details'), h('small', { style: 'overflow-wrap:anywhere' }, String(detail).slice(0, 220))) : null);
   }
   /* ---------- parsed-book cache ----------
      Splitting a whole book into chapters and sentences takes a moment, and the result never changes for
@@ -135,6 +135,227 @@
       && c.sents[0] && typeof c.sents[0].t === 'string' && c.chapters[c.chapters.length - 1].end === c.sents.length;
     return ok ? { sents: c.sents, chapters: c.chapters } : null;
   }
+  /* ---------- Step 3: the text from archive.org, only when the person taps for it ----------
+     LibriVox's archive.org text links are sometimes wrong (another issue, or a book holding several plays), so nothing from
+     archive.org is ever loaded by itself. The tap downloads <id>_djvu.txt, archiveCheck() looks at it first, and only a text
+     that passes is loaded, like an own text, with a note on the page. */
+  const openLink = u => { try { window.open(u, '_blank', 'noopener'); } catch (x) { /* blocked: nothing to do */ } };
+  function archiveIdOf(link) {
+    const m = String(link || '').match(/^https?:\/\/(?:www\.)?archive\.org\/(?:details|stream|download)\/([^\/?#]+)/i);
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  /* The buttons of the "not on Gutenberg" card, in the order they are shown. */
+  function noTextActions(link, aid) {
+    return [].concat(link ? [['Open the text source', () => openLink(link)]] : [],
+      aid ? [['Try the text from archive.org', () => tryArchiveText(link, aid)]] : [],
+      [['Use my own text', () => openSheet('sheet-text')]]);
+  }
+  /* Looks at a downloaded archive.org text before it is used. Returns { ok: true } or { ok: false, why } with a plain sentence. */
+  function archiveCheck(raw, book) {
+    const t = String(raw || ''), b = book || {};
+    const no = why => ({ ok: false, why: 'The archive.org text wasn\'t used: ' + why });
+    if (/^\s*<(!doctype|html)/i.test(t)) return no('archive.org sent back a web page, not a book.');
+    if (t.length < 8000) return no('it is far too short to be a book.');
+    // Readable: mostly letters, and mostly real-looking words.
+    const sample = t.slice(0, 200000), toks = sample.split(/\s+/).filter(Boolean);
+    const plainCh = (sample.match(/[\p{L}\p{N}\s.,;:!?'"“”‘’()\-—_]/gu) || []).length / sample.length;
+    const wordLike = toks.filter(w => /^\p{L}+(?:['’-]\p{L}+)*$/u.test(w.replace(/^[^\p{L}]+|[^\p{L}]+$/gu, ''))).length / (toks.length || 1);
+    if (plainCh < 0.9 || wordLike < 0.75) return no('it is mostly unreadable scan errors.');
+    if (!b.lang || /^en/i.test(b.lang)) {   // English prose is full of these little words; scan garbage and other languages are not
+      const stop = new Set('the and of to a in that was he it is with as his for had you her but not be at on by this which from she they have were'.split(' '));
+      const share = toks.filter(w => stop.has(w.toLowerCase().replace(/[^a-z]/g, ''))).length / (toks.length || 1);
+      if (share < 0.12) return no('it is mostly unreadable scan errors, or not in English.');
+    }
+    // The title or the author must show near the start.
+    const head = ' ' + t.slice(0, 8000).toLowerCase().replace(/[^a-z0-9]+/g, ' ') + ' ';
+    const skip = new Set('the and for with from his her its vol volume part book dramatic reading version complete illustrated'.split(' '));
+    const tw = (Core.gutTitle(b.title || '').toLowerCase().match(/[a-z]{3,}/g) || []).filter(w => !skip.has(w));
+    const titleHit = tw.length > 0 && tw.filter(w => head.includes(' ' + w)).length >= Math.ceil(tw.length * 0.6);
+    const last = String(b.authorLast || '').toLowerCase().replace(/[^a-z]/g, '');
+    const authorHit = last.length >= 3 && head.includes(' ' + last);
+    if (!titleHit && !authorHit) return no('the title and author don\'t appear at its start, so it may be a different book.');
+    // A dated issue (a magazine): its month and year must show near the start, or it is another issue.
+    const mon = (String(b.title || '').toLowerCase().match(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/) || [])[1];
+    const yr = (String(b.title || '').match(/\b(1[89]\d\d|20\d\d)\b/) || [])[1];
+    if (mon && yr && !(head.includes(' ' + mon + ' ') && head.includes(' ' + yr + ' '))) return no('it doesn\'t mention this issue\'s month and year, so it may be a different issue.');
+    // About as long as the recording (about 150 words a minute); far longer means other books or plays are inside.
+    if (+b.total >= 600) {
+      const ratio = toks.length === 0 ? 0 : t.split(/\s+/).filter(Boolean).length / (b.total / 60 * 150);
+      if (ratio > 2.5) return no('it is much longer than this recording, so it probably holds other books or plays too.');
+      if (ratio < 0.25) return no('it is much shorter than this recording.');
+    }
+    return { ok: true };
+  }
+  async function tryArchiveText(link, aid) {
+    const book = S.book, tok = ++S.textToken;
+    const show = (msg, acts) => { if (tok !== S.textToken || S.book !== book) return false; S.note = noteNode(msg, acts); renderSection(S.sec); return true; };
+    show('Downloading the text from archive.org…', null);
+    let raw;
+    try { raw = await fetchVia('https://archive.org/download/' + encodeURIComponent(aid) + '/' + encodeURIComponent(aid) + '_djvu.txt', r => r.text(), 45000); }
+    catch (e) {
+      if (e && e.message === 'HTTP 404') show('archive.org has no plain text file for this item.', noTextActions(link, ''));
+      else show('Couldn\'t download the text from archive.org. Check your connection.', [['Try again', () => tryArchiveText(link, aid)]].concat(link ? [['Open the text source', () => openLink(link)]] : [], [['Use my own text', () => openSheet('sheet-text')]]));
+      return;
+    }
+    if (tok !== S.textToken || S.book !== book) return;
+    const v = archiveCheck(raw, book);
+    if (!v.ok) { show(v.why, noTextActions(link, '')); return; }   // refused: no archive button again, the other choices stay
+    try { await useRaw(String(raw).replace(/\r\n?/g, '\n'), { kind: 'file', label: 'Text from archive.org', from: 'archive.org', ref: aid }); }
+    catch (e) { console.error('Wordtrail: archive.org text failed', e); show('The text downloaded but could not be processed.', noTextActions(link, '')); }
+  }
+  /* The note on the page for a text that came from archive.org (it comes back every time the book is opened). */
+  function srcNoteNode() {
+    return h('div', { class: 'note wt-ui', role: 'status', style: 'margin:.4rem auto;padding:.5rem .8rem' }, h('small', {}, 'Text from archive.org, may have errors'),
+      h('button', { class: 'note-link', type: 'button', onclick: () => openSheet('sheet-text') }, 'Switch text'));
+  }
+  /* The text link LibriVox gives for a book (its "text source"), or ''.
+     A book opened from LibriVox carries it as book.textUrl. The catalog keeps only Gutenberg links, so when it is missing the small
+     details file (details/<id div 1000>.json, key "s") is asked, for at most 4 s. The answer is remembered for this visit. */
+  const srcLinkMem = new Map();
+  const httpsLink = u => { u = String(u || '').trim(); return /^https?:\/\//i.test(u) ? u.replace(/^http:/i, 'https:') : ''; };
+  async function textSourceLink(book) {
+    const id = String((book && book.id) || '');
+    const direct = httpsLink(book && book.textUrl);
+    if (direct) return direct;
+    if (!/^\d+$/.test(id)) return '';
+    if (srcLinkMem.has(id)) return srcLinkMem.get(id);
+    let link = '';
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 4000);
+    try {
+      const r = await fetchText('details/' + Math.floor(+id / 1000) + '.json', ctl.signal);
+      if (r) {
+        const d = await r.json();
+        let e = null;
+        if (Array.isArray(d)) e = d.find(x => x && String(x.id) === id);
+        else if (d && typeof d === 'object') e = d[id] !== undefined ? d[id] : (d.b && d.b[id] !== undefined ? d.b[id] : (d.books && d.books[id]));
+        if (e && typeof e === 'object' && !Array.isArray(e)) link = httpsLink(e.s);
+      }
+    } catch (x) { /* no link: the card simply has no source button */ }
+    finally { clearTimeout(to); }
+    if (!ctl.signal.aborted) srcLinkMem.set(id, link);   // a timeout is not remembered, the next try may work
+    return link;
+  }
+  /* ---------- Step 2: text made from the speech-recognition timing file ----------
+     For a book whose text is not on Gutenberg, the timing file (the same "pack" the app already loads for synced books:
+     tracks[i] = { u: audio url, w: recognized words as one string, t: a start time for every word }) holds what the narrator
+     said. The book text is built from those words and shown with the word times in the file. Only used when a file exists. */
+  const ASR_LABEL = 'Text made from speech recognition';
+  const asrSent = /[.!?]["'”’)\]]*$/;
+  const asrKey = u => String(u || '').split(/[?#]/)[0].split('/').pop().toLowerCase();   // the audio file name: the same recording has the same name
+  const asrDur = w => Math.min(0.9, 0.12 + 0.055 * String(w).replace(/[^A-Za-z0-9]/g, '').length);
+  /* One track: its words and start times -> paragraphs of text. a / o = seconds where the story starts and the outro begins
+     (0 / null = keep everything). Adds full stops at pauses, a capital after each, and a new paragraph at long pauses.
+     Clear slips only: a split "'S" is joined, LibriVox is spelled one way. Nothing is guessed or re-worded. */
+  function asrTrackText(words, times, a, o) {
+    const paras = [[]];
+    let sinceEnd = 0, cap = true, prevT = -1, prevW = '', n = 0;
+    for (let j = 0; j < words.length; j++) {
+      const t = +times[j]; let w = String(words[j]).trim();
+      if (!w || !isFinite(t)) continue;
+      if (a > 0 && t < a - 0.05) continue;
+      if (o != null && t >= o) continue;
+      const cur = paras[paras.length - 1];
+      if (cur.length && (/^[.,;:!?]+$/.test(w) || /^['’](?:s|t|d|ll|re|ve|m)$/i.test(w))) {   // a lone mark or "'S" belongs to the word before it
+        cur[cur.length - 1] += w; prevW = cur[cur.length - 1];
+        if (asrSent.test(prevW)) { cap = true; sinceEnd = 0; }
+        continue;
+      }
+      if (/^lib\w{0,4}vox\w?(?=[.,;:!?]*$)/i.test(w)) w = 'LibriVox' + (w.match(/[.,;:!?]+$/) || [''])[0];
+      if (cur.length) {
+        const gap = t - prevT - asrDur(prevW), ends = asrSent.test(prevW);
+        let brk = false;
+        if (ends ? gap >= 1.6 : gap >= 2.2) brk = true;
+        else if (!ends && ((gap >= 0.9 && sinceEnd >= 6) || (sinceEnd >= 40 && gap >= 0.4) || (sinceEnd >= 75 && gap >= 0.2) || sinceEnd >= 110)) { cur[cur.length - 1] = cur[cur.length - 1].replace(/[,;:]+$/, '') + '.'; cap = true; sinceEnd = 0; }
+        if (brk) {
+          if (!ends) cur[cur.length - 1] = cur[cur.length - 1].replace(/[,;:]+$/, '') + '.';
+          paras.push([]); cap = true; sinceEnd = 0;
+        }
+      }
+      if (cap) w = w.replace(/^(["'“‘(]*)([a-z])/, (m, q, c) => q + c.toUpperCase());
+      cap = false;
+      paras[paras.length - 1].push(w); prevT = t; prevW = w; sinceEnd++; n++;
+      if (asrSent.test(w)) { cap = true; sinceEnd = 0; }
+    }
+    const last = paras[paras.length - 1];
+    if (last.length && !asrSent.test(last[last.length - 1])) last[last.length - 1] = last[last.length - 1].replace(/[,;:]+$/, '') + '.';
+    /* A spoken "Chapter eight." standing alone would become a chapter of its own and break the one-part-per-track layout:
+       it stays in the text, joined to the paragraph that follows (or the one before, at the very end). */
+    const ps = paras.filter(x => x.length).map(x => x.join(' ')), out = [];
+    for (let k = 0; k < ps.length; k++) {
+      let x = ps[k];
+      while (k + 1 < ps.length && Core.isHeading(x)) x += ' ' + ps[++k];
+      if (out.length && k === ps.length - 1 && Core.isHeading(x)) out[out.length - 1] += ' ' + x; else out.push(x);
+    }
+    return { text: out.join('\n\n'), n };
+  }
+  /* The timing-file entry that belongs to track i, or null. It must be the same audio file, and its times must fit the track length. */
+  function asrTrackFor(sec, i, tracks) {
+    const key = asrKey(sec.url);
+    let tr = null;
+    for (const k of Object.keys(tracks || {})) { const x = tracks[k]; if (x && x.u && asrKey(x.u) === key) { tr = x; break; } }
+    if (!tr && tracks && tracks[i] && !tracks[i].u) tr = tracks[i];
+    if (!tr) return null;
+    const w = String(tr.w || '').split(' '), T = tr.t;
+    if (!Array.isArray(T) || w.length < 20 || w.length !== T.length) return null;
+    const end = +T[T.length - 1];
+    if (!(end > 0) || (sec.dur > 0 && end > sec.dur + 30)) return null;   // times that run past the recording: a different recording
+    return { w, T };
+  }
+  /* Whole book: one "Track N" heading per track that has words, then its text. cutOf(i) -> [introEnd, outroStart]. Returns
+     { raw, idx (track numbers that got text), words } or null when there is too little to read. */
+  function asrBuild(secs, tracks, cutOf) {
+    const parts = [], idx = []; let words = 0;
+    secs.forEach((sec, i) => {
+      const x = asrTrackFor(sec, i, tracks); if (!x) return;
+      let c = [0, null]; try { c = cutOf ? cutOf(i, x) || c : c; } catch (e) { /* keep everything */ }
+      const r = asrTrackText(x.w, x.T, c[0] > 0 ? c[0] : 0, c[1] > 0 ? c[1] : null);
+      if (r.n < 20) return;
+      parts.push('Track ' + (i + 1) + '\n\n' + r.text); idx.push(i); words += r.n;
+    });
+    return words >= 300 ? { raw: parts.join('\n\n'), idx, words } : null;
+  }
+  /* The intro/outro cut of a track, from the notice engine (265). Only trusted finds are used; a weak find keeps the words. */
+  function asrCutFor(i) {
+    try {
+      const W = neTimingWords(i); if (!W) return [0, null];
+      const sec = S.secs[i], dur = S.durs[i] || (sec && sec.dur) || 0;
+      const ri = neFindIntro(W.filter(x => x.s < 160), null), ro = dur ? neFindOutro(W.filter(x => x.s > dur - 140), dur) : { o: null, c: 'n' };
+      return [ri.c === 'h' ? ri.a : 0, ro.c === 'h' ? ro.o : null];
+    } catch (e) { return [0, null]; }
+  }
+  /* Called after the "not on Gutenberg" card is shown. Waits (quietly) for the timing file. Returns true when the text was made, false when
+     there is no file or no usable words (nothing changes), null when the person moved on meanwhile. */
+  async function tryAsrText(token) {
+    const b = S.book, t0 = Date.now();
+    const gone = () => S.book !== b || token !== S.textToken || !!S.model;
+    while (!gone() && S.timingWait && !(S.timings && S.timings.tracks && Object.keys(S.timings.tracks).length) && Date.now() - t0 < 40000) await new Promise(r => setTimeout(r, 300));
+    if (gone()) return null;
+    const tracks = S.timings && S.timings.tracks;
+    if (!tracks || !Object.keys(tracks).length) return false;   // no file (404): the card stays as it is
+    const built = asrBuild(S.secs, tracks, asrCutFor);
+    if (!built) return false;
+    const src = { kind: 'file', label: ASR_LABEL, asr: 1 };
+    try { await idb.set('f:' + b.id, built.raw); } catch (e) { return false; }
+    const fresh = await BG.call('parseBook', [built.raw]).catch(() => null);
+    if (gone()) return null;
+    applyText(built.raw, src, {}, null, fresh);
+    /* Every track with words starts at its own "Track N" heading; the chapters up to the next such heading belong to it. */
+    const ch = S.model.chapters, pos = built.idx.map(ti => ch.findIndex(c => !c.front && c.title === 'Track ' + (ti + 1)));
+    if (pos.every(x => x >= 0)) {
+      S.mode = 'chapter'; S.map = S.secs.map(() => -1); S.span = S.map.slice();
+      built.idx.forEach((ti, k) => { S.map[ti] = pos[k]; S.span[ti] = k + 1 < pos.length ? pos[k + 1] - 1 : ch.length - 1; });
+      S.anchors = {}; S.ranges = {}; S.autoSrc = {}; S.skip = {}; S.edge = {};
+      replan(true); persist();
+    }
+    endOpen();
+    return true;
+  }
+  function asrBanner() {
+    const row = h('div', { class: 'row note-act', style: 'justify-content:center' }, h('button', { class: 'btn small ghost', type: 'button', onclick: () => openSheet('sheet-text') }, 'Choose another text'));
+    const box = h('div', { class: 'note wt-ui asr-note', role: 'note', style: 'margin-bottom:.8rem' }, h('strong', {}, 'Text made from speech recognition, may have errors.'), row);
+    textSourceLink(S.book).then(link => { if (link && box.isConnected) row.append(h('button', { class: 'note-link', type: 'button', onclick: () => { try { window.open(link, '_blank', 'noopener'); } catch (x) { /* blocked */ } } }, 'Open the text source')); });
+    return box;
+  }
   async function attachText(saved) {
     const token = ++S.textToken;
     if (!OP.active) startOpen(S.book.title, false);
@@ -164,8 +385,18 @@
       }
       if (raw && !parsed) parsed = await loadParsed(parsedKey(src, raw)); // an own text, or a text first met here
     } catch (e) {
+      if (e && e.noGutenberg) {   // not a failure: this recording's text is simply not on Project Gutenberg
+        console.info('Wordtrail: no Gutenberg text for this book');
+        const link = await textSourceLink(S.book);
+        if (token !== S.textToken) return;
+        const msg = 'This recording\'s text isn\'t on Project Gutenberg. You can still listen.', aid = archiveIdOf(link), bk = S.book;
+        note(msg, noTextActions(link, ''));   // no archive.org button yet: it is offered only once we know there is no timing-file text
+        const again = () => { if (aid && token === S.textToken && S.book === bk && !S.model) note(msg, noTextActions(link, aid)); };
+        tryAsrText(token).then(made => { if (made === false) again(); }, again);
+        return;
+      }
       console.error('Wordtrail: text download failed', e);
-      note('Couldn\'t load the book text. You can still listen.', [['Retry', () => attachText(saved)], ['Use my own text', () => openSheet('sheet-text')]], e && e.message);
+      note('Couldn\'t load the book text. You can still listen.', [['Retry', () => attachText(saved)], ['Use my own text', () => openSheet('sheet-text')]], e && e.message);   // a real network problem: Retry makes sense here
       return;
     }
     if (token !== S.textToken) return;

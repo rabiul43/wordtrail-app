@@ -48,6 +48,19 @@
     "Clean": "صاف",
     "Glass": "شیشہ",
     "Now reading": "اب پڑھ رہے ہیں",
-    "Good night": "شب بخیر"
+    "Good night": "شب بخیر",
+    "This recording's text isn't on Project Gutenberg. You can still listen.": "اس ریکارڈنگ کا متن Project Gutenberg پر موجود نہیں۔ آپ پھر بھی سن سکتے ہیں۔",
+    "Open the text source": "متن کا ماخذ کھولیں",
+    "Use my own text": "میرا اپنا متن استعمال کریں",
+    "Retry": "دوبارہ کوشش کریں",
+    "Couldn't load the book text. You can still listen.": "کتاب کا متن لوڈ نہیں ہو سکا۔ آپ پھر بھی سن سکتے ہیں۔",
+    "Try the text from archive.org": "archive.org سے متن آزمائیں",
+    "Text from archive.org, may have errors": "archive.org سے متن، اس میں غلطیاں ہو سکتی ہیں",
+    "Switch text": "متن بدلیں",
+    "Downloading the text from archive.org…": "archive.org سے متن ڈاؤن لوڈ ہو رہا ہے…",
+    "Try again": "دوبارہ کوشش کریں",
+    "Text made from speech recognition, may have errors.": "متن تقریر کی شناخت سے بنایا گیا ہے، اس میں غلطیاں ہو سکتی ہیں۔",
+    "Choose another text": "کوئی اور متن منتخب کریں",
+    "Text made from speech recognition": "تقریر کی شناخت سے بنایا گیا متن"
   }
 }
