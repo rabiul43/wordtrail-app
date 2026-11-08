@@ -542,6 +542,7 @@
     if (RESUME_OPEN && RESUME_OPEN.id && !DEEP_ID && store.get('wt:onboarded', 0) && el.player.hidden) {   // a shared link wins over "back into the book that was open"
       rememberOpen(RESUME_OPEN); // keep it saved while the book loads
       el.title.textContent = RESUME_OPEN.title || ''; el.sub.textContent = RESUME_OPEN.authors || '';
+      openingIdentity(RESUME_OPEN);
       el.page.textContent = ''; el.page.append(loadingNote());
       showView('player');
       unhideResume();

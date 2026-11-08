@@ -24,6 +24,21 @@
       } catch (e) { /* attachText will retry and report */ }
     })();
   }
+  /* While a book's track list is still loading, S.book is still the book that was open before. The player must not show that old
+     book's cover, title, times and progress under the new book's name, so the new book's own details are painted at once
+     (updateHeader() takes over when the book is ready, or puts the old book back if opening fails). */
+  function openingIdentity(b) {
+    try {
+      const pt = $('#ptitle'), pc = $('#pcover');
+      if (pt) { const au = String(b.authors || '').trim(); pt.firstChild.textContent = b.title || ''; pt.lastChild.textContent = /^unknown/i.test(au) ? '' : au; }
+      if (pc && pc._wtId !== b.id) { pc._wtId = b.id; pc.textContent = ''; pc.append(coverBox(b, 'pcover-bg'), h('div', { class: 'pcover-poster' }, coverBox(b, 'pcover-art'))); }
+      if (nrEl.title) nrEl.title.textContent = b.title || '';
+      el.cur.textContent = '0:00'; el.left.textContent = '-0:00'; el.seek.value = 0; el.seek.style.setProperty('--fill', '0%');
+      ['#book-prog', '#nr-bp', '#trk-sum'].forEach(q => { const x = $(q); if (x) x.hidden = true; });
+      document.title = (b.title || 'Wordtrail') + ' \u00b7 Wordtrail';
+    } catch (e) { /* cosmetic: the header above still names the right book */ }
+  }
+  let openSeq = 0;   // each openBook() takes a number; one that is no longer the newest stops when it wakes up (a slow book must not take over the player from a book opened after it)
   let listing = false, listingId = null, listingAt = 0;   // listingAt: a stuck request must never block the Listen button for good
   async function openBook(b, opts) {   // opts.play: start the narration as soon as the book opens (the Listen button)
     if (offBlock(b)) return;
@@ -32,7 +47,7 @@
     if (listing && !b.secs.length && String(listingId) === String(b.id) && Date.now() - listingAt < 25000) return;   // same book already loading: ignore the double tap (but only for 25 s)
     if (DET.book && String(DET.book.id) !== String(b.id)) { DET.book = null; DET.author = null; DET.rv = false; DET.stack = []; $('#detail').textContent = ''; }
     else if (DET.book) DET.stale = true;
-    const asked = b;
+    const asked = b, seq = ++openSeq;
     warmParsed(b.id); // start reading the saved book text now, in parallel with everything below
     let failure = null;
     if (!b.secs.length) { const c = await idb.get('b:' + b.id); if (c && c.secs && c.secs.length) b = c; }
@@ -43,6 +58,7 @@
         startOpen(b.title, false);
         audio.pause();
         el.title.textContent = b.title; el.sub.textContent = b.authors || '';
+        openingIdentity(b);
         el.page.textContent = ''; el.page.append(loadingNote());
         showView('player');
         const fp = fetchFull(b); // first: it registers the combined request that prefetchText then reuses
@@ -50,10 +66,12 @@
         const lim = new Promise((_, rej) => setTimeout(() => rej(new Error('The track list took too long')), 30000));
         try { const full = await Promise.race([fp, lim]); if (full) b = full; } catch (e) { failure = e; }
       } catch (e) { failure = e; }
-      finally { listing = false; }
+      finally { if (seq === openSeq) listing = false; }
     } else if (!OP.active) startOpen(b.title, false);
+    if (seq !== openSeq) return;   // another book was opened while this one loaded: it owns the player now
     if (!b.secs.length) {
       endOpen(); showView('home'); restoreBack();
+      if (S.book) { try { updateHeader(); updateSeekUI(audio.currentTime || 0); } catch (e) { /* the previous book's screen is repainted when it is opened again */ } }   // the player went back to the book that was open before
       if (failure) {
         setStatus('Could not load the tracks for "' + asked.title + '".', 'error', ['Try again', () => openBook(asked)]);
         toast('Could not load the tracks. Check your connection and try again.', 4500);
@@ -64,6 +82,7 @@
     if (VER.carry) saved = verApply(saved, b);
     await Promise.race([Promise.all([loadCuts(), loadExtras(b)]), new Promise(r => setTimeout(r, 2500))]);
     await dlReady; // which tracks are saved on this device; the first one's blob URL is made before it is needed
+    if (seq !== openSeq) return;
     if (OFF.on && b.secs.length) {   // offline with chapters missing: start at the first saved one at or after the saved position (else the nearest earlier one)
       const at = Math.min(Math.max(0, saved.sec || 0), b.secs.length - 1);
       if (!offTrackOn(b, at)) {

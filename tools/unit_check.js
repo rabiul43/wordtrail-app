@@ -544,6 +544,32 @@ queue.push(() => asyncTest('textSourceLink: a slow details file is given up afte
 }
 
 
+
+/* The player must show the book being opened, not the one open before (screenshot bug: new title on top, old cover/title below) */
+{
+  const bookSrc = read('140-open-book.js');
+  const els = {}, mk = () => ({ textContent: '', hidden: false, children: [], _wtId: undefined, append(...a) { this.children.push(...a); }, firstChild: { textContent: 'OLD' }, lastChild: { textContent: 'OLD' }, value: 9, style: { setProperty() {} } });
+  const q = {}; ['#ptitle', '#pcover', '#book-prog', '#nr-bp', '#trk-sum'].forEach(k => { q[k] = mk(); });
+  q['#pcover']._wtId = 'old-book';
+  const c = vm.createContext({ $: k => q[k] || null, h: () => ({}), coverBox: b => ({ cover: b.id }), el: { cur: mk(), left: mk(), seek: mk() }, nrEl: { title: mk() }, document: { title: '' } });
+  vm.runInContext(grab(bookSrc, 'openingIdentity') + '\nthis.f = openingIdentity;', c);
+  test('opening a book: the player shows the new book at once (title, author, cover, times), not the previous one', () => {
+    c.f({ id: '777', title: 'Selected Articles on Child Labor', authors: 'Unknown author' });
+    assert.strictEqual(q['#ptitle'].firstChild.textContent, 'Selected Articles on Child Labor');
+    assert.strictEqual(q['#ptitle'].lastChild.textContent, '', 'an unknown author is not shown');
+    assert.strictEqual(q['#pcover']._wtId, '777'); assert.strictEqual(q['#pcover'].children.length, 2);
+    assert.strictEqual(c.el.cur.textContent, '0:00'); assert.strictEqual(c.el.seek.value, 0);
+    assert.strictEqual(q['#book-prog'].hidden, true); assert.strictEqual(c.nrEl.title.textContent, 'Selected Articles on Child Labor');
+    c.f({ id: '778', title: 'Mildred', authors: 'Martha Finley' });
+    assert.strictEqual(q['#ptitle'].lastChild.textContent, 'Martha Finley'); assert.strictEqual(q['#pcover']._wtId, '778');
+  });
+  test('opening a book: a missing element never stops the opening', () => {
+    const c2 = vm.createContext({ $: () => null, h: () => ({}), coverBox: () => ({}), el: {}, nrEl: {}, document: { title: '' } });
+    vm.runInContext(grab(bookSrc, 'openingIdentity') + '\nthis.f = openingIdentity;', c2);
+    c2.f({ id: '1', title: 'x' });
+  });
+}
+
 (async () => {
   for (const q of queue) await q();
   console.log('\n' + (failed ? failed + ' of ' + total + ' failed' : 'all ' + total + ' passed'));
