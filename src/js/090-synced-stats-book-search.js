@@ -660,6 +660,8 @@
   }
   /* New book page design (phones only): <html data-det="new"> turns on 99n-detail-modern.css. Saved as P.detNew (default on). */
   function applyDet() { document.documentElement.setAttribute('data-det', P.detNew !== false && !matchMedia('(min-width: 700px)').matches ? 'new' : 'off'); }
+  /* New Library layout (phones only): <html data-lib="tiles"> turns on 99o-library-tiles.css, and libHubDraw (282) draws the synced-book card and tiles. Saved as P.libTiles (default on); first paint is in 00-head.html. */
+  function applyLib() { document.documentElement.setAttribute('data-lib', P.libTiles !== false && !matchMedia('(min-width: 700px)').matches ? 'tiles' : 'off'); }
   function applyTidy() { document.documentElement.toggleAttribute('data-tidy', P.tidyPlayer !== false); }
   /* Home header: 'new' = logo, search and account button in one row (always on tablets and computers, from 700px);
      'classic' = the big search bar under the logo, only on phones and only when Settings turns the new one off (P.hdrNew === false). */

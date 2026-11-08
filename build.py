@@ -55,6 +55,7 @@ PARTS = [
     ('file', 'src/css/99l-opening.css'),
     ('file', 'src/css/99m-detail-stage.css'),
     ('file', 'src/css/99n-detail-modern.css'),
+    ('file', 'src/css/99o-library-tiles.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

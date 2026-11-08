@@ -182,7 +182,7 @@
       throw errs.find(x => x && x.message !== 'empty') || e;
     }
   }
-  async function resumeRecent(r) {
+  async function resumeRecent(r, opts) {   // opts.play: start the narration at once (the play button on the My Library card)
     if (OP.active && OP.home) return;
     if (offBlock(r)) return;
     startOpen(r.title, true);
@@ -190,8 +190,8 @@
       let b = await idb.get('b:' + r.id);
       if (!b || !b.secs || !b.secs.length) b = await fetchFull({ id: r.id, title: r.title, authors: r.authors, cover: r.cover });
       if (!b || !b.secs.length) throw new Error('missing');
-      openBook(b);
-    } catch (e) { endOpen(); setStatus('Could not open that book right now.', 'error', ['Try again', () => resumeRecent(r)]); }
+      openBook(b, opts);
+    } catch (e) { endOpen(); setStatus('Could not open that book right now.', 'error', ['Try again', () => resumeRecent(r, opts)]); }
   }
   function bookPct() {
     const total = S.durs.reduce((a, b) => a + b, 0) || 1;

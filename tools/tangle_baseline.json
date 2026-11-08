@@ -2,7 +2,7 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 82,
-  "dependencies": 725,
+  "dependencies": 727,
   "pointing_to_a_later_file": 230,
   "largest_cycle": 75
  },
@@ -465,8 +465,10 @@
   "281-book-download-card.js -> sound/sound-cache.js",
   "282-library-hub.js -> 030-helpers-offline-audio.js",
   "282-library-hub.js -> 080-ui-shell-favourites.js",
+  "282-library-hub.js -> 090-synced-stats-book-search.js",
   "282-library-hub.js -> 102-home-sections.js",
   "282-library-hub.js -> 130-book-detail.js",
+  "282-library-hub.js -> 133-open-progress-saved-state.js",
   "282-library-hub.js -> 135-ratings.js",
   "282-library-hub.js -> 270-sheets-nextup-back.js",
   "290-backup-maintenance.js -> 030-helpers-offline-audio.js",

@@ -1,0 +1,70 @@
+/* New Library layout (phones): the synced-book card and the 2x2 tiles on My Library.
+   Everything is scoped under html[data-lib="tiles"] (set by applyLib in 090 and the first-paint script in 00-head.html; Settings > New Library layout),
+   and only under 700px. Colours come from the theme variables, so dark, black, white, sepia and high-contrast all work.
+   Code: libTilesDraw in 282-library-hub.js. To undo: remove this file and its line in build.py (and restore 282). */
+@media (max-width: 699.98px) {
+  html[data-lib="tiles"] #shelf-hub { gap: .65rem; margin-top: -1.15rem; }   /* the page's own heading is empty here (the bar has the title), so close the gap it leaves */
+  html[data-lib="tiles"] .lt-lead { margin: 0 0 .1rem; color: var(--muted); font-size: .95rem; line-height: 1.3; }
+
+  /* the card */
+  html[data-lib="tiles"] .lt-hero { display: grid; gap: .6rem; padding: .55rem 1rem 1rem; border-radius: 22px; background: var(--accent); color: var(--accent-ink); }
+  html[data-lib="tiles"] .lt-hero-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%; min-height: 2.75rem; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: start; }
+  html[data-lib="tiles"] .lt-pill { display: inline-flex; align-items: center; gap: .45rem; min-height: 2.2rem; padding: 0 .9rem 0 .7rem; border-radius: 999px; background: color-mix(in srgb, var(--accent-ink) 14%, transparent); font-weight: 700; font-size: .95rem; }
+  html[data-lib="tiles"] .lt-pill svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  html[data-lib="tiles"] .lt-chev { flex: none; width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .75; }
+  html[data-lib="tiles"] .lt-mid { display: flex; align-items: center; gap: .85rem; }
+  html[data-lib="tiles"] .lt-cover { flex: none; width: 52px; height: 70px; border-radius: 8px; object-fit: cover; background: var(--accent-ink); }
+  html[data-lib="tiles"] .lt-cover-fb { display: flex; align-items: flex-end; padding: .35rem; overflow: hidden; color: var(--accent); font: 500 .74rem/1.05 var(--font-display); hyphens: auto; overflow-wrap: anywhere; }
+  html[data-lib="tiles"] .lt-info { flex: 1; min-width: 0; display: grid; gap: .15rem; }
+  html[data-lib="tiles"] .lt-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font: 500 1.4rem/1.1 var(--font-display); }
+  html[data-lib="tiles"] .lt-by { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: .9rem; line-height: 1.25; opacity: .78; }
+  html[data-lib="tiles"] .lt-wave { display: flex; align-items: flex-end; gap: 3px; height: 1.6rem; margin-top: .3rem; }
+  html[data-lib="tiles"] .lt-wave i { display: block; width: 4px; border-radius: 2px; background: currentColor; opacity: .3; }
+  html[data-lib="tiles"] .lt-wave i.on { opacity: 1; }
+  html[data-lib="tiles"] .lt-play { flex: none; display: grid; place-items: center; width: 3.25rem; height: 3.25rem; padding: 0; border: 0; border-radius: 50%; background: var(--accent-ink); color: var(--accent); }
+  html[data-lib="tiles"] .lt-play svg { width: 1.4rem; height: 1.4rem; fill: currentColor; stroke: none; margin-inline-start: .1rem; }
+  html[data-lib="tiles"] .lt-foot { display: flex; justify-content: space-between; gap: .75rem; font-size: .9rem; opacity: .78; }
+
+  /* no synced book yet: calmer, no accent fill */
+  html[data-lib="tiles"] .lt-hero-empty { background: var(--accent-soft); color: var(--ink); }
+  html[data-lib="tiles"] .lt-hero-empty .lt-pill { background: var(--surface-2); }
+  html[data-lib="tiles"] .lt-empty-body { display: grid; justify-items: start; gap: .35rem; padding-bottom: .15rem; }
+  html[data-lib="tiles"] .lt-empty-body b { font: 500 1.3rem/1.15 var(--font-display); }
+  html[data-lib="tiles"] .lt-empty-body p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.4; }
+  html[data-lib="tiles"] .lt-cta { min-height: 2.75rem; margin-top: .45rem; padding: 0 1.4rem; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: 700 .95rem/1 inherit; }
+  html[data-lib="tiles"] .lt-wait .lt-wait-body { min-height: 6.6rem; border-radius: 14px; background: color-mix(in srgb, var(--accent-ink) 10%, transparent); animation: ltPulse 1.4s ease-in-out infinite; }
+  @keyframes ltPulse { 50% { opacity: .5; } }
+
+  /* the tiles */
+  html[data-lib="tiles"] .lt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  html[data-lib="tiles"] .lt-tile { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 8rem; padding: .7rem .9rem .8rem; border: 0; border-radius: 20px; background: var(--surface); color: var(--ink); font: inherit; text-align: start; }
+  html[data-lib="tiles"] .lt-grid > .lt-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }   /* an odd tile out fills the row */
+  html[data-lib="tiles"] .lt-top { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; min-height: 2.25rem; margin-bottom: .35rem; }
+  html[data-lib="tiles"] .lt-tile .lt-chev { width: 1.05rem; height: 1.05rem; margin-top: .1rem; stroke: var(--muted); opacity: 1; }
+  html[data-lib="tiles"] .lt-ic { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 11px; background: var(--surface-2); color: var(--accent); }
+  html[data-lib="tiles"] .lt-ic svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  html[data-lib="tiles"] .lt-num { margin-top: auto; font: 400 1.8rem/1 var(--font-display); }
+  html[data-lib="tiles"] .lt-lab { margin-top: .3rem; font-size: 1rem; font-weight: 700; line-height: 1.2; }
+  html[data-lib="tiles"] .lt-tile small { color: var(--muted); font-size: .85rem; line-height: 1.25; }
+  html[data-lib="tiles"] .lt-bar { display: block; width: 100%; height: 4px; margin-top: .45rem; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+  html[data-lib="tiles"] .lt-bar[hidden] { display: block; visibility: hidden; }   /* keeps its room, so the tile does not jump when the figure arrives */
+  html[data-lib="tiles"] .lt-bar i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--accent); transition: width .4s ease; }
+  html[data-lib="tiles"] .lt-avs { display: flex; align-items: center; height: 2.25rem; }
+  html[data-lib="tiles"] .lt-av { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; margin-inline-start: -.6rem; border: 2px solid var(--surface); border-radius: 50%; color: var(--ink); font-size: .72rem; font-weight: 700; line-height: 1; }
+  html[data-lib="tiles"] .lt-av:first-child { margin-inline-start: 0; }
+  html[data-lib="tiles"] .lt-av0 { background: color-mix(in srgb, var(--accent) 38%, var(--surface-2)); }
+  html[data-lib="tiles"] .lt-av1 { background: color-mix(in srgb, var(--ink) 20%, var(--surface-2)); }
+  html[data-lib="tiles"] .lt-av2 { background: color-mix(in srgb, var(--accent) 18%, var(--surface-2)); }
+  html[data-lib="tiles"] .lt-stars { display: flex; align-items: center; gap: .3rem; height: 2.25rem; }
+  html[data-lib="tiles"] .lt-stars svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: var(--muted); stroke-width: 1.7; stroke-linejoin: round; opacity: .55; }
+  html[data-lib="tiles"] .lt-stars svg.on { fill: var(--accent); stroke: var(--accent); opacity: 1; }
+
+  html[data-lib="tiles"] .lt-hero-head:focus-visible, html[data-lib="tiles"] .lt-play:focus-visible, html[data-lib="tiles"] .lt-tile:focus-visible, html[data-lib="tiles"] .lt-cta:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: 2px; }
+  html[data-lib="tiles"] .lt-tile:active, html[data-lib="tiles"] .lt-hero-head:active, html[data-lib="tiles"] .lt-play:active { opacity: .85; }
+  :root[data-theme="contrast"][data-lib="tiles"] .lt-tile { border: 2px solid var(--line); }
+  html[data-lib="tiles"][dir="rtl"] .lt-chev, html[data-lib="tiles"] [dir="rtl"] .lt-chev { transform: scaleX(-1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-lib="tiles"] .lt-wait .lt-wait-body { animation: none; }
+  html[data-lib="tiles"] .lt-bar i { transition: none; }
+}
