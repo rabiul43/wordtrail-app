@@ -628,12 +628,15 @@
   async function findGutenbergFor(book) {
     const be = bundles.get(String(book.id)); // the combined /book request may already know it
     if (be) { const g = await be.gut; if (g) return g; }
+    if (/^\d+$/.test(String(book.gid || ''))) return { id: String(book.gid), label: 'Project Gutenberg #' + book.gid };   // the catalog knows the number
     const m = (book.textUrl || '').match(/gutenberg\.org\/(?:ebooks|etext|files|cache\/(?:epub|etext))\/(\d+)/i);
     if (m) return { id: m[1], label: 'Project Gutenberg #' + m[1] };
     const last = String(book.authorLast || '').toLowerCase();
     let pick = null;
     for (const t of Core.gutQueries(book.title, book.authorLast)) {   // the cleaned title first ("(Dramatic Reading)" is a LibriVox label), then looser searches
-      let hits = await gutendex(t.q);
+      let hits;
+      try { hits = await gutendex(t.q); }
+      catch (e) { throw new Error(e && e.name === 'AbortError' ? 'The Gutenberg search timed out' : (e && e.message) || 'The Gutenberg search failed'); }   // plain words instead of 'signal is aborted'
       if (t.needAuthor) hits = hits.filter(x => x.author.toLowerCase().includes(last));   // a title-only search must not pick another author's book
       pick = hits.find(x => x.langs.includes('en')) || hits[0];
       if (pick) break;

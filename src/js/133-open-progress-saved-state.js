@@ -151,7 +151,7 @@
     const sleep = ms => new Promise(r => setTimeout(r, ms));
     // The combined request starts first (and at once). A book opened before already has its text on this device, so only the tracks are asked for.
     const st = (store.get('wt:book:' + id, null) || {}).text;
-    const bundleP = PROXY ? fetchBundle(String(id), { gid: st && st.kind === 'gutenberg' && st.id ? st.id : '', text: !st }) : Promise.reject(new Error('no proxy'));
+    const bundleP = PROXY ? fetchBundle(String(id), { gid: st && st.kind === 'gutenberg' && st.id ? st.id : (/^\d+$/.test(String(hint.gid || '')) ? String(hint.gid) : ''), text: !st }) : Promise.reject(new Error('no proxy'));
     bundleP.catch(() => {});
     // The older routes wait a moment for it, and start straight away if it fails.
     const gate = ms => new Promise(res => { const t = setTimeout(res, ms); bundleP.catch(() => { clearTimeout(t); res(); }); });

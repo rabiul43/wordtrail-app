@@ -373,6 +373,16 @@ queue.push(() => asyncTest('findGutenbergFor: a title-only retry never picks ano
   const r = await settle(findGutenbergFor({ id: 'x', title: 'Robin Hood (Dramatic Reading)', authorLast: 'Nobody', textUrl: '' }));
   assert.ok(r.e && r.e.message === 'No matching text', JSON.stringify(r));
 }));
+queue.push(() => asyncTest('findGutenbergFor: a number from the catalog is used at once, no search', async () => {
+  let searched = 0; setGut(async () => { searched++; return []; });
+  const g = await findGutenbergFor({ id: 'x', title: 'Robin Hood (Dramatic Reading)', authorLast: 'MacDonell', gid: '2', textUrl: '' });
+  assert.strictEqual(g.id, '2'); assert.strictEqual(searched, 0, 'must not search');
+}));
+queue.push(() => asyncTest('findGutenbergFor: a timed-out search says so in plain words', async () => {
+  setGut(async () => { const e = new Error('signal is aborted without reason'); e.name = 'AbortError'; throw e; });
+  const r = await settle(findGutenbergFor({ id: 'x', title: 'Emma', authorLast: 'Austen', textUrl: '' }));
+  assert.ok(r.e && r.e.message === 'The Gutenberg search timed out', JSON.stringify(r));
+}));
 queue.push(() => asyncTest('findGutenbergFor: a network error from the search is passed on, not hidden', async () => {
   setGut(async () => { throw new Error('Failed to fetch'); });
   const r = await settle(findGutenbergFor({ id: 'x', title: 'Emma (version 2)', authorLast: 'Austen', textUrl: '' }));
