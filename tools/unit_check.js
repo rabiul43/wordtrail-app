@@ -79,6 +79,8 @@ test('gutTitle: drops trailing LibriVox labels, keeps real titles', () => {
   assert.strictEqual(Core.gutTitle('Emma (version 2)'), 'Emma');
   assert.strictEqual(Core.gutTitle('Dracula [abridged] (Dramatic Reading)'), 'Dracula');
   assert.strictEqual(Core.gutTitle('Alice in Wonderland'), 'Alice in Wonderland');
+  assert.strictEqual(Core.gutTitle('Abraham Lincoln (Volume 1)'), 'Abraham Lincoln (Volume 1)', 'a volume number is part of the real title');
+  assert.strictEqual(Core.gutTitle('Faust (Part 2) (version 3)'), 'Faust (Part 2)');
   assert.strictEqual(Core.gutTitle('(Untitled)'), '(Untitled)', 'never returns an empty title');
   assert.strictEqual(Core.gutTitle(''), '');
 });

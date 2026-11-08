@@ -783,8 +783,16 @@ const makeCore = () => {
      "Dracula [abridged]". Gutendex needs every search word to match, so those words make the search find nothing.
      gutTitle drops trailing (...) / [...] groups; gutQueries lists the searches to try, best first (never empty strings, no repeats). */
   function gutTitle(t) {
-    let s = String(t || '').trim(), prev;
-    do { prev = s; s = s.replace(/\s*[(\[][^()\[\]]*[)\]]\s*$/, '').trim(); } while (s !== prev && s);
+    let s = String(t || '').trim();
+    for (;;) {
+      const m = /\s*[(\[]([^()\[\]]*)[)\]]\s*$/.exec(s);
+      if (!m) break;
+      const tag = m[1];   // "(Volume 1)", "(Part 2)", "(Book 3)" belong to the real title and stay; "(version 2)" is a LibriVox label and goes
+      if ((/\b(vol(ume)?s?|parts?|books?|bk|no|number|tome|band|chapter|canto|act)\b|\d/i.test(tag)) && !/^\s*(version|ver\.?|v\.?)\s*\d+\s*$/i.test(tag)) break;
+      const n = s.slice(0, m.index).trim();
+      if (!n) break;
+      s = n;
+    }
     return s || String(t || '').trim();
   }
   function gutQueries(title, last) {
