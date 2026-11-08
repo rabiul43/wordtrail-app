@@ -32,7 +32,7 @@ try {
   vm.runInContext(read('010-core.js') + '\nthis.Core = Core;', cctx);
   Core = cctx.Core;
   /* 2. Pure helpers pulled out one by one. */
-  const ctx = vm.createContext({ setTimeout, clearTimeout, AbortController, TextDecoder, Error });
+  const ctx = vm.createContext({ Core, setTimeout, clearTimeout, AbortController, TextDecoder, Error });
   vm.runInContext([
     grab(tap, 'TAP_DELAY'), grab(sync, 'resyncTime'), grab(align, 'toks'), grab(align, 'alignTokens'),
     grab(open, 'takeJsonLines'),
@@ -42,7 +42,9 @@ try {
     grab(open, 'fetchBundle'),
     'const decode = x => String(x || "");',                                   // the app's decode() needs a page; same result for plain text
     grab(net, 'normBook'),
-    'this.T = { toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch: f => { FETCH = f; } };'
+    'let GUT = async () => []; const gutendex = q => GUT(q), Core = this.Core;',
+    grab(net, 'findGutenbergFor'),
+    'this.T = { findGutenbergFor, setGut: f => { GUT = f; }, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch: f => { FETCH = f; } };'
   ].join('\n'), ctx);
   T = ctx.T;
   /* 3. The tap / undo rules, run against a small fake of the app state (S, P, audio, toast ...). */
@@ -64,13 +66,29 @@ try {
     return a;
   };
 } catch (e) { console.error('Cannot load the code under test: ' + e.message + '\nA function was probably renamed or moved; update tools/unit_check.js.'); process.exit(2); }
-const { toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch } = T;
+const { findGutenbergFor, setGut, toks, alignTokens, resyncTime, TAP_DELAY, takeJsonLines, normBook, fetchBundle, saved, bundleText, setFetch } = T;
 
 let failed = 0, total = 0;
 const test = (name, fn) => { total++; try { fn(); console.log('ok    ' + name); } catch (e) { failed++; console.log('FAIL  ' + name + '\n      ' + String(e.message).split('\n').slice(0, 4).join('\n      ')); } };
 const arr = x => Array.from(x);
 const near = (a, b, m) => assert.ok(Math.abs(a - b) < 1e-6, (m || '') + ' expected ' + b + ', got ' + a);
 
+/* ---------- finding the Project Gutenberg text for a LibriVox recording ---------- */
+test('gutTitle: drops trailing LibriVox labels, keeps real titles', () => {
+  assert.strictEqual(Core.gutTitle('Robin Hood (Dramatic Reading)'), 'Robin Hood');
+  assert.strictEqual(Core.gutTitle('Emma (version 2)'), 'Emma');
+  assert.strictEqual(Core.gutTitle('Dracula [abridged] (Dramatic Reading)'), 'Dracula');
+  assert.strictEqual(Core.gutTitle('Alice in Wonderland'), 'Alice in Wonderland');
+  assert.strictEqual(Core.gutTitle('(Untitled)'), '(Untitled)', 'never returns an empty title');
+  assert.strictEqual(Core.gutTitle(''), '');
+});
+test('gutQueries: cleaned title first, title-only needs an author match, no repeats', () => {
+  assert.deepStrictEqual(plain(Core.gutQueries('Robin Hood (Dramatic Reading)', 'MacDonell')), [
+    { q: 'Robin Hood MacDonell', needAuthor: false }, { q: 'Robin Hood', needAuthor: true },
+    { q: 'Robin Hood (Dramatic Reading) MacDonell', needAuthor: false }, { q: 'Robin Hood (Dramatic Reading)', needAuthor: true }]);
+  assert.deepStrictEqual(plain(Core.gutQueries('Emma', 'Austen')), [{ q: 'Emma Austen', needAuthor: false }, { q: 'Emma', needAuthor: true }]);
+  assert.deepStrictEqual(plain(Core.gutQueries('Emma', '')), [{ q: 'Emma', needAuthor: false }]);
+});
 /* ---------- words and alignment ---------- */
 test('toks: lowercase, apostrophes dropped, punctuation ignored', () => {
   assert.deepStrictEqual(arr(toks("Don't stop, Mr. O\u2019Neil!")), ['dont', 'stop', 'mr', 'oneil']);
@@ -334,6 +352,29 @@ queue.push(() => asyncTest('fetchBundle: a book whose track list is broken every
   setFetch(streamOf(lines(JSON.stringify({ lv: { id: 3, sections: [null, 'x'] } })), 9));
   const r = await settle(fetchBundle('3', { text: false }));
   assert.ok(r.e && r.e.message === 'empty', JSON.stringify(r));
+}));
+
+/* ---------- finding the Project Gutenberg text (async) ---------- */
+/* a stand-in for Gutendex: every search word must appear in the title or author, like the real one */
+const GUTBOOKS = [
+  { id: 1, title: 'Robin Hood', author: 'MacDonell, Amice', langs: ['en'] },
+  { id: 2, title: 'Robin Hood', author: 'Pyle, Howard', langs: ['en'] },
+  { id: 3, title: 'Emma', author: 'Austen, Jane', langs: ['en'] }];
+const fakeGut = async q => { const w = q.toLowerCase().split(/\s+/); return GUTBOOKS.filter(b => w.every(x => (b.title + ' ' + b.author).toLowerCase().includes(x))); };
+queue.push(() => asyncTest('findGutenbergFor: "Robin Hood (Dramatic Reading)" finds the MacDonell text', async () => {
+  setGut(fakeGut);
+  const g = await findGutenbergFor({ id: 'x', title: 'Robin Hood (Dramatic Reading)', authorLast: 'MacDonell', textUrl: '' });
+  assert.strictEqual(g.id, '1');
+}));
+queue.push(() => asyncTest('findGutenbergFor: a title-only retry never picks another author\'s book', async () => {
+  setGut(fakeGut);
+  const r = await settle(findGutenbergFor({ id: 'x', title: 'Robin Hood (Dramatic Reading)', authorLast: 'Nobody', textUrl: '' }));
+  assert.ok(r.e && r.e.message === 'No matching text', JSON.stringify(r));
+}));
+queue.push(() => asyncTest('findGutenbergFor: a network error from the search is passed on, not hidden', async () => {
+  setGut(async () => { throw new Error('Failed to fetch'); });
+  const r = await settle(findGutenbergFor({ id: 'x', title: 'Emma (version 2)', authorLast: 'Austen', textUrl: '' }));
+  assert.ok(r.e && r.e.message === 'Failed to fetch', JSON.stringify(r));
 }));
 
 (async () => {

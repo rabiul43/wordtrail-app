@@ -142,11 +142,13 @@
     if (!S.book) return;
 
     const hitsBox = h('div', { class: 'hits' });
-    const qInput = h('input', { type: 'search', id: 'find-q', value: (S.book.title + ' ' + S.book.authorLast).trim(), 'aria-label': 'Search Project Gutenberg' });
+    const qInput = h('input', { type: 'search', id: 'find-q', value: (Core.gutTitle(S.book.title) + ' ' + S.book.authorLast).trim(), 'aria-label': 'Search Project Gutenberg' });
     const runFind = async () => {
       hitsBox.textContent = 'Searching…';
       try {
-        const hits = await gutendex(qInput.value.trim());
+        const q0 = qInput.value.trim();
+        let hits = await gutendex(q0);
+        if (!hits.length) { const q1 = Core.gutTitle(q0); if (q1 && q1 !== q0) hits = await gutendex(q1); }   // a typed "(label)" finds nothing
         hitsBox.textContent = '';
         if (!hits.length) { hitsBox.textContent = 'Nothing found. Try fewer words.'; return; }
         hits.forEach(x => hitsBox.append(h('button', { class: 'hit', type: 'button', onclick: async () => {

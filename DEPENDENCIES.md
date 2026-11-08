@@ -17,7 +17,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `040-worker-newreader.js` | 155 | 21 | 16 | 3 |
 | `050-audio-clips.js` | 358 | 41 | 5 | 15 |
 | `060-position-bookmarks.js` | 239 | 36 | 8 | 35 |
-| `070-network-data.js` | 638 | 56 | 26 | 13 |
+| `070-network-data.js` | 644 | 56 | 26 | 13 |
 | `080-ui-shell-favourites.js` | 392 | 59 | 35 | 34 |
 | `090-synced-stats-book-search.js` | 751 | 72 | 29 | 45 |
 | `095-weekly-report.js` | 103 | 6 | 1 | 6 |
@@ -88,7 +88,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `280-downloads-progress.js` | 819 | 87 | 30 | 55 |
 | `281-book-download-card.js` | 215 | 15 | 3 | 31 |
 | `282-library-hub.js` | 145 | 21 | 3 | 18 |
-| `290-backup-maintenance.js` | 395 | 44 | 13 | 43 |
+| `290-backup-maintenance.js` | 397 | 44 | 13 | 43 |
 | `295-account-sync.js` | 586 | 74 | 11 | 10 |
 | `296-desktop-bar.js` | 64 | 8 | 1 | 4 |
 | `298-pwa.js` | 86 | 7 | 3 | 5 |

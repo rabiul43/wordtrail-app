@@ -630,8 +630,14 @@
     if (be) { const g = await be.gut; if (g) return g; }
     const m = (book.textUrl || '').match(/gutenberg\.org\/(?:ebooks|etext|files|cache\/(?:epub|etext))\/(\d+)/i);
     if (m) return { id: m[1], label: 'Project Gutenberg #' + m[1] };
-    const hits = await gutendex((book.title + ' ' + book.authorLast).trim());
-    const pick = hits.find(x => x.langs.includes('en')) || hits[0];
+    const last = String(book.authorLast || '').toLowerCase();
+    let pick = null;
+    for (const t of Core.gutQueries(book.title, book.authorLast)) {   // the cleaned title first ("(Dramatic Reading)" is a LibriVox label), then looser searches
+      let hits = await gutendex(t.q);
+      if (t.needAuthor) hits = hits.filter(x => x.author.toLowerCase().includes(last));   // a title-only search must not pick another author's book
+      pick = hits.find(x => x.langs.includes('en')) || hits[0];
+      if (pick) break;
+    }
     if (!pick) throw new Error('No matching text');
     return { id: String(pick.id), label: pick.title + (pick.author ? ' - ' + pick.author : '') };
   }

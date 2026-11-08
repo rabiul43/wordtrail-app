@@ -778,7 +778,25 @@ const makeCore = () => {
     return { found, miss };
   }
 
-  return { fdNorm, fdParse, fdMatch, fdLoad, fdKeep, fdFind, fillWordTimes, stripGutenberg, toParagraphs, isHeading, splitSentences, syllables, spokenCost, parseBook, defaultMap, buildPlan, introCost, envelope, speechSegments, alignSentences, alignStart, alignWindow, snapBoundary, mp3Header, id3End, findMp3Sync, walkFrames, sectionTimes, locate, parseNum, parseRange, namedKey, formatTime };
+
+  /* LibriVox adds labels to a title that are not part of the book's own title: "Robin Hood (Dramatic Reading)", "Emma (version 2)",
+     "Dracula [abridged]". Gutendex needs every search word to match, so those words make the search find nothing.
+     gutTitle drops trailing (...) / [...] groups; gutQueries lists the searches to try, best first (never empty strings, no repeats). */
+  function gutTitle(t) {
+    let s = String(t || '').trim(), prev;
+    do { prev = s; s = s.replace(/\s*[(\[][^()\[\]]*[)\]]\s*$/, '').trim(); } while (s !== prev && s);
+    return s || String(t || '').trim();
+  }
+  function gutQueries(title, last) {
+    const full = String(title || '').trim(), clean = gutTitle(full), a = String(last || '').trim(), out = [];
+    const add = (q, needAuthor) => { q = q.trim(); if (q && !out.some(o => o.q === q)) out.push({ q, needAuthor }); };
+    add(clean + ' ' + a, false);
+    if (a) add(clean, true);                 // title alone: only accepted when the hit's author matches (needAuthor)
+    if (clean !== full) { add(full + ' ' + a, false); if (a) add(full, true); }   // the label may be part of a real title
+    return out;
+  }
+
+  return { gutTitle, gutQueries, fdNorm, fdParse, fdMatch, fdLoad, fdKeep, fdFind, fillWordTimes, stripGutenberg, toParagraphs, isHeading, splitSentences, syllables, spokenCost, parseBook, defaultMap, buildPlan, introCost, envelope, speechSegments, alignSentences, alignStart, alignWindow, snapBoundary, mp3Header, id3End, findMp3Sync, walkFrames, sectionTimes, locate, parseNum, parseRange, namedKey, formatTime };
 };
 const Core = makeCore();
 
