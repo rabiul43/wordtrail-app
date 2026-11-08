@@ -665,6 +665,7 @@
     nrPlay(playing);
     miniPlayIcon(playing);
     const tl = $('#track-list'); if (tl) tl.classList.toggle('is-playing', !!playing);
+    try { if (isModern()) trkMRowPaint(S.sec); } catch (e) { /* Tracks sheet not drawn yet */ }   // Playing / Paused label (Modern)
   }
   guideDoc('player', 'Smart skip-back', "After a pause, playing again rewinds a few seconds (up to 10 after a long break) so you hear the sentence you were in. Turn it off in Settings > Audio.");
   /* Smart skip-back: after a real pause, resuming rewinds a few seconds (more for a longer pause) so the

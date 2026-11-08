@@ -200,7 +200,7 @@
     if (id !== 'sheet-clipedit') clEdCleanup();
     $$('.sheet').forEach(s => { s.hidden = true; });
     ghHide();
-    if (id === 'sheet-tracks') renderTracks();
+    if (id === 'sheet-tracks') { trkFilter = 'all'; renderTracks(); }
     if (id === 'sheet-text') renderTextSheet();
     if (id === 'sheet-settings') fillSettings();
     if (id === 'sheet-sethome') smHomeOpen();

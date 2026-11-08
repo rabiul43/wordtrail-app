@@ -3,7 +3,7 @@
      and shows progress per track. Saved tracks are played from a blob: URL, and are also read from there by the
      sync analysis, so nothing is fetched twice. Cancelling keeps what is already saved; pressing the button again
      fetches only what is missing. */
-  const DL = { id: null, book: null, ctl: null, running: false, cancelling: false, quota: false, st: {} }; // st[i] = { state: wait|busy|done|fail, got, total, size }
+  const DL = { id: null, book: null, ctl: null, running: false, cancelling: false, pausing: false, t0: 0, quota: false, st: {} }; // st[i] = { state: wait|busy|done|fail, got, total, size }
   const fmtMB = n => n >= 1e9 ? (n / 1e9).toFixed(2) + ' GB' : (n / 1e6).toFixed(n >= 1e8 ? 0 : 1) + ' MB';
   /* Estimate total download size from audio duration at ~128 kbps (LibriVox typical). Returns '' if no duration. */
   const dlEstSize = b => { const secs = b && b.total; return (secs > 0) ? '~' + dmMB(secs * 16000) : ''; };
@@ -112,19 +112,21 @@
     dlPersist();   // after the user's tap: ask the browser to keep the saved audio; the answer is shown in Settings > Storage
     dmUsedPct().then(pct => { if (pct != null && pct > 90 && !DL.warned) { DL.warned = true; toast('Storage is almost full (' + Math.round(pct) + '% used). The download may not fit.', 6000); } });
     const ctl = new AbortController(), q = todo.slice();
-    Object.assign(DL, { id: String(b.id), book: b, ctl, running: true, cancelling: false, quota: false, st: {} });
+    Object.assign(DL, { id: String(b.id), book: b, ctl, running: true, cancelling: false, pausing: false, t0: Date.now(), quota: false, st: {} });
+    trkPausedId = '';
     todo.forEach(i => { DL.st[i] = { state: 'wait', got: 0, total: 0, size: 0 }; });
     renderTracks(); paintCards(); updateHeader();
     const worker = async () => { while (q.length && !ctl.signal.aborted) await dlTrack(b, q.shift(), ctl.signal); };
     await Promise.all([worker(), worker()]);
-    const cancelled = DL.cancelling && !DL.quota;
-    DL.running = false; DL.ctl = null; DL.cancelling = false;
+    const cancelled = DL.cancelling && !DL.quota, paused = DL.pausing && !DL.quota && !cancelled;   // Pause: Tracks sheet, Modern design only
+    DL.running = false; DL.ctl = null; DL.cancelling = false; DL.pausing = false;
     let failed = 0;
     for (const i of Object.keys(DL.st)) { if (DL.st[i].state === 'fail') failed++; else delete DL.st[i]; }
     const left = b.secs.filter((s, i) => !isLocal(b.id, i, s.url)).length;
     if (only) toast(only.every(i => isLocal(b.id, i, b.secs[i].url)) ? 'Track saved on this device.' : DL.quota ? 'Not enough free space on this device.' : cancelled ? 'Download cancelled.' : 'This track could not be downloaded. Tap its button to try again.', 4500);
     else if (!left) { dqClear(); toast('Downloaded. This book now plays from your device.', 4500); }
     else if (DL.quota) { dqClear(); toast('Not enough free space on this device. The tracks saved so far are kept.', 6000); }
+    else if (paused) { dqClear(); trkPausedId = String(b.id); toast('Download paused. What is saved is kept.', 3500); }
     else if (cancelled) { dqClear(); toast('Download cancelled. The tracks already saved are kept.', 4000); }
     else toast(failed + (failed === 1 ? ' track' : ' tracks') + ' could not be downloaded. It continues where it stopped when the connection is back, or tap Retry.', 6000);
     paintDl(); paintCards(); if (S.book) updateHeader();
@@ -151,6 +153,8 @@
     } finally { dqBusy = false; }
   }
   function dlCancel() { if (!DL.running || !DL.ctl) return; DL.cancelling = true; DL.ctl.abort(); paintDl(); }
+  /* Pause = stop like Cancel but say so: the half-saved bytes are checkpointed (dlFetch), so Resume carries on with Range from there. */
+  function dlPause() { if (!DL.running || !DL.ctl || DL.cancelling || DL.pausing) return; DL.pausing = true; DL.ctl.abort(); paintDl(); }
   /* ---------- auto-download the next tracks (Settings > Audio > Download ahead) ----------
      While a track plays, the next 2 or 3 tracks are saved to the device in the background, on Wi-Fi only, so a weak
      connection never makes the book stop. It uses the same storage as "Download book", so tracks can be removed in
@@ -462,7 +466,8 @@
     if (t && t.state === 'fail') return t;
     return { state: 'idle' };
   }
-  function paintTrack(i) {
+  function paintTrack(i) { paintTrack0(i); if (isModern()) trkMRowPaint(i); }
+  function paintTrack0(i) {
     const r = trackRows[i];
     if (!r || !S.book) return;
     const t = trackState(i), sec = S.secs[i];
@@ -506,6 +511,7 @@
   }
   function paintDl() {
     ddPaint();   // the card on the book page (281)
+    trkMPaint();   // Tracks sheet, Modern design
     const b = S.book, T = $('#dl-t'), Sx = $('#dl-s'), go = $('#dl-go'), rm = $('#dl-rm'), m = $('#dl-m');
     if (!b || !T) return;
     const n = b.secs.length, have = b.secs.filter((s, i) => isLocal(b.id, i, s.url)).length;
@@ -604,6 +610,7 @@
     }
     r.lp.hidden = !(f > 0 && !done);
     r.lbar.style.width = Math.round(f * 100) + '%';
+    if (isModern()) trkMRowPaint(i);
     paintBookProg();
   }
   function lpSave() { if (S.book && S.lp) { store.set('wt:lp:' + S.book.id, S.lp); S.lpSaved = Date.now(); } }
@@ -631,23 +638,120 @@
     const showReader = new Set(S.secs.map(rdName).filter(Boolean)).size > 1;   // one reader for the whole book: no need to repeat the name on every row
     S.secs.forEach((s, i) => {
       const bar = h('i'), tp = h('span', { class: 'tp', hidden: true }, bar), stat = h('span', { class: 'ds' });
-      const lbar = h('i'), lp = h('span', { class: 'lp', hidden: true }, lbar), nEl = h('span', { class: 'n' }, String(i + 1));
+      const lbar = h('i'), lp = h('span', { class: 'lp', hidden: true }, lbar), nEl = h('span', { class: 'n' }, String(i + 1)), tst = isModern() ? h('small', { class: 'tst', hidden: true }) : null;
       const row = h('button', { class: 'track', type: 'button', 'aria-current': i === S.sec ? 'true' : false, onclick: () => {
         if (OFF.on && !offTrackOn(S.book, i)) { toast('This chapter is not on this device. It needs internet.', 3200); return; }   // the sheet stays open
         closeSheets(); goTrack(i, 0, true);
       } },
         nEl,
-        h('span', { class: 'tt' }, s.title, showReader && rdName(s) ? h('small', {}, rdName(s)) : null, lp, tp),
+        h('span', { class: 'tt' }, s.title, tst, showReader && rdName(s) ? h('small', {}, rdName(s)) : null, lp, tp),
         h('span', { class: 'dcol' }, h('span', { class: 'd' }, fmt(S.durs[i])), stat));
       list.append(row);
       const go = e => { if (OFF.on) return; e.stopPropagation(); e.preventDefault(); trackDlToggle(i); };   // offline the mark is display only: the tap goes to the row
       stat.addEventListener('click', go);
       stat.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(e); });
-      trackRows[i] = { bar, tp, stat, lbar, lp, n: nEl, row };
+      trackRows[i] = { bar, tp, stat, lbar, lp, n: nEl, row, tst };
       paintTrack(i); lpPaint(i);
     });
-    paintDl(); trkOffPaint();
+    if (isModern()) list.append(h('p', { class: 'trk-none', hidden: true }));
+    paintDl(); trkOffPaint(); trkFilterPaint();
     trackJumpInit(list);
+  }
+  /* ---------- Tracks sheet, Modern design (phones): summary card, filter chips, sub title, row states ----------
+     Markup is in 20-sheets-player.html (hidden), styles in 99i-explore-design.css under html[data-design="modern"].
+     Every function here returns at once unless isModern(); the other designs keep the Download book box as it was. */
+  let trkFilter = 'all', trkPausedId = '';
+  const TRK_SEGS = 36;
+  const trkPart = (t, sec) => t.total ? t.got / t.total : Math.min(0.98, t.got / (((sec && sec.dur) || 1) * 16000));
+  const plTracks = n => n + (n === 1 ? ' track' : ' tracks');
+  function trkEta(left) {
+    if (left < 60) return 'under 1 min left';
+    const m = Math.round(left / 60);
+    return 'about ' + (m < 90 ? m + ' min' : Math.round(m / 60) + ' h') + ' left';
+  }
+  function trkMPaint() {
+    const card = $('#trk-m'); if (!card) return;
+    const b = S.book, on = isModern() && !!b && !!(b.secs && b.secs.length);
+    card.hidden = !on; $('#trk-flt').hidden = !on; $('#trk-sub').hidden = !on;
+    if (!on) return;
+    const n = b.secs.length, id = String(b.id), mine = DL.id === id, run = DL.running && mine, other = DL.running && !mine;
+    const vals = b.secs.map((x, i) => isLocal(id, i, x.url) ? 1 : (run && DL.st[i] && DL.st[i].state === 'busy') ? trkPart(DL.st[i], x) : 0);
+    const have = vals.filter(v => v === 1).length, part = vals.reduce((a, v) => a + (v < 1 ? v : 0), 0);
+    const failed = mine ? Object.values(DL.st).filter(x => x.state === 'fail').length : 0;
+    const meta = dlMeta.get(id), savedB = (meta ? Object.values(meta.tracks || {}).reduce((a, x) => a + (x.s || 0), 0) : 0)
+      + (run ? Object.values(DL.st).reduce((a, x) => a + (x.state === 'busy' ? x.got || 0 : 0), 0) : 0);
+    const est = dlEstSize(b), estB = b.total > 0 ? b.total * 16000 : 0;
+    const left = n - have, paused = !run && trkPausedId === id && left > 0;
+    const sub = $('#trk-sub'), subT = (b.title || '') + ' · ' + plTracks(n);
+    if (sub.textContent !== subT) sub.textContent = subT;
+    let st, title, text = fmtMB(savedB) + ' saved' + (est ? ' of ' + est : ''), goT = '', altT = '';
+    if (!dlOk) { st = 'off'; title = 'Listen offline'; text = 'This browser cannot save audio on the device.'; }
+    else if (run) {
+      st = 'run';
+      title = DL.cancelling ? 'Cancelling…' : DL.pausing ? 'Pausing…' : 'Downloading track ' + Math.min(n, have + 1) + ' of ' + n + '…';
+      const el0 = (Date.now() - DL.t0) / 1000, sess = dlProgress().bytes, rate = el0 > 3 && sess > 0 ? sess / el0 : 0;
+      const c = navigator.connection && navigator.connection.type, net = c === 'wifi' ? 'on Wi-Fi' : c === 'cellular' ? 'on mobile data' : '';
+      const eta = rate && estB > savedB ? trkEta((estB - savedB) / rate) : '';
+      text += eta || net ? ' · ' + [eta, net].filter(Boolean).join(' ') + '.' : '.';
+      goT = 'Pause'; altT = 'Cancel';
+    } else if (left === 0) { st = 'done'; title = 'All ' + plTracks(n) + ' downloaded'; text = fmtMB(savedB) + ' saved on this device. They play without a connection.'; altT = 'Remove download'; }
+    else if (other) { st = 'busy'; title = have ? have + ' of ' + n + ' tracks downloaded' : 'Listen offline'; text = 'Another download is running: “' + DL.book.title + '”.'; goT = 'Download remaining · ' + left; }
+    else if (have === 0 && !paused) { st = 'idle'; title = 'Listen offline'; text = 'Save the audio on this device to play without a connection.' + (est ? ' Download size: ' + est + '.' : ''); goT = failed ? 'Retry' : 'Download book'; }
+    else { st = paused ? 'paused' : 'partial'; title = have + ' of ' + n + ' tracks downloaded'; text = (paused ? 'Paused. ' : '') + text + '. Saved tracks play offline.'; goT = (failed ? 'Retry' : paused ? 'Resume' : 'Download remaining') + ' · ' + left; altT = have ? 'Remove' : ''; }
+    if (OFF.on && !run) goT = '';   // offline: nothing can be downloaded
+    const arc = (have + part) / n;
+    card.dataset.st = st;
+    const setT = (q, t) => { const e = $(q); if (e.textContent !== t) e.textContent = t; };
+    setT('#tm-t', title); setT('#tm-s', text); setT('#tm-n', (run ? Math.min(n, have + 1) : have) + '/' + n);
+    $('#tm-arc').style.strokeDasharray = (Math.max(0, Math.min(1, arc)) * 100).toFixed(1) + ' 100'; $('#tm-arc').style.opacity = arc > 0 ? '' : '0';
+    const go = $('#tm-go'), alt = $('#tm-alt');
+    go.hidden = !goT; alt.hidden = !altT;
+    if (goT && go.lastElementChild.textContent !== goT) go.lastElementChild.textContent = goT;
+    if (altT && alt.textContent !== altT) alt.textContent = altT;
+    go.disabled = other || !dlOk || (run && (DL.cancelling || DL.pausing)); alt.disabled = run && DL.cancelling;
+    // segments: one per track (grouped when there are many), filled by the share of its tracks saved
+    const segs = $('#tm-segs'), m = Math.min(n, TRK_SEGS);
+    if (segs.childElementCount !== m) { segs.textContent = ''; for (let k = 0; k < m; k++) segs.append(h('i')); }
+    segs.setAttribute('aria-valuenow', String(Math.round(arc * 100)));
+    for (let k = 0; k < m; k++) {
+      const a = Math.floor(k * n / m), z = Math.floor((k + 1) * n / m), f = vals.slice(a, z).reduce((x, v) => x + v, 0) / Math.max(1, z - a), v = (f * 100).toFixed(0) + '%';
+      if (segs.children[k].dataset.f !== v) { segs.children[k].dataset.f = v; segs.children[k].style.setProperty('--f', v); }
+    }
+    // filter chips
+    const fl = $$('#trk-flt button'), labs = { all: 'All ' + n, dl: 'Downloaded ' + have, off: 'Not saved ' + left };
+    fl.forEach(x => { if (x.textContent !== labs[x.dataset.f]) x.textContent = labs[x.dataset.f]; x.setAttribute('aria-pressed', String(x.dataset.f === trkFilter)); });
+    if (trkFilter !== 'all') trkFilterPaint();
+  }
+  function trkRowShown(i) {
+    const b = S.book, f = isModern() ? trkFilter : 'all';
+    if (!b || f === 'all') return true;
+    const saved = isLocal(b.id, i, b.secs[i] && b.secs[i].url);
+    return f === 'dl' ? saved : !saved;
+  }
+  function trkFilterPaint() {
+    const none = $('#track-list .trk-none');
+    let shown = 0;
+    trackRows.forEach((r, i) => { if (!r) return; const v = trkRowShown(i); if (r.row.hidden === v) r.row.hidden = !v; if (v) shown++; });
+    if (!none) return;
+    none.hidden = shown > 0 || !trackRows.length;
+    none.textContent = trkFilter === 'dl' ? 'No tracks are saved on this device yet.' : 'Every track is saved on this device.';
+  }
+  function trkMRowPaint(i) {   // second line of a row (Playing / Downloading / Waiting / Failed) and the status mark
+    const r = trackRows[i]; if (!r || !r.tst || !S.book) return;
+    const t = trackState(i), cur = i === S.sec && !OFF.on;
+    let txt = '', kind = '';
+    if (t.state === 'busy') { const p = Math.round(trkPart(t, S.secs[i]) * 100); txt = 'Downloading · ' + p + '%'; kind = 'dling'; r.stat.className = 'ds trk-spin'; r.stat.textContent = ''; r.stat.style.setProperty('--p', p + '%'); }
+    else if (t.state === 'wait') { txt = 'Waiting'; kind = 'dling'; r.stat.className = 'ds trk-wait'; r.stat.textContent = ''; r.stat.style.removeProperty('--p'); }
+    else { r.stat.style.removeProperty('--p'); if (t.state === 'fail') { txt = 'Failed · tap to retry'; kind = 'bad'; r.stat.textContent = ''; r.stat.dataset.ic = 'dl'; r.stat.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-m-download"/></svg>'; } }
+    { const u = r.stat.querySelector('use'); if (u && u.getAttribute('href') === '#i-m-download') u.setAttribute('href', '#i-m-arrowd'); }   // Modern: a plain arrow inside the circle
+    if (cur && !kind) {
+      const d = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : +S.durs[i] || 0, lf = Math.max(0, d - (audio.currentTime || 0)) / (P.speed || 1);
+      txt = (audio.paused ? 'Paused' : 'Playing') + (d ? ' · ' + fmt(lf) + ' left' : ''); kind = 'play';
+    }
+    if (r.tst.textContent !== txt) r.tst.textContent = txt;
+    r.tst.hidden = !txt; if (r.tst.dataset.k !== kind) r.tst.dataset.k = kind;
+    r.row.classList.toggle('is-dling', kind === 'dling');
+    if (trkFilter !== 'all') { const v = trkRowShown(i); if (r.row.hidden === v) { r.row.hidden = !v; trkFilterPaint(); } }
   }
   function trkOffPaint() {   // offline and only some chapters saved: the banner "3 of 10 chapters are on this device. ..." (the Download book box is hidden then)
     const box = $('#trk-off'), bar = $('#dl-bar'), b = S.book; if (!box) return;
@@ -688,7 +792,7 @@
     list.append(wrap);
     const cur = () => list.querySelectorAll('.track')[S.sec];
     const check = () => {
-      const row = cur(), bb = body.getBoundingClientRect(); if (!row || !bb.height) { btn.hidden = true; return; }   // (a closed sheet has no size)
+      const row = cur(), bb = body.getBoundingClientRect(); if (!row || row.hidden || !bb.height) { btn.hidden = true; return; }   // (a closed sheet has no size)
       const rb = row.getBoundingClientRect();
       const above = rb.bottom < bb.top + 8, below = rb.top > bb.bottom - 8;
       btn.hidden = !(above || below);

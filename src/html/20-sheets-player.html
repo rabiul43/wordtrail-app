@@ -12,11 +12,22 @@
   </div>
 </section>
 <section id="sheet-tracks" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="h-tracks">
-  <header><h2 id="h-tracks">Tracks</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <header><h2 id="h-tracks">Tracks</h2><small id="trk-sub" class="trk-sub" hidden></small><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
   <div class="body">
     <div class="trk-nav">
       <button id="b-prevtrack" class="btn small ghost" type="button" aria-label="Previous track (or restart this one)"><svg class="ic" aria-hidden="true"><use href="#i-prevtrack"/></svg>Previous</button>
       <button id="b-nexttrack" class="btn small ghost" type="button" aria-label="Next track">Next<svg class="ic" aria-hidden="true"><use href="#i-nexttrack"/></svg></button>
+    </div>
+    <div id="trk-m" class="trk-m" hidden>
+      <div class="tm-top">
+        <div class="tm-ring" role="img" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="bg" cx="32" cy="32" r="27"/><circle id="tm-arc" class="fg" cx="32" cy="32" r="27" pathLength="100"/></svg><b id="tm-n"></b></div>
+        <div class="tm-txt"><strong id="tm-t" aria-live="polite"></strong><span id="tm-s"></span></div>
+      </div>
+      <div id="tm-segs" class="tm-segs" role="progressbar" aria-label="Download progress" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="tm-acts"><button id="tm-go" class="tm-btn pri" type="button"><svg class="ic" aria-hidden="true"><use href="#i-m-download"/></svg><span></span></button><button id="tm-alt" class="tm-btn" type="button"></button></div>
+    </div>
+    <div id="trk-flt" class="trk-flt" role="group" aria-label="Show tracks" hidden>
+      <button type="button" data-f="all" aria-pressed="true"></button><button type="button" data-f="dl" aria-pressed="false"></button><button type="button" data-f="off" aria-pressed="false"></button>
     </div>
     <div id="trk-off" class="trkoff" role="status" hidden><strong></strong> <span>are on this device. The rest need internet.</span></div>
     <div id="dl-bar" class="dlbar">

@@ -129,3 +129,105 @@ html[data-design="modern"] .home-section-head .col-count { margin-left: .45rem; 
 /* Modern Home shows Book of the day under Continue listening too (the other designs hide it while a card is showing) */
 html[data-design="modern"] #recents:not([hidden]) ~ #sec-botd:not([hidden]),
 html[data-design="modern"] #sec-tod:not([hidden]) ~ #sec-botd:not([hidden]) { display: block; }
+
+/* ---------- Tracks sheet (Modern design, phones): summary card with ring + segments, filter chips, calmer rows ----------
+   Built from wordtrail-tracks-concept.png. Markup: #trk-m, #trk-flt, #trk-sub in 20-sheets-player.html (hidden attribute; the JS in
+   280-downloads-progress.js (trkMPaint, trkMRowPaint, trkFilterPaint) shows them only while isModern()). Every rule is scoped to
+   html[data-design="modern"], so Classic and Storytel-style keep the old Download book box and rows. Colours come from the theme tokens. */
+html[data-design="modern"] {
+  --trk-ok: #B8E986;
+  --trk-dim: color-mix(in srgb, var(--ink) 15%, var(--bg));
+}
+html[data-design="modern"][data-theme="sepia"], html[data-design="modern"][data-theme="white"], html[data-design="modern"][data-theme="light"] { --trk-ok: #3F7A1C; }
+html[data-design="modern"] #sheet-tracks .trk-m[hidden], html[data-design="modern"] #sheet-tracks .trk-flt[hidden], html[data-design="modern"] #sheet-tracks .trk-sub[hidden],
+html[data-design="modern"] #sheet-tracks .trk-none[hidden], html[data-design="modern"] #sheet-tracks .tst[hidden], html[data-design="modern"] #sheet-tracks .tm-btn[hidden],
+html[data-design="modern"] #sheet-tracks .track[hidden] { display: none; }
+
+/* sheet shell + header (title, sub title, round close button) */
+html[data-design="modern"] #sheet-tracks { max-height: min(88.5%, 88.5dvh); background: var(--bg); border-radius: 28px 28px 0 0; border: 1px solid color-mix(in srgb, var(--line) 55%, transparent); border-bottom: 0; }
+html[data-design="modern"] #sheet-tracks header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "t x" "s x"; align-items: center; column-gap: .75rem; row-gap: .1rem; padding: 1.6rem 1.15rem .35rem 1.15rem; background: transparent; border-bottom: 0; }
+html[data-design="modern"] #sheet-tracks header h2 { grid-area: t; font: 700 1.65rem/1.15 var(--font-display); letter-spacing: -.01em; color: var(--ink); }
+html[data-design="modern"] #sheet-tracks .trk-sub { grid-area: s; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 .72rem/1.3 var(--font-ui); color: var(--muted); }
+html[data-design="modern"] #sheet-tracks header .ib { grid-area: x; width: 2.1rem; height: 2.1rem; min-width: 0; padding: 0; background: var(--surface); border: 0; }
+html[data-design="modern"] #sheet-tracks header .ib .ic { width: 1.05rem; height: 1.05rem; }
+html[data-design="modern"] #sheet-tracks .body { gap: .8rem; padding: .35rem 1.15rem max(1.4rem, env(safe-area-inset-bottom)); }
+
+/* Previous / Next */
+html[data-design="modern"] #sheet-tracks .trk-nav { gap: .6rem; }
+html[data-design="modern"] #sheet-tracks .trk-nav .btn { min-height: 2.75rem; border-radius: var(--r-pill); background: var(--surface); border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); color: var(--ink); font: 600 .92rem var(--font-ui); box-shadow: none; }
+html[data-design="modern"] #sheet-tracks .trk-nav .btn[disabled] { opacity: .45; }
+
+/* the old Download book box and the book-progress strip give way to the card */
+html[data-design="modern"] #sheet-tracks #dl-bar, html[data-design="modern"] #sheet-tracks #trk-sum { display: none; }
+html[data-design="modern"] #sheet-tracks .trkoff { border-radius: 18px; border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: var(--surface); font-size: .85rem; }
+
+/* summary card */
+html[data-design="modern"] #sheet-tracks .trk-m { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; padding: .95rem .9rem; border-radius: 22px; border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  background: radial-gradient(110% 95% at 94% 4%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 58%), linear-gradient(160deg, color-mix(in srgb, var(--accent) 7%, var(--surface)), var(--bg) 72%); }
+html[data-design="modern"] #sheet-tracks .tm-top { position: relative; display: flex; align-items: center; gap: .85rem; min-width: 0; }
+html[data-design="modern"] #sheet-tracks .tm-ring { position: relative; flex: none; width: 60px; height: 60px; }
+html[data-design="modern"] #sheet-tracks .tm-ring svg { display: block; width: 60px; height: 60px; transform: rotate(-90deg); }
+html[data-design="modern"] #sheet-tracks .tm-ring circle { fill: none; stroke-width: 6; }
+html[data-design="modern"] #sheet-tracks .tm-ring .bg { stroke: var(--trk-dim); }
+html[data-design="modern"] #sheet-tracks .tm-ring .fg { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 0 100; transition: stroke-dasharray .35s var(--ease, ease-out); }
+html[data-design="modern"] #sheet-tracks .tm-ring b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 .82rem var(--font-ui); font-variant-numeric: tabular-nums; color: var(--ink); }
+html[data-design="modern"] #sheet-tracks .tm-txt { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: .2rem; }
+html[data-design="modern"] #sheet-tracks .tm-txt strong { font: 700 1.26rem/1.15 var(--font-display); color: var(--ink); letter-spacing: -.012em; }
+html[data-design="modern"] #sheet-tracks .tm-txt span { font: 400 .72rem/1.5 var(--font-ui); color: var(--muted); }
+html[data-design="modern"] #sheet-tracks .tm-segs { position: relative; display: flex; gap: 2px; height: 6px; }
+html[data-design="modern"] #sheet-tracks .tm-segs i { flex: 1 1 0; min-width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--accent) var(--f, 0%), var(--trk-dim) var(--f, 0%)); }
+html[data-design="modern"] #sheet-tracks .tm-acts { position: relative; display: flex; gap: .55rem; }
+html[data-design="modern"] #sheet-tracks .tm-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; height: 2.75rem; padding: 0 1.1rem; border-radius: var(--r-pill); border: 1px solid color-mix(in srgb, var(--line) 75%, transparent); background: color-mix(in srgb, var(--ink) 5%, var(--surface)); color: var(--ink); font: 700 .82rem var(--font-ui); white-space: nowrap; }
+html[data-design="modern"] #sheet-tracks .tm-btn.pri { flex: 1; min-width: 0; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+html[data-design="modern"] #sheet-tracks .tm-btn .ic { flex: none; width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html[data-design="modern"] #sheet-tracks .tm-btn:active { transform: scale(var(--press, .97)); }
+html[data-design="modern"] #sheet-tracks .tm-btn[disabled] { opacity: .5; }
+html[data-design="modern"] #sheet-tracks .tm-btn:focus-visible, html[data-design="modern"] #sheet-tracks .trk-flt button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+html[data-design="modern"] #sheet-tracks .trk-m[data-st="run"] #tm-go { background: color-mix(in srgb, var(--ink) 9%, var(--surface)); border-color: color-mix(in srgb, var(--line) 50%, transparent); color: var(--ink); }
+html[data-design="modern"] #sheet-tracks .trk-m[data-st="run"] #tm-go .ic { display: none; }
+html[data-design="modern"] #sheet-tracks .trk-m[data-st="done"] #tm-alt { flex: 1; }
+
+/* filter chips */
+html[data-design="modern"] #sheet-tracks .trk-flt { display: flex; gap: .5rem; overflow-x: auto; margin: 0 -1.15rem; padding: .05rem 1.15rem; scrollbar-width: none; }
+html[data-design="modern"] #sheet-tracks .trk-flt::-webkit-scrollbar { display: none; }
+html[data-design="modern"] #sheet-tracks .trk-flt button { flex: none; height: 2.08rem; padding: 0 .85rem; border-radius: var(--r-pill); border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); background: var(--surface); color: var(--muted); font: 500 .76rem var(--font-ui); white-space: nowrap; font-variant-numeric: tabular-nums; }
+html[data-design="modern"] #sheet-tracks .trk-flt button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+
+/* rows */
+html[data-design="modern"] #sheet-tracks .tracks { gap: .15rem; margin-top: -.25rem; }
+html[data-design="modern"] #sheet-tracks .track { position: relative; grid-template-columns: 1.5rem minmax(0, 1fr) auto; column-gap: .75rem; min-height: 3.6rem; padding: .5rem .8rem .5rem .6rem; border-radius: 18px; }
+html[data-design="modern"] #sheet-tracks .track .n { text-align: center; font-size: .82rem; color: var(--muted); }
+html[data-design="modern"] #sheet-tracks .track .tt { font: 500 .88rem/1.25 var(--font-ui); color: var(--ink); }
+html[data-design="modern"] #sheet-tracks .track .tt small { font-size: .74rem; }
+html[data-design="modern"] #sheet-tracks .track .tst { display: block; margin-top: .12rem; color: var(--muted); font-weight: 400; opacity: 1; }
+html[data-design="modern"] #sheet-tracks .track .tst[data-k="play"] { color: var(--accent); font-weight: 500; }
+html[data-design="modern"] #sheet-tracks .track .tst[data-k="bad"] { color: var(--danger); font-weight: 500; }
+html[data-design="modern"] #sheet-tracks .track.is-dling .tt { color: color-mix(in srgb, var(--ink) 72%, var(--bg)); }
+html[data-design="modern"] #sheet-tracks .track.is-dling .tst { opacity: .7; }
+html[data-design="modern"] #sheet-tracks .track .tp { display: none; }
+html[data-design="modern"] #sheet-tracks .track .lp { height: 4px; margin-top: .55rem; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+html[data-design="modern"] #sheet-tracks .track .lp > i { background: var(--accent); border-radius: inherit; }
+html[data-design="modern"] #sheet-tracks .track .n.eq { margin: 0 auto; justify-content: center; height: 1rem; gap: 3px; }
+html[data-design="modern"] #sheet-tracks .track .n.eq i { width: 4px; border-radius: 2px; }
+html[data-design="modern"] #sheet-tracks .track .n.fin { margin: 0 auto; }
+html[data-design="modern"] #sheet-tracks .track .dcol { display: flex; align-items: center; gap: .85rem; }
+html[data-design="modern"] #sheet-tracks .track .d { color: var(--muted); font-size: .76rem; }
+html[data-design="modern"] #sheet-tracks .track[aria-current="true"] { min-height: 4.7rem; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, var(--bg)), color-mix(in srgb, var(--accent) 5%, var(--bg))); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent); }
+html[data-design="modern"] #sheet-tracks .track[aria-current="true"]::before { content: ""; position: absolute; inset-inline-start: 0; top: 13%; bottom: 13%; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+html[data-design="modern"] #sheet-tracks .track[aria-current="true"] .tt { font-weight: 600; }
+
+/* the mark at the end of a row: not saved (circle + arrow), saved (green check), downloading (progress ring), waiting (dashed ring) */
+html[data-design="modern"] #sheet-tracks .track .ds { position: relative; flex: none; width: 1.3rem; height: 1.3rem; margin: 0; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; }
+html[data-design="modern"] #sheet-tracks .track .ds::after { content: ""; position: absolute; inset: -.55rem; }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic { margin: 0; width: 1.3rem; height: 1.3rem; background: transparent; opacity: 1; }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.off { border: 1.5px solid color-mix(in srgb, var(--muted) 70%, transparent); color: var(--muted); }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.off .ic { width: .72rem; height: .72rem; stroke-width: 2.2; }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.ok { color: var(--trk-ok); }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.ok .ic { width: 1.3rem; height: 1.3rem; stroke-width: 1.9; }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.bad { border: 1.5px solid var(--danger); color: var(--danger); }
+html[data-design="modern"] #sheet-tracks .track .ds.btn-ic.bad .ic { width: .72rem; height: .72rem; stroke-width: 2.2; }
+html[data-design="modern"] #sheet-tracks .track .ds.trk-spin { display: block; background: conic-gradient(var(--accent) var(--p, 0%), color-mix(in srgb, var(--ink) 14%, transparent) 0); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px)); }
+html[data-design="modern"] #sheet-tracks .track .ds.trk-wait { display: block; border: 1.5px dashed color-mix(in srgb, var(--muted) 60%, transparent); }
+html[data-design="modern"] #sheet-tracks .track .ds.off-st { width: auto; height: auto; border-radius: 0; }   /* offline: "On device" / "Needs internet" keep their words */
+html[data-design="modern"] #sheet-tracks .track .ds.off-st.ok { color: var(--trk-ok); }
+html[data-design="modern"] #sheet-tracks .trk-none { padding: 1.4rem 1rem; text-align: center; color: var(--muted); font-size: .85rem; border: 1px dashed var(--line); border-radius: 18px; }

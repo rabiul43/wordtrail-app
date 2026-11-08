@@ -85,6 +85,11 @@
     $('#dl-go').addEventListener('click', () => { if (DL.running) dlCancel(); else dlStart(); });
     { const dh = $('#b-dl-hint'); if (dh) dh.addEventListener('click', () => { hideDlHint(); dlStart(); }); }
     $('#dl-rm').addEventListener('click', dlRemove);
+    /* Tracks sheet, Modern design: the summary card and filter chips (hidden in the other designs; see trkMPaint in 280) */
+    const trkMine = () => DL.running && S.book && DL.id === String(S.book.id);
+    $('#tm-go').addEventListener('click', () => { if (trkMine()) dlPause(); else dlStart(); });
+    $('#tm-alt').addEventListener('click', () => { if (trkMine()) dlCancel(); else dlRemove(); });
+    $$('#trk-flt button').forEach(x => x.addEventListener('click', () => { trkFilter = x.dataset.f; trkMPaint(); trkFilterPaint(); const b = $('#sheet-tracks .body'); if (b && b._trkJump) b._trkJump(); }));
     window.addEventListener('beforeunload', e => { if (DL.running) { e.preventDefault(); e.returnValue = ''; } });
     $('#b-textsync').addEventListener('click', () => openSheet('sheet-text'));
     $('#btn-howto').addEventListener('click', () => openSheet('sheet-howto'));
