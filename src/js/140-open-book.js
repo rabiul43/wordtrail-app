@@ -24,12 +24,12 @@
       } catch (e) { /* attachText will retry and report */ }
     })();
   }
-  let listing = false;
+  let listing = false, listingId = null, listingAt = 0;   // listingAt: a stuck request must never block the Listen button for good
   async function openBook(b, opts) {   // opts.play: start the narration as soon as the book opens (the Listen button)
     if (offBlock(b)) return;
     const autoplay = !!(opts && opts.play === true);
     RC.prev = ((P.recents || []).find(r => String(r.id) === String(b.id)) || {}).ts || 0;   // last listened, read before persist() stamps it
-    if (listing && !b.secs.length) return;
+    if (listing && !b.secs.length && String(listingId) === String(b.id) && Date.now() - listingAt < 25000) return;   // same book already loading: ignore the double tap (but only for 25 s)
     if (DET.book && String(DET.book.id) !== String(b.id)) { DET.book = null; DET.author = null; DET.rv = false; DET.stack = []; $('#detail').textContent = ''; }
     else if (DET.book) DET.stale = true;
     const asked = b;
@@ -38,16 +38,19 @@
     if (!b.secs.length) { const c = await idb.get('b:' + b.id); if (c && c.secs && c.secs.length) b = c; }
     if (!b.secs.length) {
       // Show the player straight away; the track list and the text load behind it.
-      listing = true;
-      startOpen(b.title, false);
-      audio.pause();
-      el.title.textContent = b.title; el.sub.textContent = b.authors || '';
-      el.page.textContent = ''; el.page.append(loadingNote());
-      showView('player');
-      const fp = fetchFull(b); // first: it registers the combined request that prefetchText then reuses
-      prefetchText(b);
-      try { const full = await fp; if (full) b = full; } catch (e) { failure = e; }
-      listing = false;
+      listing = true; listingId = b.id; listingAt = Date.now();
+      try {
+        startOpen(b.title, false);
+        audio.pause();
+        el.title.textContent = b.title; el.sub.textContent = b.authors || '';
+        el.page.textContent = ''; el.page.append(loadingNote());
+        showView('player');
+        const fp = fetchFull(b); // first: it registers the combined request that prefetchText then reuses
+        try { prefetchText(b); } catch (e) { /* the text is fetched again later */ }
+        const lim = new Promise((_, rej) => setTimeout(() => rej(new Error('The track list took too long')), 30000));
+        try { const full = await Promise.race([fp, lim]); if (full) b = full; } catch (e) { failure = e; }
+      } catch (e) { failure = e; }
+      finally { listing = false; }
     } else if (!OP.active) startOpen(b.title, false);
     if (!b.secs.length) {
       endOpen(); showView('home'); restoreBack();
