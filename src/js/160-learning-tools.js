@@ -153,6 +153,7 @@
   /* g: the old button, 0 again, 1 good, 2 easy. The scheduler (148) works out ease, interval, due, counters and stage. */
   function srsGrade(w, g) {
     const now = Date.now();
+    try { LL.review(g >= 1); } catch (e) { /* learning log (148b) not loaded */ }
     return WS.update(w, t => SRS.review(t, SRS.fromOldGrade(g), now, { kind: 'rec', tz: -new Date().getTimezoneOffset() }));
   }
   function vocDue() { const n = myWords().filter(srsDue).length; $('#vw-due').textContent = n ? '(' + n + ')' : ''; return n; }

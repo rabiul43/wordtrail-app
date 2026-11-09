@@ -275,6 +275,7 @@
     const k = dayKey(), d = ST.days[k] || (ST.days[k] = { s: 0, w: 0 });
     const before = d.s;
     d.s += ds / rate; d.w += ds * stWps();
+    try { LL.time(ds / rate); } catch (e) { /* learning log (148b) not loaded */ }   // in memory only; written once a minute
     if (P.calm !== true && ST.goal > 0 && before < ST.goal * 60 && d.s >= ST.goal * 60) { buzz('goal'); toast('Daily goal reached. Nice work!', 4000); }
     stDirty = true;
     if (now - stLastSave > 15000) stSave();

@@ -82,6 +82,7 @@
     }
     function grade(w, ok, now, kind, verdict) {
       const gr = RT.grading(kind || 'fill', verdict || (ok ? 'ok' : 'no'));
+      try { LL.review((verdict || (ok ? 'ok' : 'no')) !== 'no'); } catch (e) { /* learning log (148b) not loaded */ }
       return WS.update(w, t => SRS.review(t, gr.g, now, { kind: gr.kind, tz: -new Date().getTimezoneOffset() }));
     }
 

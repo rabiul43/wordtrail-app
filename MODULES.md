@@ -31,8 +31,8 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 239 | position recovery |
 | `070-network-data.js` | 647 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
-| `080-ui-shell-favourites.js` | 392 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
-| `090-synced-stats-book-search.js` | 751 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
+| `080-ui-shell-favourites.js` | 399 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
+| `090-synced-stats-book-search.js` | 752 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 235 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
@@ -48,12 +48,12 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `133-open-progress-saved-state.js` | 266 | opening progress, combined /book request, saved state of a book, heartbeat |
 | `134-version-picker.js` | 271 | in-player version picker, 20-second sample by another reader, moving the position to the new recording |
 | `135-ratings.js` | 499 | Ratings and one-line reviews: 1-5 stars and an optional 140-character review per signed-in user per book, the average, star breakdown and latest reviews on the book page, `ratePrompt` for the Finish card, and the per-session ratings summary for tiles and lists (`rtSumLoad`, `rtInfo`, `rtChipText`), `rtCmp` (order by rating, used by the Top rated sorts and the minimum-rating filter in `100`), the Account-tab lists "Your ratings" and "Finished, not rated yet" (`renderMyRatings`; kept in `wt:myrt`, synced), the All reviews page (`openReviews`, `drawReviews`; a layer on the book page via `DET.rv`), and the review menu (report sheet `#sheet-report`, `rtReport`; edit/delete own review). Firestore `ratings/{bookId}` (rules in `firebase/firestore.rules`). Uses `acLoad`, `acInfo`, `acSignIn`, `acDb` from `295` |
-| `140-open-book.js` | 891 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries, the "text isn't on Project Gutenberg" card (`attachText`; `textSourceLink` finds LibriVox's text link: the book's own `textUrl`, else `details/<id div 1000>.json` key `s`; Step 3: `tryArchiveText` downloads archive.org's `_djvu.txt` only on a tap, `archiveCheck` refuses wrong or doubtful texts, `useRaw` (290) loads it like an own text, `srcNoteNode` is the note on the page), text made from the speech-recognition timing file (`asr*`, `tryAsrText`; Step 2) |
-| `150-player-reader.js` | 771 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
-| `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
-| `166-word-find.js` | 198 | My Words search, filters and collections (`WF`): search box (word, sentence, note, through `WS.search`), pills All / Hard / Due / one per book, collections (create, rename, add and remove words; names of empty ones in `wt:wcols`, synced, backed up), a Collections button on every card (`WC.render` takes an optional decorator), and the sticky "Practise N due words" button that opens the Review. `vocRender` (160) calls `WF.show` and `WF.render`. Styles `94d-word-find.css`. Test: `node tools/wordfind_check.js` |
+| `140-open-book.js` | 1034 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries, the "text isn't on Project Gutenberg" card (`attachText`; `textSourceLink` finds LibriVox's text link: the book's own `textUrl`, else `details/<id div 1000>.json` key `s`; Step 3: `tryArchiveText` downloads archive.org's `_djvu.txt` only on a tap, `archiveCheck` refuses wrong or doubtful texts, `useRaw` (290) loads it like an own text, `srcNoteNode` is the note on the page), text made from the speech-recognition timing file (`asr*`, `tryAsrText`; Step 2) |
+| `150-player-reader.js` | 772 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
+| `160-learning-tools.js` | 347 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
+| `166-word-find.js` | 199 | My Words search, filters and collections (`WF`): search box (word, sentence, note, through `WS.search`), pills All / Hard / Due / one per book, collections (create, rename, add and remove words; names of empty ones in `wt:wcols`, synced, backed up), a Collections button on every card (`WC.render` takes an optional decorator), and the sticky "Practise N due words" button that opens the Review. `vocRender` (160) calls `WF.show` and `WF.render`. Styles `94d-word-find.css`. Test: `node tools/wordfind_check.js` |
 | `167b-review-types.js` | 78 | Review lesson question types, pure functions (`RT`): `level`/`pick` choose meaning match, fill or typed recall from the word's level, `bank`, `judge` (typed answer: ok / close / no), `grading`, `summary`. Test: `node tools/review_lesson_check.js` |
-| `168-review-lesson.js` | 253 | Review lesson (`RL`): full-screen session opened by "Practise N due words" (`166`), three question types, feedback panel, summary; grades go to `SRS` through `WS.update`. The old Review tab stays as the fallback. Styles `94f-review-lesson.css` |
+| `168-review-lesson.js` | 255 | Review lesson (`RL`): full-screen session opened by "Practise N due words" (`166`), three question types, feedback panel, summary; grades go to `SRS` through `WS.update`. The old Review tab stays as the fallback. Styles `94f-review-lesson.css` |
 | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
 | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
 | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |
@@ -68,16 +68,16 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `250-characters.js` | 501 | characters |
 | `260-audio-effects.js` | 420 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 317 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
-| `270-sheets-nextup-back.js` | 295 | sheets, Pre-sync, Next up, Back button / swipe-back |
+| `270-sheets-nextup-back.js` | 296 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 819 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `281-book-download-card.js` | 215 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `282-library-hub.js` | 145 | My Library on phones (under 700px): the Downloads tab is not in the bottom bar; My Library opens on a list of pages (Saved, Downloads, Following, Rated, Synced books) with counts, `libHubDraw`, `phoneUI`, `libHubTitle`. State `shelfHub` / `shelfHubNext` is in `080`; styles `99e-library-hub.css` |
-| `290-backup-maintenance.js` | 397 | Backup and restore, sync dashboard |
-| `295-account-sync.js` | 586 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
+| `290-backup-maintenance.js` | 398 | Backup and restore, sync dashboard |
+| `295-account-sync.js` | 607 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |
 | `296-desktop-bar.js` | 64 | Desktop only (from 1100px wide, styles in `98-desktop-layout.css`): the controls of the bottom player bar on Home (back/forward 15 s click the dock buttons, the seek bar drives `#seek`, `dtSeekSync` is called from `updateSeekUI` in `150`) and the track list beside the text in the player (`dtTracks`, click = `goTrack`). Also the collapse / expand button for that left panel (`dtSide`, `dtSideToggle`, the `[` key, saved as `wt:dt-side`). Optional: errors are swallowed so the app runs without it |
 | `298-pwa.js` | 86 | Registers the service worker (`src/pwa/sw.js`) after the page loads, and keeps the browser/status-bar colour (`theme-color`) equal to the current theme's background |
-| `300-wiring.js` | 829 | wiring |
+| `300-wiring.js` | 830 | wiring |
 | `999-app-close.js` | 2 | Closes the app closure `})();` |
 
 ## Sound files (`src/js/sound/`)
