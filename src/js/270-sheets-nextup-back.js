@@ -225,7 +225,7 @@
   /* The search results belong to the Library home, so they only count while that tab is showing. (The Filters sheet is a .sheet and counts as one.) */
   const searchOn = () => curTab === 'library' && !!el.results && !el.results.hidden;
   function histLayers() {
-    return OB.layers() + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
+    return OB.layers() + (RL.on ? 1 : 0) + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
       ((DET.book || DET.author) ? 1 + (DET.stack || []).length : 0) + (seeOpen ? 1 : 0) +
       (spOpen ? 1 : 0) + (spOpen && SP.mode === 'results' ? 1 : 0) + (curTab === 'shelf' && phoneUI() && !shelfHub ? 1 : 0) +   // a My Library page opened from its list (phones)
         // the Search page, and its result list on top of it
@@ -233,7 +233,8 @@
   }
   function histBack() {
     try {
-      if (OB.layers()) OB.back();
+      if (RL.on) RL.close();   // the Review lesson sits above everything
+      else if (OB.layers()) OB.back();
       else if ($$('.sheet').some(s => !s.hidden)) sheetBack();   // from a Settings sub-page, back goes to Settings home
       else if (NR.on) nrClose();
       else if (!el.player.hidden) $('#btn-back').click();

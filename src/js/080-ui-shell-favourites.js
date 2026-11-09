@@ -232,7 +232,7 @@
   let shelfMode = 'saved';
   let shelfHub = false, shelfHubNext = false;   // phones: My Library shows its list of pages (shelfHub); shelfHubNext asks the next showTab('shelf') to open on that list
   /* Hooks into later files (account-sync, ratings), filled in when those files load, so this file does not name them. Until then: a guest, nothing to draw. */
-  const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {} };
+  const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {}, top: () => false, toBooks: () => {} };
   /* Account-only pages stay out of sight for guests. Rated needs an account (ratings live in it). Following is kept on the device,
      so it stays visible for a guest who already follows an author. A page that is no longer available falls back to Saved. */
   function shelfChips() {
@@ -246,6 +246,13 @@
   function applyShelfMode() {
     shelfChips();
     const phone = phoneUI(), hub = phone && shelfHub;
+    let learn = false; try { learn = shelfHooks.top(hub); } catch (e) { /* Learn switch not ready: Books */ }
+    if (learn) {   // Learn (169): none of the Books pages is shown; the switch and Learn panel are drawn by shelfHooks.top
+      ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });
+      $('#shelf-hub').hidden = true; $('#shelf-back').hidden = true; $('#shelf-seg').hidden = true;
+      $('#shelf-title').textContent = 'My Library'; $('#shelf-sub').textContent = ''; $('#shelf').dataset.mode = 'learn';
+      return;
+    }
     $('#shelf-hub').hidden = !hub; $('#shelf-back').hidden = !(phone && !hub);
     if (hub) {   // phones: the list of pages (282) and nothing else
       ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });
@@ -274,7 +281,7 @@
     $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
   function showTab(t, keep) {
-    if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; }
+    if (t === 'synced') { t = 'shelf'; shelfMode = 'ra'; try { shelfHooks.toBooks(); } catch (e) { /* switch not ready */ } }
     if (t === 'downloads') { t = 'shelf'; shelfMode = 'dl'; }
     if (t === 'collections' && curTab === 'collections' && !keep && COL.open) COL.open = null; // tapping the tab again goes back to the shelves
     srchTab = false;

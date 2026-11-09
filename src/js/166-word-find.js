@@ -184,6 +184,7 @@
       W.bar = h('div', { class: 'wf', id: 'wf-bar' }, q, W.rowF, W.rowC, W.colbar, W.panel);
       list.before(W.bar);
       W.go = h('button', { class: 'wl-btn wl-btn--primary wl-btn--block wf__go', type: 'button', id: 'wf-go', onclick: () => {
+        if (RL.start()) return;   // the Review lesson (168); the old Review tab below stays as the fallback
         VOC.tab = 'review'; const sc = list.closest('.body'); if (sc) sc.scrollTop = 0; vocRender();
       } });
       W.dock = h('div', { class: 'wf__dock' }, W.go); list.after(W.dock);

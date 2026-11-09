@@ -1,0 +1,36 @@
+/* Review lesson: full-screen session (rl-). Built on the learning UI kit (94-learn-ui.css): chunky buttons, 2px cards, thick progress bar, bottom panel.
+   Only .rl* classes. Remove this file, 168-review-lesson.js and their build.py lines (and the RL calls in 166 and 270) to go back. */
+.rl { position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; overflow: hidden; color: var(--ink); background: var(--bg); font-family: var(--font-ui); }
+.rl[hidden] { display: none; }
+.rl__top { display: flex; align-items: center; gap: var(--s-3); box-sizing: border-box; width: min(100%, 36rem); margin: 0 auto; padding: calc(var(--s-3) + env(safe-area-inset-top, 0px)) var(--s-4) var(--s-3); }
+.rl__x { flex: none; width: 44px; height: 44px; padding: 0; font-size: 1.4rem; line-height: 1; color: var(--muted); background: none; border: 0; border-radius: var(--r-ctl); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rl__x:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+.rl__bar { flex: 1 1 auto; width: auto; }
+.rl__scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.rl__main { display: grid; gap: var(--s-4); box-sizing: border-box; width: min(100%, 36rem); margin: 0 auto; padding: var(--s-3) var(--s-4) var(--s-5, 1.5rem); }
+.rl__title { margin: 0; font: 800 clamp(1.5rem, 6vw, 1.9rem)/1.2 var(--font-ui); letter-spacing: -.01em; }
+.rl__title:focus { outline: none; }
+.rl__src { margin: calc(var(--s-2) * -1) 0 0; font: 500 var(--lead)/1.35 var(--font-ui); color: var(--muted); }
+.rl__sent { padding: var(--s-5, 1.5rem) var(--s-4); }
+.rl__s { margin: 0; font: 500 clamp(1.35rem, 5.4vw, 1.7rem)/1.9 var(--font-display); overflow-wrap: anywhere; }
+.rl__blank { display: inline-block; min-width: 5.5rem; min-height: 1.4em; margin: 0 .15em; padding: 0 .35rem; vertical-align: bottom; text-align: center; font-weight: 700; line-height: 1.3; color: var(--accent); border-bottom: 3px solid var(--accent); }
+.rl__blank.is-ok { color: var(--wl-ok-text); border-bottom-color: var(--wl-ok); }
+.rl__hintslot:empty { display: none; }
+.rl__hint { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-4); color: var(--muted); }
+.rl__lab { margin: var(--s-2) 0 calc(var(--s-2) * -1); font: 700 var(--small)/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.rl__bank { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.rl__opt { width: auto; min-width: 5rem; min-height: 56px; padding: .7rem 1.4rem; text-align: center; font: 700 1.2rem/1.2 var(--font-ui); border-radius: var(--r-xl); }
+.rl__opt[aria-disabled="true"] { cursor: default; }
+.rl__score { margin: 0; font: 800 1.6rem/1.2 var(--font-display); color: var(--accent); }
+.rl__foot { flex: none; box-sizing: border-box; width: 100%; padding: var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom, 0px)); }
+.rl__foot > .wl-btn { max-width: 36rem; margin: 0 auto; }
+.rl__foot:has(> .rl__panel) { padding: 0; }
+.rl__foot > .rl__panel { width: min(100%, 36rem); margin: 0 auto; }
+@media (prefers-reduced-motion: reduce) { .rl .wl-panel { animation: none; } .rl .wl-progress__fill { transition: none; } }
+/* Review lesson, more question types: the meaning card, the typed answer, the short wait for a meaning */
+.rl__s--def { font-size: clamp(1.15rem, 4.6vw, 1.4rem); line-height: 1.6; }
+.rl__wait { padding: var(--s-4); }
+.rl__input { box-sizing: border-box; width: 100%; min-height: 56px; padding: .6rem 1rem; font: 700 1.3rem/1.3 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); box-shadow: 0 3px 0 var(--line); border-radius: var(--r-xl); }
+.rl__input:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); border-color: var(--accent); }
+.rl__input.is-correct { color: var(--wl-ok-text); background: var(--wl-ok-soft); border-color: var(--wl-ok); }
+.rl__input.is-wrong { color: var(--wl-bad-text); background: var(--wl-bad-soft); border-color: var(--err); }

@@ -1,0 +1,9 @@
+/* My Words notes, hard button and note box (wn-). Built on the learning UI kit (94-learn-ui.css) and 94d-word-find.css.
+   Only .wn* classes. Remove this file, 167-word-notes-export.js and their build.py lines (and the WN calls in 166, 160, 300) to go back. */
+.wn { display: grid; gap: .6rem; cursor: default; }
+.wn__row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wn__box { display: grid; gap: .6rem; }
+.wn__box[hidden] { display: none; }
+.wn__ta { resize: vertical; min-height: 5.5rem; }
+.wn__btns { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wn__hard[aria-pressed="true"] { color: var(--ink); background: var(--accent-soft); border-color: var(--accent); }

@@ -330,6 +330,13 @@
 
 <main id="shelf" class="view home" hidden>
   <div class="tab-head"><button id="shelf-back" class="ib shelf-back" type="button" aria-label="Back to My Library" hidden><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg></button><h1 id="shelf-title">My Library</h1><p id="shelf-sub"></p></div>
+  <!-- Books | Learn switch (169-learn-switch.js). Books is everything below; Learn is #shelf-learn at the end -->
+  <div id="shelf-top" class="shelf-top" hidden>
+    <div class="wl-seg" role="group" aria-label="My Library section">
+      <button type="button" class="wl-seg__btn" data-t="books" aria-pressed="true">Books</button>
+      <button type="button" class="wl-seg__btn" data-t="learn" aria-pressed="false">Learn <span id="sht-badge" class="wl-badge" aria-hidden="true" hidden></span><span id="sht-due" class="sr-only"></span></button>
+    </div>
+  </div>
   <!-- Phones: My Library opens on this list (Saved, Downloads, ...); each row opens its page. Filled by libHubDraw (282-library-hub.js) -->
   <div id="shelf-hub" class="lh" hidden></div>
   <div id="shelf-seg" class="shelf-seg" role="group" aria-label="My Library view">
@@ -377,6 +384,7 @@
     <div id="synced-filters" class="synced-filters" role="group" aria-label="Filter synced books"></div>
     <div id="synced-list" class="synced-list"></div>
   </div>
+  <div id="shelf-learn" hidden></div>
 </main>
 
 <main id="account" class="view home" hidden></main>

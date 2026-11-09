@@ -1,0 +1,15 @@
+/* My Library: Books | Learn switch (169-learn-switch.js). Built on the learning kit (94-learn-ui.css: .wl-seg, .wl-badge).
+   Only #shelf-top and #shelf-learn. Remove this file, 169-learn-switch.js, their build.py lines and the markup in 10-body-views.html to go back. */
+.shelf-top { margin: 0 0 .9rem; }
+.shelf-top[hidden], #shelf-learn[hidden] { display: none; }
+/* chunky: the chosen side gets a solid bottom edge, as on the other learning buttons */
+.shelf-top .wl-seg__btn[aria-pressed="true"] { box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 62%, var(--wl-edge-mix, #000)); }
+.shelf-top .wl-seg__btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* the gold badge keeps the kit's colours; with Learn chosen the kit swaps them, so it stays readable on the gold side */
+.shelf-top .wl-badge[hidden] { display: none; }
+:root[data-calm] .shelf-top .wl-badge { display: none; }   /* Calm mode: no counts that could feel like pressure */
+:root[data-theme="contrast"] .shelf-top .wl-seg { border-color: #FFF; }
+:root[data-theme="contrast"] .shelf-top .wl-seg__btn { color: #FFF; }
+:root[data-theme="contrast"] .shelf-top .wl-seg__btn[aria-pressed="true"] { color: #000; background: #FFE600; box-shadow: none; }
+:root[data-theme="contrast"] .shelf-top .wl-badge { color: #000; background: #FFE600; outline: 1px solid #000; }
+:root[data-theme="contrast"] .shelf-top .wl-seg__btn[aria-pressed="true"] .wl-badge { color: #FFE600; background: #000; outline-color: #FFE600; }
