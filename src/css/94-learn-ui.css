@@ -1,0 +1,211 @@
+/* Learning UI kit (wl-): chunky buttons, cards, pills, thick progress bar.
+   Shared look for the learning screens. Every class starts with wl-, so no existing screen changes.
+   Uses the Midnight Library tokens from 10-base-layout.css. The only new tokens are the green "ok" colours (--wl-ok*),
+   because the app has no success colour yet. Remove this file and its build.py line to take the kit out. */
+
+:root {
+  --wl-ok: #78C99B; --wl-ok-ink: #06210F; --wl-ok-soft: #12261F; --wl-ok-text: #8FDDB0;
+  --wl-bad-soft: #2B1512; --wl-bad-text: #FF9C8E; --wl-info: #8AB4FF;
+  --wl-edge-mix: #000;           /* colour mixed into a button face to make its solid bottom edge */
+  --wl-edge: 4px;                /* depth of the bottom edge */
+}
+:root[data-theme="sepia"], :root[data-theme="white"], :root[data-theme="light"] {
+  --wl-ok: #2F7D4F; --wl-ok-ink: #FFFFFF; --wl-ok-soft: #E1EFDF; --wl-ok-text: #1F5A38;
+  --wl-bad-soft: #F8E2DD; --wl-bad-text: #8F2A1C; --wl-info: #24569F;
+}
+:root[data-theme="sepia"] { --wl-ok-soft: #E3E8C9; --wl-bad-soft: #F2DAC9; }
+:root[data-theme="contrast"] {
+  --wl-ok: #4DFF88; --wl-ok-ink: #000000; --wl-ok-soft: #001A0A; --wl-ok-text: #4DFF88;
+  --wl-bad-soft: #1F0300; --wl-bad-text: #FF8A80; --wl-info: #7DB4FF;
+  --wl-edge-mix: #666;
+}
+
+/* ---------- Buttons ---------- */
+.wl-btn {
+  --wl-bg: var(--surface-2); --wl-fg: var(--ink); --wl-bd: var(--line); --wl-ed: var(--line);
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: 48px; min-width: 44px; padding: .65rem 1.4rem; margin: 0;
+  font: 800 var(--lead)/1.2 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; text-align: center; text-decoration: none;
+  color: var(--wl-fg); background: var(--wl-bg); border: 2px solid var(--wl-bd); border-radius: var(--r-xl);
+  box-shadow: 0 var(--wl-edge) 0 var(--wl-ed);
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
+}
+.wl-btn--primary { --wl-bg: var(--accent); --wl-fg: var(--accent-ink); --wl-bd: var(--accent); --wl-ed: color-mix(in srgb, var(--accent) 62%, var(--wl-edge-mix)); }
+.wl-btn--secondary { --wl-bg: var(--surface-2); --wl-fg: var(--ink); --wl-bd: var(--line); --wl-ed: var(--line); }
+.wl-btn--ok { --wl-bg: var(--wl-ok); --wl-fg: var(--wl-ok-ink); --wl-bd: var(--wl-ok); --wl-ed: color-mix(in srgb, var(--wl-ok) 62%, var(--wl-edge-mix)); }
+.wl-btn--bad { --wl-bg: var(--err); --wl-fg: var(--err-ink); --wl-bd: var(--err); --wl-ed: color-mix(in srgb, var(--err) 62%, var(--wl-edge-mix)); }
+.wl-btn--small { --wl-edge: 3px; min-height: 44px; padding: .45rem 1rem; font-size: var(--small); border-radius: var(--r-card); }
+.wl-btn--block { display: flex; width: 100%; }
+
+@media (hover: hover) { .wl-btn:hover { filter: brightness(1.06); } }
+.wl-btn:active, .wl-btn.is-pressed { transform: translateY(var(--wl-edge)); box-shadow: 0 0 0 var(--wl-ed); filter: none; }
+
+.wl-btn:disabled, .wl-btn[aria-disabled="true"], .wl-btn.is-disabled {
+  --wl-bg: var(--surface-2); --wl-fg: var(--muted); --wl-bd: var(--line); --wl-ed: var(--line);
+  cursor: not-allowed; filter: none; opacity: .75; box-shadow: 0 var(--wl-edge) 0 var(--line); transform: none;
+}
+:root[data-theme="contrast"] .wl-btn:disabled, :root[data-theme="contrast"] .wl-btn[aria-disabled="true"], :root[data-theme="contrast"] .wl-btn.is-disabled { opacity: 1; border-style: dashed; }
+
+/* ---------- Focus ring ---------- */
+.wl-btn:focus-visible, .wl-card--tap:focus-visible, .wl-pill--tap:focus-visible, .wl-tool:focus-visible, .wl-seg__btn:focus-visible, .wl-panel__link:focus-visible {
+  outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off);
+}
+
+/* ---------- Card ---------- */
+.wl-card {
+  --wl-cbg: var(--surface); --wl-cbd: var(--line); --wl-cfg: var(--ink);
+  box-sizing: border-box; display: block; width: 100%; margin: 0; padding: var(--s-4);
+  font: 500 var(--lead)/1.35 var(--font-ui); text-align: start; color: var(--wl-cfg);
+  background: var(--wl-cbg); border: 2px solid var(--wl-cbd); border-radius: var(--r-card);
+  box-shadow: 0 3px 0 var(--wl-cbd);
+}
+.wl-card--tap {
+  min-height: 56px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.wl-card--tap:active { transform: translateY(3px); box-shadow: 0 0 0 var(--wl-cbd); }
+.wl-card.is-selected, .wl-card[aria-pressed="true"], .wl-card[aria-checked="true"] {
+  --wl-cbg: var(--accent-soft); --wl-cbd: var(--accent); --wl-cfg: var(--ink);
+}
+.wl-card.is-correct { --wl-cbg: var(--wl-ok-soft); --wl-cbd: var(--wl-ok); --wl-cfg: var(--wl-ok-text); font-weight: 700; }
+.wl-card.is-wrong { --wl-cbg: var(--wl-bad-soft); --wl-cbd: var(--err); --wl-cfg: var(--wl-bad-text); font-weight: 700; }
+.wl-card:disabled, .wl-card[aria-disabled="true"] { cursor: default; }
+
+/* ---------- Pill ---------- */
+.wl-pill {
+  box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--s-1);
+  min-height: 28px; padding: .2rem .8rem; margin: 0;
+  font: 700 var(--small)/1.2 var(--font-ui); color: var(--ink); background: var(--surface);
+  border: 2px solid var(--line); border-radius: var(--r-pill);
+}
+.wl-pill--tap { min-height: 44px; padding: .4rem 1rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.wl-pill.is-selected, .wl-pill[aria-pressed="true"] { color: var(--ink); background: var(--accent-soft); border-color: var(--accent); }
+.wl-pill.is-ok { color: var(--wl-ok-text); background: var(--wl-ok-soft); border-color: var(--wl-ok); }
+
+/* ---------- Thick progress bar (set the amount with style="--wl-p:40%") ---------- */
+.wl-progress {
+  position: relative; box-sizing: border-box; width: 100%; height: 16px; overflow: hidden;
+  background: var(--surface-2); border-radius: var(--r-pill);
+}
+.wl-progress__fill {
+  position: relative; display: block; height: 100%; width: var(--wl-p, 0%); min-width: 0; max-width: 100%;
+  background: var(--accent); border-radius: var(--r-pill);
+  transition: width var(--dur-slow) var(--ease);
+}
+.wl-progress__fill::after { /* the soft highlight stripe on top of the fill */
+  content: ""; position: absolute; left: 8px; right: 8px; top: 3px; height: 4px; border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, .35);
+}
+.wl-progress--ok .wl-progress__fill { background: var(--wl-ok); }
+:root[data-theme="contrast"] .wl-progress { background: #333; outline: 1px solid #FFFFFF; }
+:root[data-theme="contrast"] .wl-progress__fill::after { background: rgba(0, 0, 0, .35); }
+
+/* ---------- Feedback panel (bottom). Put role="status" on it; use .wl-panel--dock to fix it to the screen bottom edge as in the mock-up ---------- */
+.wl-panel {
+  --wl-pbg: var(--wl-ok-soft); --wl-pbd: var(--wl-ok); --wl-pfg: var(--wl-ok-text);
+  box-sizing: border-box; width: 100%; padding: var(--s-4); color: var(--ink);
+  background: var(--wl-pbg); border: 2px solid var(--wl-pbd); border-radius: var(--r-xl);
+  animation: wl-slide-up var(--dur-slow) var(--ease) both;
+}
+.wl-panel--bad { --wl-pbg: var(--wl-bad-soft); --wl-pbd: var(--err); --wl-pfg: var(--wl-bad-text); }
+.wl-panel--dock {
+  border-bottom-width: 0; border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding-bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+}
+.wl-panel__head { display: flex; align-items: center; gap: var(--s-3); }
+.wl-panel__icon { font-size: 2rem; line-height: 1; }
+.wl-panel__title { margin: 0; font: 800 var(--h2)/1.2 var(--font-ui); color: var(--wl-pfg); }
+.wl-panel__text { margin: var(--s-2) 0 0; font: 500 var(--lead)/1.4 var(--font-ui); color: var(--ink); }
+.wl-panel__link {
+  display: inline-flex; align-items: center; min-height: 44px; margin: var(--s-1) 0 0; padding: 0; cursor: pointer;
+  font: 800 var(--small)/1.2 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+  color: var(--wl-pfg); background: none; border: 0;
+}
+.wl-panel .wl-btn { margin-top: var(--s-3); }
+@keyframes wl-slide-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- Stat tile (value on top, small label under it) ---------- */
+.wl-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: var(--s-3); }
+.wl-stat {
+  --wl-sc: var(--ink);
+  box-sizing: border-box; display: flex; flex-direction: column; gap: 2px; min-width: 0; margin: 0; padding: var(--s-3) var(--s-4);
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-card); box-shadow: 0 3px 0 var(--line);
+}
+.wl-stat__value { display: flex; align-items: center; gap: var(--s-1); font: 800 var(--h2)/1.2 var(--font-ui); color: var(--wl-sc); font-variant-numeric: tabular-nums; }
+.wl-stat__label { font: 600 var(--label)/1.3 var(--font-ui); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.wl-stat--accent { --wl-sc: var(--accent); }
+.wl-stat--ok { --wl-sc: var(--wl-ok-text); }
+.wl-stat--info { --wl-sc: var(--wl-info); }
+
+/* ---------- Tool tile grid (two columns on a phone, more when there is room) ---------- */
+.wl-tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: var(--s-3); }
+.wl-tool {
+  box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-1);
+  min-width: 0; min-height: 88px; margin: 0; padding: var(--s-3) var(--s-4);
+  font: 700 var(--small)/1.25 var(--font-ui); text-align: start; color: var(--ink);
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-card); box-shadow: 0 3px 0 var(--line);
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+.wl-tool__icon { font-size: 1.5rem; line-height: 1; }
+.wl-tool__sub { font-weight: 500; font-size: var(--label); color: var(--muted); }
+.wl-tool:active { transform: translateY(3px); box-shadow: 0 0 0 var(--line); }
+.wl-tool.is-selected, .wl-tool[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
+.wl-tool:disabled, .wl-tool[aria-disabled="true"] { cursor: not-allowed; box-shadow: 0 3px 0 var(--line); transform: none; }
+.wl-tool:disabled .wl-tool__icon, .wl-tool[aria-disabled="true"] .wl-tool__icon { opacity: .6; }
+.wl-tool:disabled, .wl-tool[aria-disabled="true"] { color: var(--muted); }
+
+/* ---------- Segmented switch with an optional badge (role="tablist" + aria-selected, or aria-pressed) ---------- */
+.wl-seg { box-sizing: border-box; display: flex; gap: 4px; width: 100%; margin: 0; padding: 4px; background: var(--surface-2); border: 2px solid var(--line); border-radius: var(--r-pill); }
+.wl-seg__btn {
+  box-sizing: border-box; flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; padding: .4rem .9rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  font: 800 var(--small)/1.2 var(--font-ui); letter-spacing: .04em; color: var(--muted);
+  background: transparent; border: 0; border-radius: var(--r-pill); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+@media (hover: hover) { .wl-seg__btn:hover { color: var(--ink); } }
+.wl-seg__btn[aria-selected="true"], .wl-seg__btn[aria-pressed="true"], .wl-seg__btn.is-selected { color: var(--accent-ink); background: var(--accent); }
+.wl-badge {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-width: 1.4rem; height: 1.4rem; padding: 0 .4rem;
+  font: 800 .75rem/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--accent-ink); background: var(--accent); border-radius: var(--r-pill);
+}
+.wl-seg__btn[aria-selected="true"] .wl-badge, .wl-seg__btn[aria-pressed="true"] .wl-badge, .wl-seg__btn.is-selected .wl-badge { color: var(--accent); background: var(--accent-ink); }
+
+/* ---------- Streak chip (calm: a day without a streak is just muted, never red) ---------- */
+.wl-streak {
+  box-sizing: border-box; display: inline-flex; align-items: center; gap: var(--s-1); min-height: 32px; margin: 0; padding: .2rem .8rem;
+  font: 800 var(--lead)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--accent);
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-pill);
+}
+.wl-streak__icon { font-size: 1.1em; line-height: 1; }
+.wl-streak.is-off { color: var(--muted); }
+.wl-streak.is-off .wl-streak__icon { filter: grayscale(1); opacity: .7; }
+
+/* ---------- Progress ring (CSS only; set the amount with style="--wl-p:40%"; size with --wl-ring-size; hole colour with --wl-ring-hole) ---------- */
+.wl-ring {
+  --wl-ring-size: 56px; --wl-ring-w: 7px; --wl-ring-hole: var(--surface); --wl-ring-c: var(--accent);
+  position: relative; box-sizing: border-box; display: inline-grid; place-items: center; flex: none;
+  width: var(--wl-ring-size); height: var(--wl-ring-size); border-radius: 50%;
+  background: conic-gradient(var(--wl-ring-c) var(--wl-p, 0%), var(--surface-2) 0);
+}
+.wl-ring::before { content: ""; position: absolute; inset: var(--wl-ring-w); border-radius: 50%; background: var(--wl-ring-hole); }
+.wl-ring__label { position: relative; font: 800 var(--small)/1 var(--font-ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.wl-ring--ok { --wl-ring-c: var(--wl-ok); }
+:root[data-theme="contrast"] .wl-ring { outline: 1px solid #FFFFFF; }
+
+/* ---------- Preview layout (Settings > Developer > Learn UI preview) ---------- */
+.wl-prev { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1 1 100%; gap: var(--s-4); min-width: 0; }
+.wl-prev > section { min-width: 0; }
+.wl-prev-h { margin: 0 0 var(--s-2); font: 800 var(--label)/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.wl-prev-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+.wl-prev-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-3); }
+.wl-prev-demo { padding: var(--s-4); background: var(--bg); border: 2px dashed var(--line); border-radius: var(--r-card); }
+.wl-prev input[type="range"] { flex: 1 1 8rem; min-height: 44px; accent-color: var(--accent); }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .wl-btn, .wl-card--tap, .wl-tool, .wl-seg__btn, .wl-progress__fill { transition: none; }
+  .wl-panel { animation: none; }
+}

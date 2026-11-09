@@ -395,6 +395,11 @@
   <div class="sp" data-sp="dev" hidden>
     <div class="dev-search"><input id="dev-q" type="search" placeholder="Search developer settings" aria-label="Search developer settings" autocomplete="off"></div>
     <p id="dev-none" class="dev-none" hidden>No settings match.</p>
+    <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-code"/></svg>Learn UI preview</h3>
+      <details id="wl-prev"><summary>Show components</summary>
+        <div class="row"><p class="help" style="flex:1 1 100%">Shows every component of the learning screens. Developer use only.</p><div class="wl-prev" id="wl-prev-body"></div></div>
+      </details>
+    </div>
     <div class="synccard" id="sct-card"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-code"/></svg>Scene test</h3>
       <p class="help">Checks the scene detection against sample paragraphs with known answers. Paste your own cases into the box (the format is explained at the top), then run. A starting baseline is built in (it has no wrong guesses). Save your own once you have reviewed a result; later runs show what is newly wrong. Wrong guesses count against a batch of new words; missed and late do not. Cases stay on this device.</p>
       <textarea id="sct-src" rows="12" spellcheck="false" autocapitalize="none" autocomplete="off" aria-label="Scene test cases" style="width:100%;box-sizing:border-box;font:12px/1.4 ui-monospace,Menlo,monospace;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:.6rem"></textarea>
