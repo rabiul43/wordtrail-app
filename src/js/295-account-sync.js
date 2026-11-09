@@ -209,6 +209,21 @@
   }
 
   const acKeyOf = x => typeof x === 'object' && x ? (x.id !== undefined ? String(x.id) : x.w !== undefined ? String(x.w) : JSON.stringify(x)) : String(x);
+  /* Saved words from two devices (a = this device, b = the cloud). The same word (any case) becomes one entry: WM.merge joins the places
+     you met it, keeps the more recent review schedule and keeps the entry small (see 146-word-model.js). Words only on one side stay as
+     they are. Newest saved first, at most 2000. A word removed on one device comes back when the other device still has it. */
+  function acWords(A, B) {
+    const at = new Map(), out = [], odd = new Set();
+    [].concat(A, B).forEach(x => {
+      if (!x || typeof x !== 'object' || typeof x.w !== 'string') { odd.add(JSON.stringify(x)); return; }
+      const q = x.w.trim().toLowerCase(), i = at.get(q);
+      if (i === undefined) { at.set(q, out.length); out.push(x); return; }
+      const o = out[i];
+      out[i] = WM.merge(o, x) || ((x.ts || 0) > (o.ts || 0) ? x : o);
+    });
+    out.sort((x, y) => (y.ts || 0) - (x.ts || 0));   // stable
+    return out.concat([...odd].map(j => JSON.parse(j))).slice(0, 2000);
+  }
   function acUnion(k, a, b) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
     let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
     if (k === 'wt:stats') {
@@ -226,6 +241,7 @@
       return JSON.stringify(out);
     }
     if (!Array.isArray(A) || !Array.isArray(B)) return null;
+    if (k === 'wt:words') return JSON.stringify(acWords(A, B));
     const map = new Map();
     [].concat(A, B).forEach(x => { const q = k === 'wt:recent-q' ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
     let out = [...map.values()];
@@ -242,11 +258,12 @@
        wt:book:*            the furthest position (track, then time); the other fields come from the newer copy
        wt:lev:*             both copies' entries (same track: the newer copy's)
      wt:bm:* is one bookmark per book, so the newer copy still wins there. */
-  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k);
+  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words';
   const acIsObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
   function acResolve(k, a, b, mineNewer) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
     let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
     const N = mineNewer ? A : B, O = mineNewer ? B : A; // newer copy, older copy
+    if (k === 'wt:words') return Array.isArray(A) && Array.isArray(B) ? JSON.stringify(acWords(A, B)) : null;
     if (/^wt:(clips|hl):/.test(k)) {
       if (!Array.isArray(A) || !Array.isArray(B)) return null;
       const map = new Map(); O.concat(N).forEach(x => map.set(acKeyOf(x), x));

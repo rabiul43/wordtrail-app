@@ -35,6 +35,7 @@
       let v = d.ls[k];
       if (!bkShapeOk(k, v)) { skipped++; return; }
       if (k === 'wt:prefs') v = bkCleanPrefs(v);
+      if (k === 'wt:words') { const r = WM.tidyList(v, 2000); skipped += r.skipped; v = r.list; }   // old or new word shape: junk dropped, doubles merged, sizes limited
       ls[k] = v;
     });
     const src = bkIsObj(d.idb) ? d.idb : {};

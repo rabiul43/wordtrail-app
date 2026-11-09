@@ -110,6 +110,7 @@ PARTS = [
     ('file', 'src/js/140-open-book.js'),
     ('file', 'src/js/145-chapter-recap.js'),
     ('file', 'src/js/146-word-model.js'),
+    ('file', 'src/js/147-word-store.js'),
     ('file', 'src/js/150-player-reader.js'),
     ('file', 'src/js/160-learning-tools.js'),
     ('file', 'src/js/161-live-translate.js'),

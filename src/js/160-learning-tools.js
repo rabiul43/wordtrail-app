@@ -82,7 +82,7 @@
      A meaning comes from the free dictionaryapi.dev service when a word is opened, together with a
      translation from the same service the sentence translation uses. Saved words stay on this device. */
   const VOC = { tab: 'book', defs: new Map(), books: new Map(), seq: 0 };
-  const myWords = () => store.get('wt:words', []) || [];
+  const myWords = () => WS.all();   // every change to a saved word goes through WS (147-word-store.js)
   async function vocBook(id) {
     if (VOC.books.has(id)) return VOC.books.get(id);
     let d = null;
@@ -122,9 +122,8 @@
     if (tr) box.append(h('div', {}, h('strong', {}, name + ': '), tr));
   }
   function vocToggle(e) {
-    const list = myWords(), i = list.findIndex(x => x.w === e.w);
-    if (i >= 0) { list.splice(i, 1); store.set('wt:words', list); return false; }
-    list.unshift(Object.assign({ ts: Date.now() }, e)); store.set('wt:words', list.slice(0, 2000)); return true;
+    if (WS.get(e.w)) { WS.remove(e.w); return false; }
+    WS.saveWithContext(e.w, { s: e.ex, bid: e.bid, bt: e.bt }, { lv: e.lv, ex: e.ex }); return true;
   }
   function vocEntry(w, lv, ex) {
     const d = S.book ? VOC.books.get(String(S.book.id)) : null, hit = d && d.w.find(x => x[0] === w);
@@ -187,7 +186,7 @@
     if (!due.length) { help.textContent = 'All done for now. Next review is due soon.'; return; }
     help.textContent = due.length + ' to review today.';
     const e = due[0], mean = h('div', { class: 'vmean', hidden: true });
-    const grade = g => { const cur = myWords(), t = cur.find(x => x.w === e.w); if (t) { srsGrade(t, g); store.set('wt:words', cur); } vocRender(); };
+    const grade = g => { WS.update(e.w, t => { srsGrade(t, g); }); vocRender(); };
     const btns = h('div', { class: 'row', style: 'gap:.5rem;margin-top:.6rem', hidden: true },
       h('button', { class: 'btn', type: 'button', onclick: () => grade(0) }, 'Again'),
       h('button', { class: 'btn', type: 'button', onclick: () => grade(1) }, 'Good'),
