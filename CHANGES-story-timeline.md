@@ -9,3 +9,8 @@ REVIEW entries are not shown; to approve one, change its status to OK in timelin
 
 Files: src/js/136-story-timeline.js (new), src/css/99p-story-timeline.css (new), build.py (2 lines),
 src/js/131-book-stats-share.js (tlSection(b) between about and ratingsSection).
+
+## AI timelines for books without a Wikipedia plot
+Same section, second data file: timelines_ai.json (kaggle_ai_timelines.py, status AI). Shown with the label
+"Written by AI from the book's text. It may contain mistakes." instead of the Wikipedia credit. AI_REVIEW is never shown.
+A Wikipedia timeline wins if a book has both. IndexedDB key is now timelines:v2 (both files in one record).
