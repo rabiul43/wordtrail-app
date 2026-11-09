@@ -79,8 +79,8 @@
       return card;
     }
 
-    function render(host, words) {
-      vlist(host, words, card, { min: 40, est: 150, scroller: host.closest('.body') || null });
+    function render(host, words, deco) {   // deco(cardElement, entry) may add to a card (My Words search and collections, 166)
+      vlist(host, words, deco ? e => deco(card(e), e) : card, { min: 40, est: 150, scroller: host.closest('.body') || null });
     }
     return { strength, places, snippet, card, render, keep: 0 };
   })();

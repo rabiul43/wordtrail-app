@@ -1,0 +1,28 @@
+/* My Words search, filters, collections and the sticky practise button (wf-). Built on the learning UI kit (94-learn-ui.css).
+   Only .wf* classes. Remove this file, 166-word-find.js and their build.py lines (and the two WF calls in vocRender) to go back. */
+.wf { display: grid; gap: .6rem; margin-top: -.3rem; }
+.wf[hidden], .wf__dock[hidden], .wf__panel[hidden], .wf__colbar[hidden], .wf__pick[hidden] { display: none; }
+.wf__q, .wf__in { box-sizing: border-box; width: 100%; min-height: 44px; padding: .55rem .9rem; font: 500 1rem/1.3 var(--font-ui); color: var(--ink); background: var(--surface-2); border: 2px solid var(--line); border-radius: var(--r-card); }
+.wf__q:focus-visible, .wf__in:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.wf__row { display: flex; align-items: center; gap: .5rem; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
+.wf__pill { flex: none; white-space: nowrap; max-width: 14rem; }
+.wf__pl { overflow: hidden; text-overflow: ellipsis; }
+.wf__n { color: var(--muted); font-weight: 600; }
+.wf__pill[aria-pressed="true"] .wf__n { color: inherit; }
+.wf__lab { flex: none; font: 700 var(--small)/1.2 var(--font-ui); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.wf__new { border-style: dashed; }
+.wf__colbar { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.wf__cn { flex: 1 1 8rem; min-width: 0; font: 700 1.1rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.wf__panel { --wl-cbg: var(--surface-2); display: grid; gap: .6rem; padding: .8rem .95rem; }
+.wf__form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.wf__form .wf__in { flex: 1 1 10rem; width: auto; }
+.wf__res { display: grid; gap: .4rem; max-height: 14rem; overflow-y: auto; }
+.wf__add { display: flex; align-items: center; justify-content: space-between; gap: .6rem; }
+.wf__acts { display: flex; align-items: center; justify-content: space-between; gap: .6rem; cursor: default; }
+.wf__tags { display: flex; flex-wrap: wrap; gap: .3rem; min-width: 0; }
+.wf__tag { padding: .1rem .55rem; font: 600 var(--small)/1.4 var(--font-ui); color: var(--muted); border: 2px solid var(--line); border-radius: var(--r-pill); overflow-wrap: anywhere; }
+.wf__pick { display: grid; gap: .3rem; padding-top: .6rem; border-top: 1px solid var(--line); cursor: default; }
+.wf__chk { display: flex; align-items: center; gap: .7rem; min-height: 44px; font: 600 1rem/1.3 var(--font-ui); cursor: pointer; }
+.wf__chk input { width: 1.4rem; height: 1.4rem; accent-color: var(--accent); flex: none; }
+.wf__dock { position: sticky; bottom: 0; z-index: 2; margin: 0 -1.2rem; padding: .7rem 1.2rem .2rem; background: linear-gradient(to bottom, transparent, var(--surface) .7rem); }
+.wf__go { text-transform: uppercase; letter-spacing: .08em; }

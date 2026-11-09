@@ -194,13 +194,13 @@
     const list = $('#vw-list'), help = $('#vw-help'), my = ++VOC.seq;
     $$('#seg-words button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === VOC.tab)));
     vocCount(); vocDue(); if (list._vl) list._vl.destroy(); list.textContent = '';
-    $('#vw-tools').hidden = VOC.tab !== 'mine';
+    $('#vw-tools').hidden = VOC.tab !== 'mine'; WF.show(VOC.tab === 'mine');
     if (VOC.tab === 'review') { vocReview(list, help); return; }
     if (VOC.tab === 'mine') {
       const mine = myWords();
       help.textContent = mine.length ? 'Words you saved, newest first. Tap a word for its meaning.' : 'Nothing saved yet. Open a book, tap Save on a word, or press and hold a word in the text and tap Save.';
       const keep = WC.keep; WC.keep = 0;   // after Remove the list is drawn again: put the scroll position back (165)
-      WC.render(list, mine);
+      WF.render(list, help, mine);   // search, filters, collections (166); draws the cards through WC
       const sc = list.closest('.body'); if (keep && sc) sc.scrollTop = keep;
       return;
     }

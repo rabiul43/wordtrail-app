@@ -31,7 +31,7 @@
   const AC_CHUNK = 300000, AC_TOTAL = 3000000, AC_BIG = 'wt:syncbig';
   const AC_CATS = [
     ['settings', 'Settings', k => k === 'wt:prefs'],
-    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows'],
+    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:wcols' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows'],
     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
   ];
@@ -243,10 +243,10 @@
     if (!Array.isArray(A) || !Array.isArray(B)) return null;
     if (k === 'wt:words') return JSON.stringify(acWords(A, B));
     const map = new Map();
-    [].concat(A, B).forEach(x => { const q = k === 'wt:recent-q' ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
+    [].concat(A, B).forEach(x => { const q = (k === 'wt:recent-q' || k === 'wt:wcols') ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
     let out = [...map.values()];
     if (k === 'wt:listens') out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
-    const cap = { 'wt:favs': 300, 'wt:words': 2000, 'wt:recent-q': 8, 'wt:listens': 40 }[k];
+    const cap = { 'wt:favs': 300, 'wt:words': 2000, 'wt:wcols': 40, 'wt:recent-q': 8, 'wt:listens': 40 }[k];
     if (cap) out = out.slice(0, cap);
     return JSON.stringify(out);
   }
@@ -258,12 +258,13 @@
        wt:book:*            the furthest position (track, then time); the other fields come from the newer copy
        wt:lev:*             both copies' entries (same track: the newer copy's)
      wt:bm:* is one bookmark per book, so the newer copy still wins there. */
-  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words';
+  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words' || k === 'wt:wcols';
   const acIsObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
   function acResolve(k, a, b, mineNewer) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
     let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
     const N = mineNewer ? A : B, O = mineNewer ? B : A; // newer copy, older copy
     if (k === 'wt:words') return Array.isArray(A) && Array.isArray(B) ? JSON.stringify(acWords(A, B)) : null;
+    if (k === 'wt:wcols') return acUnion(k, a, b);   // collection names: both lists, one per name (any case)
     if (/^wt:(clips|hl):/.test(k)) {
       if (!Array.isArray(A) || !Array.isArray(B)) return null;
       const map = new Map(); O.concat(N).forEach(x => map.set(acKeyOf(x), x));

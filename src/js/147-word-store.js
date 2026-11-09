@@ -13,6 +13,7 @@
        WS.setNote(w, text)                saved word only; returns the entry, or null if the word is not saved
        WS.toggleHard(w)                   saved word only; returns the new true/false, or null if the word is not saved
        WS.addToCollection(w, name, on)    saved word only; on === false takes it out of the collection. Returns the entry or null
+       WS.renameCollection(from, to)      renames a collection on every word in ONE write; returns how many words changed
        WS.search(q, opts)                 opts = { hard, col, limit }. Looks in the word, note, sentences and collections
        WS.update(w, fn)                   the Review uses this: fn changes a copy of the entry, the stage is worked out again */
   const WS = (() => {
@@ -56,6 +57,17 @@
         else if (!has) e.cols = cols.concat(nm).slice(-MAX_COLS);   // already in it: nothing changes
       });
     }
+    function renameCollection(from, to) {
+      const fk = key(from), nm = String(to == null ? '' : to).trim().slice(0, MAX_COL), nk = nm.toLowerCase(); if (!fk || !nm) return 0;
+      const list = raw().slice(); let n = 0;
+      list.forEach((e, i) => {
+        if (!isW(e) || !Array.isArray(e.cols) || !e.cols.some(c => key(c) === fk)) return;
+        const m = WM.migrate(e), has = new Set(m.cols.filter(c => key(c) !== fk).map(key)), cols = [];
+        m.cols.forEach(c => { if (key(c) !== fk) cols.push(c); else if (!has.has(nk)) { has.add(nk); cols.push(nm); } });   // an existing spelling of the new name wins
+        list[i] = Object.assign({}, m, { cols }); n++;
+      });
+      if (n) save(list); return n;
+    }
     /* A word on the scheduler (sch 1) gets its stage from SRS.stage (148); an old word keeps the old rule. The result is copied, never the shared entry. */
     const update = (w, fn) => change(w, e => { const r = Object.assign({}, fn(e) || e); r.st = r.sch === 1 ? SRS.stage(r) : WM.stage(r); return r; });
 
@@ -79,5 +91,5 @@
       return o.limit > 0 ? out.slice(0, o.limit) : out;
     }
 
-    return { get, all, saveWithContext, remove, setNote, toggleHard, addToCollection, search, update };
+    return { get, all, saveWithContext, remove, setNote, toggleHard, addToCollection, renameCollection, search, update };
   })();

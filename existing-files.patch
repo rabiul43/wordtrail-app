@@ -1,0 +1,153 @@
+--- a/src/js/147-word-store.js
++++ b/src/js/147-word-store.js
+@@ -13,6 +13,7 @@
+        WS.setNote(w, text)                saved word only; returns the entry, or null if the word is not saved
+        WS.toggleHard(w)                   saved word only; returns the new true/false, or null if the word is not saved
+        WS.addToCollection(w, name, on)    saved word only; on === false takes it out of the collection. Returns the entry or null
++       WS.renameCollection(from, to)      renames a collection on every word in ONE write; returns how many words changed
+        WS.search(q, opts)                 opts = { hard, col, limit }. Looks in the word, note, sentences and collections
+        WS.update(w, fn)                   the Review uses this: fn changes a copy of the entry, the stage is worked out again */
+   const WS = (() => {
+@@ -56,6 +57,17 @@
+         else if (!has) e.cols = cols.concat(nm).slice(-MAX_COLS);   // already in it: nothing changes
+       });
+     }
++    function renameCollection(from, to) {
++      const fk = key(from), nm = String(to == null ? '' : to).trim().slice(0, MAX_COL), nk = nm.toLowerCase(); if (!fk || !nm) return 0;
++      const list = raw().slice(); let n = 0;
++      list.forEach((e, i) => {
++        if (!isW(e) || !Array.isArray(e.cols) || !e.cols.some(c => key(c) === fk)) return;
++        const m = WM.migrate(e), has = new Set(m.cols.filter(c => key(c) !== fk).map(key)), cols = [];
++        m.cols.forEach(c => { if (key(c) !== fk) cols.push(c); else if (!has.has(nk)) { has.add(nk); cols.push(nm); } });   // an existing spelling of the new name wins
++        list[i] = Object.assign({}, m, { cols }); n++;
++      });
++      if (n) save(list); return n;
++    }
+     /* A word on the scheduler (sch 1) gets its stage from SRS.stage (148); an old word keeps the old rule. The result is copied, never the shared entry. */
+     const update = (w, fn) => change(w, e => { const r = Object.assign({}, fn(e) || e); r.st = r.sch === 1 ? SRS.stage(r) : WM.stage(r); return r; });
+ 
+@@ -79,5 +91,5 @@
+       return o.limit > 0 ? out.slice(0, o.limit) : out;
+     }
+ 
+-    return { get, all, saveWithContext, remove, setNote, toggleHard, addToCollection, search, update };
++    return { get, all, saveWithContext, remove, setNote, toggleHard, addToCollection, renameCollection, search, update };
+   })();
+--- a/src/js/160-learning-tools.js
++++ b/src/js/160-learning-tools.js
+@@ -194,13 +194,13 @@
+     const list = $('#vw-list'), help = $('#vw-help'), my = ++VOC.seq;
+     $$('#seg-words button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === VOC.tab)));
+     vocCount(); vocDue(); if (list._vl) list._vl.destroy(); list.textContent = '';
+-    $('#vw-tools').hidden = VOC.tab !== 'mine';
++    $('#vw-tools').hidden = VOC.tab !== 'mine'; WF.show(VOC.tab === 'mine');
+     if (VOC.tab === 'review') { vocReview(list, help); return; }
+     if (VOC.tab === 'mine') {
+       const mine = myWords();
+       help.textContent = mine.length ? 'Words you saved, newest first. Tap a word for its meaning.' : 'Nothing saved yet. Open a book, tap Save on a word, or press and hold a word in the text and tap Save.';
+       const keep = WC.keep; WC.keep = 0;   // after Remove the list is drawn again: put the scroll position back (165)
+-      WC.render(list, mine);
++      WF.render(list, help, mine);   // search, filters, collections (166); draws the cards through WC
+       const sc = list.closest('.body'); if (keep && sc) sc.scrollTop = keep;
+       return;
+     }
+--- a/src/js/165-word-cards.js
++++ b/src/js/165-word-cards.js
+@@ -79,8 +79,8 @@
+       return card;
+     }
+ 
+-    function render(host, words) {
+-      vlist(host, words, card, { min: 40, est: 150, scroller: host.closest('.body') || null });
++    function render(host, words, deco) {   // deco(cardElement, entry) may add to a card (My Words search and collections, 166)
++      vlist(host, words, deco ? e => deco(card(e), e) : card, { min: 40, est: 150, scroller: host.closest('.body') || null });
+     }
+     return { strength, places, snippet, card, render, keep: 0 };
+   })();
+--- a/src/js/290-backup-maintenance.js
++++ b/src/js/290-backup-maintenance.js
+@@ -4,7 +4,7 @@
+      Caches and downloaded audio are left out. Restoring writes the file's items over the
+      matching ones on this device, then reloads; saving is paused meanwhile so the old in-memory state cannot
+      overwrite what was just restored. */
+-  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt', 'wt:follows'];
++  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:wcols', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt', 'wt:follows'];
+   const BK_PREFIX = ['wt:book:', 'wt:bm:', 'wt:clips:', 'wt:lp:', 'wt:lev:'];
+   const BK_IDB = /^(s|f):/;
+   const bkWanted = k => BK_KEYS.indexOf(k) >= 0 || BK_PREFIX.some(p => k.indexOf(p) === 0);
+@@ -13,7 +13,7 @@
+      so backups from other versions still restore. */
+   const BK_MAX_FILE = 200 * 1024 * 1024;   // refuse files bigger than this before reading them
+   const BK_MAX_IDB = 5000;                 // most text/sync entries one backup may carry
+-  const BK_LISTS = ['wt:favs', 'wt:words', 'wt:listens', 'wt:recent-q', 'wt:finlv'];   // these hold a list, every other item holds an object
++  const BK_LISTS = ['wt:favs', 'wt:words', 'wt:wcols', 'wt:listens', 'wt:recent-q', 'wt:finlv'];   // these hold a list, every other item holds an object
+   const bkIsObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+   const bkIsList = k => BK_LISTS.indexOf(k) >= 0 || k.indexOf('wt:clips:') === 0;
+   const bkShapeOk = (k, v) => bkIsList(k) ? Array.isArray(v) : bkIsObj(v);
+--- a/src/js/295-account-sync.js
++++ b/src/js/295-account-sync.js
+@@ -31,7 +31,7 @@
+   const AC_CHUNK = 300000, AC_TOTAL = 3000000, AC_BIG = 'wt:syncbig';
+   const AC_CATS = [
+     ['settings', 'Settings', k => k === 'wt:prefs'],
+-    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows'],
++    ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:wcols' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows'],
+     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
+     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv']
+   ];
+@@ -243,10 +243,10 @@
+     if (!Array.isArray(A) || !Array.isArray(B)) return null;
+     if (k === 'wt:words') return JSON.stringify(acWords(A, B));
+     const map = new Map();
+-    [].concat(A, B).forEach(x => { const q = k === 'wt:recent-q' ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
++    [].concat(A, B).forEach(x => { const q = (k === 'wt:recent-q' || k === 'wt:wcols') ? String(x).toLowerCase() : acKeyOf(x); const o = map.get(q); if (!o || (x && x.ts || 0) > (o && o.ts || 0)) map.set(q, x); });
+     let out = [...map.values()];
+     if (k === 'wt:listens') out.sort((x, y) => (y.ts || 0) - (x.ts || 0));
+-    const cap = { 'wt:favs': 300, 'wt:words': 2000, 'wt:recent-q': 8, 'wt:listens': 40 }[k];
++    const cap = { 'wt:favs': 300, 'wt:words': 2000, 'wt:wcols': 40, 'wt:recent-q': 8, 'wt:listens': 40 }[k];
+     if (cap) out = out.slice(0, cap);
+     return JSON.stringify(out);
+   }
+@@ -258,12 +258,13 @@
+        wt:book:*            the furthest position (track, then time); the other fields come from the newer copy
+        wt:lev:*             both copies' entries (same track: the newer copy's)
+      wt:bm:* is one bookmark per book, so the newer copy still wins there. */
+-  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words';
++  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words' || k === 'wt:wcols';
+   const acIsObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+   function acResolve(k, a, b, mineNewer) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
+     let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
+     const N = mineNewer ? A : B, O = mineNewer ? B : A; // newer copy, older copy
+     if (k === 'wt:words') return Array.isArray(A) && Array.isArray(B) ? JSON.stringify(acWords(A, B)) : null;
++    if (k === 'wt:wcols') return acUnion(k, a, b);   // collection names: both lists, one per name (any case)
+     if (/^wt:(clips|hl):/.test(k)) {
+       if (!Array.isArray(A) || !Array.isArray(B)) return null;
+       const map = new Map(); O.concat(N).forEach(x => map.set(acKeyOf(x), x));
+--- a/build.py
++++ b/build.py
+@@ -38,6 +38,7 @@
+     ('file', 'src/css/94-learn-ui.css'),
+     ('file', 'src/css/94b-word-panel.css'),
+     ('file', 'src/css/94c-word-cards.css'),
++    ('file', 'src/css/94d-word-find.css'),
+     ('file', 'src/css/95-live-translate.css'),
+     ('file', 'src/css/96-sound-tabs.css'),
+     ('file', 'src/css/97-controls-sheet.css'),
+@@ -122,6 +123,7 @@
+     ('file', 'src/js/163-word-panel.js'),
+     ('file', 'src/js/164-word-sense.js'),
+     ('file', 'src/js/165-word-cards.js'),
++    ('file', 'src/js/166-word-find.js'),
+     ('file', 'src/js/170-sync-points-drift.js'),
+     ('file', 'src/js/180-sync-alignment.js'),
+     ('file', 'src/js/190-sync-finish-retry.js'),
+--- a/MODULES.md
++++ b/MODULES.md
+@@ -51,6 +51,7 @@
+ | `140-open-book.js` | 891 | opening a book, parsed-book cache, plan + reader, intro/outro cuts, free chapter summaries, the "text isn't on Project Gutenberg" card (`attachText`; `textSourceLink` finds LibriVox's text link: the book's own `textUrl`, else `details/<id div 1000>.json` key `s`; Step 3: `tryArchiveText` downloads archive.org's `_djvu.txt` only on a tap, `archiveCheck` refuses wrong or doubtful texts, `useRaw` (290) loads it like an own text, `srcNoteNode` is the note on the page), text made from the speech-recognition timing file (`asr*`, `tryAsrText`; Step 2) |
+ | `150-player-reader.js` | 771 | Finish-and-Continue card (with the "How was it?" rating box from `135`), following the highlight, word-level highlight, Dialogue marking, audio, Sound-wave visualizer, Audio enhancer |
+ | `160-learning-tools.js` | 346 | sentence translation, book vocabulary, Review, Pronunciation, reading-only mode, gesture hint |
++| `166-word-find.js` | 198 | My Words search, filters and collections (`WF`): search box (word, sentence, note, through `WS.search`), pills All / Hard / Due / one per book, collections (create, rename, add and remove words; names of empty ones in `wt:wcols`, synced, backed up), a Collections button on every card (`WC.render` takes an optional decorator), and the sticky "Practise N due words" button that opens the Review. `vocRender` (160) calls `WF.show` and `WF.render`. Styles `94d-word-find.css`. Test: `node tools/wordfind_check.js` |
+ | `170-sync-points-drift.js` | 344 | sync points, pause map, drift auto-correct |
+ | `180-sync-alignment.js` | 468 | background alignment, Precise timing from speech recognition, Whole-book alignment |
+ | `190-sync-finish-retry.js` | 645 | finished sync saved and shared, match percentage per track, retry one track, "Sync this book" / syncNow |

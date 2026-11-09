@@ -4,7 +4,7 @@
      Caches and downloaded audio are left out. Restoring writes the file's items over the
      matching ones on this device, then reloads; saving is paused meanwhile so the old in-memory state cannot
      overwrite what was just restored. */
-  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt', 'wt:follows'];
+  const BK_KEYS = ['wt:favs', 'wt:stats', 'wt:words', 'wt:wcols', 'wt:listens', 'wt:prefs', 'wt:finlv', 'wt:recent-q', 'wt:myrt', 'wt:follows'];
   const BK_PREFIX = ['wt:book:', 'wt:bm:', 'wt:clips:', 'wt:lp:', 'wt:lev:'];
   const BK_IDB = /^(s|f):/;
   const bkWanted = k => BK_KEYS.indexOf(k) >= 0 || BK_PREFIX.some(p => k.indexOf(p) === 0);
@@ -13,7 +13,7 @@
      so backups from other versions still restore. */
   const BK_MAX_FILE = 200 * 1024 * 1024;   // refuse files bigger than this before reading them
   const BK_MAX_IDB = 5000;                 // most text/sync entries one backup may carry
-  const BK_LISTS = ['wt:favs', 'wt:words', 'wt:listens', 'wt:recent-q', 'wt:finlv'];   // these hold a list, every other item holds an object
+  const BK_LISTS = ['wt:favs', 'wt:words', 'wt:wcols', 'wt:listens', 'wt:recent-q', 'wt:finlv'];   // these hold a list, every other item holds an object
   const bkIsObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
   const bkIsList = k => BK_LISTS.indexOf(k) >= 0 || k.indexOf('wt:clips:') === 0;
   const bkShapeOk = (k, v) => bkIsList(k) ? Array.isArray(v) : bkIsObj(v);
