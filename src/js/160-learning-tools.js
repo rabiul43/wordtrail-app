@@ -61,7 +61,8 @@
   }
   async function trShow(text, word) {
     const pop = trPop || trBuild(), lang = trLang();
-    pop.wordText = word || ''; if (word) vocCard(pop.word, word, text); else pop.word.hidden = true;
+    pop.wordText = word || ''; if (word) vocCard(pop.word, word, text, trSid); else pop.word.hidden = true;
+    pop.root.classList.toggle('trpop--word', !!word);
     pop.hl.textContent = hlFind(trSid) ? 'Remove highlight' : 'Highlight';
     pop.text = text; pop.sel.value = lang; pop.src.textContent = text; pop.root.hidden = false;
     if (trCtl) trCtl.abort();
@@ -99,15 +100,11 @@
   }
   async function vocDefine(w) {
     if (VOC.defs.has(w)) return VOC.defs.get(w);
-    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 9000);
-    try {
-      const r = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(w), { signal: ctl.signal });
-      if (r.status === 404) { VOC.defs.set(w, ''); return ''; }
-      if (!r.ok) throw new Error('http ' + r.status);
-      const j = await r.json(), m = j && j[0] && j[0].meanings && j[0].meanings[0], d = m && m.definitions && m.definitions[0] && m.definitions[0].definition;
-      const t = d ? (m.partOfSpeech ? m.partOfSpeech + ': ' : '') + (d.length > 140 ? d.slice(0, 137).trimEnd() + '\u2026' : d) : '';
-      VOC.defs.set(w, t); return t;
-    } finally { clearTimeout(to); }
+    const r = await DICT.get(w);   // 149: one request, saved on this device, works offline for words seen before
+    if (!r.ok) { if (r.reason === 'none') { VOC.defs.set(w, ''); return ''; } throw new Error('no answer'); }
+    const m = r.data.meanings[0], d = m.defs[0].d;
+    const t = (m.pos ? m.pos + ': ' : '') + (d.length > 140 ? d.slice(0, 137).trimEnd() + '\u2026' : d);
+    VOC.defs.set(w, t); return t;
   }
   async function vocFill(box, w) {
     box.className = 'vmean dim'; box.textContent = 'Looking up\u2026'; box.hidden = false;
@@ -152,12 +149,11 @@
 
   guideDoc('words', 'Review and export', "Review quizzes you on saved words just before you would forget them. Export words (CSV) saves your list to a file.");
   /* ---------- Review (spaced repetition, SM-2 style) and exports ---------- */
-  const srsDue = e => !e.due || e.due <= Date.now();
-  function srsGrade(e, g) { // g: 0 again, 1 good, 2 easy
-    const ease = Math.max(1.3, (e.ease || 2.5) + (g === 0 ? -0.2 : g === 2 ? 0.15 : 0));
-    const iv = g === 0 ? 0 : !e.iv ? (g === 2 ? 4 : 1) : Math.round(e.iv * ease * (g === 2 ? 1.3 : 1));
-    Object.assign(e, { ease, iv, reps: g === 0 ? 0 : (e.reps || 0) + 1, due: Date.now() + (g === 0 ? 10 * 60e3 : iv * 864e5) });
-    if (iv >= 14 && !e.acq) e.acq = Date.now();   // acquired: you now remember it for two weeks or more
+  const srsDue = e => SRS.isDue(e, Date.now());   // same rule as before: no due time, or due now or past
+  /* g: the old button, 0 again, 1 good, 2 easy. The scheduler (148) works out ease, interval, due, counters and stage. */
+  function srsGrade(w, g) {
+    const now = Date.now();
+    return WS.update(w, t => SRS.review(t, SRS.fromOldGrade(g), now, { kind: 'rec', tz: -new Date().getTimezoneOffset() }));
   }
   function vocDue() { const n = myWords().filter(srsDue).length; $('#vw-due').textContent = n ? '(' + n + ')' : ''; return n; }
   function download(name, text, type) {
@@ -186,7 +182,7 @@
     if (!due.length) { help.textContent = 'All done for now. Next review is due soon.'; return; }
     help.textContent = due.length + ' to review today.';
     const e = due[0], mean = h('div', { class: 'vmean', hidden: true });
-    const grade = g => { WS.update(e.w, t => { srsGrade(t, g); }); vocRender(); };
+    const grade = g => { srsGrade(e.w, g); vocRender(); };
     const btns = h('div', { class: 'row', style: 'gap:.5rem;margin-top:.6rem', hidden: true },
       h('button', { class: 'btn', type: 'button', onclick: () => grade(0) }, 'Again'),
       h('button', { class: 'btn', type: 'button', onclick: () => grade(1) }, 'Good'),
@@ -197,13 +193,15 @@
   async function vocRender() {
     const list = $('#vw-list'), help = $('#vw-help'), my = ++VOC.seq;
     $$('#seg-words button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === VOC.tab)));
-    vocCount(); vocDue(); list.textContent = '';
+    vocCount(); vocDue(); if (list._vl) list._vl.destroy(); list.textContent = '';
     $('#vw-tools').hidden = VOC.tab !== 'mine';
     if (VOC.tab === 'review') { vocReview(list, help); return; }
     if (VOC.tab === 'mine') {
       const mine = myWords();
       help.textContent = mine.length ? 'Words you saved, newest first. Tap a word for its meaning.' : 'Nothing saved yet. Open a book, tap Save on a word, or press and hold a word in the text and tap Save.';
-      mine.forEach(e => list.append(vocRow(e, true)));
+      const keep = WC.keep; WC.keep = 0;   // after Remove the list is drawn again: put the scroll position back (165)
+      WC.render(list, mine);
+      const sc = list.closest('.body'); if (keep && sc) sc.scrollTop = keep;
       return;
     }
     if (!S.book) { help.textContent = 'Open a book to see its words.'; return; }
@@ -277,14 +275,17 @@
     }, { once: true });
     c.addEventListener('error', () => { if (PR.clip === c) { prStop(); toast('Could not play the narrator clip.', 2500); } }, { once: true });
   }
-  function prButtons(w, ref) {
+  function prButtons(w, ref, kit) {   // kit: the word panel (163) asks for square icon buttons from the UI kit
     const row = h('div', { class: 'vpron' });
-    if (prSpeech) row.append(h('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Hear ' + w + ' in the device voice', onclick: () => prVoice(w) }, '\u{1F50A} Voice'));
+    if (prSpeech) row.append(kit ? h('button', { class: 'wl-btn wl-btn--secondary wl-btn--icon', type: 'button', title: 'Voice', 'aria-label': 'Hear ' + w + ' in the device voice', onclick: () => prVoice(w) }, '\u{1F50A}')
+      : h('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Hear ' + w + ' in the device voice', onclick: () => prVoice(w) }, '\u{1F50A} Voice'));
     const nOk = ref && wordTimesAny(ref.id) && S.sentSec[ref.id] === S.sec;
-    if (nOk) row.append(h('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Hear ' + w + ' from the narrator, slowed', onclick: () => prNarrator(ref) }, '\u{1F422} Narrator' + (wordTimesFor(ref.id) ? '' : ' (approx.)')));
+    if (nOk) row.append(kit ? h('button', { class: 'wl-btn wl-btn--secondary wl-btn--icon', type: 'button', title: 'Narrator', 'aria-label': 'Hear ' + w + ' from the narrator, slowed', onclick: () => prNarrator(ref) }, '\u{1F422}')
+      : h('button', { class: 'btn small ghost', type: 'button', 'aria-label': 'Hear ' + w + ' from the narrator, slowed', onclick: () => prNarrator(ref) }, '\u{1F422} Narrator' + (wordTimesFor(ref.id) ? '' : ' (approx.)')));
     return row;
   }
-  function vocCard(box, w, sentence) {
+  function vocCard(box, w, sentence, sid) {
+    if (typeof WPNL !== 'undefined') { WPNL.render(box, w, sentence, sid); return; }   // 163: the new word panel; the old card below is the fallback
     box.textContent = ''; box.hidden = false;
     const e = vocEntry(w, '', sentence), meaning = h('div', { class: 'vmean', hidden: true });
     box.append(h('div', { class: 'vtop' }, h('strong', {}, w), vocSaveBtn(e, false)), prButtons(w, PR.ref), meaning);

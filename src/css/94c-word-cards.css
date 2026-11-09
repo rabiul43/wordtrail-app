@@ -1,0 +1,25 @@
+/* My Words cards (wc-): the "My words" list in the Words sheet. Built on the learning UI kit (wl-card, wl-ok colours) from
+   94-learn-ui.css. Only .wc* classes, so no other list changes. Remove this file and its build.py line to go back to the old rows. */
+.wc { --wl-cbg: var(--surface-2); display: grid; gap: .55rem; padding: .8rem .95rem .85rem; cursor: pointer; }
+.wc__head { display: block; width: 100%; margin: 0; padding: 0; min-height: 44px; background: none; border: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.wc__head:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+.wc__top { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
+.wc__id { display: flex; align-items: baseline; flex-wrap: wrap; gap: .1rem .5rem; min-width: 0; }
+.wc__w { font: 700 1.45rem/1.2 var(--font-display); overflow-wrap: anywhere; }
+.wc__flag { color: var(--wl-bad-text); font-size: 1rem; line-height: 1; }
+.wc__st { font: 600 var(--small)/1.2 var(--font-ui); color: var(--muted); white-space: nowrap; }
+.wc__bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: .55rem; }
+.wc__seg { display: block; height: 12px; border-radius: 6px; background: var(--line); }
+.wc__seg.on { background: var(--wc-fill, var(--accent)); }
+.wc--learning { --wc-fill: var(--accent); }
+.wc--familiar, .wc--mastered { --wc-fill: var(--wl-ok); }
+.wc__q { margin: 0; padding-inline-start: .75rem; border-inline-start: 3px solid var(--line); font: italic 400 1rem/1.4 var(--font-display); color: var(--ink); overflow-wrap: anywhere; }
+.wc__q--1 { border-inline-start-color: var(--accent); }
+.wc__q q { quotes: "\201C" "\201D"; }
+.wc__src { margin-inline-start: .25rem; font: normal 400 .8rem/1.3 var(--font-display); color: var(--muted); white-space: normal; }
+.wc__meta { margin: 0; display: flex; flex-wrap: wrap; gap: .1rem .5rem; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.wc__meta > span + span::before { content: "\00B7"; margin-inline-end: .5rem; }
+.wc__more { display: grid; gap: .55rem; padding-top: .6rem; border-top: 1px solid var(--line); cursor: default; }
+.wc__more[hidden] { display: none; }
+.wc__note { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 500 var(--small)/1.45 var(--font-ui); color: var(--ink); }
+.wc__acts { display: flex; justify-content: flex-end; }

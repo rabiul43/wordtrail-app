@@ -56,7 +56,8 @@
         else if (!has) e.cols = cols.concat(nm).slice(-MAX_COLS);   // already in it: nothing changes
       });
     }
-    const update = (w, fn) => change(w, e => { const r = fn(e) || e; r.st = WM.stage(r); return r; });
+    /* A word on the scheduler (sch 1) gets its stage from SRS.stage (148); an old word keeps the old rule. The result is copied, never the shared entry. */
+    const update = (w, fn) => change(w, e => { const r = Object.assign({}, fn(e) || e); r.st = r.sch === 1 ? SRS.stage(r) : WM.stage(r); return r; });
 
     function search(q, opts) {
       const o = opts || {}, t = key(q), col = o.col ? key(o.col) : '', hits = [];

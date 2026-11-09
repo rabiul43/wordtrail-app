@@ -146,9 +146,9 @@ const store = {
 let T = {}, learn;
 try {
   const l160 = read('160-learning-tools.js');
-  const code = read('146-word-model.js') + '\n' + read('147-word-store.js') + '\n' +
+  const code = read('146-word-model.js') + '\n' + read('147-word-store.js') + '\n' + read('148-scheduler.js') + '\n' +
     ['myWords', 'srsDue', 'srsGrade', 'vocToggle', 'vocEntry'].map(n => grab(l160, n)).join('\n') +
-    '\nthis.T = { WM, WS, myWords, srsDue, srsGrade, vocToggle, vocEntry };';
+    '\nthis.T = { WM, WS, SRS, myWords, srsDue, srsGrade, vocToggle, vocEntry };';
   const ctx = vm.createContext({ store, S: { book: { id: 7, title: 'Emma' } }, VOC: { books: new Map() } });
   vm.runInContext(code, ctx); T = ctx.T; learn = l160;
 } catch (e) { console.error('words_check: cannot load the code: ' + e.message); process.exit(2); }
@@ -182,14 +182,15 @@ t('the list is capped at 2000, oldest dropped', () => {
 });
 t('Review grade keeps every old field and sets the SM-2 fields', () => {
   reset([{ ts: 5, w: 'ample', lv: 'B2', ex: 'x', bid: '7', bt: 'Emma' }]);
-  const e = T.myWords()[0]; WS.update(e.w, t => { T.srsGrade(t, 1); });
+  const e = T.myWords()[0]; T.srsGrade(e.w, 1);
   const s = saved()[0];
   assert.deepStrictEqual([s.ts, s.w, s.lv, s.ex, s.bid, s.bt], [5, 'ample', 'B2', 'x', '7', 'Emma']);
-  assert.strictEqual(s.iv, 1); assert.strictEqual(s.reps, 1); assert.ok(s.due > Date.now()); assert.strictEqual(s.st, 'learning');
+  assert.strictEqual(s.iv, 2); assert.strictEqual(s.reps, 1); assert.ok(s.due > Date.now()); assert.strictEqual(s.st, 'learning');
+  assert.strictEqual(s.sch, 1); assert.strictEqual(s.cnt.rec, 1); assert.strictEqual(s.cnt.rcl, 0);   // Good = right at the recognise level
 });
 t('grading a word that is not saved changes nothing and writes nothing', () => {
   reset([{ ts: 1, w: 'a' }]); log.length = 0;
-  assert.strictEqual(WS.update('zzz', t => { T.srsGrade(t, 2); }), null); assert.strictEqual(log.length, 0);
+  assert.strictEqual(T.srsGrade('zzz', 2), null); assert.strictEqual(log.length, 0);
 });
 t('myWords still works with srsDue (new word is due, graded word is not)', () => {
   reset([{ ts: 1, w: 'a' }, { ts: 2, w: 'b', due: Date.now() + 1e6 }]);

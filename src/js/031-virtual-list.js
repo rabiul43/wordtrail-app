@@ -4,7 +4,8 @@
        host   the list element (the page scrolls, not the host)
        items  array of anything
        make   (item, index) => Element   (called when a row comes near the screen, again if it was dropped and comes back)
-       opts   { min: 60 }   lists shorter than this are drawn in full, exactly as before
+       opts   { scroller: el }  the element that scrolls (a sheet body); leave out when the page scrolls
+              { min: 60 }   lists shorter than this are drawn in full, exactly as before
               { est: 110 }  guess for the height of a row not measured yet (px; replaced by the real height as rows are drawn)
      Returns { destroy, count, scrollTo(i) } and also keeps it on host._vl. Call vlist again on the same host to replace it.
      Heights are measured, so rows may differ in height (a row that grows later is picked up by ResizeObserver).
@@ -13,7 +14,7 @@
     opts = opts || {};
     if (host._vl) host._vl.destroy();
     host.textContent = '';
-    const MIN = opts.min || 60;
+    const MIN = opts.min || 60, SC = opts.scroller || null;   // SC: a scrolling box instead of the page
     if (items.length < MIN || typeof requestAnimationFrame !== 'function') {
       const nodes = items.map(make);
       host.append(...nodes);
@@ -41,9 +42,9 @@
       if (bb !== lastB) { host.style.paddingBottom = lastB = bb; }
     }
     function range() {
-      const vh = window.innerHeight || 700, buf = vh * 1.5;
-      const r = host.getBoundingClientRect();
-      const y0 = -r.top - buf, y1 = -r.top + vh + buf;   // visible band in host coordinates (padding included)
+      const vh = (SC ? SC.clientHeight : window.innerHeight) || 700, buf = vh * 1.5;
+      const r = host.getBoundingClientRect(), rt = r.top - (SC ? SC.getBoundingClientRect().top : 0);
+      const y0 = -rt - buf, y1 = -rt + vh + buf;   // visible band in host coordinates (padding included)
       let y = PT, from = a;   // PT is the height above row a: start there and move only as far as the scroll has moved
       while (from > 0 && y > y0) { from--; y -= hOf(from); }
       while (from < n && y + hOf(from) < y0) { y += hOf(from); from++; }
@@ -74,7 +75,7 @@
       a = from; b = to;
       for (const node of add) if (ro) ro.observe(node);
       measure(add);
-      if (anchor && anchor.isConnected) { const d = anchor.getBoundingClientRect().top - top0; if (Math.abs(d) > 0.5) window.scrollBy(0, d); }
+      if (anchor && anchor.isConnected) { const d = anchor.getBoundingClientRect().top - top0; if (Math.abs(d) > 0.5) { if (SC) SC.scrollTop += d; else window.scrollBy(0, d); } }
     }
     function measure(add) {   // only the rows just drawn are read; the others are watched by the ResizeObserver
       for (const node of add) setH(node._vi, node.offsetHeight + gap);
@@ -83,14 +84,14 @@
     function refit() { if (cntM) est = sumM / cntM; pads(a, b); }
     function schedule() { if (!raf && !dead) raf = requestAnimationFrame(update); }
     const onScroll = () => schedule();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    (SC || window).addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     pads(0, 0);   // all height is "below" until the first update has run
     update();
     const api = {
       count: n,
-      destroy() { dead = true; if (raf) cancelAnimationFrame(raf); if (ro) ro.disconnect(); if (hro) hro.disconnect(); window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); host.style.paddingTop = host.style.paddingBottom = host.style.overflowAnchor = ''; live.clear(); host._vl = null; },
-      scrollTo(i) { let y = 0; for (let k = 0; k < i; k++) y += hOf(k); window.scrollTo(0, window.scrollY + host.getBoundingClientRect().top + y - 70); schedule(); }
+      destroy() { dead = true; if (raf) cancelAnimationFrame(raf); if (ro) ro.disconnect(); if (hro) hro.disconnect(); (SC || window).removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); host.style.paddingTop = host.style.paddingBottom = host.style.overflowAnchor = ''; live.clear(); host._vl = null; },
+      scrollTo(i) { let y = 0; for (let k = 0; k < i; k++) y += hOf(k); if (SC) SC.scrollTop += host.getBoundingClientRect().top - SC.getBoundingClientRect().top + y - 10; else window.scrollTo(0, window.scrollY + host.getBoundingClientRect().top + y - 70); schedule(); }
     };
     host._vl = api; return api;
   }
