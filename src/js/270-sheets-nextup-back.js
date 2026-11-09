@@ -211,7 +211,7 @@
     if (cur) cur.scrollIntoView({ block: 'center' });
     histSoon();
   }
-  function closeSheets() { SMH.from = false; if (AMB.preview) { AMB.preview = false; ambSync(); } shCleanup(); try { clEdCleanup(); } catch (e) { /* clips not ready yet */ } $$('.sheet').forEach(s => { s.hidden = true; }); el.backdrop.hidden = true; histSoon(); }
+  function closeSheets() { SMH.from = false; if (AMB.preview) { AMB.preview = false; ambSync(); } shCleanup(); try { clEdCleanup(); } catch (e) { /* clips not ready yet */ } $$('.sheet').forEach(s => { s.hidden = true; }); el.backdrop.hidden = true; try { LearnHub.refresh(); } catch (e) { /* hub not ready */ } histSoon(); }
 
   guideDoc('home', 'Back button and swipe-back', "Back closes the top layer first (a panel, the player, a book page, an open collection) instead of leaving the app.");
   /* ---------- Back button / swipe-back ----------

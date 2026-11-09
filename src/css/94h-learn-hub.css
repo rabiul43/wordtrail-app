@@ -1,0 +1,11 @@
+/* Learn hub (169b-learn-hub.js): a grid of tiles on the Learn side of My Library. Built on the learning kit (.wl-card, .wl-badge in 94-learn-ui.css).
+   Only .lhub-* classes. Remove this file, 169b-learn-hub.js, their build.py lines and the LearnHub.refresh() calls (168, 270) to go back. */
+.lhub-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.lhub-tile { display: flex; flex-direction: column; align-items: flex-start; gap: .2rem; min-height: 6.5rem; padding: var(--s-3, .75rem) var(--s-4, 1rem); font: inherit; }
+.lhub-tile:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.lhub-top { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 1.6rem; }
+.lhub-ic { font-size: 1.35rem; line-height: 1; color: var(--ink); }
+.lhub-title { font: 800 1.1rem/1.2 var(--font-ui); color: var(--ink); }
+.lhub-sub { font: 500 .85rem/1.3 var(--font-ui); color: var(--muted); }
+:root[data-calm] .lhub-badge { display: none; }   /* Calm mode: no counts */
+@media (min-width: 700px) { .lhub-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

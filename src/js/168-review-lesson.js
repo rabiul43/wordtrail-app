@@ -246,6 +246,7 @@
       L.on = false; L.seq++; L.tok++; L.root.hidden = true;
       if ($('#sheet-words') && !$('#sheet-words').hidden) vocRender();   // the due counts changed
       if (L.n && !L.finished) toast('Progress saved.', 1600);
+      try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }   // counts on the Learn hub changed
       histSoon(); if (L.opener && L.opener.isConnected) L.opener.focus();
     }
 
