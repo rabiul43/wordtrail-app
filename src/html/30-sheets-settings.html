@@ -132,6 +132,7 @@
     <button type="button" class="dm-it" role="menuitem" data-go="textsync"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="dm-t">Fix highlight sync</span></button>
     <button type="button" class="dm-it dm-all" role="menuitem" data-go="tools"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">More tools</span><span class="dm-v">&#8250;</span></button>
   </div>
+  <button type="button" class="dm-it" role="menuitem" data-go="learn"><span class="dm-i" aria-hidden="true">&#127891;</span><span class="dm-t">Learn</span></button>
 </div>
 
 <section id="fpanel" class="sheet fpanel" hidden role="dialog" aria-modal="true" aria-labelledby="h-fpanel">
@@ -226,6 +227,10 @@
       <div class="row" id="lf-scope" style="margin-top:.5rem"><label style="flex:1">Keep lit</label><div class="seg" id="seg-lf"><button data-v="sentence">Sentence</button><button data-v="paragraph">Paragraph</button></div></div>
     </div>
     <div>
+      <h3>Learning</h3>
+      <div class="row"><label for="in-learnbtn" style="flex:1">Show the Learn button<small class="spd-s">The gold button on the player. The Learn item stays in the player menu</small></label><input id="in-learnbtn" type="checkbox" checked></div>
+    </div>
+    <div>
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-pen"/></svg>Highlight</h3>
       <div class="row"><label style="flex:1">Style</label><div class="seg" id="seg-hl"><button data-v="fill">Fill</button><button data-v="underline">Underline</button></div></div>
       <div class="row" style="margin-top:.5rem"><label style="flex:1">Color</label>
@@ -265,6 +270,9 @@
         <button data-v="classic">Classic</button><button data-v="storytel">Storytel-style</button><button data-v="modern">Modern</button>
       </div>
       <p class="help">Classic is the first Home. Storytel-style is a plain Home title with genre chips and big covers. Modern is the newest look: greeting, daily goal, Continue listening card, Book of the day and a redesigned Explore. Phones only; your choice is remembered.</p>
+    </div>
+    <div class="row">
+      <label for="in-today" style="flex:1"><span style="display:block">Today card</span><small style="color:var(--muted)">A card at the top of Home with your plan for the day. Turn off and Home looks as before.</small></label><input id="in-today" type="checkbox" role="switch">
     </div>
     <div class="row">
       <label for="in-libnew" style="flex:1"><span style="display:block">New Library layout</span><small style="color:var(--muted)">Synced book card and tiles on My Library. Turn off for the simple list.</small></label><input id="in-libnew" type="checkbox" role="switch">

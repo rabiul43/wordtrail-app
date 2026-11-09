@@ -436,6 +436,7 @@
     $('#in-lite').addEventListener('change', e => { P.liteGfx = e.target.checked; savePrefs(); applyLite(); });
     $('#in-liteforce').addEventListener('change', e => { P.liteForce = e.target.checked; savePrefs(); applyLite(); });
     $('#in-detnew').addEventListener('change', e => { P.detNew = e.target.checked; savePrefs(); applyDet(); });
+    $('#in-today').addEventListener('change', e => { P.todayCard = e.target.checked; savePrefs(); try { TDH.paint(); homeGoal(); } catch (x) { /* Home not ready */ } });
     $('#in-libnew').addEventListener('change', e => { P.libTiles = e.target.checked; savePrefs(); applyLib(); if (curTab === 'shelf' && shelfHub) applyShelfMode(); });
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyDet); matchMedia('(min-width: 700px)').addEventListener('change', applyLib); } catch (e) { /* old browser: applies on the next start */ }
     $('#in-tidy').addEventListener('change', e => { P.tidyPlayer = e.target.checked; savePrefs(); applyTidy(); paintBookProg(); });

@@ -543,7 +543,7 @@
   function homeGoal() {
     const sec = $('#ex-goal'); if (!sec) return;
     try {
-      if (!isModern() || P.calm === true || OFF.on) { sec.hidden = true; return; }
+      if (!isModern() || P.calm === true || OFF.on || TDH.on()) { sec.hidden = true; return; }   // the Today card (169d) shows the same goal
       if (stDirty) stSave(); else ST = stLoad();
       const m = stSummary(), goalS = (ST.goal || 0) * 60;
       if (!goalS && !m.cur) { sec.hidden = true; return; }
@@ -572,7 +572,7 @@
     sec.hidden = false;
   }
   function renderRecents() {
-    homeGreet(); homeGoal(); homeDownloads();
+    homeGreet(); try { TDH.paint(); } catch (e) { /* Today card not ready */ } homeGoal(); homeDownloads();
     loadPicks();
     el.recentList.textContent = '';
     const recs = OFF.on ? recs.filter(r => offHave(r.id)) : P.recents;   // offline: only books that can be played

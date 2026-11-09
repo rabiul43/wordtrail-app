@@ -13,7 +13,8 @@
         timing: press('b-timing'), text: press('btn-aa'), live: press('btn-live'), tracks: press('btn-tracks'), settings: () => openSettingsHome(),
         sound: () => ambOpen(),
         bm: press('b-bm'), chars: press('b-chars'), hl: press('b-hl'), clips: press('b-clips'), textsync: press('b-textsync'),
-        tools: () => toolsOpen()
+        tools: () => toolsOpen(),
+        learn: () => LB.open()   // Study this chapter sheet (169e)
       };
       /* Speed and Sleep timer open in place under their row (chips + a stepper), using the same setters as the Controls sheet. */
       const XS = {

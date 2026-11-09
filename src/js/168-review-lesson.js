@@ -248,6 +248,7 @@
       if ($('#sheet-words') && !$('#sheet-words').hidden) vocRender();   // the due counts changed
       if (L.n && !L.finished) toast('Progress saved.', 1600);
       try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }   // counts on the Learn hub changed
+      try { TD.refresh(); } catch (e) { /* Today not ready */ }   // the Today page shows the new numbers
       histSoon(); if (L.opener && L.opener.isConnected) L.opener.focus();
     }
 

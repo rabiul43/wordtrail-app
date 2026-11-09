@@ -1,0 +1,14 @@
+/* Today card on Home (169d-today-card.js). Built on the learning kit (94-learn-ui.css). Only .td-home* classes; #td-home is display:none while hidden, so a Home
+   without the card is untouched. Remove this file, 169d-today-card.js and their build.py lines to go back. */
+.td-home[hidden] { display: none; }
+.td-home { box-sizing: border-box; width: 100%; max-width: 40rem; padding: .85rem 0 0; }
+.td-home__card { display: grid; gap: var(--s-3); padding: var(--s-3) var(--s-4); font: inherit; --wl-cbg: var(--accent-soft); --wl-cbd: var(--accent); }
+.td-home__card:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+.td-home__top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.td-home__txt { display: grid; gap: .1rem; min-width: 0; }
+.td-home__k { font: 800 .8rem/1.2 var(--font-ui); letter-spacing: .1em; color: var(--accent); }
+.td-home__n { font: 800 1.3rem/1.2 var(--font-ui); color: var(--ink); }
+.td-home__go { flex: none; padding: .55rem 1.1rem; font: 800 .9rem/1.2 var(--font-ui); letter-spacing: .08em; color: var(--accent-ink); background: var(--accent); border-radius: var(--r-xl); box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 62%, #000); }
+.td-home__card .wl-progress { height: 12px; background: var(--surface-2); }
+.td-home__chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.td-home__chip { padding: .3rem .75rem; font: 700 .9rem/1.2 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-pill); }
