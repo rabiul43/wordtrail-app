@@ -1,5 +1,5 @@
 # Wordtrail
-lllllllllll
+l252525
 One app, many small files. `build.py` joins them into a single `dist/index.html`.
 
 ## Build
