@@ -26,12 +26,12 @@
     }
     return t ? await t.translate(text) : null;
   }
-  async function ltGet(text, lang) {
+  /* The messages for the provider's refusals (TP, 160b). 'limit' and 'wait' are cleared by the layer itself. */
+  const LT_MSG = { limit: 'The free translation limit is used up for now. Saved translations still work. It will try again later.', offline: 'You are offline. Live translation needs a connection.', wait: 'Translation is busy. Trying again in a moment.', fail: 'Could not translate. It will try again in a moment.' };
+  async function ltGet(text, lang, prio) {
     const key = ltKey(lang, text);
     if (ltCache.has(key)) return ltCache.get(key);
-    let r = null;
-    try { r = await ltOnDevice(text, lang, false); } catch (e) { r = null; }
-    if (!r) r = await trFetch(text, lang);
+    const r = await TP.get(text, lang, { prio: prio || 0, owner: 'lt' });   // saved copy, then device translator, then the free service (queue, backoff, limit)
     ltCache.set(key, r);
     if (ltCache.size > 400) ltCache.delete(ltCache.keys().next().value);
     return r;
@@ -77,7 +77,7 @@
   }
   function ltHide() {
     if (LT.box) LT.box.root.hidden = true;
-    clearTimeout(LT.tm); LT.tok++;
+    clearTimeout(LT.tm); LT.tok++; TP.drop('lt');
     document.documentElement.classList.remove('lt-strip'); document.documentElement.style.removeProperty('--lt-h'); LT.h = 0;
   }
   function ltRow(row, text, cls) {
@@ -92,7 +92,7 @@
     b.sel.value = lang;
     [b.prev, b.cur, b.next].forEach(r => r.setAttribute('lang', lang));
     const id = S.curId, cur = ltSent(id), nxt = ltSent(id + 1), prv = ltSent(id - 1);
-    clearTimeout(LT.tm); const tok = ++LT.tok;
+    clearTimeout(LT.tm); const tok = ++LT.tok; TP.drop('lt');
     if (!cur) { ltRow(b.prev, ''); ltRow(b.next, ''); b.src.hidden = true; ltRow(b.cur, 'Press play or tap a sentence to begin.', 'dim'); return; }
     const peek = t => (t && ltCache.get(ltKey(lang, t))) || '';
     ltRow(b.prev, peek(prv), 'dim');
@@ -104,15 +104,17 @@
     if (Date.now() < LT.failUntil) return;
     LT.tm = setTimeout(async () => {
       try {
-        if (!have) { const t = await ltGet(cur, lang); if (tok !== LT.tok) return; ltRow(b.cur, t); }
-        if (nxt && !peek(nxt)) { const t = await ltGet(nxt, lang); if (tok !== LT.tok) return; ltRow(b.next, t, 'dim'); }
+        if (!have) { const t = await ltGet(cur, lang, 0); if (tok !== LT.tok) return; ltRow(b.cur, t); }
+        if (nxt && !peek(nxt)) { const t = await ltGet(nxt, lang, 1); if (tok !== LT.tok) return; ltRow(b.next, t, 'dim'); }
       } catch (e) {
-        if (tok !== LT.tok) return;
-        LT.msg = navigator.onLine === false ? 'You are offline. Live translation needs a connection.' : 'Could not translate. The free daily limit may be used up. It will try again in a moment.';
-        LT.failUntil = Date.now() + 15000;
+        if (tok !== LT.tok || (e && e.code === 'dropped')) return;
+        const c = e && LT_MSG[e.code] ? e.code : 'fail';
+        LT.msg = LT_MSG[c];
+        if (c === 'fail') LT.failUntil = Date.now() + 15000;   // this sentence was refused: leave it for now
+        else LT.tm = setTimeout(ltUpdate, Math.min(Math.max((e.retryAt || 0) - Date.now(), 3000), 3600000));   // paused by the layer: ask again when it may send
         if (!peek(cur)) ltRow(b.cur, LT.msg, 'dim');
       }
-    }, have ? 0 : 220);
+    }, have || TP.state().state !== 'ok' ? 0 : 220);
   }
   function ltSyncMenu() {
     const m = $('#btn-live'); if (!m) return;
@@ -128,6 +130,7 @@
     if (m) m.addEventListener('click', () => ltSet(!P.liveTr));
     ltSyncMenu();
     window.addEventListener('resize', () => { if (LT.box && !LT.box.root.hidden) ltLayout(); });
+    TP.onState(s => { if (s.state === 'ok' && P.liveTr && LT.box && !LT.box.root.hidden) ltUpdate(); });   // back online or the pause is over
     if (window.MutationObserver) {
       const mo = new MutationObserver(() => { if (P.liveTr) ltUpdate(); });
       mo.observe(el.player, { attributes: true, attributeFilter: ['hidden'] });

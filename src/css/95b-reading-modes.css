@@ -1,0 +1,26 @@
+/* Reading modes (161b): English / Both / Translation. The translation of a sentence is its data-tr attribute, drawn here. */
+@property --rm-fs { syntax: '<length>'; inherits: true; initial-value: 1rem; }
+.page { --rm-fs: 1em; }   /* the page's own text size as a fixed length, so the translation keeps it while the original is hidden */
+.rm-bar { position: sticky; top: 0; z-index: 3; padding: .5rem 1rem .35rem; background: var(--bg); font-family: var(--font-ui); }
+.rm-seg { display: flex; gap: .25rem; padding: .25rem; border: 2px solid var(--line, var(--surface-2)); border-radius: 16px; background: var(--surface); max-width: 26rem; margin: 0 auto; }
+.rm-b { flex: 1 1 0; min-height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font: 650 .95rem var(--font-ui); cursor: pointer; padding: 0 .5rem; }
+.rm-b[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 60%, #000); }   /* chunky: solid bottom edge */
+.rm-b:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, var(--accent)); outline-offset: 2px; }
+.rm-st { margin: .35rem auto 0; max-width: 26rem; text-align: center; font-size: .8rem; color: var(--muted); }
+.rm-st[hidden] { display: none; }
+.reader.rm-live { overflow-anchor: none; }
+/* Both: each sentence is a block with its translation under it. The highlight (.s.now) covers both lines. */
+.page.rm-both .s { display: block; margin-block: .1em .6em; }
+.page.rm-both .s[data-tr]::after, .page.rm-tr .s[data-tr]::after { content: attr(data-tr); unicode-bidi: plaintext; font-family: 'Noto Sans Bengali', var(--font-ui), system-ui, sans-serif; }
+.page.rm-both .s[data-tr]::after { display: block; margin-top: .25em; font-size: .84em; line-height: 1.6; color: var(--muted); }
+.page.rm-both .s.now[data-tr]::after { color: var(--ink); }
+/* Translation only: the original is hidden (font-size 0) and the translation takes its place at the page's text size. */
+.page.rm-tr .s[data-tr] { display: block; font-size: 0; margin-block: .1em .6em; border-radius: .35rem; }
+.page.rm-tr .s[data-tr]::after { display: block; font-size: var(--rm-fs); line-height: 1.7; }
+.page.rm-tr .s.now[data-tr] { box-shadow: 0 0 0 .22rem var(--mark); }
+.page.rm-tr .s.now.hw[data-tr] { box-shadow: 0 0 0 .22rem var(--accent-soft); }
+@media (min-width: 1100px) {
+  .player > .reader > .rm-bar { grid-column: 2; grid-row: 1; align-self: start; width: 100%; max-width: 46rem; justify-self: center; box-sizing: border-box; }
+  .player > .reader > .page { padding-top: 4.6rem; }
+}
+@media (prefers-reduced-motion: no-preference) { .rm-b { transition: background-color .15s, color .15s; } }
