@@ -103,3 +103,12 @@ Western digits are kept everywhere (the app prints them that way: 2 ঘণ্ট
 | Delete account | অ্যাকাউন্ট মুছুন | OK |
 | Delete your account? ... This cannot be undone. | আপনার অ্যাকাউন্ট মুছবেন? ... এটি ফেরানো যাবে না। | Is the warning clear enough? |
 | Settings opens one page with ... three sections | সেটিংস একটি সার্চ বক্স ও তিনটি অংশসহ ... | Guide text: Help section added |
+
+## Old words and idioms (Task 36, new, unreviewed)
+
+| English | Current | Question |
+|---|---|---|
+| Highlight old words and idioms | পুরনো শব্দ ও বাগধারা চিহ্নিত করুন | Is "বাগধারা" the word a Class 4 child knows for "idiom"? |
+| Idiom | বাগধারা | Same question |
+| It means | এর অর্থ | Fine for a card heading? |
+| Other old words in this chapter | এই অধ্যায়ের অন্যান্য পুরনো শব্দ | "পুরনো শব্দ" or "সেকেলে শব্দ"? |

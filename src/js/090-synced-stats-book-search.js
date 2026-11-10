@@ -744,6 +744,7 @@
     $$('#seg-hl button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (P.hlStyle === 'underline' ? 'underline' : 'fill'))));
     $$('#hl-colors button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === (hc ? P.hlColor : ''))));
     const wh = $('#in-wordhl'); if (wh) wh.checked = P.wordHl !== false;
+    const ow = $('#in-oldwords'); if (ow) ow.checked = P.oldWords !== false;
     { const cp = $('#in-clpro'); if (cp) cp.checked = P.clPro === true; const ch = $('#clpro-help'); if (ch) ch.textContent = P.clPro === true ? 'On: whole-track strip, tap to place a playhead, Start here / End here, and zoom.' : 'Off: simple trim handles only.'; }
     { const v = $('#ws-val'); if (v) { const x = P.wordShift || 0; v.textContent = (x > 0 ? '+' : x < 0 ? '\u2212' : '') + Math.abs(x).toFixed(1) + ' s'; } const r = $('#row-wordshift'); if (r) r.style.opacity = P.wordHl === false ? '.5' : ''; }
     const we = $('#in-wordest'); if (we) { we.checked = P.wordEst !== false; we.disabled = P.wordHl === false; }

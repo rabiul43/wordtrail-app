@@ -1,0 +1,42 @@
+/* Old words and idioms (Task 36): the lines under the words, and the card. Look from the mock-up: 2px bordered cards, chunky Save phrase
+   button with a solid bottom edge, calm. The lines are CSS Custom Highlights (no change to the text), so each theme names its colours here. */
+::highlight(wt-old) { text-decoration-line: underline; text-decoration-color: #C9A8FF; text-decoration-thickness: 2px; }
+::highlight(wt-idiom) { text-decoration-line: underline; text-decoration-color: #8AB4FF; text-decoration-thickness: 2px; }
+:root[data-theme="light"] ::highlight(wt-old), :root[data-theme="white"] ::highlight(wt-old), :root[data-theme="sepia"] ::highlight(wt-old) { text-decoration-color: #6A3FB0; }
+:root[data-theme="light"] ::highlight(wt-idiom), :root[data-theme="white"] ::highlight(wt-idiom), :root[data-theme="sepia"] ::highlight(wt-idiom) { text-decoration-color: #24569F; }
+:root[data-theme="contrast"] ::highlight(wt-old) { text-decoration-color: #E6D2FF; text-decoration-thickness: 3px; }
+:root[data-theme="contrast"] ::highlight(wt-idiom) { text-decoration-color: #7DB4FF; text-decoration-thickness: 3px; }
+
+.ow-card {
+  position: fixed; z-index: 24; left: 50%; bottom: 0; transform: translateX(-50%); width: min(100%, 36rem); max-height: 80%; overflow-y: auto;
+  box-sizing: border-box; display: grid; gap: var(--s-3, .75rem); align-content: start;
+  padding: .5rem 1.1rem max(1.1rem, env(safe-area-inset-bottom));
+  background: var(--surface); color: var(--ink); border: 2px solid var(--line); border-bottom: 0; border-radius: var(--r-xl) var(--r-xl) 0 0;
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, .35);
+}
+.ow-card[hidden] { display: none; }
+.ow-card.is-open { animation: ow-up .18s ease-out; }
+@keyframes ow-up { from { transform: translate(-50%, 24px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ow-card.is-open { animation: none; } }
+.ow-grip { justify-self: center; width: 3.5rem; min-height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.ow-grip::before { content: ""; width: 2.6rem; height: 5px; border-radius: 3px; background: var(--line); }
+.ow-grip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ow-tags { display: flex; gap: .5rem; flex-wrap: wrap; }
+.ow-tags:empty { display: none; }
+.ow-tag { display: inline-flex; align-items: center; min-height: 36px; padding: 0 1rem; border: 2px solid; border-radius: var(--r-pill); font: 700 var(--small, .85rem)/1 var(--font-ui); }
+.ow-tag--idiom { color: #8AB4FF; border-color: #3F6FC2; background: rgba(138, 180, 255, .1); }
+.ow-tag--old { color: #C9A8FF; border-color: #7B55C4; background: rgba(201, 168, 255, .1); }
+:root[data-theme="light"] .ow-tag--idiom, :root[data-theme="white"] .ow-tag--idiom, :root[data-theme="sepia"] .ow-tag--idiom { color: #1F4A8A; border-color: #24569F; background: rgba(36, 86, 159, .08); }
+:root[data-theme="light"] .ow-tag--old, :root[data-theme="white"] .ow-tag--old, :root[data-theme="sepia"] .ow-tag--old { color: #54308F; border-color: #6A3FB0; background: rgba(106, 63, 176, .08); }
+:root[data-theme="contrast"] .ow-tag { color: #fff; background: #000; }
+.ow-title { margin: 0; font: 700 1.7rem/1.25 var(--font-read); color: var(--ink); overflow-wrap: anywhere; outline: none; }
+.ow-box { display: grid; gap: .25rem; }
+.ow-note, .ow-auto { margin: 0; font: 500 var(--small, .85rem)/1.4 var(--font-ui); color: var(--muted); }
+.ow-trtext { font-weight: 600; }
+.ow-more .wp-label { margin-bottom: .5rem; }
+.ow-chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+.ow-chip { color: #C9A8FF; border-color: #7B55C4; background: rgba(201, 168, 255, .1); font-weight: 700; }
+:root[data-theme="light"] .ow-chip, :root[data-theme="white"] .ow-chip, :root[data-theme="sepia"] .ow-chip { color: #54308F; border-color: #6A3FB0; background: rgba(106, 63, 176, .08); }
+:root[data-theme="contrast"] .ow-chip { color: #fff; background: #000; }
+.ow-save { margin-top: .25rem; text-transform: uppercase; letter-spacing: .08em; gap: .6rem; }
+.ow-save[aria-pressed="true"] { --wl-bg: var(--wl-ok); --wl-fg: var(--wl-ok-ink); --wl-bd: var(--wl-ok); --wl-ed: color-mix(in srgb, var(--wl-ok) 62%, var(--wl-edge-mix)); }
