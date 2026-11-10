@@ -2,8 +2,8 @@
      1. When a chapter ends while you listen with the screen on, a sheet shows the "story so far": 3 sentences from that chapter.
      2. When you open a book after RC_DAYS or more away, a "Previously..." sheet shows the last finished chapter's 3 sentences.
      Both can be switched off in Settings (P.recap). Chapters too short for a summary show nothing. */
-  const RC = { prev: 0, bk: null, shown: new Set(), backAt: 0, ci: -1, next: -1, mode: '' };
-  const RC_DAYS = 3;
+  const RC = { prev: 0, bk: null, shown: new Set(), backAt: 0, ci: -1, next: -1, mode: '', vtok: 0 };
+  const RC_DAYS = 3, RC_VOCAB = 5;
   guideDoc('reading', 'Chapter recaps', "When a chapter ends, a short sheet shows the story so far in 3 sentences, and playback waits for you. After 3 or more days away, \"Previously\u2026\" shows the last chapter before you continue. Both are made on your phone from the chapter's own sentences and can be turned off in Settings.");
   function rcList(ci) {
     const m = S.model, c = m && m.chapters[ci];
@@ -14,6 +14,9 @@
       cache[ci] = list.length >= SUM_N + 3 && list.join(' ').split(/\s+/).length >= 200 ? sumPick(list, SUM_N) : [];
     }
     return cache[ci];
+  }
+  function rcVocab(ci) {   // up to 5 important words of this chapter (167c); the chapter was reached, so it is allowed
+    try { return QG.vocabWords(String(S.book.id), S.model, ci, Math.max(QG.furthest(S.lp, S.map, S.span), ci), RC_VOCAB) || []; } catch (e) { return []; }
   }
   const rcPlay = () => { try { const r = audio.play(); if (r && r.catch) r.catch(() => {}); } catch (e) { /* the browser may refuse; the play button still works */ } };
   function rcStart(ci) {
@@ -39,12 +42,19 @@
       box.append(h('div', { class: 'rc-k', text: 'From ' + c.title }));
     } else box.append(h('div', { class: 'rc-title', text: c.title }), h('div', { class: 'rc-k', text: 'The story so far' }));
     box.append(h('ol', { class: 'rc-list' }, ...sents.map(t => h('li', { text: t }))));
+    const vw = rcVocab(ci), vt = ++RC.vtok;   // important words; a meaning is added when the dictionary has one (cached, optional)
+    if (vw.length) {
+      const ds = vw.map(() => h('span', { class: 'rc-vd' }));
+      box.append(h('div', { class: 'rc-k', text: 'Important words' }), h('ul', { class: 'rc-vocab' }, ...vw.map((w, i) => h('li', {}, h('b', { text: w }), ds[i]))));
+      vw.forEach((w, i) => { try { vocDefine(w).then(t => { if (vt === RC.vtok && t) ds[i].textContent = t; }).catch(() => { /* offline: the word alone */ }); } catch (e) { /* no dictionary */ } });
+    }
     box.append(h('p', { class: 'rc-note', text: 'Made on your phone from the chapter\u2019s own sentences.' }));
     const go = h('button', { type: 'button', class: 'rc-go', onclick: () => { closeSheets(); rcPlay(); } }, mode === 'back' ? 'Continue listening' : next >= 0 ? 'Continue to the next chapter' : 'Continue');
+    const prac = typeof QS === 'undefined' ? null : h('button', { type: 'button', class: 'rc-alt rc-wide', onclick: () => { closeSheets(); try { QS.start({ bookId: String(S.book.id), chapter: ci }); } catch (e) { /* questions not available */ } } }, 'Practise this chapter');
     const row = h('div', { class: 'rc-row' });
     if (mode === 'back') row.append(h('button', { type: 'button', class: 'rc-alt', onclick: closeSheets }, 'Skip recap'));
     else row.append(h('button', { type: 'button', class: 'rc-alt', onclick: () => { closeSheets(); rcStart(ci); } }, 'Replay chapter'), h('button', { type: 'button', class: 'rc-alt', onclick: closeSheets }, 'Close'));
-    body.textContent = ''; body.append(box, go, row);
+    body.textContent = ''; body.append(box, go); if (prac) body.append(prac); body.append(row);
     openSheet('sheet-recap');
     return true;
   }

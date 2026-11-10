@@ -1,0 +1,13 @@
+/* Chapter questions (169g, QS). The frame and the feedback panel reuse the .rl* and .wl-* styles of the Review lesson; this file only adds the
+   chapter chip, the full-width numbered answers and the flash on a sentence found with "Show in book". Remove it with 169g to go back. */
+.qs__chip { flex: none; display: inline-flex; align-items: center; gap: var(--s-2); min-height: 44px; box-sizing: border-box; padding: 0 var(--s-3); font: 800 var(--small)/1 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 999px; white-space: nowrap; }
+.qs__list { display: grid; gap: var(--s-3); }
+.qs__opt { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 56px; padding: .8rem var(--s-4); text-align: start; font: 600 1.15rem/1.35 var(--font-ui); border-radius: var(--r-xl); }
+.qs__opt[aria-disabled="true"] { cursor: default; }
+.qs__num { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; box-sizing: border-box; font: 800 .95rem/1 var(--font-ui); color: var(--muted); border: 2px solid var(--line); border-radius: 50%; }
+.qs__opt[aria-pressed="true"] .qs__num, .qs__opt.is-correct .qs__num, .qs__opt.is-wrong .qs__num { color: inherit; border-color: currentColor; }
+.qs__txt { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.qs__hit { font-weight: 800; color: var(--accent); }
+.qs-flash { animation: qs-flash 2.4s ease-out 1; }
+@keyframes qs-flash { 0%, 55% { background: var(--accent-soft); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .qs-flash { animation: none; background: var(--accent-soft); } }

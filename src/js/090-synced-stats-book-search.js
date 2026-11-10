@@ -203,6 +203,7 @@
     const home = $('#acct-home'), a = $('#acct-activity'), head = $('#account > .tab-head');
     if (!home || !a) return;
     home.hidden = !!act; a.hidden = !act; if (head) head.hidden = !!act;
+    if (act) { try { PG.show(); } catch (e) { /* progress section (169f) is optional */ } }
     window.scrollTo(0, 0);
   }
   function renderAccount() {
@@ -276,6 +277,7 @@
     const before = d.s;
     d.s += ds / rate; d.w += ds * stWps();
     try { LL.time(ds / rate); } catch (e) { /* learning log (148b) not loaded */ }   // in memory only; written once a minute
+    try { BT.add(S.book.id, ds / rate); } catch (e) { /* book time (148c) not loaded */ }   // same: memory, written about once a minute
     if (P.calm !== true && ST.goal > 0 && before < ST.goal * 60 && d.s >= ST.goal * 60) { buzz('goal'); toast('Daily goal reached. Nice work!', 4000); }
     stDirty = true;
     if (now - stLastSave > 15000) stSave();

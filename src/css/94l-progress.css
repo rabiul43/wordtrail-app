@@ -1,0 +1,60 @@
+/* Progress (169f-progress.js): tiles and growth chart inside Account > Your activity. Only .pg* classes; built on the learning kit (94-learn-ui.css).
+   Remove this file, 169f-progress.js, their build.py lines, the #pg section in 10-body-views.html and the PG call in acctView (090) to go back. */
+.pg { display: grid; gap: var(--s-3); margin: 0 0 var(--s-5, 1.5rem); }
+.pg[hidden] { display: none; }
+.pg > h2 { margin: 0; font: 800 var(--h2)/1.2 var(--font-display); color: var(--ink); }
+.pg-streak { display: flex; align-items: center; gap: var(--s-4); }
+.pg-streak.on { --wl-cbg: var(--accent-soft); --wl-cbd: var(--accent); }
+.pg-flame { flex: none; font-size: 2.6rem; line-height: 1; }
+.pg-streak:not(.on) .pg-flame { filter: grayscale(1); opacity: .6; }
+.pg-streak-n { font: 800 1.5rem/1.15 var(--font-ui); }
+.pg-streak-n strong { font-size: 2.2rem; }
+.pg-streak p { margin: .15rem 0 0; font: 500 1.05rem/1.3 var(--font-ui); color: var(--muted); }
+.pg-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); }
+.pg-tile { gap: 4px; }
+.pg-ic { font-size: 1.35rem; line-height: 1; }
+.pg-tile .wl-stat__value { font-size: 2rem; }
+.pg-tile .wl-stat__value.pg-ok { color: var(--wl-ok-text); }
+.pg-tile .wl-stat__label { text-transform: none; letter-spacing: 0; font-size: 1.05rem; }
+.pg-chart-h { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); margin-bottom: var(--s-2); }
+.pg-chart-h strong { font: 800 1.2rem/1.2 var(--font-ui); }
+.pg-chart-h span { font: 500 1rem/1.2 var(--font-ui); color: var(--muted); }
+.pg-svg svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pg-grid { stroke: color-mix(in srgb, var(--line) 60%, transparent); stroke-width: 1; }
+.pg-tick { fill: var(--muted); font: 600 11px var(--font-ui); }
+.pg-end { fill: var(--ink); font: 800 13px var(--font-ui); }
+.pg-line { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.pg-line--c, .pg-dot--c { stroke: var(--accent); }
+.pg-line--m, .pg-dot--m { stroke: var(--wl-ok); }
+.pg-dot { stroke-width: 2; }
+.pg-dot--c { fill: var(--accent); stroke: var(--surface); }
+.pg-dot--m { fill: var(--wl-ok); stroke: var(--surface); }
+.pg-legend { display: flex; gap: var(--s-4); margin-top: var(--s-2); font: 600 1.05rem/1.2 var(--font-ui); color: var(--ink); }
+.pg-legend span { display: inline-flex; align-items: center; gap: .45rem; }
+.pg-sw { display: inline-block; width: .85rem; height: .85rem; }
+.pg-sw--c { border-radius: 50%; background: var(--accent); }
+.pg-sw--m { border-radius: 2px; background: var(--wl-ok); }
+:root[data-theme="contrast"] .pg-dot--c, :root[data-theme="contrast"] .pg-dot--m { stroke: #000; }
+.pg-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) { .pg-svg svg { animation: wl-slide-up .25s ease-out; } }
+/* Task 25: books and milestones */
+.pg-box { display: grid; gap: var(--s-2); }
+.pg-box > h3 { margin: var(--s-2) 0 0; font: 800 1.2rem/1.2 var(--font-ui); color: var(--ink); }
+.pg-books { display: grid; gap: var(--s-3); }
+.pg-book { display: grid; gap: var(--s-2); }
+.pg-book-t { font: 800 1.2rem/1.25 var(--font-ui); overflow-wrap: anywhere; }
+.pg-book-s { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2) var(--s-3); }
+.pg-book-s div { display: flex; flex-direction: column; min-width: 0; }
+.pg-book-s strong { font: 800 1.35rem/1.2 var(--font-ui); font-variant-numeric: tabular-nums; }
+.pg-book-s span { font: 500 1rem/1.3 var(--font-ui); color: var(--muted); }
+.pg-more { justify-self: start; min-height: 44px; padding: 0 var(--s-2); font: 800 1rem/1 var(--font-ui); color: var(--accent); background: none; border: 0; cursor: pointer; }
+.pg-more[hidden] { display: none; }
+.pg-more:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+.pg-ms { display: grid; margin: 0; padding: 0; list-style: none; border: 2px solid var(--line); border-radius: var(--r-card); background: var(--surface); }
+.pg-ms li { display: flex; align-items: center; gap: var(--s-3); min-height: 48px; padding: var(--s-2) var(--s-4); font: 600 1.1rem/1.3 var(--font-ui); color: var(--ink); }
+.pg-ms li + li { border-top: 2px solid var(--line); }
+.pg-ms-mark { flex: none; display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; box-sizing: border-box; border: 2px solid var(--line); border-radius: 50%; font-size: .95rem; font-weight: 800; }
+.pg-ms .is-done .pg-ms-mark { color: var(--wl-ok-ink); background: var(--wl-ok); border-color: var(--wl-ok); }
+.pg-ms-t { flex: 1 1 auto; min-width: 0; }
+.pg-ms-n { flex: none; font: 600 1rem/1.2 var(--font-ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.pg-ms .is-done .pg-ms-n { color: var(--wl-ok-text); }

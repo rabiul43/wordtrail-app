@@ -21,6 +21,7 @@
               no repeats, oldest first, the last 10
        cnt    { rec, und, rcl, use }: right answers per level (Hard, Good and Easy are right; Again is not)
        st     'new' | 'learning' | 'familiar' | 'mastered' (stage() below)
+       mt     time (ms) the word last BECAME mastered; set by review(), absent on older words (the Progress chart then uses lr)
      Mastered needs BOTH: right recall answers on 3 separate days AND an interval of 21 days or more. A forgotten word (Again) has no
      interval, so it is not mastered any more until it has grown back. An old word with a long interval but no recall days is 'familiar'.
 
@@ -118,6 +119,7 @@
         if (RECALL[kind]) out.rdays = days((Array.isArray(s.rdays) ? s.rdays : []).concat(dayOf(now, o.tz)));
       }
       out.st = stage(out);
+      if (out.st === 'mastered' && s.st !== 'mastered') out.mt = now;   // when it became mastered (Progress chart, 169f)
       return out;
     }
 
