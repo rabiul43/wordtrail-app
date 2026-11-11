@@ -55,7 +55,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `161-live-translate.js` | 138 | 17 | 7 | 5 |
 | `161b-reading-modes.js` | 183 | 22 | 1 | 11 |
 | `161c-reveal-save.js` | 189 | 2 | 1 | 10 |
-| `161d-old-words.js` | 272 | 4 | 2 | 8 |
+| `161d-old-words.js` | 273 | 4 | 2 | 9 |
 | `161e-known-underline.js` | 286 | 5 | 3 | 10 |
 | `162-learn-ui-preview.js` | 87 | 0 | 0 | 0 |
 | `163-word-panel.js` | 100 | 1 | 1 | 11 |
@@ -72,7 +72,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `169c-today.js` | 203 | 1 | 0 | 13 |
 | `169d-today-card.js` | 30 | 1 | 1 | 0 |
 | `169e-learn-button.js` | 105 | 1 | 0 | 10 |
-| `169l-goal.js` | 216 | 2 | 0 | 14 |
+| `169l-goal.js` | 217 | 2 | 0 | 14 |
 | `169f-progress.js` | 199 | 1 | 0 | 5 |
 | `169g-question-screen.js` | 192 | 1 | 0 | 5 |
 | `169h-echo-mode.js` | 209 | 2 | 0 | 13 |
@@ -139,7 +139,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`askConfirm`, `toast`); `090-synced-stats-book-search.js` (`stDirty`, `stLoad`, `stSave`, `stSummary`); `102-home-sections.js` (`plural`); `120-search-recommendations.js` (`paintCards`); `140-open-book.js` (`updateHeader`); `150-player-reader.js` (`loadAudio`, `pre`); `280-downloads-progress.js` (`dqClear`, `dqGet`, `fmtMB`, `paintDl`, `renderTracks`); `300-wiring.js` (`init`)
 
-**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `HF_PROXY` (265), `OFF` (080, 120, 140, 280, 281), `PROXY` (133, 280), `adb` (280), `buzz` (12 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280, 281), `dlOk` (180, 280, 281), `dlPersist` (280), `dlReady` (090, 140, 280, 281, 282), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090, 280, 281), `dmMB` (280, 281, 282), `dmRender` (280, 290), `dmSize` (090, 280, 281, 282), `dmUsedPct` (280), `fmt` (8 files), `fmtLong` (8 files), `fmtShort` (101, 105, 110), `guideDoc` (33 files), `idb` (17 files), `isLocal` (050, 140, 150, 180, 280), `learnOn` (120, 131b, 161b, 161e, 169f), `motionOk` (080, 102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offForced` (280), `offHave` (120, 280), `offMsg` (280), `offNearSaved` (140, 280), `offTrackOn` (140, 280), `reduceMotion` (090, 150, 246, 247), `savePrefs` (27 files), `srcSeq` (150), `store` (52 files), `storeHook` (295), `warmUrl` (050, 140, 150)
+**Shared:** `GUIDE_REG` (080), `GUIDE_SECS` (080), `HF_PROXY` (265), `OFF` (080, 120, 140, 280, 281), `PROXY` (133, 280), `adb` (280), `buzz` (12 files), `curSrc` (150), `decode` (070, 130, 133), `dlBlob` (170, 180), `dlClearUrls` (140, 280), `dlDropTrack` (150, 280), `dlKey` (140, 150), `dlMeta` (090, 120, 280, 281), `dlOk` (180, 280, 281), `dlPersist` (280), `dlReady` (090, 140, 280, 281, 282), `dlSaved` (180, 280), `dlUrls` (150), `dlWarmAround` (150, 280), `dmDeleteAll` (300), `dmDeleteFinished` (300), `dmDrop` (090, 280, 281), `dmMB` (280, 281, 282), `dmRender` (280, 290), `dmSize` (090, 280, 281, 282), `dmUsedPct` (280), `fmt` (8 files), `fmtLong` (8 files), `fmtShort` (101, 105, 110), `guideDoc` (33 files), `idb` (17 files), `isLocal` (050, 140, 150, 180, 280), `learnOn` (120, 131b, 161b, 161d, 161e, 169f), `motionOk` (080, 102, 103, 110, 120), `offBlock` (133, 140), `offBooks` (280), `offDim` (101, 120), `offForced` (280), `offHave` (120, 280), `offMsg` (280), `offNearSaved` (140, 280), `offTrackOn` (140, 280), `reduceMotion` (090, 150, 246, 247), `savePrefs` (27 files), `srcSeq` (150), `store` (52 files), `storeHook` (295), `warmUrl` (050, 140, 150)
 
 ### `031-virtual-list.js`
 
@@ -395,7 +395,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `161d-old-words.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`guideDoc`, `savePrefs`); `080-ui-shell-favourites.js` (`toast`); `150-player-reader.js` (`scrollGlide`); `160-learning-tools.js` (`trLang`, `vocCount`); `161c-reveal-save.js` (`RVC`); `161e-known-underline.js` (`kuClose`)
+**Needs:** `030-helpers-offline-audio.js` (`guideDoc`, `learnOn`, `savePrefs`); `080-ui-shell-favourites.js` (`toast`); `150-player-reader.js` (`scrollGlide`); `160-learning-tools.js` (`trLang`, `vocCount`); `161c-reveal-save.js` (`RVC`); `161e-known-underline.js` (`kuClose`)
 
 **Shared:** `owChapter` (150), `owRepaint` (150)
 

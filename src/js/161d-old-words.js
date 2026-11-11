@@ -86,7 +86,7 @@
   const OW = (() => {
     const st = { m: null, C: null, cache: new Map(), tok: 0, tm: 0, rng: new Map(), hl: {}, card: null, cur: null, seq: 0, tr: '' };
     const can = () => typeof Highlight !== 'undefined' && !!(window.CSS && CSS.highlights);
-    const enabled = () => P.oldWords !== false && can();
+    const enabled = () => P.oldWords !== false && can() && learnOn();   // Standard mode: no old-word or idiom lines, no card
     function matcher() {
       if (st.m) return st.m;
       let w = {}, i = {};
@@ -266,7 +266,8 @@
       });
     }
     guideDoc('reading', 'Old words and idioms', 'Old-fashioned words get a purple line and idioms a blue line. Tap one to see what it means today, then Save phrase adds it to My words. You can turn the lines off in Settings > Reading.');
-    return { run, repaint, showCard, closeCard, rangeOf, hitAt };   // rangeOf, hitAt: also used by 161e (new words)
+    function sync() { if (!enabled()) { st.tok++; clearTimeout(st.tm); closeCard(); clearAll(); } else if (S.model && !S.rb && S.sec != null) run(S.sec); }   // 169l calls this when Learn mode is switched
+    return { run, repaint, showCard, closeCard, rangeOf, hitAt, sync };   // rangeOf, hitAt: also used by 161e (new words)
   })();
   function owChapter(i) { OW.run(i); }
   function owRepaint(id) { OW.repaint(id); }

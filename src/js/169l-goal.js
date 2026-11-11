@@ -22,11 +22,11 @@
        GLC (pure, between GLC-START/END): ymd, parse, days, mode, fromChoice, withLearn, withExam, examState, elapsed, tabLabel, normTarget, askOn, offerOn.
        GL (screen): get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label.
      STANDARD | LEARN GATE (one switch, Settings > Reading > Learning > Learn mode): Standard = learn mode off (the default). Learn mode on sets data-learn on <html>.
-       Hidden in Standard by CSS ([data-lrn], 99e3-learn-gate.css): Learn tab, Learn button (169e) and menu item, Words tile in Controls, Save word (163), Save phrase and the eye bubbles (161c),
+       Hidden in Standard by CSS ([data-lrn], 99e3-learn-gate.css): Learn tab, Learn button (169e) and menu item, Words tile in Controls, Save word (163), Save phrase and the eye bubbles (161c), old words and idioms (161d lines and card),
        the English / Both / Translation bar (161b; Standard shows the original text only, RM sync via rmSync, P.rmode is kept),
        coverage chip and card (161e), book preview (131b), Account > Learning progress (#pg), the learning rows in Settings. Switched off in code with learnOn() (030):
        Underline new words (161e, KU.sync), the morning review card (120), the progress block (169f), the preview request (131b).
-       STAYS in Standard: tap-a-word card and dictionary (163), press-and-hold translate (160), Live translate, old words and idioms.
+       STAYS in Standard: tap-a-word card and dictionary (163), press-and-hold translate (160), Live translate.
        Nothing is deleted when the mode changes. Existing users with saved words get one toast (P.learnNote). Test: node tools/learn_gate_check.js
      Styles 94t-goal.css (after 99e: the phone bar gets a fifth column). Test: node tools/goal_check.js */
   /* GLC-START */
@@ -198,6 +198,7 @@
     function paintGate() {
       document.documentElement.toggleAttribute('data-learn', tabOn());   // no attribute = Standard: every [data-lrn] element is hidden by CSS
       try { KU.sync(); } catch (e) { /* reader not ready */ }          // underline new words + coverage chip follow the mode, live
+      try { OW.sync(); } catch (e) { /* reader not ready */ }          // old words and idioms (purple and blue lines, the Old use card)
       try { loadTod(); } catch (e) { /* Home not ready */ }            // the morning review card on Home
       try { rmSync(); } catch (e) { /* reader not ready */ }           // reading modes (English / Both / Translation): Standard = English only
       if (!tabOn()) document.querySelectorAll('[data-rv]').forEach(n => n.removeAttribute('data-rv'));   // translations opened with the eye bubbles close
