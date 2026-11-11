@@ -36,3 +36,15 @@
 
 /* Onboarding goal card: title above the description, as in the mock-up */
 #ob-step-g .ob-lvl-t, #ob-step-g .ob-lvl-d { display: block; }
+
+/* First screen of onboarding, as in the mock-up: a progress bar on top, no logo, big option cards with an emoji and a check mark, Continue at the bottom */
+.ob-dots { gap: .3rem; }
+.ob-dot { flex: 1; width: auto; height: .5rem; border-radius: var(--r-pill); }
+.ob-card:has(#ob-step-g:not([hidden])) { min-height: calc(100dvh - 4rem); }
+.ob-card:has(#ob-step-g:not([hidden])) .ob-logo { display: none; }
+#ob-step-g { flex: 1; }
+#ob-step-g .ob-h { font-size: 1.7rem; }
+#ob-step-g .ob-lvl { padding: 1rem 1.1rem; }
+#ob-step-g .ob-emoji { font-size: 1.9rem; line-height: 1; }
+#ob-step-g .ob-lvl[aria-pressed="true"]::after { content: "\2714"; margin-left: auto; color: var(--accent); font-size: 1.2rem; }
+#ob-step-g .ob-actions { margin-top: auto; padding-top: 1rem; }

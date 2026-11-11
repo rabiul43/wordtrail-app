@@ -228,8 +228,10 @@
     </div>
     <div>
       <h3>Learning</h3>
-      <div class="row"><label style="flex:1">How you use Wordtrail<small class="spd-s">Shapes Home and the bottom bar. Your saved words and progress are kept when you switch</small></label></div>
-      <div class="row"><div class="seg" id="seg-goal" role="group" aria-label="How you use Wordtrail"><button type="button" data-v="stories" aria-pressed="false">Enjoy stories</button><button type="button" data-v="learn" aria-pressed="false">Learn English</button><button type="button" data-v="ielts" aria-pressed="false">Prepare for IELTS</button></div></div>
+      <div class="row"><label for="in-learnmode" style="flex:1">Learn mode<small class="spd-s">Off by default. Adds a Learn tab and the daily plan. Your saved words and progress are kept when you switch it</small></label><input id="in-learnmode" type="checkbox"></div>
+      <div id="gl-learn-rows" hidden>
+        <div class="row"><label for="in-examon" style="flex:1">Prepare for IELTS<small class="spd-s">An exam countdown on Home</small></label><input id="in-examon" type="checkbox"></div>
+      </div>
       <div id="gl-exam-rows" hidden>
         <div class="row"><label for="in-examdate" style="flex:1">Exam date</label><input id="in-examdate" type="date"></div>
         <div class="row"><label for="in-examtarget" style="flex:1">Target band</label><select id="in-examtarget" class="num" style="width:auto"><option value="">Not set</option><option value="5.0">5.0</option><option value="5.5">5.5</option><option value="6.0">6.0</option><option value="6.5">6.5</option><option value="7.0">7.0</option><option value="7.5">7.5</option><option value="8.0">8.0</option><option value="8.5">8.5</option><option value="9.0">9.0</option></select></div>

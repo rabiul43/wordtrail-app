@@ -99,7 +99,7 @@ t('the Learn-tab offer: Enjoy stories only, from the third saved word, once', ()
   assert.strictEqual(G.offerOn(s, 2), false); assert.strictEqual(G.offerOn(s, 3), true);
   assert.strictEqual(G.offerOn(Object.assign({}, s, { offered: true }), 9), false);
   assert.strictEqual(G.offerOn(G.fromChoice('learn', now, null), 9), false);
-  assert.strictEqual(G.offerOn(undefined, 9), false);
+  assert.strictEqual(G.offerOn(undefined, 9), true);   // not chosen = learn mode off
 });
 t('the offer flag survives a change of goal', () => {
   const g = G.fromChoice('learn', now, Object.assign(G.fromChoice('stories', now, null), { offered: true }));

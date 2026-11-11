@@ -67,12 +67,12 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `167d-grammar-detector.js` | 389 | 1 | 0 | 2 |
 | `167e-grammar-sheet.js` | 246 | 2 | 1 | 1 |
 | `168-review-lesson.js` | 256 | 1 | 0 | 6 |
-| `169-learn-switch.js` | 52 | 1 | 1 | 6 |
+| `169-learn-switch.js` | 51 | 1 | 1 | 6 |
 | `169b-learn-hub.js` | 63 | 1 | 1 | 4 |
 | `169c-today.js` | 203 | 1 | 0 | 13 |
 | `169d-today-card.js` | 30 | 1 | 1 | 0 |
 | `169e-learn-button.js` | 105 | 1 | 0 | 10 |
-| `169l-goal.js` | 195 | 2 | 0 | 13 |
+| `169l-goal.js` | 201 | 2 | 0 | 13 |
 | `169f-progress.js` | 199 | 1 | 0 | 4 |
 | `169g-question-screen.js` | 192 | 1 | 0 | 5 |
 | `169h-echo-mode.js` | 209 | 2 | 0 | 13 |

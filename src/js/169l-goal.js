@@ -3,21 +3,24 @@
        learn  true / false   the Learn tab (and the Learn side of My Library) is part of the app
        exam   { on, kind: 'ielts', date: 'YYYY-MM-DD' or '', target: 4-9 in halves or null, from: 'YYYY-MM-DD' }
               an exam countdown on Home; an exam needs learning on (turning learning off turns the exam off, the date and target are kept)
+     LEARN MODE IS OFF BY DEFAULT: a person who has not chosen counts as off (no Learn tab, no Today card, no Books/Learn switch).
+     Settings > Reading > Learning has a Learn mode switch and, under it, a Prepare for IELTS switch with the date and target.
      Saved as P.goal in wt:prefs (so it syncs like every setting): { v: 1, learn, exam, ask: 'done' or '', offered: bool }.
      No P.goal = the person has not chosen yet: the app looks exactly as it did before (Learn switch in My Library, Today card, no exam card).
      The three-way choice in onboarding and in Settings is only a view of the two settings:
        Enjoy stories = learn off   Learn English = learn on, exam off   Prepare for IELTS = learn on, exam on
      What each state changes:
        Learn tab    a tab in the bottom bar / side rail (data-tab="learn", labelled Learn, or IELTS while an exam is on). It opens My Library on its Learn side.
-                    The Books | Learn switch inside My Library is hidden once a goal is chosen (the tab replaces it).
+                    The Books | Learn switch inside My Library is hidden (the tab replaces it).
        Today card   hidden in Enjoy stories, and while an exam is on (the exam card has the plan button and "N of M done"). TDH.on asks GL.todayOk().
        Exam card    #gl-home on Home: days left, a bar of the preparation time, the plan button; or "set your date", "exam day", "date has passed".
-       Ask card     #gl-home for people who have not chosen (existing users): one dismissible card. Dismiss = ask: 'done'.
+       First visit  the goal card is the first onboarding screen (40-onboarding.html, 300-wiring). There is no card on Home: someone who skipped it, or
+                    used the app before, has learn mode off and can turn it on in Settings.
        Offer        Enjoy stories: after 3 saved words, once, a toast "Want a Learn tab to review these?" (WS.saveWithContext calls GL.newWord).
      The reader's Learn button (P.learnBtn) is NOT tied to the goal. Choosing a goal for the first time sets its default
      (off for Enjoy stories, on otherwise); after that only its own Settings switch changes it.
        GLC (pure, between GLC-START/END): ymd, parse, days, mode, fromChoice, withLearn, withExam, examState, elapsed, tabLabel, normTarget, askOn, offerOn.
-       GL (screen): get, mode, tabOn, todayOk, choose, setLearn, setExam, dismiss, paint, openLearn, newWord, label.
+       GL (screen): get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label.
      Styles 94t-goal.css (after 99e: the phone bar gets a fifth column). Test: node tools/goal_check.js */
   /* GLC-START */
   const GLC = (() => {
@@ -71,7 +74,7 @@
     }
     const tabLabel = g => mode(g) === 'exam' ? 'IELTS' : 'Learn';
     const askOn = g => !valid(g) && !(g && g.ask === 'done');   // not chosen and not dismissed
-    const offerOn = (g, count) => mode(g) === 'stories' && !g.offered && count >= 3;
+    const offerOn = (g, count) => (mode(g) === 'stories' || mode(g) === 'unset') && !(g && g.offered) && count >= 3;   // learn mode off, from the third saved word, once
     return { ymd, parse, days, mode, fromChoice, withLearn, withExam, examState, elapsed, tabLabel, normTarget, askOn, offerOn };
   })();
   /* GLC-END */
@@ -80,7 +83,7 @@
     const get = () => (GLC.mode(P.goal) === 'unset' ? null : P.goal);
     const mode = () => GLC.mode(P.goal);
     const tabOn = () => { const m = mode(); return m === 'learn' || m === 'exam'; };
-    const todayOk = () => { const m = mode(); return m !== 'stories' && m !== 'exam'; };   // Enjoy stories: no Today card; an exam has its own card
+    const todayOk = () => mode() === 'learn';   // Learn mode is off by default (no Today card); an exam has its own card
     const label = () => GLC.tabLabel(P.goal);
     const NAMES = { stories: 'Enjoy stories', learn: 'Learn English', exam: 'Prepare for IELTS' };
     let ob = null;   // onboarding: a choice made on the first card, applied when onboarding finishes (see 300)
@@ -100,7 +103,6 @@
       if (target !== undefined) ex.target = GLC.normTarget(target);
       save(Object.assign({}, g, { exam: ex }));
     }
-    function dismiss() { save(Object.assign({}, GLC.mode(P.goal) === 'unset' ? { v: 0 } : P.goal, { ask: 'done' })); }
 
     /* ----- the Learn tab ----- */
     const CAP = '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6"/>';
@@ -111,7 +113,7 @@
       document.documentElement.toggleAttribute('data-goal-tab', on);
       const sp = tab.querySelector('.gl-tab-t'); if (sp) sp.textContent = label();
       tab.title = label();
-      if (!on && typeof curTab !== 'undefined' && curTab === 'shelf' && LSW.cur === 'learn' && mode() === 'stories') LSW.toBooks();
+      if (!on && typeof curTab !== 'undefined' && curTab === 'shelf' && LSW.cur === 'learn') LSW.toBooks();
       try { tabHlPaint(); } catch (e) { /* tab bar not ready */ }
     }
     function openLearn() {
@@ -122,7 +124,7 @@
 
     /* ----- Home: the exam card or the ask card ----- */
     const fmtDate = s => { const p = GLC.parse(s); return p ? new Date(p.y, p.m - 1, p.d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''; };
-    function openSettingsAt() { closeSheets(); openSheet('sheet-settings'); setTimeout(() => { const n = $('#seg-goal'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
+    function openSettingsAt() { closeSheets(); openSheet('sheet-settings'); setTimeout(() => { const n = $('#in-learnmode'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
     function examCard(g, now) {
       const st = GLC.examState(g, now), ex = g.exam;
       const btn = (cls, text, fn) => h('button', { type: 'button', class: 'gl-btn ' + cls, onclick: fn }, text);
@@ -144,20 +146,12 @@
       if (bar) card.append(bar);
       return card;
     }
-    function askCard() {
-      const pick = (c, text, ic) => h('button', { type: 'button', class: 'gl-opt', onclick: () => choose(c, true) }, h('span', { class: 'gl-opt-ic', 'aria-hidden': 'true' }, ic), h('span', {}, text));
-      return h('div', { class: 'wl-card gl-card gl-card--ask', role: 'group', 'aria-label': 'How do you want to use Wordtrail?' },
-        h('span', { class: 'gl-top' }, h('span', { class: 'gl-txt' }, h('span', { class: 'gl-k' }, 'NEW'), h('span', { class: 'gl-big' }, 'How do you want to use Wordtrail?'), h('span', { class: 'gl-sub' }, 'Pick one and Home adapts. You can change it any time in Settings.')),
-          h('button', { type: 'button', class: 'gl-x', 'aria-label': 'Not now', onclick: dismiss }, '\u00D7')),
-        h('span', { class: 'gl-opts' }, pick('stories', 'Enjoy stories', '\uD83C\uDFA7'), pick('learn', 'Learn English', '\uD83C\uDF31'), pick('ielts', 'Prepare for IELTS', '\uD83C\uDF93')));
-    }
     function paintHome() {
       const sec = $('#gl-home'); if (!sec) return;
       sec.textContent = '';
       const now = new Date(), m = mode();
       try {
         if (m === 'exam') sec.append(examCard(P.goal, now));
-        else if (GLC.askOn(P.goal) && store.get('wt:onboarded', 0)) sec.append(askCard());
       } catch (e) { sec.textContent = ''; }
       sec.hidden = !sec.firstChild;
       try { TDH.paint(); } catch (e) { /* Today card not ready */ }
@@ -165,8 +159,10 @@
 
     /* ----- Settings ----- */
     function paintSettings() {
-      const m = mode(), seg = $('#seg-goal'); if (!seg) return;
-      $$('#seg-goal button').forEach(b => b.setAttribute('aria-pressed', String((m === 'unset' ? '' : m === 'exam' ? 'ielts' : m) === b.dataset.v)));
+      const m = mode(), sw = $('#in-learnmode'); if (!sw) return;
+      sw.checked = m === 'learn' || m === 'exam';
+      const lr = $('#gl-learn-rows'); if (lr) lr.hidden = !sw.checked;
+      const eo = $('#in-examon'); if (eo) eo.checked = m === 'exam';
       const g = m === 'unset' ? null : P.goal, ex = g && g.exam, rows = $('#gl-exam-rows');
       if (rows) rows.hidden = m !== 'exam';
       const d = $('#in-examdate'), t = $('#in-examtarget');
@@ -174,7 +170,9 @@
       if (t) t.value = ex && ex.target ? String(ex.target.toFixed(1)) : '';
     }
     function wire() {
-      $$('#seg-goal button').forEach(b => b.addEventListener('click', () => choose(b.dataset.v, GLC.mode(P.goal) === 'unset')));
+      const lm = $('#in-learnmode'), eo = $('#in-examon');
+      if (lm) lm.addEventListener('change', e => { if (GLC.mode(P.goal) === 'unset') choose(e.target.checked ? 'learn' : 'stories', true); else setLearn(e.target.checked); });
+      if (eo) eo.addEventListener('change', e => setExam(e.target.checked));
       const d = $('#in-examdate'), t = $('#in-examtarget');
       if (d) d.addEventListener('change', e => setExamField(e.target.value, undefined));
       if (t) t.addEventListener('change', e => setExamField(undefined, e.target.value));
@@ -191,5 +189,5 @@
 
     function paint() { paintTab(); paintHome(); paintSettings(); }
     function start() { wire(); paint(); document.addEventListener('visibilitychange', () => { if (!document.hidden && GLC.mode(P.goal) === 'exam') paintHome(); }); }   // the day changed while the app was in the background
-    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, dismiss, paint, openLearn, newWord, label, start, NAMES };
+    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label, start, NAMES };
   })();

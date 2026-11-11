@@ -5263,6 +5263,18 @@ html[data-acct] .sb-avatar .sb-gear { display: block; }
 
 /* Onboarding goal card: title above the description, as in the mock-up */
 #ob-step-g .ob-lvl-t, #ob-step-g .ob-lvl-d { display: block; }
+
+/* First screen of onboarding, as in the mock-up: a progress bar on top, no logo, big option cards with an emoji and a check mark, Continue at the bottom */
+.ob-dots { gap: .3rem; }
+.ob-dot { flex: 1; width: auto; height: .5rem; border-radius: var(--r-pill); }
+.ob-card:has(#ob-step-g:not([hidden])) { min-height: calc(100dvh - 4rem); }
+.ob-card:has(#ob-step-g:not([hidden])) .ob-logo { display: none; }
+#ob-step-g { flex: 1; }
+#ob-step-g .ob-h { font-size: 1.7rem; }
+#ob-step-g .ob-lvl { padding: 1rem 1.1rem; }
+#ob-step-g .ob-emoji { font-size: 1.9rem; line-height: 1; }
+#ob-step-g .ob-lvl[aria-pressed="true"]::after { content: "\2714"; margin-left: auto; color: var(--accent); font-size: 1.2rem; }
+#ob-step-g .ob-actions { margin-top: auto; padding-top: 1rem; }
 /* ---------- Confirm dialog (replaces the browser's confirm() popup; see askConfirm in 080) ---------- */
 .cf-back { position: fixed; inset: 0; z-index: 400; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 env(safe-area-inset-bottom); background: color-mix(in srgb, #000 62%, transparent); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity var(--dur) var(--ease); }
 .cf-back.on { opacity: 1; }
@@ -9159,8 +9171,10 @@ html[data-lite] .player.opening .pcover-poster { animation: none; }
     </div>
     <div>
       <h3>Learning</h3>
-      <div class="row"><label style="flex:1">How you use Wordtrail<small class="spd-s">Shapes Home and the bottom bar. Your saved words and progress are kept when you switch</small></label></div>
-      <div class="row"><div class="seg" id="seg-goal" role="group" aria-label="How you use Wordtrail"><button type="button" data-v="stories" aria-pressed="false">Enjoy stories</button><button type="button" data-v="learn" aria-pressed="false">Learn English</button><button type="button" data-v="ielts" aria-pressed="false">Prepare for IELTS</button></div></div>
+      <div class="row"><label for="in-learnmode" style="flex:1">Learn mode<small class="spd-s">Off by default. Adds a Learn tab and the daily plan. Your saved words and progress are kept when you switch it</small></label><input id="in-learnmode" type="checkbox"></div>
+      <div id="gl-learn-rows" hidden>
+        <div class="row"><label for="in-examon" style="flex:1">Prepare for IELTS<small class="spd-s">An exam countdown on Home</small></label><input id="in-examon" type="checkbox"></div>
+      </div>
       <div id="gl-exam-rows" hidden>
         <div class="row"><label for="in-examdate" style="flex:1">Exam date</label><input id="in-examdate" type="date"></div>
         <div class="row"><label for="in-examtarget" style="flex:1">Target band</label><select id="in-examtarget" class="num" style="width:auto"><option value="">Not set</option><option value="5.0">5.0</option><option value="5.5">5.5</option><option value="6.0">6.0</option><option value="6.5">6.5</option><option value="7.0">7.0</option><option value="7.5">7.5</option><option value="8.0">8.0</option><option value="8.5">8.5</option><option value="9.0">9.0</option></select></div>
@@ -9486,21 +9500,21 @@ html[data-lite] .player.opening .pcover-poster { animation: none; }
 
       <div class="ob-levels" role="group" aria-label="What brings you to Wordtrail?">
         <button class="ob-lvl" id="ob-goal-stories" data-goal="stories" type="button" aria-pressed="true">
-          <span class="ob-lvl-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14h3v5H5a1 1 0 0 1-1-1zM20 14h-3v5h2a1 1 0 0 0 1-1z"/></svg></span>
+          <span class="ob-lvl-ic ob-emoji" aria-hidden="true">🎧</span>
           <span class="ob-lvl-body">
             <span class="ob-lvl-t">Enjoy stories</span>
             <span class="ob-lvl-d">Just listening and reading</span>
           </span>
         </button>
         <button class="ob-lvl" id="ob-goal-learn" data-goal="learn" type="button" aria-pressed="false">
-          <span class="ob-lvl-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 13c0-4.5-3.5-7-8-7 0 4.5 3 7 8 7z"/><path d="M12 11c0-3.5 2.5-6 7-6 0 3.5-2.5 6-7 6z"/></svg></span>
+          <span class="ob-lvl-ic ob-emoji" aria-hidden="true">🌱</span>
           <span class="ob-lvl-body">
             <span class="ob-lvl-t">Learn English</span>
             <span class="ob-lvl-d">Words, speaking, daily plan</span>
           </span>
         </button>
         <button class="ob-lvl" id="ob-goal-ielts" data-goal="ielts" type="button" aria-pressed="false">
-          <span class="ob-lvl-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6"/></svg></span>
+          <span class="ob-lvl-ic ob-emoji" aria-hidden="true">🎓</span>
           <span class="ob-lvl-body">
             <span class="ob-lvl-t">Prepare for IELTS</span>
             <span class="ob-lvl-d">Exam countdown and practice</span>
@@ -23966,10 +23980,9 @@ const Core = makeCore();
     function top(hub) {
       wire();
       const show = shelfMode !== 'dl' && (!phoneUI() || hub);   // not on a Books sub-page, and not on the Downloads page
-      const goal = GL.mode();   // 169l: once a goal is chosen the Learn tab replaces this switch, and Enjoy stories has no Learn side
-      if (goal === 'stories' && cur === 'learn') cur = 'books';
+      if (!GL.tabOn() && cur === 'learn') cur = 'books';   // 169l: Learn mode is off by default and has no Learn side; the Learn tab replaces this switch
       const learn = show && cur === 'learn';
-      $('#shelf-top').hidden = !show || goal !== 'unset';
+      $('#shelf-top').hidden = true;
       if (show) {
         $$('#shelf-top .wl-seg__btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === cur)));
         const n = dueN(), badge = $('#sht-badge');
@@ -24393,21 +24406,24 @@ const Core = makeCore();
        learn  true / false   the Learn tab (and the Learn side of My Library) is part of the app
        exam   { on, kind: 'ielts', date: 'YYYY-MM-DD' or '', target: 4-9 in halves or null, from: 'YYYY-MM-DD' }
               an exam countdown on Home; an exam needs learning on (turning learning off turns the exam off, the date and target are kept)
+     LEARN MODE IS OFF BY DEFAULT: a person who has not chosen counts as off (no Learn tab, no Today card, no Books/Learn switch).
+     Settings > Reading > Learning has a Learn mode switch and, under it, a Prepare for IELTS switch with the date and target.
      Saved as P.goal in wt:prefs (so it syncs like every setting): { v: 1, learn, exam, ask: 'done' or '', offered: bool }.
      No P.goal = the person has not chosen yet: the app looks exactly as it did before (Learn switch in My Library, Today card, no exam card).
      The three-way choice in onboarding and in Settings is only a view of the two settings:
        Enjoy stories = learn off   Learn English = learn on, exam off   Prepare for IELTS = learn on, exam on
      What each state changes:
        Learn tab    a tab in the bottom bar / side rail (data-tab="learn", labelled Learn, or IELTS while an exam is on). It opens My Library on its Learn side.
-                    The Books | Learn switch inside My Library is hidden once a goal is chosen (the tab replaces it).
+                    The Books | Learn switch inside My Library is hidden (the tab replaces it).
        Today card   hidden in Enjoy stories, and while an exam is on (the exam card has the plan button and "N of M done"). TDH.on asks GL.todayOk().
        Exam card    #gl-home on Home: days left, a bar of the preparation time, the plan button; or "set your date", "exam day", "date has passed".
-       Ask card     #gl-home for people who have not chosen (existing users): one dismissible card. Dismiss = ask: 'done'.
+       First visit  the goal card is the first onboarding screen (40-onboarding.html, 300-wiring). There is no card on Home: someone who skipped it, or
+                    used the app before, has learn mode off and can turn it on in Settings.
        Offer        Enjoy stories: after 3 saved words, once, a toast "Want a Learn tab to review these?" (WS.saveWithContext calls GL.newWord).
      The reader's Learn button (P.learnBtn) is NOT tied to the goal. Choosing a goal for the first time sets its default
      (off for Enjoy stories, on otherwise); after that only its own Settings switch changes it.
        GLC (pure, between GLC-START/END): ymd, parse, days, mode, fromChoice, withLearn, withExam, examState, elapsed, tabLabel, normTarget, askOn, offerOn.
-       GL (screen): get, mode, tabOn, todayOk, choose, setLearn, setExam, dismiss, paint, openLearn, newWord, label.
+       GL (screen): get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label.
      Styles 94t-goal.css (after 99e: the phone bar gets a fifth column). Test: node tools/goal_check.js */
   /* GLC-START */
   const GLC = (() => {
@@ -24461,7 +24477,7 @@ const Core = makeCore();
     }
     const tabLabel = g => mode(g) === 'exam' ? 'IELTS' : 'Learn';
     const askOn = g => !valid(g) && !(g && g.ask === 'done');   // not chosen and not dismissed
-    const offerOn = (g, count) => mode(g) === 'stories' && !g.offered && count >= 3;
+    const offerOn = (g, count) => (mode(g) === 'stories' || mode(g) === 'unset') && !(g && g.offered) && count >= 3;   // learn mode off, from the third saved word, once
     return { ymd, parse, days, mode, fromChoice, withLearn, withExam, examState, elapsed, tabLabel, normTarget, askOn, offerOn };
   })();
   /* GLC-END */
@@ -24470,7 +24486,7 @@ const Core = makeCore();
     const get = () => (GLC.mode(P.goal) === 'unset' ? null : P.goal);
     const mode = () => GLC.mode(P.goal);
     const tabOn = () => { const m = mode(); return m === 'learn' || m === 'exam'; };
-    const todayOk = () => { const m = mode(); return m !== 'stories' && m !== 'exam'; };   // Enjoy stories: no Today card; an exam has its own card
+    const todayOk = () => mode() === 'learn';   // Learn mode is off by default (no Today card); an exam has its own card
     const label = () => GLC.tabLabel(P.goal);
     const NAMES = { stories: 'Enjoy stories', learn: 'Learn English', exam: 'Prepare for IELTS' };
     let ob = null;   // onboarding: a choice made on the first card, applied when onboarding finishes (see 300)
@@ -24490,7 +24506,6 @@ const Core = makeCore();
       if (target !== undefined) ex.target = GLC.normTarget(target);
       save(Object.assign({}, g, { exam: ex }));
     }
-    function dismiss() { save(Object.assign({}, GLC.mode(P.goal) === 'unset' ? { v: 0 } : P.goal, { ask: 'done' })); }
 
     /* ----- the Learn tab ----- */
     const CAP = '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6"/>';
@@ -24501,7 +24516,7 @@ const Core = makeCore();
       document.documentElement.toggleAttribute('data-goal-tab', on);
       const sp = tab.querySelector('.gl-tab-t'); if (sp) sp.textContent = label();
       tab.title = label();
-      if (!on && typeof curTab !== 'undefined' && curTab === 'shelf' && LSW.cur === 'learn' && mode() === 'stories') LSW.toBooks();
+      if (!on && typeof curTab !== 'undefined' && curTab === 'shelf' && LSW.cur === 'learn') LSW.toBooks();
       try { tabHlPaint(); } catch (e) { /* tab bar not ready */ }
     }
     function openLearn() {
@@ -24512,7 +24527,7 @@ const Core = makeCore();
 
     /* ----- Home: the exam card or the ask card ----- */
     const fmtDate = s => { const p = GLC.parse(s); return p ? new Date(p.y, p.m - 1, p.d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''; };
-    function openSettingsAt() { closeSheets(); openSheet('sheet-settings'); setTimeout(() => { const n = $('#seg-goal'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
+    function openSettingsAt() { closeSheets(); openSheet('sheet-settings'); setTimeout(() => { const n = $('#in-learnmode'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
     function examCard(g, now) {
       const st = GLC.examState(g, now), ex = g.exam;
       const btn = (cls, text, fn) => h('button', { type: 'button', class: 'gl-btn ' + cls, onclick: fn }, text);
@@ -24534,20 +24549,12 @@ const Core = makeCore();
       if (bar) card.append(bar);
       return card;
     }
-    function askCard() {
-      const pick = (c, text, ic) => h('button', { type: 'button', class: 'gl-opt', onclick: () => choose(c, true) }, h('span', { class: 'gl-opt-ic', 'aria-hidden': 'true' }, ic), h('span', {}, text));
-      return h('div', { class: 'wl-card gl-card gl-card--ask', role: 'group', 'aria-label': 'How do you want to use Wordtrail?' },
-        h('span', { class: 'gl-top' }, h('span', { class: 'gl-txt' }, h('span', { class: 'gl-k' }, 'NEW'), h('span', { class: 'gl-big' }, 'How do you want to use Wordtrail?'), h('span', { class: 'gl-sub' }, 'Pick one and Home adapts. You can change it any time in Settings.')),
-          h('button', { type: 'button', class: 'gl-x', 'aria-label': 'Not now', onclick: dismiss }, '\u00D7')),
-        h('span', { class: 'gl-opts' }, pick('stories', 'Enjoy stories', '\uD83C\uDFA7'), pick('learn', 'Learn English', '\uD83C\uDF31'), pick('ielts', 'Prepare for IELTS', '\uD83C\uDF93')));
-    }
     function paintHome() {
       const sec = $('#gl-home'); if (!sec) return;
       sec.textContent = '';
       const now = new Date(), m = mode();
       try {
         if (m === 'exam') sec.append(examCard(P.goal, now));
-        else if (GLC.askOn(P.goal) && store.get('wt:onboarded', 0)) sec.append(askCard());
       } catch (e) { sec.textContent = ''; }
       sec.hidden = !sec.firstChild;
       try { TDH.paint(); } catch (e) { /* Today card not ready */ }
@@ -24555,8 +24562,10 @@ const Core = makeCore();
 
     /* ----- Settings ----- */
     function paintSettings() {
-      const m = mode(), seg = $('#seg-goal'); if (!seg) return;
-      $$('#seg-goal button').forEach(b => b.setAttribute('aria-pressed', String((m === 'unset' ? '' : m === 'exam' ? 'ielts' : m) === b.dataset.v)));
+      const m = mode(), sw = $('#in-learnmode'); if (!sw) return;
+      sw.checked = m === 'learn' || m === 'exam';
+      const lr = $('#gl-learn-rows'); if (lr) lr.hidden = !sw.checked;
+      const eo = $('#in-examon'); if (eo) eo.checked = m === 'exam';
       const g = m === 'unset' ? null : P.goal, ex = g && g.exam, rows = $('#gl-exam-rows');
       if (rows) rows.hidden = m !== 'exam';
       const d = $('#in-examdate'), t = $('#in-examtarget');
@@ -24564,7 +24573,9 @@ const Core = makeCore();
       if (t) t.value = ex && ex.target ? String(ex.target.toFixed(1)) : '';
     }
     function wire() {
-      $$('#seg-goal button').forEach(b => b.addEventListener('click', () => choose(b.dataset.v, GLC.mode(P.goal) === 'unset')));
+      const lm = $('#in-learnmode'), eo = $('#in-examon');
+      if (lm) lm.addEventListener('change', e => { if (GLC.mode(P.goal) === 'unset') choose(e.target.checked ? 'learn' : 'stories', true); else setLearn(e.target.checked); });
+      if (eo) eo.addEventListener('change', e => setExam(e.target.checked));
       const d = $('#in-examdate'), t = $('#in-examtarget');
       if (d) d.addEventListener('change', e => setExamField(e.target.value, undefined));
       if (t) t.addEventListener('change', e => setExamField(undefined, e.target.value));
@@ -24581,7 +24592,7 @@ const Core = makeCore();
 
     function paint() { paintTab(); paintHome(); paintSettings(); }
     function start() { wire(); paint(); document.addEventListener('visibilitychange', () => { if (!document.hidden && GLC.mode(P.goal) === 'exam') paintHome(); }); }   // the day changed while the app was in the background
-    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, dismiss, paint, openLearn, newWord, label, start, NAMES };
+    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label, start, NAMES };
   })();
   /* ---------- Progress: tiles and growth chart in Account > Your activity (PG) ----------
      No second dashboard: one section (#pg, in the Your activity page above "Your listening") that is filled when that page opens.
@@ -36370,7 +36381,7 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
     });
   }
   /* Settings shows which build this device runs, with a button that drops the saved page and reloads from the network. */
-  { const WT_BUILD = '2026-11-11-340094';
+  { const WT_BUILD = '2026-11-11-5c00a3';
     const v = $('#wt-ver'), u = $('#wt-upd');
     if (v) v.textContent = 'Version ' + WT_BUILD;
     if (u) u.addEventListener('click', async () => {

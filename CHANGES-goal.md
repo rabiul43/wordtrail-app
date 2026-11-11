@@ -10,13 +10,16 @@ One saved choice shapes Home and the bottom bar. Underneath it is **two settings
 The three-way choice the person sees is only a view of those two: **Enjoy stories** = learning off, **Learn English** = learning on, **Prepare for IELTS** = learning on + exam on.
 Saved as `P.goal` in `wt:prefs`, so it syncs like every other setting. **No `P.goal` = the app is exactly as before.**
 
+## Learn mode is off by default
+Settings > Reading > Learning has a **Learn mode** switch (off by default). Under it, when on, a **Prepare for IELTS** switch with exam date and target band. Until learn mode is on there is no Learn tab, no Today card and no Books/Learn switch in My Library, for new and existing users alike. The three-way card in onboarding is kept (it just turns learn mode on or off, and the exam on for IELTS).
+
 ## What changes for the person
-- **Onboarding**: a new first card "What brings you to Wordtrail?" (Enjoy stories preselected). "Skip for now" leaves the goal unset unless a card was tapped.
+- **First visit**: a full first screen like the mock-up (progress bar, emoji cards, check mark, Continue at the bottom). Before this change the same question was a card on Home; that card is removed. A new first card "What brings you to Wordtrail?" (Enjoy stories preselected). "Skip for now" leaves the goal unset unless a card was tapped.
 - **Bottom bar**: a Learn tab appears for learners, labelled **IELTS** while an exam is on. It opens My Library on its Learn side. The other tabs never move. The phone bar goes from 4 to 5 columns only when the tab shows.
 - **Home**: IELTS users get an exam card (days left, bar of the preparation time, target, "N of M done today", a Today's plan button). It also handles: no date yet ("When is your exam?"), exam day, and date passed (set a new date / done).
 - **Today card**: hidden in Enjoy stories (uncluttered) and during an exam (the exam card replaces it).
 - **My Library**: the Books | Learn switch is hidden once a goal is chosen (the tab replaces it).
-- **Existing users**: nothing changes until they choose. Home shows one dismissible card "How do you want to use Wordtrail?". Dismissing it is permanent.
+- **Existing users**: nothing changes. There is no card on Home; they turn Learn mode on in Settings.
 - **Enjoy stories, later**: after the 3rd saved word, once, a toast "Want a Learn tab to review these words? [Add it]".
 - **Settings > Reading > Learning**: the three-way control, exam date and target band. Switching never deletes saved words or progress; switching IELTS -> Learn -> IELTS keeps the date and target.
 - **The reader's Learn button** (`P.learnBtn`) is independent of the goal. Only the very first choice sets its default (off for Enjoy stories, on otherwise).

@@ -29,10 +29,9 @@
     function top(hub) {
       wire();
       const show = shelfMode !== 'dl' && (!phoneUI() || hub);   // not on a Books sub-page, and not on the Downloads page
-      const goal = GL.mode();   // 169l: once a goal is chosen the Learn tab replaces this switch, and Enjoy stories has no Learn side
-      if (goal === 'stories' && cur === 'learn') cur = 'books';
+      if (!GL.tabOn() && cur === 'learn') cur = 'books';   // 169l: Learn mode is off by default and has no Learn side; the Learn tab replaces this switch
       const learn = show && cur === 'learn';
-      $('#shelf-top').hidden = !show || goal !== 'unset';
+      $('#shelf-top').hidden = true;
       if (show) {
         $$('#shelf-top .wl-seg__btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === cur)));
         const n = dueN(), badge = $('#sht-badge');
