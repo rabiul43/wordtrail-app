@@ -267,7 +267,7 @@
     HIST = { n: 0, busy: false, t: 0 };
     /* These screens are shown and hidden from many places; watching them keeps the history entries in step. */
     const mo = new MutationObserver(() => histSoon());
-    ['results', 'fpanel', 'ob-overlay', 'ob-step-0', 'ob-step-1', 'ob-quiz'].forEach(id => { const n = document.getElementById(id); if (n) mo.observe(n, { attributes: true, attributeFilter: ['hidden'] }); });
+    ['results', 'fpanel', 'ob-overlay', 'ob-step-g', 'ob-step-0', 'ob-step-1', 'ob-quiz'].forEach(id => { const n = document.getElementById(id); if (n) mo.observe(n, { attributes: true, attributeFilter: ['hidden'] }); });
     /* Press Back again to exit (phones and the installed app): a base history entry sits under the app's own entries.
        Back with nothing open lands on it; the first time we show a message and put the app's entry back, the second
        press within 2 seconds really leaves. */

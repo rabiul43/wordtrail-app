@@ -31,8 +31,9 @@
       if (t === 'search') return;   // the Search tab has its own listener in appBarInit (080)
       if (t === 'settings') { closeSheets(); openSheet('sheet-settings'); return; }
       if (t === 'downloads') { closeSheets(); showTab('downloads'); return; }
+      if (t === 'learn') { GL.openLearn(); return; }   // 169l: the Learn (or IELTS) tab opens My Library on its Learn side
       if (t === 'shelf' && shelfMode === 'dl') shelfMode = 'saved';   // My Library never opens on the Downloads page
-      if (t === 'shelf') shelfHubNext = true;   // phones: the list of pages
+      if (t === 'shelf') { shelfHubNext = true; if (GL.tabOn()) LSW.toBooks(); }   // phones: the list of pages; with a Learn tab, My Library is the Books side
       pendingBack = null; showTab(t);
     }));
     $('#shelf-browse').addEventListener('click', () => showTab('library'));
@@ -44,6 +45,7 @@
     initSearchFilters();
     spInit();
     appBarInit();
+    GL.start();
     $('#mini-open').addEventListener('click', () => { showView('player'); requestAnimationFrame(() => { try { resnap(); } catch (e) { /* not ready */ } }); });
     $('#mini-play').addEventListener('click', togglePlay);
     /* Close: stop playback and tuck the bar away. It returns when a book is opened or played again. */
@@ -555,9 +557,11 @@
 
   /* ===================== First-run onboarding =====================
      Shows once when wt:onboarded is not set.
-     Step 0: reading level (Easy=0 / Medium=1 / Hard=2, or placement quiz).
-     Step 1: translation language (pre-selects common ones as chips).
-     Results are written into P.readerLvl and P.tlang and saved.
+     Step 0: what brings you here (Enjoy stories / Learn English / Prepare for IELTS, GL in 169l). Enjoy stories is preselected;
+             "Skip for now" keeps the choice unset unless one was tapped, and Home then offers it once.
+     Step 1: reading level (Easy=0 / Medium=1 / Hard=2, or placement quiz).
+     Step 2: translation language (pre-selects common ones as chips).
+     Results are written into P.goal, P.readerLvl and P.tlang and saved.
      LF.lvl is seeded from P.readerLvl so "Picked for you" is personalised
      from the very first home-screen load.
      ================================================================ */
@@ -613,8 +617,10 @@
     const lvBtns  = [0, 1, 2].map(i => $('ob-pick-' + i));
     const plBtn   = $('ob-pick-pl');
     const next0   = $('ob-next-0');
+    const stepG   = $('ob-step-g');
     const step0   = $('ob-step-0');
     const step1   = $('ob-step-1');
+    const goalBtns = ['stories', 'learn', 'ielts'].map(g => $('ob-goal-' + g));
     const quiz    = $('ob-quiz');
     const qHd     = $('ob-q-hd');
     const qOpts   = $('ob-q-opts');
@@ -624,7 +630,7 @@
     const langGrid = $('ob-lang-grid');
     const langSel  = $('ob-lang-sel');
     const obDone  = $('ob-done');
-    const dots    = [$('ob-dot-0'), $('ob-dot-1')];
+    const dots    = [$('ob-dot-g'), $('ob-dot-0'), $('ob-dot-1')];
 
     /* --- Language lists --- */
     const COMMON_LANGS = ['bn', 'hi', 'ur', 'ar', 'es', 'fr', 'de', 'pt', 'id', 'zh-CN', 'ja', 'ko'];
@@ -705,14 +711,22 @@
     /* --- Step navigation --- */
     function goStep1() {
       step0.hidden = true; step1.hidden = false;
-      setDot(1);
+      setDot(2);
     }
-    /* Back inside onboarding: step 2 returns to step 1, an open placement quiz returns to the level choices.
+    /* The goal (first card). Enjoy stories is preselected; goalTouched is true once the person taps one, so "Skip for now" can tell a choice from the default. */
+    let chosenGoal = 'stories', goalTouched = false;
+    goalBtns.forEach(b => b.addEventListener('click', () => {
+      chosenGoal = b.dataset.goal; goalTouched = true;
+      goalBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+    $('ob-next-g').addEventListener('click', () => { goalTouched = true; stepG.hidden = true; step0.hidden = false; setDot(1); });
+    /* Back inside onboarding: step 3 returns to step 2, an open placement quiz returns to the level choices, step 2 returns to the goal.
        On the first step with nothing open, Back behaves as usual. */
-    OB.layers = () => ov.hidden ? 0 : (!step1.hidden || !quiz.hidden) ? 1 : 0;
+    OB.layers = () => ov.hidden ? 0 : (!step1.hidden || !quiz.hidden || !step0.hidden) ? 1 : 0;
     OB.back = () => {
-      if (!step1.hidden) { step1.hidden = true; step0.hidden = false; setDot(0); }
+      if (!step1.hidden) { step1.hidden = true; step0.hidden = false; setDot(1); }
       else if (!quiz.hidden) { quiz.hidden = true; quizMode = false; plBtn.setAttribute('aria-pressed', 'false'); next0.disabled = chosenLvl === null; }
+      else if (!step0.hidden) { step0.hidden = true; stepG.hidden = false; setDot(0); }
     };
 
     next0.addEventListener('click', goStep1);
@@ -799,6 +813,9 @@
       P.readerLvl = chosenLvl;
       savePrefs();
       store.set('wt:onboarded', 1);
+      /* The goal: only a choice the person made (Continue, or a tap before Skip). Otherwise it stays unset and Home offers it once. */
+      if (goalTouched) { try { GL.choose(chosenGoal, true); } catch (e) { /* the app still works without a goal */ } }
+      else { try { GL.paint(); } catch (e) { /* Home not ready */ } }
       setTimeout(() => { try { sharedOpen(); } catch (e) { /* no shared link waiting */ } }, 300);   // a shared link that arrived on the first run opens now
       ov.style.transition = 'opacity .22s ease';
       ov.style.opacity = '0';

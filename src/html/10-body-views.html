@@ -165,6 +165,8 @@
     <div id="sfilt-count" class="sfilt-count" hidden></div>
   </div>
   </div>
+  <!-- Goal card (169l): the IELTS countdown, or the one-time "how do you want to use Wordtrail?" card. Hidden and empty otherwise -->
+  <section id="gl-home" class="gl-home" aria-label="Your goal" hidden></section>
   <!-- Today card (169d): hidden and empty unless Settings > Today card is on -->
   <section id="td-home" class="td-home" aria-label="Today" hidden></section>
   <!-- Daily goal strip (phone design, filled by homeGoal in 120) -->
@@ -454,6 +456,9 @@
   </button>
   <button class="tab" type="button" data-tab="shelf" title="My Library">
     <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></span><span>My Library</span>
+  </button>
+  <button class="tab" type="button" data-tab="learn" title="Learn" hidden>
+    <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6"/></svg></span><span class="gl-tab-t">Learn</span>
   </button>
   <button class="tab" type="button" data-tab="downloads" title="Downloads">
     <span class="tab-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M5 20h14"/></svg></span><span>Downloads</span>

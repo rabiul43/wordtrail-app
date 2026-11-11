@@ -5,7 +5,8 @@
      The gold badge counts the saved words that are due (WS + srsDue, the same rule as the Review lesson). It is worked out
      only when the My Library tab is drawn, never while a book plays. It is hidden in Calm mode (see 94g-learn-switch.css).
      Hooks: 080 (applyShelfMode) calls shelfHooks.top(hub); showTab calls shelfHooks.toBooks() for the Synced books page.
-     Later tasks: set LSW.render = host => { ... } to draw the Learn page. It runs each time Learn opens. Styles 94g-learn-switch.css. */
+     Goal (169l): with a goal chosen the switch is hidden; the Learn tab (or IELTS tab) calls LSW.set('learn'), My Library calls LSW.toBooks().
+   Later tasks: set LSW.render = host => { ... } to draw the Learn page. It runs each time Learn opens. Styles 94g-learn-switch.css. */
   const LSW = (() => {
     const KEY = 'wt:shelf-top';
     let cur = 'books', wired = false, built = false;
@@ -28,8 +29,10 @@
     function top(hub) {
       wire();
       const show = shelfMode !== 'dl' && (!phoneUI() || hub);   // not on a Books sub-page, and not on the Downloads page
+      const goal = GL.mode();   // 169l: once a goal is chosen the Learn tab replaces this switch, and Enjoy stories has no Learn side
+      if (goal === 'stories' && cur === 'learn') cur = 'books';
       const learn = show && cur === 'learn';
-      $('#shelf-top').hidden = !show;
+      $('#shelf-top').hidden = !show || goal !== 'unset';
       if (show) {
         $$('#shelf-top .wl-seg__btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === cur)));
         const n = dueN(), badge = $('#sht-badge');

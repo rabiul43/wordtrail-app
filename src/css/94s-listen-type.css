@@ -1,6 +1,7 @@
 /* Listen and type (169k-listen-type.js, #sheet-lt). Only .lt* classes; built on the learning kit (94-learn-ui.css) and the full-screen .sheet.ced.
    Remove this file, 28d-sheet-listen-type.html, 169k and their build.py lines to go back. */
 .sheet.lt { display: flex; flex-direction: column; }
+.sheet.lt[hidden] { display: none; }   /* without this the closed sheet stays on screen: .sheet.lt (above) has the same weight as .sheet[hidden] and comes later */
 .sheet.lt header { gap: var(--s-3); border-bottom: 0; }
 .sheet.lt header::before { display: none; }
 .lt-prog { flex: 1; min-width: 0; }

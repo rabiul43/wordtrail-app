@@ -1,0 +1,38 @@
+/* Goal: how the person uses Wordtrail (169l-goal.js). Only .gl-* classes, plus the fifth bottom-bar column. Must come after 99e-library-hub.css,
+   which sets the phone bar to four columns. Remove this file, 169l-goal.js and their build.py lines to go back (see the hooks listed in 169l). */
+.tab[hidden] { display: none; }
+
+/* phones: Home, Explore, My Library, Learn, Search (the Learn tab is only shown once a goal needs it) */
+@media (max-width: 699.98px) {
+  html[data-goal-tab] .tabbar { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Home card: the exam countdown, or the one-time question */
+.gl-home[hidden] { display: none; }
+.gl-home { box-sizing: border-box; width: 100%; max-width: 40rem; padding: .85rem 0 0; }
+.gl-card { display: grid; gap: var(--s-3); padding: var(--s-3) var(--s-4); --wl-cbg: var(--accent-soft); --wl-cbd: var(--accent); }
+.gl-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.gl-txt { display: grid; gap: .1rem; min-width: 0; }
+.gl-k { font: 800 .8rem/1.2 var(--font-ui); letter-spacing: .1em; color: var(--accent); }
+.gl-big { font: 800 1.45rem/1.2 var(--font-ui); color: var(--ink); }
+.gl-sub { font: 600 var(--small, .85rem)/1.35 var(--font-ui); color: var(--muted); }
+.gl-card .wl-progress { height: 12px; background: var(--surface-2); }
+.gl-pair { display: flex; flex-wrap: wrap; gap: var(--s-2); justify-content: flex-end; }
+.gl-btn { flex: none; min-height: 44px; margin: 0; padding: .55rem 1.1rem; font: 800 .9rem/1.2 var(--font-ui); letter-spacing: .08em; border: 0; border-radius: var(--r-xl); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.gl-btn--go { color: var(--accent-ink); background: var(--accent); box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 62%, #000); }
+.gl-btn--go:active { transform: translateY(3px); box-shadow: none; }
+.gl-btn--quiet { color: var(--ink); background: var(--surface); border: 2px solid var(--line); }
+.gl-btn:focus-visible, .gl-opt:focus-visible, .gl-x:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+.gl-x { flex: none; align-self: flex-start; width: 44px; height: 44px; margin: -.5rem -.7rem 0 0; font-size: 1.6rem; line-height: 1; color: var(--muted); background: transparent; border: 0; border-radius: var(--r-pill); cursor: pointer; }
+.gl-opts { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.gl-opt { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: .45rem .95rem; font: 700 .92rem/1.2 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) { .gl-opt:hover { border-color: var(--accent); } }
+:root[data-calm] .gl-btn--go:active { transform: none; }
+@media (prefers-reduced-motion: reduce) { .gl-btn--go:active { transform: none; } }
+
+/* Settings: the exam rows */
+#gl-exam-rows[hidden] { display: none; }
+#in-examdate { font: inherit; min-height: 2.4rem; }
+
+/* Onboarding goal card: title above the description, as in the mock-up */
+#ob-step-g .ob-lvl-t, #ob-step-g .ob-lvl-d { display: block; }

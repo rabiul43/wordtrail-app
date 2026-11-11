@@ -41,7 +41,7 @@
       if (i >= 0) { const n = WM.addCtx(list[i], c); list[i] = n; save(list); return n; }
       const base = { ts: Date.now(), w: k, lv: m.lv || '', ex: m.ex != null ? m.ex : (c.s || ''), bid: c.bid == null ? '' : String(c.bid), bt: c.bt || '' };
       const n = WM.addCtx(WM.migrate(base), c);
-      list.unshift(n); save(list.slice(0, MAX)); try { LL.newWord(); } catch (e) { /* learning log (148b) not loaded */ } return n;
+      list.unshift(n); save(list.slice(0, MAX)); try { LL.newWord(); } catch (e) { /* learning log (148b) not loaded */ } try { GL.newWord(); } catch (e) { /* goal (169l) not loaded */ } return n;
     }
     function remove(w) {
       const k = key(w), list = raw(); if (!k || idx(list, k) < 0) return false;

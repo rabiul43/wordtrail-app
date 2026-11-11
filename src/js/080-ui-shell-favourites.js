@@ -277,7 +277,7 @@
   }
   function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
     const dlTab = !phoneUI();   // on phones Downloads is a page inside My Library, not a tab
-    const hl = srchTab && curTab === 'library' ? 'search' : dlTab && curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (dlTab && OFF.on && curTab === 'library' ? 'downloads' : curTab);
+    const hl = srchTab && curTab === 'library' ? 'search' : (curTab === 'shelf' && shelfMode !== 'dl' && LSW.cur === 'learn' && GL.tabOn()) ? 'learn' : dlTab && curTab === 'shelf' && shelfMode === 'dl' ? 'downloads' : (dlTab && OFF.on && curTab === 'library' ? 'downloads' : curTab);
     $$('#tabbar .tab').forEach(b => { if (b.dataset.tab === hl) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
   function showTab(t, keep) {

@@ -9,7 +9,7 @@
      Nothing runs at start-up or during playback. Styles 94j-today-card.css. Remove this file, that file, their build.py lines, #td-home in 10-body-views.html,
      the #in-today row in 30-sheets-settings.html and the TDH calls in 120, 169c, 290 and 300 to go back. */
   const TDH = (() => {
-    const on = () => { try { return P.todayCard !== false && P.calm !== true; } catch (e) { return false; } };
+    const on = () => { try { return P.todayCard !== false && P.calm !== true && GL.todayOk(); } catch (e) { return false; } };   // Enjoy stories (169l) has no Today card
     function paint() {
       const sec = $('#td-home'); if (!sec) return;
       if (!on()) { sec.hidden = true; sec.textContent = ''; return; }
