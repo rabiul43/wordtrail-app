@@ -511,21 +511,21 @@
     })());
   }
   /* ---------- extras: skip list per book, made by wt_extras.py from the timing pack (extras/extras-<id>.json on Hugging Face).
-     Test phase: only these books look for the file. Add an id here to try another book. ---------- */
-  const EX_BOOKS = ['104', '10054', '1113'];
+     Every book looks for the file. A book with no file (404) is remembered for a day. ---------- */
   const EX = { id: null, d: null, p: null };
   function loadExtras(b) {
     const id = String(b && b.id || '');
-    if (!EX_BOOKS.includes(id)) { EX.id = id; EX.d = null; EX.p = null; return Promise.resolve(); }
+    if (!id) { EX.id = id; EX.d = null; EX.p = null; return Promise.resolve(); }
     if (EX.id === id && EX.p) return EX.p;
     EX.id = id; EX.d = null;
     return EX.p = (async () => {
       let c = store.get('wt:ex:' + id, null);
-      if (!(c && c.d && Date.now() - c.t < 600e3)) {
+      if (!(c && Date.now() - c.t < (c.d ? 600e3 : c.m ? 86400e3 : 0))) {
         try {
           const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
           const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/extras-' + encodeURIComponent(id) + '.json', { signal: ctl.signal }); clearTimeout(to);
-          if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.tracks) { c = { t: Date.now(), d: j.tracks }; store.set('wt:ex:' + id, c); } }
+          if (r.status === 404) { c = { t: Date.now(), m: 1, d: null }; store.set('wt:ex:' + id, c); }
+          else if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.tracks) { c = { t: Date.now(), d: j.tracks }; store.set('wt:ex:' + id, c); } }
         } catch (e) { /* missing or offline: use the saved copy, or behave as before */ }
       }
       if (EX.id === id) EX.d = c && c.d ? c.d : null;
