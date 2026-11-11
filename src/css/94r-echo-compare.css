@@ -1,0 +1,25 @@
+/* Echo compare and history (169j-echo-compare.js): duration bars, pace line, "what we heard" chips, the optional switch and the History panel.
+   Only .ec-cmp, .ec-bar*, .ec-pace*, .ec-heard*, .ec-hw*, .ec-sr*, .ec-stat* and .ec-hist classes; built on the learning kit (94-learn-ui.css). Remove this file and the 169j markup to go back. */
+.ec-cmp { display: grid; gap: var(--s-2); }
+.ec-bars { display: grid; gap: var(--s-2); }
+.ec-bar { display: block; height: 14px; border-radius: 999px; background: var(--surface-2, var(--accent-soft)); border: 2px solid var(--line, var(--muted)); overflow: hidden; }
+.ec-bar-f { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--muted); }
+.ec-bar-f--y { background: var(--accent); }
+.ec-pace { margin: 0; font: 700 var(--small)/1.4 var(--font-ui); color: var(--ink); }
+.ec-pace-x { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.ec-pace-n { margin: 0; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-heard { display: grid; gap: var(--s-2); }
+.ec-heard[hidden] { display: none; }
+.ec-heard-h { margin: 0; color: var(--muted); font: 800 .75rem/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+.ec-heard-l { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.ec-heard-n { margin: 0; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-hw { min-height: 36px; }
+.ec-hw--q { color: var(--ink); background: var(--accent-soft); border-color: var(--warn); }
+.ec-sr { display: grid; justify-items: center; gap: var(--s-2); text-align: center; }
+.ec-sr[hidden] { display: none; }
+.ec-sr .wl-btn[aria-pressed="true"] { --wl-bg: var(--accent-soft); --wl-bd: var(--accent); --wl-ed: var(--accent); --wl-fg: var(--ink); }
+.ec-sr-n { margin: 0; max-width: 34rem; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-stats { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.ec-stat { flex: 1 1 5rem; display: grid; gap: .1rem; padding: var(--s-3); border: 2px solid var(--line, var(--muted)); border-radius: 16px; text-align: center; font: 500 var(--small)/1.3 var(--font-ui); color: var(--muted); }
+.ec-stat b { color: var(--ink); font: 800 1.5rem/1.1 var(--font-ui); font-variant-numeric: tabular-nums; }
+.ec-hist .wl-btn--small { justify-self: start; }

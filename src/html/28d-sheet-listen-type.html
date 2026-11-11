@@ -1,0 +1,47 @@
+<section id="sheet-lt" class="sheet ced lt" hidden role="dialog" aria-modal="true" aria-labelledby="lt-title">
+  <header class="lt-head">
+    <button id="lt-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="lt-prog" class="wl-progress lt-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this session"><span class="wl-progress__fill"></span></div>
+    <span id="lt-flame" class="wl-pill lt-flame" role="img" aria-label=""><span aria-hidden="true">&#128293;</span> <span id="lt-flame-n" aria-hidden="true">0</span></span>
+  </header>
+  <div class="body lt-body">
+    <div class="lt-top">
+      <h2 id="lt-title" class="lt-title" tabindex="-1">Type what you hear</h2>
+      <p class="lt-where"><span id="lt-pos"></span><span id="lt-sep"> &middot; </span><span id="lt-ch"></span></p>
+    </div>
+    <div id="lt-main" class="lt-main">
+      <div class="lt-play">
+        <button id="lt-play" class="lt-big" type="button" aria-label="Play the sentence"><span aria-hidden="true">&#128266;</span></button>
+        <button id="lt-slow" class="lt-turtle" type="button" aria-label="Play slowly"><span aria-hidden="true">&#128034;</span></button>
+      </div>
+      <p id="lt-plays" class="lt-plays" role="status"></p>
+      <div class="wl-card lt-card">
+        <p id="lt-pat" class="lt-pat" role="img" aria-label="" hidden></p>
+        <label class="sr-only" for="lt-in">Type the sentence you hear</label>
+        <textarea id="lt-in" class="lt-in" rows="3" maxlength="400" lang="en" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence you hear&hellip;"></textarea>
+      </div>
+      <div class="lt-hints">
+        <button id="lt-hint" class="lt-chip" type="button" aria-pressed="false"><span aria-hidden="true">&#128161;</span> <span id="lt-hint-l"></span></button>
+        <button id="lt-first" class="lt-chip" type="button" aria-pressed="false">Show first letters</button>
+      </div>
+      <p id="lt-status" class="lt-status" role="status"></p>
+    </div>
+    <div id="lt-end" class="lt-end" hidden>
+      <ul id="lt-sum" class="lt-sum"></ul>
+      <p id="lt-all" class="lt-all" hidden>All sentences were perfect.</p>
+      <h3 id="lt-prac-h" class="lt-prac-h" hidden>Sentences to practise</h3>
+      <ul id="lt-prac" class="lt-prac"></ul>
+    </div>
+  </div>
+  <footer id="lt-foot" class="lt-foot">
+    <div id="lt-fb" class="lt-fb" hidden role="status">
+      <p id="lt-fb-t" class="lt-fb-t"></p>
+      <p id="lt-fb-a" class="lt-fb-a"></p>
+      <p id="lt-fb-s" class="lt-fb-s"></p>
+      <p id="lt-fb-yl" class="lt-fb-yl" hidden>You typed</p>
+      <p id="lt-fb-y" class="lt-fb-y" hidden></p>
+    </div>
+    <button id="lt-check" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Check</button>
+    <button id="lt-next" class="wl-btn wl-btn--primary wl-btn--block" type="button" hidden>Continue</button>
+  </footer>
+</section>

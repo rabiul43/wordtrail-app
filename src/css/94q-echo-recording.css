@@ -1,0 +1,19 @@
+/* Echo recording (169i-echo-recording.js): the take card, the Record button and the My recordings panel inside #sheet-echo.
+   Only .ec-take*, .ec-lib* and .ec-row* classes; built on the learning kit (94-learn-ui.css). Remove this file, the "ec-rec" markup in 28c and 169i to go back. */
+.ec-take { align-self: stretch; display: grid; gap: var(--s-3); text-align: start; }
+.ec-take-h { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s-2); color: var(--muted); font: 500 var(--small)/1.3 var(--font-ui); font-variant-numeric: tabular-nums; }
+.ec-take-who { color: var(--ink); font-weight: 800; }
+.ec-take-b { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.ec-take-n { margin: 0; min-height: 1.4em; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-lib { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; background: var(--surface); color: var(--ink); }
+.ec-lib[hidden] { display: none; }
+.ec-lib-h { display: flex; align-items: center; gap: var(--s-3); padding: max(.8rem, env(safe-area-inset-top)) .8rem .7rem .8rem; }
+.ec-lib-t { flex: 1; margin: 0; font: 800 1.4rem/1.2 var(--font-ui); outline: 0; }
+.ec-lib-n { flex: none; font-variant-numeric: tabular-nums; }
+.ec-lib-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--s-4) max(var(--s-4), env(safe-area-inset-bottom)); display: grid; align-content: start; gap: var(--s-3); }
+.ec-lib-note, .ec-lib-e { margin: 0; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-lib-l { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-3); }
+.ec-row { display: grid; gap: var(--s-3); text-align: start; }
+.ec-row-s { margin: 0; font: 500 1.05rem/1.5 var(--font-read); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ec-row-i { margin: 0; color: var(--muted); font: 500 var(--small)/1.3 var(--font-ui); font-variant-numeric: tabular-nums; }
+.ec-row-b { display: flex; flex-wrap: wrap; gap: var(--s-3); }

@@ -19,10 +19,72 @@
       <li class="wl-pill ec-step" data-step="next"><span class="ec-sn">3</span> <span>Next</span></li>
     </ol>
     <p id="ec-status" class="ec-status" role="status"></p>
+    <div id="ec-take" class="wl-card ec-take" hidden>
+      <p class="ec-take-h"><span class="ec-take-who">You</span> <span id="ec-take-d"></span> <span aria-hidden="true">&middot;</span> <span>Narrator</span> <span id="ec-take-nd"></span></p>
+      <div id="ec-cmp" class="ec-cmp">
+        <div class="ec-bars" aria-hidden="true">
+          <span class="ec-bar"><span id="ec-bar-y" class="ec-bar-f ec-bar-f--y"></span></span>
+          <span class="ec-bar"><span id="ec-bar-n" class="ec-bar-f"></span></span>
+        </div>
+        <p class="ec-pace"><span id="ec-pace-w"></span> <span id="ec-pace-x" class="ec-pace-x"></span></p>
+        <p id="ec-pace-n" class="ec-pace-n"></p>
+      </div>
+      <div class="ec-take-b">
+        <button id="ec-play" class="wl-btn wl-btn--secondary wl-btn--small" type="button"><span aria-hidden="true">&#9654;</span> <span id="ec-play-l">Play mine</span></button>
+        <button id="ec-narr" class="wl-btn wl-btn--secondary wl-btn--small" type="button"><span aria-hidden="true">&#9654;</span> <span id="ec-narr-l">Narrator</span></button>
+        <button id="ec-prac" class="wl-btn wl-btn--secondary wl-btn--small" type="button" aria-pressed="false"><span id="ec-prac-l">Add to practice list</span></button>
+        <button id="ec-del" class="wl-btn wl-btn--secondary wl-btn--small" type="button">Delete</button>
+      </div>
+      <div id="ec-heard" class="ec-heard" hidden>
+        <h3 class="ec-heard-h">What we heard</h3>
+        <ul id="ec-heard-l" class="ec-heard-l"></ul>
+        <p id="ec-heard-n" class="ec-heard-n" role="status"></p>
+      </div>
+      <p id="ec-take-n" class="ec-take-n" role="status"></p>
+    </div>
+    <div id="ec-sr" class="ec-sr" hidden>
+      <button id="ec-sr-t" class="wl-btn wl-btn--secondary wl-btn--small" type="button" aria-pressed="false" aria-describedby="ec-sr-n"><span id="ec-sr-l">Show what we heard: off</span></button>
+      <p id="ec-sr-n" class="ec-sr-n">Optional. Your browser's speech service may send your voice to the browser maker to turn it into words. It shows what was heard, never a score. It is a guide, not a pronunciation grade.</p>
+    </div>
     <div class="ec-aux">
       <button id="ec-again" class="wl-btn wl-btn--secondary wl-btn--small" type="button"><span aria-hidden="true">&#8635;</span> <span>Hear again</span></button>
       <button id="ec-slow" class="wl-btn wl-btn--secondary wl-btn--small" type="button" aria-pressed="false">Slow 0.8&times;</button>
+      <button id="ec-rec" class="wl-btn wl-btn--secondary wl-btn--small" type="button" aria-pressed="false" disabled><span aria-hidden="true">&#9679;</span> <span id="ec-rec-l">Record</span></button>
+      <button id="ec-mine" class="wl-btn wl-btn--secondary wl-btn--small" type="button">My recordings</button>
+      <button id="ec-hist-b" class="wl-btn wl-btn--secondary wl-btn--small" type="button">History</button>
     </div>
   </div>
   <footer class="ec-foot"><button id="ec-done" class="wl-btn wl-btn--primary wl-btn--block" type="button">I'm done, next</button></footer>
+  <div id="ec-lib" class="ec-lib" hidden role="region" aria-labelledby="ec-lib-t">
+    <header class="ec-lib-h">
+      <button id="ec-lib-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <h2 id="ec-lib-t" class="ec-lib-t" tabindex="-1">My recordings</h2>
+      <span id="ec-lib-n" class="wl-pill ec-lib-n"></span>
+    </header>
+    <div class="ec-lib-body">
+      <p class="ec-lib-note">Saved on this device only. Nothing is uploaded.</p>
+      <p class="ec-lib-note">Up to 20 recordings are kept. The oldest is removed first.</p>
+      <p id="ec-lib-e" class="ec-lib-e" hidden></p>
+      <ul id="ec-lib-l" class="ec-lib-l"></ul>
+    </div>
+  </div>
+  <div id="ec-hist" class="ec-lib ec-hist" hidden role="region" aria-labelledby="ec-hist-t">
+    <header class="ec-lib-h">
+      <button id="ec-hist-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <h2 id="ec-hist-t" class="ec-lib-t" tabindex="-1">History</h2>
+    </header>
+    <div class="ec-lib-body">
+      <p class="ec-lib-note">Saved on this device only. Nothing is uploaded.</p>
+      <div id="ec-hist-s" class="ec-stats"></div>
+      <p id="ec-hist-p" class="ec-pace" hidden><span id="ec-hist-pw"></span> <span id="ec-hist-px" class="ec-pace-x"></span></p>
+      <h3 class="ec-heard-h">Problem words</h3>
+      <ul id="ec-hist-w" class="ec-heard-l"></ul>
+      <p id="ec-hist-we" class="ec-lib-e"></p>
+      <h3 class="ec-heard-h">Practice list</h3>
+      <p id="ec-hist-le" class="ec-lib-e" hidden>No practice sentences yet.</p>
+      <ul id="ec-hist-l" class="ec-lib-l"></ul>
+      <p id="ec-hist-m" class="ec-lib-e" role="status"></p>
+      <button id="ec-hist-c" class="wl-btn wl-btn--secondary wl-btn--small" type="button">Clear history</button>
+    </div>
+  </div>
 </section>

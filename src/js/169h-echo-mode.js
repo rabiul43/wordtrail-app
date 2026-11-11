@@ -1,5 +1,5 @@
   /* ---------- Echo mode: hear one sentence, say it out loud (ECC, EM) ----------
-     Task 42. The narrator plays ONE sentence, then the screen waits while you say it out loud (no recording, no microphone), then the next
+     Task 42. The narrator plays ONE sentence, then the screen waits while you say it out loud (you can record yourself: 169i-echo-recording.js), then the next
      sentence starts. Three steps: 1 Listen, 2 Repeat (a countdown ring sized to the sentence), 3 Next. Buttons: Hear again, Slow 0.8x
      (hears this and the next sentences at 0.8x until you tap it again; the saved speed P.speed is never changed), I'm done, next (skips the rest of the countdown).
      It reuses what the app has: the sentence timing (S.plan[track].starts, sentTime and shClip from Shadow reading in 140), Core.locate for the
@@ -8,8 +8,10 @@
      the "Back to mm:ss" chip of the Study sheet), puts the audio back at the same track and second, and plays again if it was playing.
      Only while the screen is open: a 40 ms check while the clip plays and a 100 ms countdown. Nothing runs at start-up or while it is closed.
      Moves made by Echo are not written to the jump history (S.quietJump, one hook in 060 trJump).
-     Storage: none. Setting: none. Registered in the Learn hub (169b) as the tile "Echo"; the same tile is in the player's "Study this chapter" sheet (169e).
+     Storage: none here (recordings are kept by 169i). Setting: none. Registered in the Learn hub (169b) as the tile "Echo"; the same tile is in the player's "Study this chapter" sheet (169e).
        ECC.secs(dur, rate) / pick(hidden, n, k, d) / first(hidden, n, k) / SLOW   pure, tested by tools/echo_check.js
+       EM.use(h) hold() resume() again() ring() ctx() step   small hooks for 169i (recording); h = { paint(step), close() }
+       EM.narr(done) narrStop() jump(sentenceId)   (Task 44, used by 169j) play the narrator clip once in place; listen to another sentence of this track
        EM.start()   opens Echo at the current sentence; false (with a message) when no book text is lined up with the audio
        EM.close()   EM.on   EM.k (index of the sentence in the track)
      Remove this file, 94p-echo.css, 28c-sheet-echo.html, their build.py lines and the S.quietJump line in 060 to go back. */
@@ -38,13 +40,15 @@
   })();
 
   const EM = (() => {
-    const st = { on: false, k: 0, step: '', slow: false, snap: null, tok: 0, watch: 0, tick: 0, after: 0, p: null, a: 0, b: 0, total: 0, t0: 0, fail: false, n: '', u: '' };
+    const st = { on: false, k: 0, step: '', slow: false, snap: null, tok: 0, watch: 0, tick: 0, after: 0, nw: 0, nf: null, p: null, a: 0, b: 0, total: 0, t0: 0, fail: false, n: '', u: '' };
     const q = id => document.getElementById(id);
     const rate = () => (st.slow ? ECC.SLOW : 1);
     const hid = k => { const s = S.model && st.p && S.model.sents[st.p.ids[k]]; return !s || !!s.h; };
     function quiet(f) { S.quietJump = true; try { f(); } finally { S.quietJump = false; } }   // Echo moves are not "jumps" for the jump history (060)
     function stopAudio() { try { if (!audio.paused) audio.pause(); } catch (e) { /* nothing to stop */ } try { audio.playbackRate = P.speed; } catch (e) { /* ignore */ } }
-    function halt() { clearInterval(st.watch); clearInterval(st.tick); clearTimeout(st.after); st.watch = st.tick = st.after = 0; st.tok++; }
+    const hk = [];   // hooks from other files (169i recording); a hook that throws never breaks Echo
+    function hook(n, a) { hk.forEach(h => { try { if (h[n]) h[n](a); } catch (e) { /* ignore */ } }); }
+    function halt() { narrStop(); clearInterval(st.watch); clearInterval(st.tick); clearTimeout(st.after); st.watch = st.tick = st.after = 0; st.tok++; }
 
     /* ----- the screen ----- */
     const TITLE = { listen: 'Listen to the narrator', repeat: 'Your turn. Say it out loud', next: 'Next sentence', end: 'Well done' };
@@ -77,6 +81,7 @@
       q('ec-slow').setAttribute('aria-pressed', String(st.slow));
       q('ec-again').disabled = step === 'end';
       q('ec-done').textContent = step === 'end' ? 'Back to listening' : "I'm done, next";
+      hook('paint', step);
     }
     function count(left) {
       const s = Math.max(1, Math.ceil(left));
@@ -125,6 +130,39 @@
       st.k = i; listen();
     }
 
+    /* ----- Task 44 (169j compare): play the narrator clip once without leaving the step; jump to a sentence ----- */
+    function narrStop() {
+      if (!st.nw) return;
+      clearInterval(st.nw); st.nw = 0; const f = st.nf; st.nf = null;
+      try { if (!audio.paused) audio.pause(); audio.playbackRate = P.speed; } catch (e) { /* ignore */ }
+      if (f) { try { f(); } catch (e) { /* ignore */ } }
+    }
+    function narr(done) {   // false when it cannot play; done() is called when the clip ends or is stopped
+      if (!st.on || !st.p || st.step === 'end' || !hold()) return false;
+      const [a, b] = shClip(st.p, st.k), t0 = Date.now(); let seen = false;
+      st.nf = done || null;
+      st.nw = setInterval(() => {
+        if (!audio.paused) seen = true;
+        if ((seen && nowT() >= b - 0.03) || (seen && audio.paused && Date.now() - t0 > 400) || (!seen && Date.now() - t0 > 5000)) narrStop();
+      }, 40);
+      try {
+        audio.playbackRate = rate(); quiet(() => seekAudio(a));
+        const r = audio.play(); if (r && r.catch) r.catch(() => narrStop());
+      } catch (e) { narrStop(); return false; }
+      return true;
+    }
+    function jump(id) {   // listen to the sentence with this id if it is in the open track and narrated
+      if (!st.on || !st.p) return false;
+      const i = st.p.ids.indexOf(id); if (i < 0 || hid(i)) return false;
+      st.k = i; listen(); return true;
+    }
+
+    /* ----- small hooks for 169i (recording): wait, carry on, say where we are ----- */
+    function hold() { if (!st.on || st.step === 'end') return false; halt(); stopAudio(); return true; }   // stops the countdown or the clip and keeps the screen as it is
+    function resume() { if (st.on && st.step === 'repeat') repeat(); }   // a fresh countdown for the same sentence
+    function again() { if (st.on && st.step !== 'end') listen(); }       // hear the sentence once more
+    function ctx() { return st.on && st.p ? { book: String(S.book.id), title: S.book.title || '', sec: S.sec, k: st.k, id: st.p.ids[st.k], text: (S.model.sents[st.p.ids[st.k]] || {}).t || '', dur: Math.max(0, st.b - st.a) } : null; }
+
     /* ----- open and close; the audio goes back to where it was ----- */
     function start() {
       if (st.on) return true;
@@ -143,7 +181,7 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
-      halt(); stopAudio();
+      halt(); stopAudio(); hook('close');
       const snap = st.snap; st.snap = null;
       if (!snap || !S.book || String(S.book.id) !== snap.bookId) return;
       try {
@@ -160,8 +198,8 @@
     q('ec-again').addEventListener('click', () => { if (st.on && st.step !== 'end') listen(); });
     q('ec-slow').addEventListener('click', () => { if (!st.on) return; st.slow = !st.slow; if (st.step !== 'end') listen(); else paint(); });
     new MutationObserver(() => { if (q('sheet-echo').hidden) finish(); }).observe(q('sheet-echo'), { attributes: true, attributeFilter: ['hidden'] });
-    guideDoc('reading', 'Echo mode', 'Study this chapter > Echo: the narrator reads one sentence, then you say it out loud. Nothing is recorded. When you close it, the audio goes back to where you were.');
-    return { start, close, get on() { return st.on; }, get k() { return st.k; } };
+    guideDoc('reading', 'Echo mode', 'Study this chapter > Echo: the narrator reads one sentence, then you say it out loud. You can record yourself and play it back; recordings stay on this device and nothing is uploaded. When you close it, the audio goes back to where you were.');
+    return { start, close, use: h => { hk.push(h); }, hold, resume, again, ctx, narr, narrStop, jump, ring: setRing, get step() { return st.step; }, get on() { return st.on; }, get k() { return st.k; } };
   })();
 
   LearnHub.register({
