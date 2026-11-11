@@ -72,7 +72,7 @@
     function addBubble(sp) {
       const p = sp.parentElement; if (!p || p.tagName !== 'P') return;
       const nx = sp.nextElementSibling; if (nx && nx.classList.contains('rv-b')) return;
-      sp.after(h('button', { class: 'rv-b', type: 'button', 'aria-expanded': 'false', 'aria-label': 'Show translation', title: 'Show translation' }));
+      sp.after(h('button', { class: 'rv-b', 'data-lrn': true, type: 'button', 'aria-expanded': 'false', 'aria-label': 'Show translation', title: 'Show translation' }));
     }
     function decorate(n) {
       if (!n || n.nodeType !== 1) return;

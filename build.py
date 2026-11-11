@@ -70,6 +70,7 @@ PARTS = [
     ('file', 'src/css/99e3-learn-gate.css'),
     ('file', 'src/css/99b-confirm.css'),
     ('file', 'src/css/99f-settings-polish.css'),
+    ('file', 'src/css/99e4-learn-mode-card.css'),
     ('file', 'src/css/99f-library-polish.css'),
     ('file', 'src/css/99g-black-theme.css'),
     ('file', 'src/css/99h-white-theme.css'),

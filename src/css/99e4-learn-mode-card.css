@@ -1,0 +1,33 @@
+/* Settings > Reading: the Standard | Learn mode card (30-sheets-settings.html, GL in 169l-goal.js). Colours come from the theme variables, so every theme follows.
+   The text that changes with the mode is swapped by CSS on <html data-learn>. Remove this file and its build.py line to go back to plain rows. */
+.lm { margin: 0 0 1.1rem; }
+.lm-hero { display: flex; align-items: center; gap: .9rem; padding: 1.05rem 1.1rem; border-radius: 1.4rem; background: var(--surface-2); border: 2px solid var(--line); transition: background .2s, border-color .2s; }
+:root[data-learn] .lm-hero { background: var(--accent-soft); border-color: var(--accent); }
+.lm-ic { flex: none; width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--line); color: var(--ink); transition: background .2s, color .2s; }
+:root[data-learn] .lm-ic { background: var(--accent); color: var(--accent-ink); }
+.lm-ic .ic { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.lm-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .2rem; cursor: pointer; }
+.lm-tx b { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; line-height: 1.2; }
+.lm-tx small { color: var(--muted); font-size: .85rem; line-height: 1.4; }
+#sheet-settings .lm-hero input[type="checkbox"] { width: 3.6rem; height: 2.1rem; }
+#sheet-settings .lm-hero input[type="checkbox"]::after { top: .25rem; left: .25rem; width: 1.6rem; height: 1.6rem; }
+#sheet-settings .lm-hero input[type="checkbox"]:checked::after { transform: translateX(1.5rem); background: var(--accent-ink); }
+[dir="rtl"] #sheet-settings .lm-hero input[type="checkbox"]::after { left: auto; right: .25rem; }
+[dir="rtl"] #sheet-settings .lm-hero input[type="checkbox"]:checked::after { transform: translateX(-1.5rem); }
+.lm-on { display: none; }
+:root[data-learn] .lm-on { display: inline; }
+:root[data-learn] .lm-off { display: none; }
+.lm-note { margin: .8rem .2rem .6rem; color: var(--muted); font-size: .85rem; line-height: 1.5; }
+.lm-note b { color: var(--ink); }
+.lm-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .45rem; }
+.lm-chips li { padding: .38rem .8rem; border-radius: 999px; font-size: .8rem; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); }
+.lm-chips li::before { content: "\2713\00a0"; color: var(--muted); }
+.lm-chips .lm-plus { background: transparent; border-style: dashed; color: var(--muted); }
+.lm-chips .lm-plus::before { content: "+\00a0"; }
+:root[data-learn] .lm-chips .lm-plus { background: var(--accent-soft); border: 1px solid var(--accent); color: var(--ink); }
+:root[data-learn] .lm-chips .lm-plus::before { content: "\2713\00a0"; color: var(--accent); }
+.lm-tools { margin: 1.1rem 0 1.4rem; padding: .3rem 1rem .4rem; border-radius: 1.3rem; background: var(--surface); border: 1px solid var(--line); }
+.lm-tools .lm-th { margin: .8rem 0 .2rem; font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.lm-tools .row { margin: 0; padding: .85rem 0; border-top: 1px solid var(--line); }
+.lm-tools .lm-th + .row, .lm-tools .lm-th + div > .row:first-child { border-top: 0; }
+@media (prefers-reduced-motion: reduce) { .lm-hero, .lm-ic { transition: none; } }

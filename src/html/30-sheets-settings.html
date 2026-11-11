@@ -195,7 +195,25 @@
     <button type="button" role="tab" data-sp="storage" aria-selected="false"><svg class="ic ti" aria-hidden="true"><use href="#i-m-archive"/></svg><span>Storage</span></button>
     <button type="button" role="tab" data-sp="dev" aria-selected="false" hidden><svg class="ic ti" aria-hidden="true"><use href="#i-m-code"/></svg><span>Developer</span></button>
   </div>
-  <div class="sp" data-sp="reading">    <div class="row"><label for="in-uilang"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-globe"/></svg>Language</h3><small style="color:var(--muted)">App language. Arabic and Urdu use right-to-left layout. The book text stays as written</small></label><select id="in-uilang" class="num" style="width:auto"></select></div>
+  <div class="sp" data-sp="reading">
+    <section class="lm" aria-labelledby="lm-h">
+      <div class="lm-hero"><span class="lm-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5M22 9v6"/></svg></span><label class="lm-tx" for="in-learnmode"><b id="lm-h">Learn mode</b><small><span class="lm-off">Off: just stories, player and reader.</span><span class="lm-on">On: stories plus word cards, review and a daily plan.</span></small></label><input id="in-learnmode" type="checkbox"></div>
+      <p class="lm-note" role="status"><span class="lm-off"><b>Standard mode.</b> Learning tools are hidden everywhere. Your saved words and progress are kept.</span><span class="lm-on"><b>Learn mode is on.</b> The Learn tab, Today&rsquo;s plan and word tools are available.</span></p>
+      <ul class="lm-chips" aria-label="What each mode includes"><li>Stories</li><li>Player</li><li>Tap a word</li><li>Translate</li><li class="lm-plus">Word cards</li><li class="lm-plus">Review</li><li class="lm-plus">Daily plan</li><li class="lm-plus">IELTS</li></ul>
+    </section>
+    <div class="lm-tools" id="gl-tools" data-lrn>
+      <h3 class="lm-th">Learning tools</h3>
+      <div id="gl-learn-rows" hidden>
+        <div class="row"><label for="in-examon" style="flex:1">Prepare for IELTS<small class="spd-s">An exam countdown on Home</small></label><input id="in-examon" type="checkbox"></div>
+      </div>
+      <div id="gl-exam-rows" hidden>
+        <div class="row"><label for="in-examdate" style="flex:1">Exam date</label><input id="in-examdate" type="date"></div>
+        <div class="row"><label for="in-examtarget" style="flex:1">Target band</label><select id="in-examtarget" class="num" style="width:auto"><option value="">Not set</option><option value="5.0">5.0</option><option value="5.5">5.5</option><option value="6.0">6.0</option><option value="6.5">6.5</option><option value="7.0">7.0</option><option value="7.5">7.5</option><option value="8.0">8.0</option><option value="8.5">8.5</option><option value="9.0">9.0</option></select></div>
+      </div>
+      <div class="row"><label for="in-learnbtn" style="flex:1">Show the Learn button<small class="spd-s">The gold button on the player</small></label><input id="in-learnbtn" type="checkbox" checked></div>
+      <div class="row"><label for="in-knownul" style="flex:1">Underline new words<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Words from the book's word list that you have not marked as known get a soft dotted line. Tap one to see its meaning.</small></label><input id="in-knownul" type="checkbox"></div>
+    </div>
+    <div class="row"><label for="in-uilang"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-globe"/></svg>Language</h3><small style="color:var(--muted)">App language. Arabic and Urdu use right-to-left layout. The book text stays as written</small></label><select id="in-uilang" class="num" style="width:auto"></select></div>
 
     <div>
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-contrast"/></svg>Theme</h3>
@@ -225,21 +243,6 @@
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-focus"/></svg>Line focus</h3>
       <div class="row"><label for="in-lf" style="flex:1">Dim everything except what is being read<small class="spd-s">Off by default</small></label><input id="in-lf" type="checkbox"></div>
       <div class="row" id="lf-scope" style="margin-top:.5rem"><label style="flex:1">Keep lit</label><div class="seg" id="seg-lf"><button data-v="sentence">Sentence</button><button data-v="paragraph">Paragraph</button></div></div>
-    </div>
-    <div>
-      <h3>Learning</h3>
-      <div class="row"><label for="in-learnmode" style="flex:1">Learn mode<small class="spd-s">Off by default (Standard). Adds a Learn tab, the daily plan and word tools. Tap-a-word and translate stay on in both. Your saved words and progress are kept when you switch it</small></label><input id="in-learnmode" type="checkbox"></div>
-      <div id="gl-tools" data-lrn>
-      <div id="gl-learn-rows" hidden>
-        <div class="row"><label for="in-examon" style="flex:1">Prepare for IELTS<small class="spd-s">An exam countdown on Home</small></label><input id="in-examon" type="checkbox"></div>
-      </div>
-      <div id="gl-exam-rows" hidden>
-        <div class="row"><label for="in-examdate" style="flex:1">Exam date</label><input id="in-examdate" type="date"></div>
-        <div class="row"><label for="in-examtarget" style="flex:1">Target band</label><select id="in-examtarget" class="num" style="width:auto"><option value="">Not set</option><option value="5.0">5.0</option><option value="5.5">5.5</option><option value="6.0">6.0</option><option value="6.5">6.5</option><option value="7.0">7.0</option><option value="7.5">7.5</option><option value="8.0">8.0</option><option value="8.5">8.5</option><option value="9.0">9.0</option></select></div>
-      </div>
-      <div class="row"><label for="in-learnbtn" style="flex:1">Show the Learn button<small class="spd-s">The gold button on the player</small></label><input id="in-learnbtn" type="checkbox" checked></div>
-      <div class="row"><label for="in-knownul" style="flex:1">Underline new words<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Words from the book's word list that you have not marked as known get a soft dotted line. Tap one to see its meaning.</small></label><input id="in-knownul" type="checkbox"></div>
-      </div>
     </div>
     <div>
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-pen"/></svg>Highlight</h3>

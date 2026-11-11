@@ -162,12 +162,20 @@
     const b1 = mk('en', 'English', 'Original text only'), b2 = mk('both', 'Both', 'Original and translation'), b3 = mk('tr', rmLangName(), 'Translation only');
     RM.btns = [b1, b2, b3]; RM.lab = b3;
     RM.st = h('p', { class: 'rm-st', role: 'status', 'aria-live': 'polite', hidden: true });
-    RM.bar = h('div', { class: 'rm-bar' }, h('div', { class: 'rm-seg', role: 'group', 'aria-label': 'Reading mode' }, b1, b2, b3), RM.st);
+    RM.bar = h('div', { class: 'rm-bar', 'data-lrn': true }, h('div', { class: 'rm-seg', role: 'group', 'aria-label': 'Reading mode' }, b1, b2, b3), RM.st);
     el.reader.insertBefore(RM.bar, el.page);
     RM.bar.addEventListener('pointerdown', rmLabel, true);
   }
+  /* 169l calls this when Learn mode is switched: Standard shows the original text only, Learn brings back the saved mode. P.rmode is never changed here. */
+  function rmSync() {
+    const m = learnOn() ? rmNorm(P.rmode) : 'en';
+    if (m === RM.mode) return;
+    let a = null; try { a = rmAnchor(); } catch (e) { /* reader empty */ }
+    RM.mode = m; rmPaint(); try { if (a) rmRestore(a); } catch (e) { /* reader empty */ }
+    if (m === 'en') rmStop(); else rmStart();
+  }
   rmBuild();
-  RM.mode = rmNorm(P.rmode);
+  RM.mode = learnOn() ? rmNorm(P.rmode) : 'en';   // Standard mode: the original text only (the saved choice P.rmode is kept for Learn mode)
   rmPaint();
   if (RM.mode !== 'en') rmStart();
   /* The translation language can be changed in three places (the live panel, the long-press card, onboarding): look again after any selection change. */
