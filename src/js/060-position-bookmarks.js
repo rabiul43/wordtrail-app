@@ -19,7 +19,7 @@
   function trGo(e) { if (e.sec === S.sec) seekAudio(e.time); else goTrack(e.sec, e.time, !audio.paused); }
   /* called just before a jump: remembers where you were and offers a way back */
   function trJump(toSec, toTime) {
-    if (!S.book || !S.secs || !S.secs.length) return;
+    if (!S.book || !S.secs || !S.secs.length || S.quietJump) return;   // S.quietJump: Echo mode (169h) moves the audio in small steps and back; not a jump
     const from = { sec: S.sec, time: nowT() };
     if (!(from.time > 5 || from.sec > 0)) return;
     if (toSec === S.sec && Math.abs(toTime - from.time) <= 30) return;

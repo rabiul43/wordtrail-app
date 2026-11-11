@@ -1,0 +1,31 @@
+/* Echo mode (169h-echo-mode.js, #sheet-echo). Only .ec* classes; built on the learning kit (94-learn-ui.css) and the full-screen .sheet.ced.
+   Remove this file, 28c-sheet-echo.html, 169h and their build.py lines to go back. */
+.sheet.echo header { gap: var(--s-3); border-bottom: 0; }
+.sheet.echo header::before { display: none; }
+.ec-prog { flex: 1; min-width: 0; }
+.ec-tag { flex: none; }
+.sheet.echo .ec-body { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: var(--s-4); padding-top: var(--s-2); text-align: center; }
+.sheet.echo .ec-body [hidden] { display: none !important; }
+.ec-top { align-self: stretch; text-align: start; }
+.sheet.echo .ec-title { margin: 0; font: 800 1.6rem/1.2 var(--font-ui); color: var(--ink); outline: 0; }
+.ec-where { margin: var(--s-1) 0 0; color: var(--muted); font: 500 var(--small)/1.3 var(--font-ui); }
+.ec-card { align-self: stretch; max-height: 34vh; overflow-y: auto; text-align: start; }
+.ec-sent { margin: 0; font: 500 1.35rem/1.6 var(--font-read); color: var(--ink); overflow-wrap: anywhere; }
+.ec-ring { --wl-ring-size: min(15rem, 56vw); --wl-ring-w: 16px; --wl-ring-hole: var(--surface); margin: var(--s-2) 0; transition: opacity .2s; }
+.ec-ring.is-wait { opacity: .55; }
+.ec-ringin { position: relative; display: grid; gap: var(--s-1); justify-items: center; }
+.ec-n { font: 800 3.4rem/1 var(--font-ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.ec-u { font: 500 var(--lead)/1.2 var(--font-ui); color: var(--muted); }
+.ec-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }
+.ec-step { min-height: 40px; padding: .3rem 1rem; color: var(--muted); }
+.ec-step .ec-sn { font-variant-numeric: tabular-nums; }
+.ec-step.is-now { color: var(--ink); background: var(--accent-soft); border-color: var(--accent); }
+.ec-step.is-ok { color: var(--wl-ok-text); background: var(--wl-ok-soft); border-color: var(--wl-ok); }
+.ec-step.is-ok > span:last-child::after { content: " \2714"; }
+.ec-status { margin: 0; min-height: 1.4em; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.ec-aux { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-3); margin-top: auto; }
+.ec-aux .wl-btn[aria-pressed="true"] { --wl-bg: var(--accent-soft); --wl-bd: var(--accent); --wl-ed: var(--accent); --wl-fg: var(--ink); }
+.ec-foot { padding: var(--s-3) var(--s-4) max(var(--s-4), env(safe-area-inset-bottom)); background: var(--surface); }
+:root[data-theme="contrast"] .ec-step.is-now { background: #000; border-color: #fff; color: #fff; }
+@media (prefers-reduced-motion: reduce) { .ec-ring { transition: none; } }
+@media (max-height: 640px) { .ec-ring { --wl-ring-size: 9rem; } .ec-n { font-size: 2.4rem; } .ec-card { max-height: 24vh; } }

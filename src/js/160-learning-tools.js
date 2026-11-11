@@ -47,12 +47,14 @@
     const hlB = h('button', { class: 'btn small ghost', type: 'button' }, 'Highlight');
     const noteB = h('button', { class: 'btn small ghost', type: 'button' }, 'Note');
     const cardB = h('button', { class: 'btn small ghost', type: 'button' }, 'Quote card');
+    const gramB = h('button', { class: 'btn small ghost', type: 'button' }, 'Grammar');
     const root = h('div', { class: 'trpop', role: 'dialog', 'aria-label': 'Sentence translation', hidden: true },
-      h('div', { class: 'tr-top' }, h('strong', {}, 'Translation'), sel), src, out, word, h('div', { class: 'tr-acts tr-hl' }, hlB, noteB, cardB), h('div', { class: 'tr-acts' }, copy, close));
+      h('div', { class: 'tr-top' }, h('strong', {}, 'Translation'), sel), src, out, word, h('div', { class: 'tr-acts tr-hl' }, hlB, noteB, cardB, gramB), h('div', { class: 'tr-acts' }, copy, close));
     document.body.append(root);
     hlB.addEventListener('click', () => { hlToggle(trSid); trClose(); });
     noteB.addEventListener('click', () => { const id = trSid; if (!hlFind(id)) hlToggle(id, true); trClose(); hlOpen(id); });
     cardB.addEventListener('click', () => { const t = (S.model && S.model.sents[trSid]) ? S.model.sents[trSid].t : trPop.text; trClose(); cardOpen(t); });
+    gramB.addEventListener('click', () => { const sid = trSid, t = (S.model && S.model.sents[sid]) ? S.model.sents[sid].t : trPop.text; trClose(); if (typeof GRS !== 'undefined') GRS.open(t, sid); });   // grammar sheet (167e)
     close.addEventListener('click', trClose);
     copy.addEventListener('click', () => { const t = out.textContent; if (t && !out.classList.contains('dim') && navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('Copied.', 1200), () => {}); });
     sel.addEventListener('change', () => { P.tlang = sel.value; savePrefs(); trShow(trPop.text, trPop.wordText); });

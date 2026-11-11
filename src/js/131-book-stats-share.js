@@ -164,7 +164,7 @@
           h('button', { class: 'det-share', type: 'button', 'aria-label': 'Share this book', onclick: () => shareBook(b) }, svgIcon('#i-share')),
           ddBtn(b)),   // new design only: the download icon that opens the offline options sheet (281)
         h('div', { class: 'det-dlhost' }, ddMake(b))),   // the Listen offline card; with the new design it is shown inside the sheet instead
-      about, tlSection(b), ratingsSection(b), bgrd, more);
+      (typeof BPV !== 'undefined' ? BPV.section(b) : null), about, tlSection(b), ratingsSection(b), bgrd, more);   // book preview (131b)
     /* floating Listen bar: shows when the big button has scrolled out of sight (phones only, see 99m-detail-stage.css) */
     try {
       const btn = d.querySelector('.det-btn');

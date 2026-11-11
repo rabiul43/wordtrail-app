@@ -1,0 +1,28 @@
+<section id="sheet-echo" class="sheet ced echo" hidden role="dialog" aria-modal="true" aria-labelledby="ec-title">
+  <header class="ec-head">
+    <button id="ec-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="ec-prog" class="wl-progress ec-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this track"><span class="wl-progress__fill"></span></div>
+    <span class="wl-pill is-ok ec-tag">Echo</span>
+  </header>
+  <div class="body ec-body">
+    <div class="ec-top">
+      <h2 id="ec-title" class="ec-title" tabindex="-1"></h2>
+      <p class="ec-where"><span id="ec-pos"></span> &middot; <span id="ec-ch"></span></p>
+    </div>
+    <div class="wl-card ec-card"><p id="ec-sent" class="ec-sent"></p></div>
+    <div id="ec-ring" class="wl-ring ec-ring" role="img" aria-label="">
+      <span class="ec-ringin"><span id="ec-n" class="ec-n" aria-hidden="true"></span><span id="ec-u" class="ec-u" aria-hidden="true"></span></span>
+    </div>
+    <ol class="ec-steps" aria-label="Steps">
+      <li class="wl-pill ec-step" data-step="listen"><span class="ec-sn">1</span> <span>Listen</span></li>
+      <li class="wl-pill ec-step" data-step="repeat"><span class="ec-sn">2</span> <span>Repeat</span></li>
+      <li class="wl-pill ec-step" data-step="next"><span class="ec-sn">3</span> <span>Next</span></li>
+    </ol>
+    <p id="ec-status" class="ec-status" role="status"></p>
+    <div class="ec-aux">
+      <button id="ec-again" class="wl-btn wl-btn--secondary wl-btn--small" type="button"><span aria-hidden="true">&#8635;</span> <span>Hear again</span></button>
+      <button id="ec-slow" class="wl-btn wl-btn--secondary wl-btn--small" type="button" aria-pressed="false">Slow 0.8&times;</button>
+    </div>
+  </div>
+  <footer class="ec-foot"><button id="ec-done" class="wl-btn wl-btn--primary wl-btn--block" type="button">I'm done, next</button></footer>
+</section>

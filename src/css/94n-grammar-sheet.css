@@ -1,0 +1,33 @@
+/* Grammar sheet (167e-grammar-sheet.js, #sheet-grammar). Only .gs* classes; built on the learning kit (94-learn-ui.css).
+   Remove this file, the HTML file 28b-sheet-grammar.html, 167e and their build.py lines to go back. */
+.gs [hidden] { display: none !important; }
+.gs-grip { display: block; position: relative; width: 6rem; height: 44px; margin: 0 auto; padding: 0; border: 0; background: none; cursor: pointer; }
+.gs-grip::before { content: ""; position: absolute; left: 50%; top: 18px; width: 3.2rem; height: 6px; margin-left: -1.6rem; border-radius: var(--r-pill); background: var(--line); }
+.gs-body { gap: var(--s-4); padding-top: 0; }
+.gs-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
+.gs-tag { display: inline-block; padding: .45rem 1.1rem; font: 800 var(--lead)/1.2 var(--font-ui); color: var(--accent); background: var(--accent-soft); border: 2px solid var(--accent); border-radius: var(--r-pill); }
+.gs-kind { color: var(--muted); font: 500 var(--small)/1.2 var(--font-ui); }
+.gs-sent, .gs-q { margin: 0; font: 500 1.45rem/1.55 var(--font-read); color: var(--ink); }
+.gs-sent mark, .gs-sent mark.gs-m2 { background: none; color: inherit; }
+.gs-sent mark.gs-m1 { background: var(--accent); color: var(--accent-ink); font-weight: 700; padding: .05em .3em; border-radius: 8px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.gs-sent mark.gs-m2 { color: var(--wl-info); font-weight: 700; }
+#gs-view, #gs-quiz { display: grid; gap: var(--s-3); }
+.gs-label { margin: 0 0 var(--s-1); font: 800 var(--label)/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.gs-form { margin: 0; font: 800 1.5rem/1.25 var(--font-ui); color: var(--ink); }
+.gs-desc { margin: var(--s-1) 0 0; font: 500 var(--lead)/1.45 var(--font-ui); color: var(--muted); }
+.gs-bn { font-family: 'Noto Sans Bengali', var(--font-ui); line-height: 1.8; }
+.gs-bn p { margin: 0 0 var(--s-2); }
+.gs-bn-name { font-weight: 800; color: var(--accent); }
+.gs-bn-form { color: var(--ink); }
+.gs-ex { font-size: var(--small); color: var(--muted); }
+.gs-ex-l { font: 800 var(--label)/1 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; margin-inline-end: var(--s-2); }
+.gs-none { margin: 0; color: var(--muted); font: 500 var(--lead)/1.45 var(--font-ui); }
+.gs-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.gs-note { margin: 0; color: var(--muted); font: 500 var(--small)/1.4 var(--font-ui); }
+.gs-opts { display: grid; gap: var(--s-3); }
+.gs-opt { text-align: center; font-weight: 700; }
+.gs-blank { display: inline-block; min-width: 3.5em; margin: 0 .15em; border-bottom: 3px solid var(--accent); }
+.gs-acts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-2); }
+.gs-acts .wl-btn { min-width: 0; padding-inline: var(--s-3); }
+@media (prefers-reduced-motion: reduce) { .gs .wl-panel { animation: none; } }
+.gs-tag:focus, .gs-tag:focus-visible { outline: none; }   /* not a control; it only receives focus so a screen reader reads the new sheet */

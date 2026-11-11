@@ -1,0 +1,28 @@
+/* Known words (Task 41): the dotted line under new words, the tap card and the coverage chip. Look from the mock-up: 2px bordered cards,
+   chunky buttons with a solid bottom edge (.wl-btn), a thick calm meter, no pressure. The card reuses .ow-card / .ow-grip / .ow-title (95d).
+   The lines are CSS Custom Highlights (no change to the text), so each theme names its colour here. */
+::highlight(wt-new) { text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: #E3B15C; text-decoration-thickness: 2px; }
+::highlight(wt-new-sel) { background-color: rgba(227, 177, 92, .38); }
+:root[data-theme="light"] ::highlight(wt-new), :root[data-theme="white"] ::highlight(wt-new), :root[data-theme="sepia"] ::highlight(wt-new) { text-decoration-color: #8A5A00; }
+:root[data-theme="light"] ::highlight(wt-new-sel), :root[data-theme="white"] ::highlight(wt-new-sel), :root[data-theme="sepia"] ::highlight(wt-new-sel) { background-color: rgba(138, 90, 0, .22); }
+:root[data-theme="contrast"] ::highlight(wt-new) { text-decoration-color: #FFD84D; text-decoration-thickness: 3px; }
+:root[data-theme="contrast"] ::highlight(wt-new-sel) { background-color: rgba(255, 216, 77, .45); }
+
+.kw-cov { display: flex; align-items: center; gap: .75rem; padding: .45rem .9rem; border-bottom: 1px solid var(--line); background: var(--bg); }
+.kw-cov[hidden] { display: none; }
+:root[data-calm] .kw-cov { display: none; }   /* Calm mode hides scores; the lines stay */
+.kw-bar { flex: 1; min-width: 0; height: 14px; border-radius: var(--r-pill); background: var(--surface-2); border: 2px solid var(--line); overflow: hidden; box-sizing: border-box; }
+.kw-bar i { display: block; height: 100%; width: 0; border-radius: var(--r-pill); background: linear-gradient(to bottom, color-mix(in srgb, var(--wl-ok) 78%, #fff) 0 35%, var(--wl-ok) 35% 100%); transition: width .35s var(--ease, ease-out); }
+.kw-chip { flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 0 1rem; border: 2px solid var(--wl-ok); border-radius: var(--r-pill); background: var(--wl-ok-soft); color: var(--wl-ok-text); font: 700 var(--small, .85rem)/1 var(--font-ui); font-variant-numeric: tabular-nums; white-space: nowrap; }
+:root[data-theme="contrast"] .kw-chip { color: #fff; background: #000; }
+@media (prefers-reduced-motion: reduce) { .kw-bar i { transition: none; } }
+
+.kw-head { display: flex; align-items: flex-start; gap: .75rem; }
+.kw-text { flex: 1; min-width: 0; }
+.kw-mean { margin: .25rem 0 0; font: 500 var(--lead, 1rem)/1.4 var(--font-ui); color: var(--muted); overflow-wrap: anywhere; }
+.kw-mean:empty { display: none; }
+.kw-say { flex: none; width: 52px; min-height: 52px; display: grid; place-items: center; padding: 0; font-size: 1.4rem; color: var(--ink); background: var(--surface-2); border: 2px solid var(--line); border-radius: var(--r-card); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kw-say:focus-visible { outline: var(--focus-w, 3px) solid var(--focus-ring, var(--accent)); outline-offset: var(--focus-off, 2px); }
+.kw-acts { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .25rem; }
+.kw-acts .wl-btn { min-width: 0; }
+.kw-card [aria-pressed="true"] { --wl-bg: var(--wl-ok); --wl-fg: var(--wl-ok-ink); --wl-bd: var(--wl-ok); --wl-ed: color-mix(in srgb, var(--wl-ok) 62%, var(--wl-edge-mix)); }

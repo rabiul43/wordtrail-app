@@ -1,0 +1,33 @@
+<section id="sheet-grammar" class="sheet gs" hidden role="dialog" aria-modal="true" aria-label="Grammar">
+  <button class="gs-grip" type="button" data-close aria-label="Close"></button>
+  <div class="body gs-body">
+    <div class="gs-top"><span class="gs-tag" id="gs-tag" tabindex="-1"></span><span class="gs-kind" id="gs-kind"></span></div>
+    <p class="gs-sent" id="gs-sent" lang="en"></p>
+    <div id="gs-view">
+      <section class="wl-card gs-pat" id="gs-pat" hidden>
+        <h3 class="gs-label">The pattern</h3>
+        <p class="gs-form" id="gs-form"></p>
+        <p class="gs-desc" id="gs-desc"></p>
+      </section>
+      <section class="wl-card gs-bn" id="gs-bn" lang="bn" hidden>
+        <p class="gs-bn-name" id="gs-bn-name"></p>
+        <p class="gs-bn-tr" id="gs-bn-tr" hidden></p>
+        <p class="gs-bn-desc" id="gs-bn-desc"></p>
+        <p class="gs-ex"><span class="gs-ex-l" lang="en">Example</span> <span id="gs-ex-en" lang="en"></span><br><span id="gs-ex-bn"></span></p>
+      </section>
+      <p class="gs-none" id="gs-none" hidden>No clear tense or pattern was found in this sentence. Short sentences, commands and old words can be missed.</p>
+      <div class="gs-chips" id="gs-chips" role="group" aria-label="Patterns in this sentence" hidden></div>
+      <p class="gs-note" id="gs-note">Detected automatically, so it may sometimes be wrong.</p>
+    </div>
+    <div id="gs-quiz" hidden>
+      <h3 class="gs-label">Fill the blank</h3>
+      <p class="gs-q" id="gs-q" lang="en"></p>
+      <div class="gs-opts" id="gs-opts" role="group" aria-label="Choose the missing word"></div>
+      <div id="gs-fb"></div>
+    </div>
+    <div class="gs-acts">
+      <button class="wl-btn wl-btn--secondary" id="gs-try" type="button">Try one</button>
+      <button class="wl-btn wl-btn--primary" id="gs-got" type="button" data-close>Got it</button>
+    </div>
+  </div>
+</section>

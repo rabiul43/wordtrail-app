@@ -213,6 +213,7 @@
     }
     function showCard(c, tapped) {
       const card = st.card; if (!card) return;
+      if (typeof kuClose === 'function') kuClose();   // only one card at a time (161e)
       const sent = sentOf(c.id), text = sent.slice(c.s, c.e), lang = trLang(), n = ++st.seq;
       st.cur = { text, sent, id: c.id, rec: c.rec, k: c.k, tr: '' };
       const tags = $('#ow-tags'); tags.textContent = '';
@@ -265,7 +266,7 @@
       });
     }
     guideDoc('reading', 'Old words and idioms', 'Old-fashioned words get a purple line and idioms a blue line. Tap one to see what it means today, then Save phrase adds it to My words. You can turn the lines off in Settings > Reading.');
-    return { run, repaint, showCard, closeCard };
+    return { run, repaint, showCard, closeCard, rangeOf, hitAt };   // rangeOf, hitAt: also used by 161e (new words)
   })();
   function owChapter(i) { OW.run(i); }
   function owRepaint(id) { OW.repaint(id); }
