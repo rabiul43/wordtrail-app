@@ -326,6 +326,8 @@
 
   const P = Object.assign({ theme: 'auto', size: 1.24, speed: 1, nudge: 0.15, recents: [], viz: (reduceMotion || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'off' : 'bars' }, store.get('wt:prefs', {}));
   const savePrefs = () => store.set('wt:prefs', P);
+  /* Learn mode (GL, 169l) on? The one question every learning feature asks. Standard mode = false. Safe to call before GL exists (start-up): false. */
+  const learnOn = () => { try { return GL.tabOn(); } catch (e) { return false; } };
   /* Player style (Playback + Sleep timer sheets): 'clean' | 'glass'. Settings saved before this existed keep 'clean'; a fresh install (nothing saved yet) gets 'glass'. The first-paint script in 00-head.html uses the same rule. */
   if (P.playerStyle !== 'clean' && P.playerStyle !== 'glass') P.playerStyle = Object.keys(window.__wtP || {}).length ? 'clean' : 'glass';
   /* Haptics: one small vocabulary of vibrations, used the same way everywhere. Off switch: Settings > Audio. */

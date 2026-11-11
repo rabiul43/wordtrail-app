@@ -105,8 +105,8 @@
       sec.hidden = false;
     }
     function section(b) {
-      const sec = h('section', { class: 'bpv', hidden: true, 'aria-label': 'Book preview' });
-      if (b && b.id) setTimeout(() => { model(b).then(m => { if (m && DET.book === b) paint(sec, b, m); }).catch(() => { /* no preview: the block stays hidden */ }); }, 500);
+      const sec = h('section', { class: 'bpv', 'data-lrn': true, hidden: true, 'aria-label': 'Book preview' });
+      if (b && b.id && learnOn()) setTimeout(() => { model(b).then(m => { if (m && DET.book === b) paint(sec, b, m); }).catch(() => { /* no preview: the block stays hidden */ }); }, 500);
       return sec;
     }
     return { section, model };

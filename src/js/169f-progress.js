@@ -147,7 +147,7 @@
     function show() {
       const box = document.getElementById('pg'); if (!box) return;
       const m = model();
-      if (!m.collected && !m.minutes && !m.reviews && !m.books.length) { box.hidden = true; box.textContent = ''; return; }
+      if (!learnOn() || (!m.collected && !m.minutes && !m.reviews && !m.books.length)) { box.hidden = true; box.textContent = ''; return; }
       const kids = [h('h2', { id: 'pg-h' }, 'Progress')];
       if (!m.calm) {
         kids.push(h('div', { class: 'pg-streak wl-card' + (m.streak ? ' on' : '') },

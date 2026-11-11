@@ -14,7 +14,7 @@
      Play during practice is never undone), and plays again if it was playing. Leaving the player forgets the snapshot and resumes nothing.
      LB.open()  LB.paint()  LB.ctx()  LB.place (the snapshot, or null)  LB.back() */
   const LB = (() => {
-    const fab = h('button', { id: 'lrn-fab', type: 'button', class: 'lrn-fab', 'aria-haspopup': 'dialog', 'aria-label': 'Learn: study this chapter' },
+    const fab = h('button', { id: 'lrn-fab', 'data-lrn': true, type: 'button', class: 'lrn-fab', 'aria-haspopup': 'dialog', 'aria-label': 'Learn: study this chapter' },
       h('span', { class: 'lrn-ic', 'aria-hidden': 'true' }, '🎓'), h('span', { class: 'lrn-t' }, 'Learn'));
     fab.hidden = P.learnBtn === false;
     el.dock.after(fab);   // next to the dock, so a slim dock (Focus mode) can hide it with CSS

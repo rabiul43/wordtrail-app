@@ -49,7 +49,7 @@
       const e = vocEntry(w, '', sentence);
       const sub = h('div', { class: 'wp-sub' }), tabs = h('div', { class: 'wp-tabs', role: 'tablist', 'aria-label': 'About this word', hidden: true });
       const body = h('div', { class: 'wp-body', 'aria-live': 'polite' }, h('p', { class: 'wp-text dim' }, 'Looking up…'));
-      const save = h('button', { class: 'wl-btn wl-btn--primary wl-btn--block', type: 'button', 'aria-pressed': 'false' });
+      const save = h('button', { class: 'wl-btn wl-btn--primary wl-btn--block', 'data-lrn': true, type: 'button', 'aria-pressed': 'false' });   // Standard mode: look up and translate only, no saving
       const paint = () => { const on = myWords().some(x => x.w === e.w); save.setAttribute('aria-pressed', String(on)); save.textContent = ''; save.append(h('span', { 'aria-hidden': 'true' }, '★'), h('span', {}, on ? 'Saved' : 'Save word')); };
       /* Save keeps the sentence, the book and the chapter (WS.saveWithContext, 147). It never touches the audio: no hold, no seek. */
       const here = () => { const m = S.model && S.model.sents && S.model.sents[sid]; return m && typeof m.ch === 'number' ? m.ch + 1 : null; };   // chapter number = its place in the book

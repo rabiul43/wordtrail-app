@@ -1,0 +1,3 @@
+/* Standard | Learn gate (see GL in 169l-goal.js). Standard mode = no data-learn on <html>: everything marked data-lrn is hidden, for good.
+   Tap-a-word, translate and the reading modes are NOT marked. Remove this file and its build.py line to go back (then also remove the data-lrn marks). */
+:root:not([data-learn]) [data-lrn] { display: none !important; }

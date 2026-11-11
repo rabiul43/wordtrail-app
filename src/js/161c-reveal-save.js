@@ -140,7 +140,7 @@
 
     /* ----- the Save phrase button ----- */
     function build() {
-      const btn = h('button', { class: 'wl-btn wl-btn--primary rv-save', type: 'button', 'aria-pressed': 'false', hidden: true });
+      const btn = h('button', { class: 'wl-btn wl-btn--primary rv-save', 'data-lrn': true, type: 'button', 'aria-pressed': 'false', hidden: true });
       btn.addEventListener('mousedown', e => e.preventDefault());   // keep the selection while the button is pressed
       btn.addEventListener('pointerdown', () => { st.hold = st.cur; });
       btn.addEventListener('click', onSave);

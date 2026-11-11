@@ -72,7 +72,7 @@
       <div class="qk-tiles qk-t4">
       <button id="btn-aa" class="qk-tile" type="button" data-n="Text size and font" data-d="Size, line spacing and font" aria-label="Text size and font: size, line spacing and font"><span class="qk-aa" aria-hidden="true">Aa</span><span>Text size &amp; font</span></button>
       <button id="qk-read" class="qk-tile" type="button" data-n="Hide player" data-d="Hide the player and just read" aria-label="Hide player: hide the player and just read"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg><span>Hide player</span></button>
-      <button id="b-words" class="qk-tile" type="button" data-n="Words" data-d="Look up words in this book and review the ones you saved" aria-label="Words: Look up words in this book and review the ones you saved"><svg class="ic" aria-hidden="true"><use href="#i-m-dict"/></svg><span>Words</span></button>
+      <button id="b-words" data-lrn class="qk-tile" type="button" data-n="Words" data-d="Look up words in this book and review the ones you saved" aria-label="Words: Look up words in this book and review the ones you saved"><svg class="ic" aria-hidden="true"><use href="#i-m-dict"/></svg><span>Words</span></button>
       </div>
       <div class="more-list">
         <button id="btn-live" class="mrow" type="button" aria-pressed="false"><span class="mr-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 2.600 5.600 5.500 7M11 5c-.7 3.400-3 6.200-6.500 7.500M13 21l4-10 4 10M14.500 18h5"/></svg></span><span class="mr-main"><span class="mr-t mi-l">Live translation</span><span class="mr-d">See each sentence in your language</span></span></button>
@@ -132,7 +132,7 @@
     <button type="button" class="dm-it" role="menuitem" data-go="textsync"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="dm-t">Fix highlight sync</span></button>
     <button type="button" class="dm-it dm-all" role="menuitem" data-go="tools"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">More tools</span><span class="dm-v">&#8250;</span></button>
   </div>
-  <button type="button" class="dm-it" role="menuitem" data-go="learn"><span class="dm-i" aria-hidden="true">&#127891;</span><span class="dm-t">Learn</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="learn" data-lrn><span class="dm-i" aria-hidden="true">&#127891;</span><span class="dm-t">Learn</span></button>
 </div>
 
 <section id="fpanel" class="sheet fpanel" hidden role="dialog" aria-modal="true" aria-labelledby="h-fpanel">
@@ -228,7 +228,8 @@
     </div>
     <div>
       <h3>Learning</h3>
-      <div class="row"><label for="in-learnmode" style="flex:1">Learn mode<small class="spd-s">Off by default. Adds a Learn tab and the daily plan. Your saved words and progress are kept when you switch it</small></label><input id="in-learnmode" type="checkbox"></div>
+      <div class="row"><label for="in-learnmode" style="flex:1">Learn mode<small class="spd-s">Off by default (Standard). Adds a Learn tab, the daily plan and word tools. Tap-a-word and translate stay on in both. Your saved words and progress are kept when you switch it</small></label><input id="in-learnmode" type="checkbox"></div>
+      <div id="gl-tools" data-lrn>
       <div id="gl-learn-rows" hidden>
         <div class="row"><label for="in-examon" style="flex:1">Prepare for IELTS<small class="spd-s">An exam countdown on Home</small></label><input id="in-examon" type="checkbox"></div>
       </div>
@@ -236,7 +237,9 @@
         <div class="row"><label for="in-examdate" style="flex:1">Exam date</label><input id="in-examdate" type="date"></div>
         <div class="row"><label for="in-examtarget" style="flex:1">Target band</label><select id="in-examtarget" class="num" style="width:auto"><option value="">Not set</option><option value="5.0">5.0</option><option value="5.5">5.5</option><option value="6.0">6.0</option><option value="6.5">6.5</option><option value="7.0">7.0</option><option value="7.5">7.5</option><option value="8.0">8.0</option><option value="8.5">8.5</option><option value="9.0">9.0</option></select></div>
       </div>
-      <div class="row"><label for="in-learnbtn" style="flex:1">Show the Learn button<small class="spd-s">The gold button on the player. It does not depend on how you use Wordtrail. The Learn item stays in the player menu</small></label><input id="in-learnbtn" type="checkbox" checked></div>
+      <div class="row"><label for="in-learnbtn" style="flex:1">Show the Learn button<small class="spd-s">The gold button on the player</small></label><input id="in-learnbtn" type="checkbox" checked></div>
+      <div class="row"><label for="in-knownul" style="flex:1">Underline new words<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Words from the book's word list that you have not marked as known get a soft dotted line. Tap one to see its meaning.</small></label><input id="in-knownul" type="checkbox"></div>
+      </div>
     </div>
     <div>
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-pen"/></svg>Highlight</h3>
@@ -252,7 +255,6 @@
         </div></div>
       <div class="row" style="margin-top:.5rem"><label for="in-wordhl" style="flex:1">Highlight each word as it is read<small id="wordhl-help" style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Off: only the whole sentence is highlighted.</small></label><input id="in-wordhl" type="checkbox"></div>
       <div class="row" style="margin-top:.5rem"><label for="in-oldwords" style="flex:1">Highlight old words and idioms<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Old-fashioned words get a purple line and idioms a blue line. Tap one to see what it means today.</small></label><input id="in-oldwords" type="checkbox"></div>
-      <div class="row" style="margin-top:.5rem"><label for="in-knownul" style="flex:1">Underline new words<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Words from the book's word list that you have not marked as known get a soft dotted line. Tap one to see its meaning.</small></label><input id="in-knownul" type="checkbox"></div>
       <div class="row" id="row-wordshift" style="margin-top:.5rem"><label style="flex:1">Word timing<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">If the word is ahead of the voice, press &minus;. If it is behind, press +.</small></label><div class="seg"><button type="button" id="ws-down" aria-label="Highlight words later">&minus;</button><button type="button" id="ws-val" aria-label="Reset word timing" style="min-width:4.2rem;font-variant-numeric:tabular-nums">0.0 s</button><button type="button" id="ws-up" aria-label="Highlight words earlier">+</button></div></div>
       <div class="row" id="row-clpro" style="margin-top:.5rem"><label for="in-clpro" style="flex:1">Video-style clip editor<small id="clpro-help" style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Off: simple trim handles only.</small></label><input id="in-clpro" type="checkbox"></div>
       <div class="row" id="row-wordest" style="margin-top:.5rem"><label for="in-wordest" style="flex:1">Estimate words in books without word timing<small style="display:block;color:var(--muted);font-weight:400;font-size:.8rem;line-height:1.4;margin-top:.15rem">Exact timing is always used when a book has it. Estimates can run a little ahead or behind.</small></label><input id="in-wordest" type="checkbox"></div>

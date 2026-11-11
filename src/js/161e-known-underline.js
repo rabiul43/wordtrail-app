@@ -81,7 +81,7 @@
   const KU = (() => {
     const st = { idx: new Map(), cache: new Map(), tok: 0, C: null, hl: null, sel: null, rng: new Map(), ws: new Set(), cur: null, seq: 0, card: null, cov: null };
     const can = () => typeof Highlight !== 'undefined' && !!(window.CSS && CSS.highlights);
-    const on = () => P.knownUl === true;
+    const on = () => P.knownUl === true && learnOn();   // Standard mode: never
     const idle = f => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 600 }) : setTimeout(f, 40));
     function lines() { if (!st.hl) { st.hl = new Highlight(); CSS.highlights.set('wt-new', st.hl); } return st.hl; }
     function selLine() { if (!st.sel) { st.sel = new Highlight(); CSS.highlights.set('wt-new-sel', st.sel); } return st.sel; }
@@ -278,7 +278,8 @@
       });
     }
     guideDoc('reading', 'New words', 'Turn on Underline new words in Settings > Reading. Words from the book\u2019s word list that you have not marked as known get a soft dotted line. Tap one for its meaning, then I know it or Learn. The chip above the text shows how much of the chapter you know.');
-    return { run, repaint, showCard, closeCard, model };
+    function sync() { if (!on()) off(); else if (S.model && !S.rb && S.sec != null) run(S.sec); }   // 169l calls this when Learn mode is switched
+    return { run, repaint, showCard, closeCard, model, sync };
   })();
   function kuChapter(i) { KU.run(i); }
   function kuRepaint(id) { KU.repaint(id); }

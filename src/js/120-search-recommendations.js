@@ -455,6 +455,7 @@
     const my = ++TOD.seq, part = todPart();
     try {
       if (part === 'morning') {
+        if (!learnOn()) { sec.hidden = true; sec.textContent = ''; return; }   // Standard mode: no review card
         const due = myWords().filter(srsDue).length;
         if (!due) { sec.hidden = true; sec.textContent = ''; return; }
         const mins = Math.max(1, Math.round(due / 3));

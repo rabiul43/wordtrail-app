@@ -67,6 +67,7 @@ PARTS = [
     ('file', 'src/css/99d-search-page.css'),
     ('file', 'src/css/99e-library-hub.css'),
     ('file', 'src/css/99e2-goal.css'),
+    ('file', 'src/css/99e3-learn-gate.css'),
     ('file', 'src/css/99b-confirm.css'),
     ('file', 'src/css/99f-settings-polish.css'),
     ('file', 'src/css/99f-library-polish.css'),
