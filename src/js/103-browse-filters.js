@@ -38,7 +38,7 @@
     try { if (LF.lvl.size && !LVL.ready) await LVL.load(); if (LF.ready && !VER.ready) await VER.load(); } catch (e) { /* use what loaded */ }
     if (from === 'search') { if (el.q.value.trim() && !el.results.hidden) showBooks(RS.all); } else applyFilters();
   }
-  const FLT = { len: '', mood: '', lang: '', nar: '', rate: '', sort: '', shown: 0 };
+  const FLT = { len: '', mood: '', lang: '', nar: '', rate: '', sort: '', ielts: false, acc: '', shown: 0 };   // ielts, acc: 103b
   /* Sort by (Newest is the default, so '' means Newest) and Minimum rating. Both need the ratings summary (135-ratings.js),
      which only has books with at least 5 ratings, so a rating filter or Top rated leaves unrated books out. Calm mode
      hides the rating controls and ignores them. */
@@ -70,12 +70,13 @@
     if (FLT.lang) { if ((b.lang || 'English').toLowerCase() !== FLT.lang.toLowerCase()) return false; }
     else if (!P.otherLangs && b.lang && !/^english$/i.test(b.lang)) return false;
     if (nar && !nar.has(b.id)) return false;
+    if ((FLT.ielts || FLT.acc !== '') && !AC.match(b)) return false;   // 103b
     const rate = fltRate();
     if (rate || fltSort() === 'rated') { const i = rtInfo(b.id); if (!i || (rate && i.avg < +rate)) return false; }
     if (genreWords && !genreWords.every(w => b._g.includes(w))) return false;
     return true;
   }
-  function fltActiveCount() { return (FLT.len ? 1 : 0) + (LF.lvl.size ? 1 : 0) + (LF.ready ? 1 : 0) + (FLT.mood ? 1 : 0) + (FLT.lang ? 1 : 0) + (FLT.nar ? 1 : 0) + (fltRate() ? 1 : 0) + (fltSort() ? 1 : 0); }
+  function fltActiveCount() { return (FLT.len ? 1 : 0) + (LF.lvl.size ? 1 : 0) + (LF.ready ? 1 : 0) + (FLT.mood ? 1 : 0) + (FLT.lang ? 1 : 0) + (FLT.nar ? 1 : 0) + (fltRate() ? 1 : 0) + (fltSort() ? 1 : 0) + (FLT.ielts ? 1 : 0) + (FLT.acc !== '' ? 1 : 0); }
   async function applyFilters(more) {
     const n = fltActiveCount(), res = $('#filter-results'), g = genreEls();
     { const dn = $('#fp-done'); if (dn && !n) dn.textContent = 'Done'; }
@@ -91,6 +92,10 @@
       if (!LVL.ready) { list.textContent = ''; count.textContent = 'Reading levels have not loaded yet. Check your connection and try again.'; moreBtn.hidden = true; return; }
     }
     if (FLT.mood) await MOODS.load(); // if it cannot load, the keyword guess is used
+    if (FLT.ielts || FLT.acc !== '') {
+      await AC.load();
+      if (!AC.ready()) { list.textContent = ''; count.textContent = 'IELTS data has not loaded yet. Check your connection and try again.'; moreBtn.hidden = true; return; }
+    }
     const nar = FLT.nar ? (fltNarrators().get(FLT.nar) || new Set()) : null;
     const gdef = activeGenre ? GENRES.find(x => x.lv === activeGenre) : null;
     const gw = gdef ? String(gdef.lv).replace(/\+/g, ' ').toLowerCase().split(/\s+/) : null;
@@ -107,7 +112,7 @@
     { const dn = $('#fp-done'); if (dn) dn.textContent = all.length ? 'Show ' + plural(all.length, 'book') : 'Done'; }
     if (!more) list.textContent = '';
     const from = more ? list.children.length : 0;
-    const cards = all.slice(from, FLT.shown).map(({ _t, _a, _l, _g, ...b }) => bookCard(b, () => openDetail(b)));
+    const cards = all.slice(from, FLT.shown).map(({ _t, _a, _l, _g, ...b }) => bookCard(b, () => openDetail(b), AC.extra(b)));
     list.append(...cards);
     checkReady(cards);
     moreBtn.hidden = FLT.shown >= all.length;
@@ -136,6 +141,7 @@
     names.forEach(n => ns.append(h('option', { value: n }, n + ' (' + nm.get(n).size + ')')));
     ns.value = FLT.nar;
     $('#flt-nar-help').textContent = names.length ? 'Narrators of the books you have opened.' : 'Narrators appear here once you have opened a few books. The catalog does not list narrators.';
+    AC.fill();
   }
   /* ---------- Filters: one bottom sheet (#fpanel) ----------
      Sort, Minimum rating, Level, Length, Mood, Genre, Language, Narrator and Read-along ready live here. The scope chips under the
@@ -149,7 +155,7 @@
   }
   function fltClearAll() {
     if (activeGenre) clearGenre();
-    FLT.len = FLT.mood = FLT.lang = FLT.nar = FLT.rate = FLT.sort = ''; LF.lvl.clear(); LF.ready = false; lfPaint(); fltSegPaint();
+    FLT.len = FLT.mood = FLT.lang = FLT.nar = FLT.rate = FLT.sort = ''; FLT.acc = ''; FLT.ielts = false; LF.lvl.clear(); LF.ready = false; lfPaint(); fltSegPaint(); AC.paint();
     $$('#flt-len button, #flt-mood button').forEach(x => x.setAttribute('aria-pressed', 'false'));
     $('#flt-lang').value = ''; $('#flt-nar').value = ''; applyFilters();
   }
@@ -165,6 +171,8 @@
     if (fltSort()) { const x = FLT_SORTS.find(y => y[0] === fltSort()); if (x) items.push(['Sort: ' + x[1], () => { FLT.sort = ''; fltSegPaint(); applyFilters(); }]); }
     if (fltRate()) { const x = FLT_RATES.find(y => y[0] === fltRate()); if (x) items.push([x[1].replace(' +', '+') + ' rated', () => { FLT.rate = ''; fltSegPaint(); applyFilters(); }]); }
     if (FLT.lang) items.push([FLT.lang, () => { FLT.lang = ''; $('#flt-lang').value = ''; applyFilters(); }]);
+    if (FLT.ielts) items.push(['IELTS-friendly', () => { FLT.ielts = false; AC.paint(); applyFilters(); }]);
+    if (FLT.acc !== '') items.push([AC.ACC[+FLT.acc], () => { FLT.acc = ''; AC.paint(); applyFilters(); }]);
     if (FLT.nar) items.push(['Narrator: ' + FLT.nar, () => { FLT.nar = ''; $('#flt-nar').value = ''; applyFilters(); }]);
     const sig = items.map(i => i[0]).join('|');
     if (host._sig === sig) return;

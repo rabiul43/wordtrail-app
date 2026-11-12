@@ -129,6 +129,7 @@
         examCard(g, now),
         h('div', { class: 'ie-grid' }, ...SK.map(sk => skillCard(sk, c, foc))),
         h('p', { class: 'ie-cap' }, 'Rings show practice done this month, not a score. A full ring is ' + IEC.RING + ' sessions.'),
+        h('button', { type: 'button', class: 'wl-btn wl-btn--block ie-books', onclick: () => AC.shelf() }, 'Books for IELTS'),   // 103b
         h('button', { type: 'button', class: 'wl-btn wl-btn--primary wl-btn--block ie-today', onclick: () => { if (foc.length) openSkill(foc[0]); else { try { TD.open(); } catch (e) { /* Today not ready */ } } } }, foc.length ? TODAY[foc[0]] : 'Today\u2019s plan'));
     }
     function section() {   // LearnHub.head: a fresh section each time the hub is drawn

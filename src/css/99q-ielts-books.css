@@ -1,0 +1,13 @@
+/* IELTS books (103b-ielts-books.js): the academic-words bar on filtered book cards, and the Essay phrases button in My words. Colours come from the theme tokens. */
+.ac-row { display: grid; gap: .25rem; margin-top: var(--s-2, .5rem); }
+.ac-line { display: flex; align-items: center; gap: .5rem; }
+.ac-bar { flex: 1; height: .6rem; border-radius: 99px; background: var(--line); overflow: hidden; }
+.ac-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.ac-p { font: 800 .85rem/1 var(--font-ui); color: var(--accent); }
+.ac-lab { font: 600 .8rem/1.2 var(--font-ui); color: var(--muted); }
+.ac-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.ac-chips span { font: 700 .75rem/1 var(--font-ui); color: var(--ink); border: 2px solid var(--line); border-radius: 99px; padding: .3rem .6rem; }
+.ep-offer { margin: .5rem 0; }
+.ep-offer .wl-btn { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; }
+.ep-n { font: 800 .8rem/1 var(--font-ui); border: 2px solid currentColor; border-radius: 99px; padding: .15rem .5rem; }
+.ie-books { margin-top: var(--s-2, .5rem); }

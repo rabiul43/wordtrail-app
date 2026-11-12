@@ -191,7 +191,8 @@
     }
     function render(list, help, words) {
       W.words = words; W.help = help; W.base = help.textContent; ensure(list);
-      W.bar.hidden = false; paintBar(); paintGo(); drawList();
+      W.bar.hidden = false; EP.prepare(); paintBar(); paintGo(); drawList();
+      EP.offer(W.bar, () => render(list, help, WS.all()));   // 103b: Essay phrases
     }
     function show(on) { if (!on && W.bar) { W.bar.hidden = true; W.dock.hidden = true; closePanel(); } }
 
