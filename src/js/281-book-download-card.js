@@ -126,7 +126,7 @@
     const ic = h('div', { class: 'dd-ic', 'aria-hidden': 'true' }), tt = h('b'), sub = h('span'), btn = h('button', { class: 'dd-btn', type: 'button' }), bar = h('i'), pb = h('div', { class: 'dd-pb', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': 'Download progress', hidden: true }, bar);
     const ck = h('input', { type: 'checkbox' }), ot = h('b'), os = h('small');
     const opt = h('label', { class: 'dd-opt', hidden: true }, ck, h('span', { class: 'dd-ot' }, ot, os));
-    const node = h('div', { class: 'dd-card' }, ic, h('div', { class: 'dd-t' }, tt, sub), btn, opt, pb);
+    const node = h('div', { class: 'dd-card' }, ic, h('div', { class: 'dd-t' }, tt, sub), btn, opt, pb, LPK.row(b));   // LPK.row: the learning pack (283)
     node._p = { ic, tt, sub, btn, bar, pb, opt, ck, ot, os };
     btn.addEventListener('click', () => { if (node.dataset.s === 'full') ddRemove(b); else ddTap(b); });
     ck.addEventListener('change', () => {
@@ -212,4 +212,5 @@
     q.pb.hidden = frac < 0;
     if (frac >= 0) { const w = Math.round(frac * 100); q.bar.style.width = w + '%'; q.pb.setAttribute('aria-valuenow', String(w)); }
     ddIconPaint(k, frac);
+    LPK.paint();
   }

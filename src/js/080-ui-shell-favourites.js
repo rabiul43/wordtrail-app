@@ -232,7 +232,7 @@
   let shelfMode = 'saved';
   let shelfHub = false, shelfHubNext = false;   // phones: My Library shows its list of pages (shelfHub); shelfHubNext asks the next showTab('shelf') to open on that list
   /* Hooks into later files (account-sync, ratings), filled in when those files load, so this file does not name them. Until then: a guest, nothing to draw. */
-  const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {}, top: () => false, toBooks: () => {} };
+  const shelfHooks = { signedIn: () => false, myRatings: () => {}, firstSave: () => {}, top: () => false, toBooks: () => {}, ask: () => {} };
   /* Account-only pages stay out of sight for guests. Rated needs an account (ratings live in it). Following is kept on the device,
      so it stays visible for a guest who already follows an author. A page that is no longer available falls back to Saved. */
   function shelfChips() {
@@ -246,6 +246,7 @@
   function applyShelfMode() {
     shelfChips();
     const phone = phoneUI(), hub = phone && shelfHub;
+    try { shelfHooks.ask(shelfMode !== 'dl' && (!phone || hub)); } catch (e) { /* goal question (169n) not ready */ }   // the one-time goal card shows on the start of My Library only
     let learn = false; try { learn = shelfHooks.top(hub); } catch (e) { /* Learn switch not ready: Books */ }
     if (learn) {   // Learn (169): none of the Books pages is shown; the switch and Learn panel are drawn by shelfHooks.top
       ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });

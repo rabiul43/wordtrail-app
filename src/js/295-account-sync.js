@@ -34,7 +34,7 @@
     ['library', 'Favourites, saved words, searches', k => k === 'wt:favs' || k === 'wt:words' || k === 'wt:wcols' || k === 'wt:recent-q' || k === 'wt:myrt' || k === 'wt:follows' || k === 'wt:qres' || k === 'wt:known'],
     ['marks', 'Bookmarks, clips and highlights', k => /^wt:(bm|clips|hl):/.test(k)],
     ['progress', 'Progress and listening stats', k => /^wt:(book|lp|lev):/.test(k) || k === 'wt:stats' || k === 'wt:listens' || k === 'wt:finlv' || k === 'wt:booktime'],
-    ['learning', 'Learning stats', k => k === 'wt:learnlog']
+    ['learning', 'Learning stats', k => k === 'wt:learnlog' || k === 'wt:ielts']
   ];
   let acFb = null, acLoading = null, acDb = null, acUser = null, acStale = false, acWhy = '', acBusy = false, acTimer = null, acMsg = '', acErr = '';
   /* keys changed here and not uploaded yet. Kept in wt:syncdirty so a closed page or a restart cannot forget them
@@ -259,12 +259,13 @@
        wt:lp:*              furthest point reached, per track
        wt:book:*            the furthest position (track, then time); the other fields come from the newer copy
        wt:lev:*             both copies' entries (same track: the newer copy's)
+     wt:ielts             per day, the larger value of each skill (IE.mergeJson in 169o)
      wt:learnlog          per day, the larger value of each field (LL.merge in 148b)
      wt:booktime          per book, the larger value (BT.merge in 148c)
      wt:known             both lists of words joined, every word once (KW.merge in 148e)
      wt:qres              per chapter: most tries and best result, last set from the newer copy (QR.merge in 148d)
      wt:bm:* is one bookmark per book, so the newer copy still wins there. */
-  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words' || k === 'wt:wcols' || k === 'wt:learnlog' || k === 'wt:booktime' || k === 'wt:qres' || k === 'wt:known';
+  const AC_MERGE = k => /^wt:(clips|hl|lp|lev|book):/.test(k) || k === 'wt:words' || k === 'wt:wcols' || k === 'wt:learnlog' || k === 'wt:ielts' || k === 'wt:booktime' || k === 'wt:qres' || k === 'wt:known';
   const acIsObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
   function acResolve(k, a, b, mineNewer) { // a = this device, b = cloud. Returns the merged JSON text, or null to let the newer copy win.
     let A, B; try { A = JSON.parse(a); B = JSON.parse(b); } catch (e) { return null; }
@@ -274,6 +275,7 @@
     if (k === 'wt:qres') return QR.mergeJson(a, b);   // chapter question results (148d)
     if (k === 'wt:known') return KW.mergeJson(a, b);   // known words (148e): both lists, every word kept once
     if (k === 'wt:booktime') return BT.mergeJson(a, b);   // time per book (148c): per book, the larger value
+    if (k === 'wt:ielts') return IE.mergeJson(a, b);   // IELTS practice log (169o): per day, the larger value of each skill
     if (k === 'wt:learnlog') return LL.mergeJson(a, b);   // learning stats log (148b): per day, the larger value of each field
     if (/^wt:(clips|hl):/.test(k)) {
       if (!Array.isArray(A) || !Array.isArray(B)) return null;

@@ -1,0 +1,32 @@
+/* IELTS hub (169o-ielts-hub.js): the section at the top of the Learn hub while "Prepare for IELTS" is on. Only .ie-* classes; colours come from the theme tokens. */
+.ie-hub { display: grid; gap: var(--s-3); width: 100%; max-width: 40rem; margin: 0 0 var(--s-5); }
+.ie-hub + .lhub-grid { margin-top: var(--s-2); }
+.ie-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.ie-h { margin: 0; font: 800 1.5rem/1.2 var(--font-display, var(--font-ui)); color: var(--ink); }
+.ie-streak { font: 800 1rem/1 var(--font-ui); color: var(--accent); }
+.ie-exam { display: grid; gap: var(--s-2); padding: var(--s-4); border-color: var(--accent); background: var(--accent-soft, var(--surface)); }
+.ie-exam-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-3); }
+.ie-exam-tx { display: grid; gap: .15rem; min-width: 0; }
+.ie-kick { font: 800 .75rem/1 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.ie-big { font: 800 2rem/1.1 var(--font-display, var(--font-ui)); color: var(--ink); overflow-wrap: anywhere; }
+.ie-sub { margin: 0; font: 600 var(--small, .85rem)/1.4 var(--font-ui); color: var(--muted); }
+.ie-bar { margin: .2rem 0 0; }
+.ie-edit-row { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; margin-top: var(--s-1); }
+.ie-in { box-sizing: border-box; min-height: 44px; padding: .4rem .7rem; font: 600 1rem/1.2 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: var(--r-card); }
+.ie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+.ie-skill { display: grid; justify-items: center; align-content: start; gap: .35rem; min-height: 9rem; padding: var(--s-3); text-align: center; }
+.ie-ring { position: relative; display: grid; place-items: center; width: 4rem; height: 4rem; }
+.ie-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ie-trk { stroke: var(--line); }
+.ie-arc { stroke: currentColor; }
+.ie-ic { position: relative; font-size: 1.35rem; line-height: 1; }
+.ie-l { color: #3fae85; } .ie-r { color: #4f8df0; } .ie-w { color: var(--accent); } .ie-s { color: #9b72e8; }
+.ie-name { font: 800 1.1rem/1.2 var(--font-ui); color: var(--ink); }
+.ie-n { font: 600 var(--small, .85rem)/1.2 var(--font-ui); color: var(--muted); }
+.ie-focus { color: var(--accent); border-color: var(--accent); }
+.ie-cap { margin: 0; font: 600 var(--small, .85rem)/1.4 var(--font-ui); color: var(--muted); }
+.ie-today { text-transform: uppercase; letter-spacing: .06em; }
+.ie-sheet .body { display: grid; gap: var(--s-3); padding: var(--s-4); }
+.ie-sh-n { margin: 0; font: 800 1.4rem/1.2 var(--font-ui); color: var(--ink); }
+.ie-sh-p { margin: 0; font: 600 var(--small, .9rem)/1.45 var(--font-ui); color: var(--muted); }
+.ie-sh-btns { display: grid; gap: var(--s-2); }

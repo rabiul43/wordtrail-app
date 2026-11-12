@@ -82,6 +82,9 @@
       async get(k) {
         try { const d = await db(); return await new Promise(res => { const q = d.transaction('texts').objectStore('texts').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); }); } catch (e) { return undefined; }
       },
+      async del(k) {   // removes the key itself (used by the learning pack, 283)
+        try { const d = await db(); return await new Promise(res => { const tx = d.transaction('texts', 'readwrite'); tx.objectStore('texts').delete(k); tx.oncomplete = () => res(true); tx.onerror = tx.onabort = () => res(false); }); } catch (e) { return false; }
+      },
       async set(k, v) {
         if (window.__wtRestoring) return false;
         try { const d = await db(); return await new Promise(res => { const tx = d.transaction('texts', 'readwrite'); tx.objectStore('texts').put(v, k); tx.oncomplete = () => res(true); tx.onerror = tx.onabort = () => res(false); }); } catch (e) { return false; /* cache unavailable */ }
@@ -231,10 +234,11 @@
   const dmSize = m => Object.values(m.tracks || {}).reduce((a, t) => a + (t.s || 0), 0);
   const dmMB = n => n < 1e5 ? Math.max(0, Math.round(n / 1e3)) + ' KB' : fmtMB(n);
   function dmFinished() { try { if (stDirty) stSave(); else ST = stLoad(); return new Set(stSummary().done.map(x => String(x.id))); } catch (e) { return new Set(); } }
-  async function dmDrop(id) {   // removes one book's saved audio; false if it could not (or is downloading right now)
+  async function dmDrop(id, withPack) {   // removes one book's saved audio; false if it could not (or is downloading right now). withPack: its learning pack goes too (delete all, delete finished, auto-delete)
     id = String(id);
     if (DL.running && DL.id === id) return false;
     try { await adb.dropBook(id); } catch (e) { return false; }
+    if (withPack) { try { await LPK.drop(id); } catch (e) { /* the pack is removed from its own card */ } }
     dlMeta.delete(id);
     { const q = dqGet(); if (q && q.id === id) dqClear(); }
     if (DL.id === id) DL.st = {};
@@ -291,6 +295,7 @@
     rows.forEach(r => {
       const sub = h('small', {}, r.n + ' of ' + r.m.n + (r.m.n === 1 ? ' track' : ' tracks'));
       if (r.done) sub.append(' · ', h('span', { class: 'dm-tag' }, 'Finished'));
+      { const lp = LPK.size(r.m.id); if (lp) sub.append(' · ', 'Learning pack ' + dmMB(lp)); }
       list.append(h('div', { class: 'dm-row' },
         h('div', { class: 'dm-t' }, h('b', {}, r.m.title || 'Untitled'), sub),
         h('span', { class: 'dm-sz' }, dmMB(r.size)),
@@ -308,18 +313,22 @@
     const rows = [...dlMeta.values()];
     if (!rows.length) { toast('No books are downloaded.'); return; }
     const size = rows.reduce((a, m) => a + dmSize(m), 0);
-    if (!await askConfirm({ title: 'Delete all downloads?', item: plural(rows.length, 'book'), meta: dmMB(size), text: 'Your positions, stats and favourites are kept.', ok: 'Delete all' })) return;
-    let ok = 0; for (const m of rows) if (await dmDrop(m.id)) ok++;
+    if (!await askConfirm({ title: 'Delete all downloads?', item: plural(rows.length, 'book'), meta: dmMB(size), text: 'Saved learning packs are removed too. Your positions, stats and favourites are kept.', ok: 'Delete all' })) return;
+    const lone = LPK.ids().filter(x => !dlMeta.has(x));   // packs of books whose audio is not saved
+    let ok = 0; for (const m of rows) if (await dmDrop(m.id, true)) ok++;
+    for (const x of lone) await LPK.drop(x);
     toast(ok === rows.length ? plural(ok, 'book') + ' deleted, ' + dmMB(size) + ' freed.' : ok + ' of ' + rows.length + ' deleted. A book that is downloading right now was skipped.', 4500);
     paintCards(); paintDl(); dmRender();
   }
   async function dmDeleteFinished() {
     await dlReady;
     const fset = dmFinished(), rows = [...dlMeta.values()].filter(m => fset.has(String(m.id)));
-    if (!rows.length) { toast('No finished books are downloaded.'); return; }
+    if (!rows.length && !LPK.ids().some(x => fset.has(x))) { toast('No finished books are downloaded.'); return; }
     const size = rows.reduce((a, m) => a + dmSize(m), 0);
-    if (!await askConfirm({ title: 'Delete finished books?', item: plural(rows.length, 'finished book'), meta: dmMB(size), text: 'Your positions, stats and favourites are kept.', ok: 'Delete' })) return;
-    let ok = 0; for (const m of rows) if (await dmDrop(m.id)) ok++;
+    if (!await askConfirm({ title: 'Delete finished books?', item: plural(rows.length, 'finished book'), meta: dmMB(size), text: 'Their learning packs are removed too. Your positions, stats and favourites are kept.', ok: 'Delete' })) return;
+    const lone = LPK.ids().filter(x => !dlMeta.has(x) && fset.has(x));
+    let ok = 0; for (const m of rows) if (await dmDrop(m.id, true)) ok++;
+    for (const x of lone) await LPK.drop(x);
     toast(ok === rows.length ? plural(ok, 'finished book') + ' deleted, ' + dmMB(size) + ' freed.' : ok + ' of ' + rows.length + ' deleted. A book that is downloading right now was skipped.', 4500);
     paintCards(); paintDl(); dmRender();
   }

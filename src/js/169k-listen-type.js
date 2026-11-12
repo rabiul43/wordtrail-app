@@ -381,7 +381,7 @@
       if (st.step === 'end') { close(); return; }
       if (st.step !== 'checked') return;
       endClip();
-      if (st.i + 1 >= st.set.length) { st.step = 'end'; hideFeedback(); paint(); paintEnd(); try { q('lt-title').focus({ preventScroll: true }); } catch (e) { /* ignore */ } return; }
+      if (st.i + 1 >= st.set.length) { st.step = 'end'; try { IE.log('l'); } catch (e) { /* IELTS practice log (169o) not loaded */ } hideFeedback(); paint(); paintEnd(); try { q('lt-title').focus({ preventScroll: true }); } catch (e) { /* ignore */ } return; }
       st.i++; newSentence();
       try { q('lt-in').focus({ preventScroll: true }); } catch (e) { /* ignore */ }
     }

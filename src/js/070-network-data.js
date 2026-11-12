@@ -266,9 +266,10 @@
 
   /* ---------- text-analysis data (levels, moods, similar, vocab): Hugging Face first, GitHub as a fallback ---------- */
   const TEXT_REPO = 'rabiul43/wordtrail-text';
+  const textUrls = name => ['https://huggingface.co/datasets/' + TEXT_REPO + '/resolve/main/data/' + name,
+                            'https://raw.githubusercontent.com/' + ghCfg().repo + '/main/' + name];   // also used by the learning pack (283)
   async function fetchText(name, signal) {
-    const urls = ['https://huggingface.co/datasets/' + TEXT_REPO + '/resolve/main/data/' + name,
-                  'https://raw.githubusercontent.com/' + ghCfg().repo + '/main/' + name];
+    const urls = textUrls(name);
     for (const u of urls) {
       try { const r = await fetch(u, { signal }); if (r.ok) return r; } catch (e) { if (signal && signal.aborted) return null; }
     }

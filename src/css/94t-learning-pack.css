@@ -1,0 +1,9 @@
+/* Learning pack rows in the Listen offline card (283). One row per item: name, size, status. Calm: no colours beyond the accent tick. */
+.lpk-l { display: block; width: 100%; margin-top: .45rem; }
+.lpk-r { display: flex; align-items: baseline; gap: .6rem; min-height: 1.9rem; padding: .3rem 0; border-top: 1px solid var(--line); font-size: .85rem; }
+.lpk-r:first-child { border-top: 0; }
+.lpk-n { flex: 1 1 auto; min-width: 0; color: var(--ink); }
+.lpk-z { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lpk-s { flex: none; min-width: 5.2rem; text-align: right; color: var(--muted); }
+.lpk-r.ok .lpk-s { color: var(--accent); font-weight: 600; }
+.lpk-r.run .lpk-s { color: var(--ink); }

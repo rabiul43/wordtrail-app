@@ -1,0 +1,36 @@
+<section id="sheet-ws" class="sheet ced ws" hidden role="dialog" aria-modal="true" aria-labelledby="ws-title">
+  <header class="ws-head">
+    <button id="ws-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+  </header>
+  <div class="body ws-body">
+    <h2 id="ws-title" class="ws-title" tabindex="-1">Share with a class</h2>
+    <p id="ws-sub" class="ws-sub"></p>
+    <div id="ws-paper" class="ws-paper" role="region" aria-label="Preview of the worksheet" tabindex="0"></div>
+    <div class="ws-rng">
+      <span class="ws-lbl" id="ws-rl">Chapters</span>
+      <label class="sr-only" for="ws-from">From chapter</label><select id="ws-from" class="ws-sel" aria-describedby="ws-rl"></select>
+      <span aria-hidden="true">&ndash;</span>
+      <label class="sr-only" for="ws-to">To chapter</label><select id="ws-to" class="ws-sel" aria-describedby="ws-rl"></select>
+    </div>
+    <p class="ws-lbl" id="ws-ol">Include</p>
+    <div id="ws-opts" class="ws-opts" role="group" aria-labelledby="ws-ol"></div>
+    <p id="ws-status" class="ws-status" role="status"></p>
+  </div>
+  <footer class="ws-foot">
+    <button id="ws-dl" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Download worksheet (PDF)</button>
+    <div class="ws-alt">
+      <button id="ws-anki" class="wl-btn wl-btn--secondary wl-btn--block" type="button" disabled>Anki file</button>
+      <button id="ws-link" class="wl-btn wl-btn--secondary wl-btn--block" type="button" disabled>Copy class link</button>
+    </div>
+  </footer>
+</section>
+<section id="sheet-cw" class="sheet ced ws" hidden role="dialog" aria-modal="true" aria-labelledby="cw-title">
+  <header class="ws-head">
+    <button id="cw-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+  </header>
+  <div class="body ws-body">
+    <h2 id="cw-title" class="ws-title" tabindex="-1">Class words</h2>
+    <p id="cw-sub" class="ws-sub"></p>
+    <ol id="cw-list" class="cw-list"></ol>
+  </div>
+</section>

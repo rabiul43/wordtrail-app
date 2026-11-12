@@ -205,7 +205,7 @@
     }
     /* Someone who used saved words before the switch existed would find the tools gone: say so once, with a way back. */
     function legacyNote() {
-      if (GLC.mode(P.goal) !== 'unset' || P.learnNote) return;
+      if (GLC.mode(P.goal) !== 'unset' || P.learnNote || (P.goal && P.goal.ask === 'done')) return;   // not after the goal question was answered or skipped (169n)
       let n = 0; try { n = (WS.all() || []).length; } catch (e) { /* no words store */ }
       if (!n) return;
       P.learnNote = true; savePrefs();
@@ -213,5 +213,5 @@
     }
     function paint() { paintGate(); paintTab(); paintHome(); paintSettings(); }
     function start() { wire(); paint(); setTimeout(legacyNote, 3000); document.addEventListener('visibilitychange', () => { if (!document.hidden && GLC.mode(P.goal) === 'exam') paintHome(); }); }   // the day changed while the app was in the background
-    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, paint, openLearn, newWord, label, start, NAMES };
+    return { get, mode, tabOn, todayOk, choose, setLearn, setExam, setExamField, paint, openLearn, newWord, label, start, NAMES };
   })();

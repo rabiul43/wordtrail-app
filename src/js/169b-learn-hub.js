@@ -9,11 +9,12 @@
            player           optional: false keeps the tile out of the "Study this chapter" sheet in the player (169e); default true
            playerSubtitle   optional: text, or a function(ctx) returning text, used instead of subtitle inside that sheet.
                             ctx = { book, bookId, chapter (index, -1 if unknown), chapterTitle, track, time (seconds) }; open(ctx) gets the same ctx there
+       LearnHub.head(fn)        fn() returns a node (or null) drawn ABOVE the tiles each time the hub is drawn; used by the IELTS hub (169o) when an exam is on
        LearnHub.unregister(id)  LearnHub.has(id)  LearnHub.list()  LearnHub.refresh()  (redraws when Learn is on screen)
      The hub is drawn by LSW.render (169), each time Learn opens. A tile whose functions throw is skipped, never the whole hub.
      Styles 94h-learn-hub.css. Tiles that are registered here: My Words, Review (at the end of this file). */
   const LearnHub = (() => {
-    const tiles = [];
+    const tiles = [], heads = [];
     let seq = 0;
     const val = (v, a) => { try { return typeof v === 'function' ? v(a) : v; } catch (e) { return ''; } };
     function register(t) {
@@ -38,14 +39,15 @@
     }
     const emptyView = LSW.render;   // the empty state from 169, shown while nothing is registered
     function draw(host) {
-      const ts = list();
-      if (!ts.length) { emptyView(host); return; }
+      const ts = list(), top = [];
+      heads.forEach(fn => { try { const n = fn(); if (n) top.push(n); } catch (e) { /* a broken head is skipped */ } });
+      if (!ts.length && !top.length) { emptyView(host); return; }
       const grid = h('div', { class: 'lhub-grid' });
       ts.forEach(t => { try { grid.append(tile(t)); } catch (e) { /* skip a broken tile */ } });
-      host.textContent = ''; host.append(grid);
+      host.textContent = ''; top.forEach(n => host.append(n)); if (ts.length) host.append(grid);
     }
     function refresh() { if (!$('#shelf-learn').hidden) applyShelfMode(); }
-    return { register, unregister, has: id => tiles.some(x => x.id === id), list, tile, draw, refresh };
+    return { head: fn => { if (typeof fn === 'function' && heads.indexOf(fn) < 0) heads.push(fn); }, register, unregister, has: id => tiles.some(x => x.id === id), list, tile, draw, refresh };
   })();
   LSW.render = LearnHub.draw;
 

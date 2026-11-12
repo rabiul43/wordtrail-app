@@ -114,5 +114,5 @@
         if (!t) throw unavailable();
         return t;
       } });
-    return { load, status, name, parse, check, _t: { st, CFG } };   // _t: for tools/translate_pack_provider_check.js
+    return { load, status, name, parse, check, readJson, _t: { st, CFG } };   // _t: for tools/translate_pack_provider_check.js
   })();

@@ -295,10 +295,11 @@
     try {
       if (P.autoDel !== true) return;
       await dlReady;
-      const m = dlMeta.get(String(id)); if (!m) return;
+      const m = dlMeta.get(String(id));
+      if (!m) { if (LPK.has(id) && await LPK.drop(id)) paintCards(); return; }   // no audio saved, but a learning pack: it goes too
       if (DL.running && DL.id === String(id)) return;
       const size = dmSize(m);
-      if (await dmDrop(id)) { paintCards(); paintDl(); }
+      if (await dmDrop(id, true)) { paintCards(); paintDl(); }
     } catch (e) { /* keep the download */ }
   }
   audio.addEventListener('timeupdate', stSample);

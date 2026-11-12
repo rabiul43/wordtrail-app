@@ -137,6 +137,7 @@
       frame(); setBar(L.qs.length);
       const n = L.qs.length, prev = QR.get(L.bid, L.ch);
       const saved = QR.save(L.bid, L.ch, n, L.right, Date.now());
+      try { IE.log('r'); } catch (e) { /* IELTS practice log (169o) not loaded */ }
       try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }
       L.scroll.append(h('div', { class: 'rl__main' }, title('Set complete'),
         h('p', { class: 'rl__score' }, L.right + ' of ' + n + ' right'),

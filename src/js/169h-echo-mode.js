@@ -124,6 +124,7 @@
       }, 100);
     }
     function go(d) {
+      if (d > 0 && st.on) st.cnt = (st.cnt || 0) + 1;   // sentences finished in this practice (169o counts 3 or more as a speaking session)
       halt(); stopAudio();
       const i = ECC.pick(hid, st.p.ids.length, st.k + d, d);
       if (i < 0) { st.step = 'end'; st.fail = false; paint(); return; }
@@ -181,6 +182,8 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
+      if (st.cnt >= 3) { try { IE.log('s'); } catch (e) { /* IELTS practice log (169o) not loaded */ } }
+      st.cnt = 0;
       halt(); stopAudio(); hook('close');
       const snap = st.snap; st.snap = null;
       if (!snap || !S.book || String(S.book.id) !== snap.bookId) return;

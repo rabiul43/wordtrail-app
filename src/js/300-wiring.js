@@ -813,9 +813,9 @@
       P.readerLvl = chosenLvl;
       savePrefs();
       store.set('wt:onboarded', 1);
-      /* The goal: only a choice the person made (Continue, or a tap before Skip). Otherwise it stays unset and Home offers it once. */
+      /* The goal: only a choice the person made (Continue, or a tap before Skip). Otherwise it stays unset (and is not asked again: ask 'done'). */
       if (goalTouched) { try { GL.choose(chosenGoal, true); } catch (e) { /* the app still works without a goal */ } }
-      else { try { GL.paint(); } catch (e) { /* Home not ready */ } }
+      else { try { P.goal = Object.assign({}, P.goal, { ask: 'done' }); savePrefs(); GL.paint(); } catch (e) { /* Home not ready */ } }   // skipped: not asked again (169n); Settings still has the switch
       setTimeout(() => { try { sharedOpen(); } catch (e) { /* no shared link waiting */ } }, 300);   // a shared link that arrived on the first run opens now
       ov.style.transition = 'opacity .22s ease';
       ov.style.opacity = '0';
