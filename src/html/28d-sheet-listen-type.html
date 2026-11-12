@@ -27,6 +27,11 @@
       <p id="lt-status" class="lt-status" role="status"></p>
     </div>
     <div id="lt-end" class="lt-end" hidden>
+      <div class="wl-card lt-score">
+        <div id="lt-ring" class="lt-ring" role="img" aria-label="Score"><span id="lt-ring-t" class="lt-ring-t"></span></div>
+        <div class="lt-score-t"><p id="lt-sc-h" class="lt-sc-h"></p><p id="lt-sc-s" class="lt-sc-s"></p></div>
+      </div>
+      <ol id="lt-rows" class="lt-rows" hidden></ol>
       <ul id="lt-sum" class="lt-sum"></ul>
       <p id="lt-all" class="lt-all" hidden>All sentences were perfect.</p>
       <h3 id="lt-prac-h" class="lt-prac-h" hidden>Sentences to practise</h3>
@@ -38,10 +43,12 @@
       <p id="lt-fb-t" class="lt-fb-t"></p>
       <p id="lt-fb-a" class="lt-fb-a"></p>
       <p id="lt-fb-s" class="lt-fb-s"></p>
+      <ul id="lt-fb-d" class="lt-fixes" hidden></ul>
       <p id="lt-fb-yl" class="lt-fb-yl" hidden>You typed</p>
       <p id="lt-fb-y" class="lt-fb-y" hidden></p>
     </div>
     <button id="lt-check" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Check</button>
+    <button id="lt-save" class="wl-btn wl-btn--block lt-save" type="button" hidden></button>
     <button id="lt-next" class="wl-btn wl-btn--primary wl-btn--block" type="button" hidden>Continue</button>
   </footer>
 </section>

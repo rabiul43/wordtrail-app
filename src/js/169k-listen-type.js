@@ -9,13 +9,22 @@
      It reuses what the app has: shPlan / shClip (140: the sentence timing), Core.locate, seekAudio, the one <audio> element, openSheet. Echo (169h) is not
      touched. When closed in ANY way the audio goes back to the same track and second and plays again if it was playing (same rule as Echo).
      Runs only while the screen is open: a 40 ms check while a clip plays. Nothing at start-up. Playback never depends on this file.
-     Storage: none (results live in memory until the next session: LN.last()). Setting: none. Words are in src/i18n/*.json.
+     Task 46 (spelling): UK and US spellings are both accepted (`src/data/spelling-variants.json`, put in the page as #lt-variants by build.py; the answer panel
+     and the result screen say which one was typed and that the other is also accepted). A wrong word shows its exact wrong letters (`LNC.diff`): the typed
+     word struck through, the right word with the letters to fix marked, and a plain reason (missing "n" before "m"). The end screen is the "Your answers"
+     screen: score ring (perfect sentences), the spelling slips, one row per word worth a look, Save N words (wrong words -> My Words), Continue.
+     When a word that is already in My Words appears in a checked sentence, its review state is updated through WS.update (SRS.review, kind 'rcl':
+     right = Good, one letter off = Hard, wrong or missed = Again; with Show first letters on, a right word counts as Hard). Once per word per session.
+     Storage: no key of its own (results live in memory until the next session: LN.last()); My Words entries are changed only through WS.update / WS.saveWithContext.
+     Setting: none. Words are in src/i18n/*.json.
      Registered in the Learn hub (169b) as the tile "Listen and type"; the same tile is in the player's "Study this chapter" sheet (169e).
-       LNC.check(typed, target)   pure: { words: [{ w, v: ok|close|no|miss, t }], tw: [{ w, v: ok|close|no|extra }], extra: [typed words], ok, close, wrong, miss, nExtra, total, v: ok|near|no }
+       LNC.check(typed, target, V)   pure (V = LNC.variants(list), optional): { words: [{ w, v: ok|close|no|miss, t, alt? }], nVar, tw: [{ w, v: ok|close|no|extra }], extra: [typed words], ok, close, wrong, miss, nExtra, total, v: ok|near|no }
+       LNC.variants(list)   pure: Map word -> [{ w, side }] from "uk|us" pairs   LNC.diff(typed, target)   pure: { tgt, typ: [{ c, bad }], n, why }
+       LNC.varNote(side, target)   LNC.rows(items, max)   pure: the rows of the result screen   LNC.spell(row)   true for a spelling slip
        LNC.pickSet(texts, hidden, k, size)   pure: up to `size` indexes   LNC.pattern(target, hint, first)   LNC.spans(text)   LNC.words(text)   LNC.fold(word)
        LN.start()   opens a session at the current sentence; false (with a message) when no book text is lined up with the audio
        LN.close()   LN.on   LN.results()   [{ k, id, text, typed, v, ok, close, wrong, miss, extra, plays, hint, first }] of the session on screen
-       LN.last()    { bookId, title, sec, ts, res } of the last session that was finished or closed with at least one answer, or null
+       LN.last()    { bookId, title, sec, ts, res (each also has `saved`: [{ w, v }] My Words entries updated) } of the last session that was finished or closed with at least one answer, or null
      Remove this file, 94s-listen-type.css, 28d-sheet-listen-type.html and their build.py lines to go back. */
   const LNC = (() => {
     /*LNC-START*/
@@ -41,17 +50,68 @@
       return d[n][m];
     }
     const rel = (t, u) => (t === u ? 'ok' : (t.length >= 5 && dist(t, u) <= 1 ? 'close' : 'no'));
+    /* UK and US spellings: "uk|us" pairs -> Map(folded word -> [{ w: the other spelling, side: 'uk'|'us' of that other spelling }]) */
+    function variants(list) {
+      const M = new Map(), put = (a, b, side) => { const k = fold(a); if (!M.has(k)) M.set(k, []); M.get(k).push({ w: b, side }); };
+      (Array.isArray(list) ? list : []).forEach(p => {
+        const x = str(p).split('|'); if (x.length !== 2) return;
+        const a = x[0].trim(), b = x[1].trim(); if (!a || !b || fold(a) === fold(b)) return;
+        put(a, b, 'us'); put(b, a, 'uk');
+      });
+      return M;
+    }
+    const altOf = (V, t, u) => { const l = V && V.get(t); return l ? (l.find(x => fold(x.w) === u) || null) : null; };
+    const varNote = (side, target) => (side === 'uk' ? 'UK' : 'US') + ' spelling · ' + (side === 'uk' ? 'US' : 'UK') + ' “' + target + '” is also accepted';
+    /* the exact letters: typed word against the right word. tgt / typ = letters [{ c, bad }]; n = letters to change (two swapped letters count 1);
+       why = a plain reason when there are one or two fixes */
+    const fc = c => fold(c) || c;
+    function diff(typed, target) {
+      const a = Array.from(str(typed)), b = Array.from(str(target)), fa = a.map(fc), fb = b.map(fc), n = a.length, m = b.length;
+      const D = [], O = [];
+      for (let i = 0; i <= n; i++) { D[i] = []; O[i] = []; }
+      D[0][0] = 0;
+      for (let i = 1; i <= n; i++) { D[i][0] = i; O[i][0] = 'x'; }
+      for (let j = 1; j <= m; j++) { D[0][j] = j; O[0][j] = 'm'; }
+      for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) {
+        let best = D[i - 1][j - 1] + (fa[i - 1] === fb[j - 1] ? 0 : 1), op = fa[i - 1] === fb[j - 1] ? '=' : 's';
+        if (D[i - 1][j] + 1 < best) { best = D[i - 1][j] + 1; op = 'x'; }
+        if (D[i][j - 1] + 1 < best) { best = D[i][j - 1] + 1; op = 'm'; }
+        if (i > 1 && j > 1 && fa[i - 1] === fb[j - 2] && fa[i - 2] === fb[j - 1] && fa[i - 1] !== fa[i - 2] && D[i - 2][j - 2] + 1 < best) { best = D[i - 2][j - 2] + 1; op = 'w'; }
+        D[i][j] = best; O[i][j] = op;
+      }
+      const tgt = b.map(c => ({ c, bad: false })), typ = a.map(c => ({ c, bad: false })), ev = [];
+      let i = n, j = m;
+      while (i > 0 || j > 0) {
+        const op = O[i][j];
+        if (op === '=') { i--; j--; }
+        else if (op === 's') { tgt[j - 1].bad = typ[i - 1].bad = true; ev.unshift({ op, i: i - 1, j: j - 1 }); i--; j--; }
+        else if (op === 'w') { tgt[j - 1].bad = tgt[j - 2].bad = typ[i - 1].bad = typ[i - 2].bad = true; ev.unshift({ op, i: i - 2, j: j - 2 }); i -= 2; j -= 2; }
+        else if (op === 'x') { typ[i - 1].bad = true; ev.unshift({ op, i: i - 1, j: j }); i--; }
+        else { tgt[j - 1].bad = true; ev.unshift({ op, i, j: j - 1 }); j--; }
+      }
+      const one = e => {
+        if (e.op === 'm') { const L = b[e.j], nx = b[e.j + 1]; return e.j === 0 ? 'missing “' + L + '” at the start' : (nx === undefined ? 'missing “' + L + '” at the end' : 'missing “' + L + '” before “' + nx + '”'); }
+        if (e.op === 'x') return 'extra “' + a[e.i] + '”';
+        if (e.op === 's') return '“' + a[e.i] + '” should be “' + b[e.j] + '”';
+        return '“' + a[e.i] + a[e.i + 1] + '” should be “' + b[e.j] + b[e.j + 1] + '”';
+      };
+      const why = !ev.length ? '' : ev.length === 1 ? one(ev[0]) : ev.length === 2 ? one(ev[0]) + '; ' + one(ev[1]) : ev.length + ' letters to fix';
+      return { tgt, typ, n: D[n][m], why };
+    }
     /* compare what was typed with the sentence, word by word (the cheapest way to line the two lists up) */
-    function check(typed, target) {
+    function check(typed, target, V) {
       const T = words(target), U = words(typed), n = T.length, m = U.length, tf = T.map(fold), uf = U.map(fold);
+      const rel2 = (t, u) => (t === u ? 'ok' : altOf(V, t, u) ? 'var' : rel(t, u));   // 'var' = the other UK / US spelling: counts as right
       const C = [], B = [];
       for (let i = 0; i <= n; i++) { C[i] = []; B[i] = []; }
       C[0][0] = 0;
       for (let i = 1; i <= n; i++) { C[i][0] = i; B[i][0] = 't'; }
       for (let j = 1; j <= m; j++) { C[0][j] = j; B[0][j] = 'u'; }
       for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) {
-        const r = rel(tf[i - 1], uf[j - 1]);
-        let best = C[i - 1][j - 1] + (r === 'ok' ? 0 : r === 'close' ? 0.4 : 1), b = 'd';
+        const r = rel2(tf[i - 1], uf[j - 1]);
+        // a wrong word that is only a letter or two away from this one (4+ letters) lines up with it before a far-away word does
+        const near = r === 'no' && Math.max(tf[i - 1].length, uf[j - 1].length) >= 4 && dist(tf[i - 1], uf[j - 1]) <= 2;
+        let best = C[i - 1][j - 1] + (r === 'ok' || r === 'var' ? 0 : r === 'close' ? 0.4 : near ? 0.7 : 1), b = 'd';
         if (C[i - 1][j] + 1 < best - 1e-9) { best = C[i - 1][j] + 1; b = 't'; }
         if (C[i][j - 1] + 1 < best - 1e-9) { best = C[i][j - 1] + 1; b = 'u'; }
         C[i][j] = best; B[i][j] = b;
@@ -60,14 +120,18 @@
       let i = n, j = m;
       while (i > 0 || j > 0) {
         const b = B[i][j];
-        if (b === 'd') { const r = rel(tf[i - 1], uf[j - 1]); ws[i - 1] = { w: T[i - 1], v: r, t: U[j - 1] }; tw[j - 1] = { w: U[j - 1], v: r }; i--; j--; }
+        if (b === 'd') {
+          const r = rel2(tf[i - 1], uf[j - 1]), a = r === 'var' ? altOf(V, tf[i - 1], uf[j - 1]) : null;
+          ws[i - 1] = { w: T[i - 1], v: r === 'var' ? 'ok' : r, t: U[j - 1] }; if (a) ws[i - 1].alt = { side: a.side };
+          tw[j - 1] = { w: U[j - 1], v: r === 'var' ? 'ok' : r }; i--; j--;
+        }
         else if (b === 't') { ws[i - 1] = { w: T[i - 1], v: 'miss', t: '' }; i--; }
         else { tw[j - 1] = { w: U[j - 1], v: 'extra' }; extra.unshift(U[j - 1]); j--; }
       }
       const cnt = v => ws.filter(x => x.v === v).length;
       const ok = cnt('ok'), close = cnt('close'), wrong = cnt('no'), miss = cnt('miss'), nExtra = extra.length;
       const errors = wrong + miss + nExtra;
-      return { words: ws, tw, extra, ok, close, wrong, miss, nExtra, total: n, v: n > 0 && errors === 0 ? (close === 0 ? 'ok' : 'near') : 'no' };
+      return { words: ws, tw, extra, ok, close, wrong, miss, nExtra, nVar: ws.filter(x => x.alt).length, total: n, v: n > 0 && errors === 0 ? (close === 0 ? 'ok' : 'near') : 'no' };
     }
     /* up to `size` sentence numbers for one session: from k to the end of the track, then from its start; texts[i] is the sentence, hidden(i) true when it is not narrated */
     function pickSet(texts, hidden, k, size) {
@@ -89,13 +153,33 @@
       if (!hint && !first) return [];
       return words(target).map(w => { const f = fold(w), head = first ? f.charAt(0) : '_'; return hint ? head + '_'.repeat(Math.max(0, f.length - 1)) : head + '…'; });
     }
+    /* a spelling slip: one letter off, or a different word that is only a letter or two away (the typed word is there, so it was heard and written) */
+    const spell = r => !!(r && r.typed && (r.v === 'close' || (r.v === 'no' && r.w.length >= 4 && r.diff && r.diff.n <= 2)));
+    /* the rows of the result screen. items = [{ chk, saved: { word: 1 } }] (one per checked sentence, in order). A row is a word worth a look:
+       wrong, close, missed, typed in the other UK / US spelling, or a word saved in My Words. { w, typed, v: ok|close|no|miss, diff, note, saved, spell }. */
+    function rows(items, max) {
+      const out = [], seen = new Set();
+      (items || []).forEach(it => {
+        const sv = (it && it.saved) || {};
+        ((it && it.chk && it.chk.words) || []).forEach(x => {
+          const isSaved = !!sv[String(x.w).toLowerCase()];
+          if (x.v === 'ok' && !x.alt && !isSaved) return;
+          const key = fold(x.w) + '|' + fold(x.t || '') + '|' + x.v; if (seen.has(key)) return; seen.add(key);
+          const r = { w: x.w, typed: x.t || '', v: x.v, diff: null, note: x.alt ? varNote(x.alt.side, x.w) : '', saved: isSaved, spell: false };
+          if (x.v === 'close' || (x.v === 'no' && x.t)) { const d = diff(x.t, x.w); if (d.n <= Math.max(2, Math.floor(Array.from(x.w).length / 2))) r.diff = d; }
+          r.spell = spell(r);
+          out.push(r);
+        });
+      });
+      return max > 0 && out.length > max ? Object.assign(out.slice(0, max), { more: out.length - max }) : out;
+    }
     /*LNC-END*/
-    return { SIZE, SLOW, MIN_W, MAX_W, fold, words, spans, check, pickSet, pattern };
+    return { SIZE, SLOW, MIN_W, MAX_W, fold, words, spans, check, pickSet, pattern, variants, diff, varNote, rows, spell };
   })();
 
   const LN = (() => {
-    const st = { on: false, p: null, set: [], i: 0, step: '', plays: 0, hint: false, first: false, snap: null, tok: 0, watch: 0, playing: false, fail: false, res: [], chk: null };
-    let last = null;
+    const st = { on: false, p: null, set: [], i: 0, step: '', plays: 0, hint: false, first: false, snap: null, tok: 0, watch: 0, playing: false, fail: false, res: [], chk: null, graded: new Set() };
+    let last = null, VM = null;
     const q = id => document.getElementById(id);
     const hid = k => { const s = S.model && st.p && S.model.sents[st.p.ids[k]]; return !s || !!s.h; };
     const kNow = () => st.set[st.i];
@@ -107,6 +191,67 @@
       try { const c = S.model.chapters && S.model.chapters.find(x => id >= x.start && id < x.end); return [S.book.title, c && c.title].filter(Boolean).join(' · '); } catch (e) { return S.book ? S.book.title : ''; }
     }
     const perfect = () => st.res.filter(r => r && r.v === 'ok').length;
+    const vmap = () => {   // UK / US pairs from the page (#lt-variants), read once on first use
+      if (!VM) { let l = []; try { l = (JSON.parse(q('lt-variants').textContent) || {}).pairs || []; } catch (e) { l = []; } VM = LNC.variants(l); }
+      return VM;
+    };
+    const svMap = r => { const m = {}; ((r && r.saved) || []).forEach(x => { m[x.w] = 1; }); return m; };
+
+    /* ----- exact letters: the right word with the letters to fix marked, a plain reason, the UK / US note ----- */
+    const letters = a => h('b', { class: 'lt-r-c' }, ...a.map(x => (x.bad ? h('mark', { class: 'lt-l' }, x.c) : x.c)));
+    function detail(r) {
+      if (r.v === 'ok') return r.note ? h('p', { class: 'lt-r-d' }, h('span', { class: 'lt-r-note' }, r.note)) : null;
+      if (r.v === 'miss') return h('p', { class: 'lt-r-d' }, h('span', { class: 'lt-r-lab' }, 'Missing word:'), ' ', h('b', { class: 'lt-r-c' }, r.w));
+      const p = h('p', { class: 'lt-r-d' }, h('span', { class: 'lt-r-lab' }, 'Correct:'), ' ', letters(r.diff ? r.diff.tgt : Array.from(r.w).map(c => ({ c, bad: false }))));
+      if (r.diff && r.diff.why) p.append(h('span', { class: 'lt-r-sep', 'aria-hidden': 'true' }, ' · '), h('span', { class: 'lt-r-why' }, r.diff.why));
+      return p;
+    }
+    function paintFixes(c) {   // under the answer: one line per word to fix (exact letters) or accepted in the other spelling
+      const ul = q('lt-fb-d'); ul.textContent = '';
+      LNC.rows([{ chk: c, saved: {} }], 4).forEach(r => {
+        const li = h('li', { class: 'lt-d ' + (r.v === 'ok' ? 'is-ok' : 'is-bad') });
+        if (r.v === 'ok') li.append(h('b', { class: 'lt-r-w' }, r.typed || r.w)); else if (r.typed) li.append(h('s', { class: 'lt-r-w' }, r.typed));
+        const d = detail(r); if (d) li.append(d);
+        ul.append(li);
+      });
+      ul.hidden = !ul.children.length;
+      return !ul.hidden;
+    }
+
+    /* ----- My Words: a saved word that was in the sentence gets its review updated (right = Good, one letter off = Hard, wrong or missed = Again) ----- */
+    function applySaved(c) {
+      const out = [];
+      if (typeof WS === 'undefined' || typeof SRS === 'undefined') return out;
+      const now = Date.now(), tz = -new Date().getTimezoneOffset();
+      c.words.forEach(x => {
+        const k = String(x.w).toLowerCase(); if (st.graded.has(k)) return;
+        let e = null; try { e = WS.get(k); } catch (err) { e = null; }
+        if (!e || e.ph) return;   // not saved, or a saved phrase
+        st.graded.add(k);
+        let g = x.v === 'ok' ? SRS.GOOD : x.v === 'close' ? SRS.HARD : SRS.AGAIN;
+        if (g === SRS.GOOD && st.first) g = SRS.HARD;   // the first letters were shown: not full recall
+        try { WS.update(k, t => SRS.review(t, g, now, { kind: 'rcl', tz })); try { LL.review(g !== SRS.AGAIN); } catch (err) { /* learning log (148b) not loaded */ } out.push({ w: k, v: x.v, g }); } catch (err) { /* the word stays as it was */ }
+      });
+      return out;
+    }
+    function savable() {   // wrong words (4+ letters) that are not in My Words yet
+      const seen = new Set(), out = [];
+      if (typeof WS === 'undefined') return out;
+      st.res.filter(Boolean).forEach(r => r.chk.words.forEach(x => {
+        if (x.v === 'ok') return;
+        const w = String(x.w).toLowerCase(); if (seen.has(w) || Array.from(w).length < 4) return; seen.add(w);
+        let e = null; try { e = WS.get(w); } catch (err) { e = null; } if (e) return;
+        out.push({ w, s: r.text });
+      }));
+      return out.slice(0, 10);
+    }
+    function saveWords() {
+      const l = savable(); if (!l.length) return;
+      try { if (WS.all().length + l.length > 2000) { toast('My Words is full. Remove a word first.', 4000); return; } } catch (e) { /* count unknown: try anyway */ }
+      l.forEach(x => { try { WS.saveWithContext(x.w, { s: x.s, bid: S.book ? String(S.book.id) : '', bt: S.book ? S.book.title || '' : '' }, { ex: x.s }); } catch (e) { /* skip this word */ } });
+      toast('Saved ' + l.length + (l.length === 1 ? ' word' : ' words') + ' to My Words.', 3500);
+      q('lt-save').hidden = true;
+    }
 
     /* ----- the sentence, marked ----- */
     function marked(text, ws, typedLine) {
@@ -128,7 +273,7 @@
     }
     function paint() {
       const end = st.step === 'end', done = st.step === 'checked', n = st.set.length;
-      q('lt-title').textContent = end ? 'Well done' : 'Type what you hear';
+      q('lt-title').textContent = end ? 'Your answers' : 'Type what you hear';
       q('lt-main').hidden = end; q('lt-end').hidden = !end;
       q('lt-pos').textContent = end ? '' : 'Sentence ' + (st.i + 1) + ' of ' + n; q('lt-sep').hidden = end;
       q('lt-ch').textContent = chapterOf(st.p.ids[st.set[Math.min(st.i, n - 1)]]);
@@ -146,7 +291,8 @@
         q('lt-check').hidden = done; q('lt-next').hidden = !done;
         q('lt-check').disabled = !LNC.words(q('lt-in').value).length;
         q('lt-next').textContent = 'Continue';
-      } else { q('lt-check').hidden = true; q('lt-next').hidden = false; q('lt-next').textContent = 'Back to listening'; }
+      } else { q('lt-check').hidden = true; q('lt-next').hidden = false; q('lt-next').textContent = 'Continue'; }
+      q('lt-foot').classList.toggle('is-end', end); if (!end) q('lt-save').hidden = true;
       paintPlay();
     }
     function paintFeedback(c, text) {
@@ -154,14 +300,36 @@
       foot.classList.remove('is-ok', 'is-near', 'is-no'); foot.classList.add('is-' + c.v);
       q('lt-fb-t').textContent = c.v === 'ok' ? 'Perfect. Every word is right.' : c.v === 'near' ? 'Almost. Check the spelling of the marked words.' : 'Not quite. Here is the sentence.';
       const a = q('lt-fb-a'); a.textContent = ''; a.append(marked(text, c.words, false));
-      const fx = fixList(c), s = q('lt-fb-s'); s.textContent = fx; s.hidden = !fx;
+      const fx = fixList(c), s = q('lt-fb-s'), shown = paintFixes(c); s.textContent = fx; s.hidden = !fx || shown;   // the lines with exact letters say the same, in more detail
       const y = q('lt-fb-y'), yl = q('lt-fb-yl'); y.textContent = ''; y.hidden = yl.hidden = c.v === 'ok';
       if (c.v !== 'ok') y.append(marked(q('lt-in').value, c.tw, true));
       f.hidden = false;
     }
     function hideFeedback() { q('lt-fb').hidden = true; q('lt-foot').classList.remove('is-ok', 'is-near', 'is-no'); }
+    function rowEl(r, n) {
+      const good = r.v === 'ok';
+      const li = h('li', { class: 'wl-card lt-r ' + (good ? 'is-ok' : 'is-bad') },
+        h('p', { class: 'lt-r-h' }, h('span', { class: 'lt-r-n' }, String(n)),
+          !good && r.typed ? h('s', { class: 'lt-r-w' }, r.typed) : h('span', { class: 'lt-r-w' }, good ? (r.typed || r.w) : r.w),
+          h('span', { class: 'lt-r-i', role: 'img', 'aria-label': good ? 'Right' : 'To fix' }, good ? '✓' : '✗')));
+      const d = detail(r); if (d) li.append(d);
+      if (r.saved) li.append(h('p', { class: 'lt-r-sv' }, good ? 'In My Words · spelled right' : 'In My Words · it comes back in your review soon'));
+      return li;
+    }
+    function paintScore() {   // the "Your answers" part: score ring, spelling slips, a row per word worth a look, Save N words
+      const r = st.res.filter(Boolean), n = r.length, ok = r.filter(x => x.v === 'ok').length, pct = n ? Math.round(100 * ok / n) : 0;
+      const items = r.map(x => ({ chk: x.chk, saved: svMap(x) })), slips = LNC.rows(items).filter(x => x.spell).length;
+      q('lt-ring').style.setProperty('--p', pct + '%'); q('lt-ring-t').textContent = ok + '/' + n;
+      q('lt-sc-h').textContent = pct >= 90 ? 'Great listening!' : pct >= 60 ? 'Nice work' : 'Good effort';
+      q('lt-sc-s').textContent = slips ? slips + (slips === 1 ? ' spelling mistake cost you a mark' : ' spelling mistakes cost you marks') : (ok === n ? 'Every word was right.' : 'Some words were missed or different.');
+      const ol = q('lt-rows'), rs = LNC.rows(items, 12); ol.textContent = ''; ol.hidden = !rs.length;
+      rs.forEach((x, i) => ol.append(rowEl(x, i + 1)));
+      if (rs.more) ol.append(h('li', { class: 'lt-r-more' }, '+' + rs.more + ' more'));
+      const sv = savable().length, b = q('lt-save'); b.hidden = !sv; b.textContent = '★ Save ' + sv + (sv === 1 ? ' word' : ' words');
+    }
     function paintEnd() {
       const r = st.res, ok = r.filter(x => x.v === 'ok').length, near = r.filter(x => x.v === 'near').length, no = r.length - ok - near;
+      paintScore();
       const sum = q('lt-sum'); sum.textContent = '';
       [['is-ok', ok + ' perfect'], ['is-near', near + ' almost'], ['is-no', no + ' to practise']].forEach(x => sum.append(h('li', { class: 'wl-pill lt-sumi ' + x[0] }, x[1])));
       const bad = r.filter(x => x.v !== 'ok'), list = q('lt-prac'); list.textContent = '';
@@ -201,9 +369,9 @@
       if (!st.on || st.step !== 'type') return;
       const typed = q('lt-in').value; if (!LNC.words(typed).length) return;
       endClip();
-      const T = textNow(), c = LNC.check(typed, T), k = kNow();
+      const T = textNow(), c = LNC.check(typed, T, vmap()), k = kNow();
       st.chk = c; st.step = 'checked';
-      st.res[st.i] = { k, id: st.p.ids[k], text: T, typed, v: c.v, ok: c.ok, close: c.close, wrong: c.wrong, miss: c.miss, extra: c.nExtra, plays: st.plays, hint: st.hint, first: st.first, chk: c };
+      st.res[st.i] = { k, id: st.p.ids[k], text: T, typed, v: c.v, ok: c.ok, close: c.close, wrong: c.wrong, miss: c.miss, extra: c.nExtra, plays: st.plays, hint: st.hint, first: st.first, chk: c, saved: applySaved(c) };
       try { q('lt-in').blur(); } catch (e) { /* ignore */ }   // the keyboard goes away, so the answer panel has room
       paint(); paintFeedback(c, T);
       try { q('lt-next').focus({ preventScroll: true }); } catch (e) { /* ignore */ }
@@ -232,7 +400,7 @@
       const set = LNC.pickSet(texts, hid, Core.locate(p.starts, nowT() + P.nudge), LNC.SIZE);
       if (!set.length) { toast('This track has no sentences to type. Try another track.', 4000); return false; }
       st.snap = { bookId: String(S.book.id), sec: S.sec, time: nowT(), playing: !audio.paused && !audio.ended };
-      st.on = true; st.set = set; st.i = 0; st.res = []; st.playing = false;
+      st.on = true; st.set = set; st.i = 0; st.res = []; st.playing = false; st.graded = new Set();
       stopAudio();
       openSheet('sheet-lt');
       if (window.visualViewport) { window.visualViewport.addEventListener('resize', vv); window.visualViewport.addEventListener('scroll', vv); vv(); }
@@ -262,6 +430,7 @@
     q('lt-slow').addEventListener('click', () => play(true));
     q('lt-check').addEventListener('click', check);
     q('lt-next').addEventListener('click', next);
+    q('lt-save').addEventListener('click', saveWords);
     q('lt-hint').addEventListener('click', () => { if (st.on && st.step === 'type') { st.hint = !st.hint; paint(); } });
     q('lt-first').addEventListener('click', () => { if (st.on && st.step === 'type') { st.first = !st.first; paint(); } });
     q('lt-in').addEventListener('input', () => { if (st.on && st.step === 'type') q('lt-check').disabled = !LNC.words(q('lt-in').value).length; });

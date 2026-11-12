@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Checks for Listen and type (src/js/169k-listen-type.js, 94s css, 28d sheet; Task 45):   node tools/listen_type_check.js
+/* Checks for Listen and type (src/js/169k-listen-type.js, 94s css, 28d sheet, src/data/spelling-variants.json; Tasks 45 and 46):   node tools/listen_type_check.js
    Part 1 loads the pure helpers (LNC, between the LNC-START/END markers): word splitting, the word-by-word check (case, punctuation, apostrophes,
    missing / extra / wrong / close words, an empty answer), picking the 10 sentences (hidden, headings, too short or long, repeats, wrap), the hint line, spans.
    Part 2 (needs Playwright; skipped with a clear line when it is missing) loads the REAL 169k, the REAL sheet markup and css, and the REAL sentTime /
@@ -20,7 +20,7 @@ try {
   const a = SRC.indexOf('/*LNC-START*/'), b = SRC.indexOf('/*LNC-END*/');
   if (a < 0 || b < a) throw new Error('LNC markers missing');
   const ctx = {}; vm.createContext(ctx);
-  LNC = vm.runInContext(SRC.slice(a, b) + '\n({ SIZE, SLOW, MIN_W, MAX_W, fold, words, spans, check, pickSet, pattern });', ctx);
+  LNC = vm.runInContext(SRC.slice(a, b) + '\n({ SIZE, SLOW, MIN_W, MAX_W, fold, words, spans, check, pickSet, pattern, variants, diff, varNote, rows, spell });', ctx);
 } catch (e) { console.error('listen_type_check: cannot load: ' + e.message); process.exit(2); }
 const J = x => JSON.parse(JSON.stringify(x));   // plain objects (the helpers come from another vm context)
 
@@ -92,6 +92,52 @@ const J = x => JSON.parse(JSON.stringify(x));   // plain objects (the helpers co
     assert.strictEqual(new Set(ids).size, ids.length, 'ids are unique');
   });
 
+  await t('UK and US spellings: both accepted, either way round, with a side; without the list they are only close', () => {
+    const V = LNC.variants(['colour|color', 'analyse|analyze', 'bad', 'a|a', '']);
+    const a = J(LNC.check('The color of the sea', 'The colour of the sea.', V));
+    assert.strictEqual(a.v, 'ok'); assert.strictEqual(a.nVar, 1); assert.deepStrictEqual(a.words[1].alt, { side: 'us' }); assert.strictEqual(a.words[1].v, 'ok');
+    const b = J(LNC.check('We analyse it', 'We analyze it', V)); assert.strictEqual(b.v, 'ok'); assert.deepStrictEqual(b.words[1].alt, { side: 'uk' });
+    assert.strictEqual(J(LNC.check('We colour it', 'We colour it', V)).nVar, 0, 'the same spelling is not a variant');
+    assert.strictEqual(J(LNC.check('The color of the sea', 'The colour of the sea')).v, 'near', 'no list: one letter off');
+    assert.strictEqual(J(LNC.check('We analise it', 'We analyse it', V)).v, 'near', 'a real slip is still a slip');
+    assert.strictEqual(LNC.varNote('us', 'colour'), 'US spelling · UK “colour” is also accepted'); assert.strictEqual(LNC.varNote('uk', 'color'), 'UK spelling · US “color” is also accepted');
+    assert.strictEqual(V.size, 4);
+  });
+  await t('the data file: valid pairs, no duplicates, every pair accepted both ways, the examples are there', () => {
+    const d = JSON.parse(rd('src/data/spelling-variants.json')); assert.strictEqual(d.v, 1); assert.ok(d.pairs.length > 200 && d.pairs.length < 4000);
+    const seen = new Set(); d.pairs.forEach(p => { const x = p.split('|'); assert.strictEqual(x.length, 2, p); assert.ok(x[0] && x[1] && x[0] !== x[1] && x[0] === x[0].toLowerCase() && !/\s/.test(p), p); assert.ok(!seen.has(p), 'duplicate ' + p); seen.add(p); });
+    ['colour|color', 'analyse|analyze', 'organisation|organization', 'grey|gray', 'centre|center', 'travelling|traveling'].forEach(p => assert.ok(seen.has(p), p));
+    const V = LNC.variants(d.pairs);
+    d.pairs.forEach(p => { const [u, c] = p.split('|'); [[u, c], [c, u]].forEach(([tg, ty]) => { const r = J(LNC.check('say ' + ty, 'say ' + tg, V)); assert.ok(r.v === 'ok' && r.nVar === 1, tg + ' / ' + ty); }); });
+  });
+  await t('exact letters: missing, extra, wrong, swapped, several; accents ignored; the letters to fix are marked on both words', () => {
+    const bad = a => a.map((x, i) => (x.bad ? i : -1)).filter(i => i >= 0), W = (x, y) => J(LNC.diff(x, y));
+    let d = W('enviroment', 'environment'); assert.strictEqual(d.n, 1); assert.strictEqual(d.why, 'missing “n” before “m”'); assert.deepStrictEqual(bad(d.tgt), [6]); assert.deepStrictEqual(bad(d.typ), []);
+    d = W('wich', 'which'); assert.strictEqual(d.why, 'missing “h” before “i”'); assert.deepStrictEqual(bad(d.tgt), [1]);
+    d = W('cat', 'cats'); assert.strictEqual(d.why, 'missing “s” at the end');
+    d = W('ats', 'cats'); assert.strictEqual(d.why, 'missing “c” at the start');
+    d = W('catt', 'cat'); assert.strictEqual(d.why, 'extra “t”'); assert.strictEqual(bad(d.typ).length, 1); assert.strictEqual(bad(d.tgt).length, 0);
+    d = W('analise', 'analyse'); assert.strictEqual(d.why, '“i” should be “y”'); assert.deepStrictEqual(bad(d.tgt), [4]); assert.deepStrictEqual(bad(d.typ), [4]);
+    d = W('analize', 'analyse'); assert.strictEqual(d.n, 2); assert.strictEqual(d.why, '“i” should be “y”; “z” should be “s”');
+    d = W('recieve', 'receive'); assert.strictEqual(d.n, 1); assert.strictEqual(d.why, '“ie” should be “ei”'); assert.deepStrictEqual(bad(d.tgt), [3, 4]);
+    d = W('begining', 'beginning'); assert.strictEqual(d.n, 1); assert.strictEqual(bad(d.tgt).length, 1);
+    d = W('abcdefgh', 'hgfedcba'); assert.ok(/ letters to fix$/.test(d.why), d.why);
+    d = W('cafe', 'café'); assert.strictEqual(d.n, 0); assert.strictEqual(d.why, ''); assert.strictEqual(W('Colour', 'colour').n, 0);
+    assert.strictEqual(W('x', 'x').n, 0); assert.strictEqual(W('', 'ab').n, 2);
+  });
+  await t('result rows: wrong, close, missed, other spelling and saved words; repeats once; spelling slips; the cap', () => {
+    const V = LNC.variants(['colour|color', 'grey|gray']);
+    const c1 = LNC.check('The color is gray', 'The colour is grey.', V), c2 = LNC.check('We analize the enviroment', 'We analyse the environment today.', V), c3 = LNC.check('We analize', 'We analyse the environment today.', V);
+    const rs = J(LNC.rows([{ chk: c1, saved: {} }, { chk: c2, saved: { environment: 1 } }, { chk: c3, saved: {} }]));
+    assert.deepStrictEqual(rs.map(r => r.w + ':' + r.v), ['colour:ok', 'grey:ok', 'analyse:no', 'environment:close', 'today:miss', 'the:miss', 'environment:miss']);
+    const by = w => rs.filter(r => r.w === w);
+    assert.strictEqual(by('colour')[0].note, 'US spelling · UK “colour” is also accepted'); assert.strictEqual(by('grey')[0].note, 'US spelling · UK “grey” is also accepted');
+    assert.strictEqual(by('analyse').length, 1, 'the same wrong word is listed once'); assert.strictEqual(by('analyse')[0].typed, 'analize'); assert.strictEqual(by('analyse')[0].spell, true);
+    assert.strictEqual(by('environment')[0].saved, true); assert.strictEqual(by('environment')[0].spell, true); assert.strictEqual(by('environment')[0].diff.why, 'missing “n” before “m”');
+    assert.ok(rs.some(r => r.w === 'today' && r.v === 'miss' && !r.typed), 'a missed word is a row'); assert.ok(!rs.some(r => r.w === 'The' || r.w === 'is'), 'plain right words are not rows');
+    assert.strictEqual(LNC.spell({ v: 'miss', typed: '', w: 'today' }), false); assert.strictEqual(LNC.spell({ v: 'no', typed: 'xyz', w: 'today', diff: null }), false);
+    const cap = LNC.rows([{ chk: LNC.check('a b c d e f g h i j k l m n', 'the cat sat mat bat rat hat fat vat pat oat eat lat gat'), saved: {} }], 5); assert.strictEqual(cap.length, 5); assert.ok(cap.more > 0);
+  });
   let chromium; try { ({ chromium } = require('playwright')); } catch (e) { console.log('skip browser part: playwright is not installed'); }
   if (chromium) await browserPart(chromium);
   console.log('\nran ' + ran + ', failed ' + bad);
@@ -104,7 +150,7 @@ async function browserPart(chromium) {
   const real = [grab(s150, '  function sentTime(', /\n/), grab(s140, '  function shPlan()', /\n/), grab(s140, '  function shClip(', /\n  }\n/)].join('\n');
   const css = ['10-base-layout', '94-learn-ui', '20-home-library', '40-player-sheets-chips', '60-reading-search', '80-progress-v10', '94s-listen-type'].map(f => rd('src/css/' + f + '.css')).join('\n');
   const html = `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><html data-theme="dark"><head><style>${css}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui)} .sheet.ced{animation:none}</style></head><body><div id="backdrop" hidden></div>${rd('src/html/28d-sheet-listen-type.html')}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui)} .sheet.ced{animation:none}</style></head><body><div id="backdrop" hidden></div>${rd('src/html/28d-sheet-listen-type.html')}<script type="application/json" id="lt-variants">${rd('src/data/spelling-variants.json')}</script>
 <script>
 window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
 (() => {
@@ -125,10 +171,13 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
   const toast = m => T.toasts.push(m), onPlayFail = () => {}, goTrack = () => {}, fmt = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'), guideDoc = () => {};
   const h = (tag, attrs, ...kids) => { const e = document.createElement(tag); Object.keys(attrs || {}).forEach(k => e.setAttribute(k, attrs[k])); e.append(...kids); return e; };
   const LearnHub = { register(r) { T.reg = r; } };
+  const WSstore = { environment: { w: 'environment' } }; window.WSlog = [];
+  const WS = { get: w => WSstore[w] || null, update: (w, fn) => { const e = fn(WSstore[w]); WSstore[w] = e; WSlog.push(['update', w, e.g, e.kind]); return e; }, saveWithContext: (w, ctx) => { WSlog.push(['save', w, ctx.s]); WSstore[w] = { w }; return WSstore[w]; }, all: () => Object.values(WSstore) };
+  const SRS = { AGAIN: 0, HARD: 1, GOOD: 2, review: (t, g, now, o) => Object.assign({}, t, { g, kind: o.kind }) };
   ${real}
-  window.run = new Function('S','P','audio','Core','nowT','seekAudio','openSheet','closeSheets','toast','onPlayFail','goTrack','fmt','guideDoc','LearnHub','sentTime','shPlan','shClip','h',
+  window.run = new Function('S','P','audio','Core','nowT','seekAudio','openSheet','closeSheets','toast','onPlayFail','goTrack','fmt','guideDoc','LearnHub','sentTime','shPlan','shClip','h','WS','SRS',
     ${JSON.stringify(SRC + '\nreturn { LN, LNC };')});
-  window.api = window.run(S, P, audio, Core, nowT, seekAudio, openSheet, closeSheets, toast, onPlayFail, goTrack, fmt, guideDoc, LearnHub, sentTime, shPlan, shClip, h);
+  window.api = window.run(S, P, audio, Core, nowT, seekAudio, openSheet, closeSheets, toast, onPlayFail, goTrack, fmt, guideDoc, LearnHub, sentTime, shPlan, shClip, h, WS, SRS);
 })();
 </script></body></html>`;
   let browser;
@@ -181,7 +230,7 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
     }
     assert.deepStrictEqual(verdicts, ['ok', 'ok', 'no', 'ok', 'near', 'ok', 'no', 'ok', 'ok', 'ok']);
     const e = await ev(() => ({ title: document.getElementById('lt-title').textContent, sum: [...document.querySelectorAll('#lt-sum li')].map(x => x.textContent), prac: document.querySelectorAll('#lt-prac li').length, all: document.getElementById('lt-all').hidden, main: document.getElementById('lt-main').hidden, btn: document.getElementById('lt-next').textContent, res: api.LN.results().map(r => [r.k, r.v, r.plays, r.hint, r.first]) }));
-    assert.strictEqual(e.title, 'Well done'); assert.deepStrictEqual(e.sum, ['7 perfect', '1 almost', '2 to practise']); assert.strictEqual(e.prac, 3); assert.strictEqual(e.all, true); assert.strictEqual(e.main, true); assert.strictEqual(e.btn, 'Back to listening');
+    assert.strictEqual(e.title, 'Your answers'); assert.deepStrictEqual(e.sum, ['7 perfect', '1 almost', '2 to practise']); assert.strictEqual(e.prac, 3); assert.strictEqual(e.all, true); assert.strictEqual(e.main, true); assert.strictEqual(e.btn, 'Continue');
     assert.strictEqual(e.res.length, 10); assert.deepStrictEqual(e.res.map(r => r[0]), [14, 15, 16, 17, 18, 19, 20, 21, 22, 23]);
     await shot('5-end');
     const sk = await ev(() => T.seeks.slice(0, 10)); sk.forEach((x, i) => assert.ok(Math.abs(x - ((14 + i) * 3 + 0.02)) < 1e-9, 'seek ' + i + ' = ' + x));
@@ -243,6 +292,38 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
     const r = await ev(() => ({ last: api.LN.last(), paused: audio.paused })); assert.strictEqual(r.last.res.length, 1); assert.strictEqual(r.last.bookId, '7'); assert.ok(r.paused);
     const before = await ev(() => T.plays); await page.waitForTimeout(250); assert.strictEqual(await ev(() => T.plays), before, 'nothing plays by itself after close');
     assert.deepStrictEqual(reqs.filter(u => !/^http:\/\/localhost\/?(favicon.*)?$/.test(u)), [], 'no request');
+  });
+  await t('spelling session: UK and US both accepted with a note; exact letters under the answer; saved words updated; Your answers screen; Save N words', async () => {
+    await reset(14 * 3 + 0.5, false);
+    await ev(() => { S.model.sents[14].t = 'The colour of the sea is grey.'; S.model.sents[15].t = 'We analyse the environment with care.'; window.WSlog.length = 0; delete window.WSlog.x; });
+    const typeCheck = txt => ev(x => { const i = document.getElementById('lt-in'); i.value = x; i.dispatchEvent(new Event('input')); document.getElementById('lt-check').click(); }, txt);
+    const txt = id => ev(i => document.getElementById(i).textContent, id);
+    assert.strictEqual(await ev(() => api.LN.start()), true);
+    await typeCheck('The color of the sea is gray.');
+    assert.strictEqual(await txt('lt-fb-t'), 'Perfect. Every word is right.');
+    const f1 = await ev(() => [...document.querySelectorAll('#lt-fb-d li')].map(l => l.textContent)); assert.strictEqual(f1.length, 2);
+    assert.ok(f1[0].includes('color') && f1[0].includes('US spelling · UK “colour” is also accepted'), f1[0]); assert.ok(f1[1].includes('US spelling · UK “grey” is also accepted'), f1[1]);
+    await shot('6-variant');
+    await click('lt-next');
+    await typeCheck('We analize the enviroment with care.');
+    assert.ok(/^Not quite/.test(await txt('lt-fb-t')));
+    const f2 = await ev(() => ({ rows: [...document.querySelectorAll('#lt-fb-d li')].map(l => ({ t: l.textContent, struck: [...l.querySelectorAll('s')].map(x => x.textContent), marks: [...l.querySelectorAll('mark')].map(x => x.textContent) })), words: document.getElementById('lt-fb-s').hidden }));
+    assert.strictEqual(f2.rows.length, 2); assert.deepStrictEqual(f2.rows[0].struck, ['analize']); assert.deepStrictEqual(f2.rows[0].marks, ['y', 's']); assert.ok(f2.rows[0].t.includes('Correct:analyse') || f2.rows[0].t.includes('Correct: analyse'), f2.rows[0].t);
+    assert.deepStrictEqual(f2.rows[1].struck, ['enviroment']); assert.deepStrictEqual(f2.rows[1].marks, ['n']); assert.ok(f2.rows[1].t.includes('missing “n” before “m”'), f2.rows[1].t); assert.strictEqual(f2.words, true);
+    await shot('7-letters');
+    assert.deepStrictEqual(await ev(() => window.WSlog), [['update', 'environment', 1, 'rcl']], 'the saved word got Hard (one letter off), once, as recall');
+    await click('lt-next');
+    for (let i = 2; i < 10; i++) { await typeCheck(await ev(k => S.model.sents[k].t, 14 + i)); await click('lt-next'); }
+    const e = await ev(() => ({ title: document.getElementById('lt-title').textContent, ring: document.getElementById('lt-ring-t').textContent, head: document.getElementById('lt-sc-h').textContent, sub: document.getElementById('lt-sc-s').textContent, save: [document.getElementById('lt-save').hidden, document.getElementById('lt-save').textContent], next: document.getElementById('lt-next').textContent, foot: document.getElementById('lt-foot').classList.contains('is-end'),
+      rows: [...document.querySelectorAll('#lt-rows li')].map(l => l.textContent), good: [...document.querySelectorAll('#lt-rows li.is-ok')].length, bad: [...document.querySelectorAll('#lt-rows li.is-bad')].length }));
+    assert.strictEqual(e.title, 'Your answers'); assert.strictEqual(e.ring, '9/10'); assert.strictEqual(e.head, 'Great listening!'); assert.strictEqual(e.sub, '2 spelling mistakes cost you marks');
+    assert.strictEqual(e.rows.length, 4); assert.strictEqual(e.good, 2); assert.strictEqual(e.bad, 2); assert.ok(e.rows[0].includes('color') && e.rows[0].includes('UK “colour”'), e.rows[0]); assert.ok(e.rows[3].includes('In My Words · it comes back in your review soon'), e.rows[3]);
+    assert.deepStrictEqual(e.save, [false, '★ Save 1 word']); assert.strictEqual(e.next, 'Continue'); assert.strictEqual(e.foot, true);
+    await shot('8-your-answers');
+    await click('lt-save');
+    assert.deepStrictEqual(await ev(() => window.WSlog.filter(x => x[0] === 'save')), [['save', 'analyse', 'We analyse the environment with care.']]);
+    assert.ok((await ev(() => T.toasts)).includes('Saved 1 word to My Words.')); assert.strictEqual(await ev(() => document.getElementById('lt-save').hidden), true);
+    await ev(() => api.LN.close());
   });
   await t('no page errors; the sheet fits a phone: the box, Check and the speaker are all inside the screen', async () => {
     assert.deepStrictEqual(errs, []);

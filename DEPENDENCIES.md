@@ -78,7 +78,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `169h-echo-mode.js` | 209 | 2 | 0 | 13 |
 | `169i-echo-recording.js` | 285 | 2 | 0 | 0 |
 | `169j-echo-compare.js` | 287 | 2 | 0 | 0 |
-| `169k-listen-type.js` | 278 | 2 | 0 | 13 |
+| `169k-listen-type.js` | 447 | 2 | 0 | 14 |
 | `170-sync-points-drift.js` | 344 | 24 | 13 | 14 |
 | `180-sync-alignment.js` | 468 | 22 | 9 | 17 |
 | `190-sync-finish-retry.js` | 645 | 33 | 7 | 18 |
@@ -319,7 +319,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 **Needs:** nothing from other files in this closure.
 
-**Shared:** `SRS` (147, 160, 167b, 168, 169f)
+**Shared:** `SRS` (147, 160, 167b, 168, 169f, 169k)
 
 ### `148b-learn-log.js`
 
@@ -533,7 +533,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 
 ### `169k-listen-type.js`
 
-**Needs:** `030-helpers-offline-audio.js` (`fmt`, `guideDoc`); `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `140-open-book.js` (`shClip`, `shPlan`); `150-player-reader.js` (`goTrack`, `nowT`, `onPlayFail`, `seekAudio`); `169b-learn-hub.js` (`LearnHub`); `270-sheets-nextup-back.js` (`closeSheets`, `openSheet`)
+**Needs:** `030-helpers-offline-audio.js` (`fmt`, `guideDoc`); `040-worker-newreader.js` (`audio`); `080-ui-shell-favourites.js` (`toast`); `140-open-book.js` (`shClip`, `shPlan`); `148-scheduler.js` (`SRS`); `150-player-reader.js` (`goTrack`, `nowT`, `onPlayFail`, `seekAudio`); `169b-learn-hub.js` (`LearnHub`); `270-sheets-nextup-back.js` (`closeSheets`, `openSheet`)
 
 **Shared:** nothing; every name here is private to the file.
 

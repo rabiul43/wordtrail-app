@@ -81,3 +81,39 @@
 :root[data-theme="contrast"] .lt-big, :root[data-theme="contrast"] .lt-turtle, :root[data-theme="contrast"] .lt-chip { border-color: #fff; }
 @media (prefers-reduced-motion: reduce) { .lt-big, .lt-turtle, .lt-chip { transition: none; } .lt-big.is-playing { animation: none; } }
 @media (max-height: 640px) { .sheet.lt textarea.lt-in { min-height: 3.6rem; } .lt-big { width: 4.8rem; height: 4.8rem; font-size: 2rem; } .lt-turtle { width: 3.4rem; height: 3.4rem; } .lt-fb { max-height: 30vh; } }
+
+/* Task 46: exact letters under the answer, and the "Your answers" part of the end screen */
+.lt-fixes { display: grid; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }
+.lt-d { display: grid; gap: 2px; }
+.lt-d .lt-r-d { margin: 0; }
+.lt-r-w { font: 700 1.05rem/1.4 var(--font-read); overflow-wrap: anywhere; }
+s.lt-r-w { color: var(--danger); text-decoration: line-through 2px; }
+.lt-r-d { margin: 0; font: 500 var(--small)/1.5 var(--font-ui); color: var(--muted); overflow-wrap: anywhere; }
+.lt-r-lab { color: var(--muted); }
+.lt-r-c { color: var(--ink); font: 700 1.05rem/1.4 var(--font-read); letter-spacing: .02em; }
+mark.lt-l { color: var(--ink); background: color-mix(in srgb, var(--warn) 38%, transparent); border-radius: 4px; padding: 0 .12em; text-decoration: underline 2px var(--warn); text-underline-offset: 3px; }
+.lt-r-note { color: var(--wl-ok-text); font-weight: 600; }
+.lt-score { align-self: stretch; display: flex; align-items: center; gap: var(--s-4); padding: var(--s-4); }
+.lt-ring { --p: 0%; flex: none; display: grid; place-items: center; width: 5rem; height: 5rem; border-radius: 50%; background: conic-gradient(var(--wl-ok) var(--p), var(--line) 0); position: relative; }
+.lt-ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--surface); }
+.lt-ring-t { position: relative; font: 800 1.1rem/1 var(--font-ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.lt-score-t { display: grid; gap: 2px; text-align: start; min-width: 0; }
+.lt-sc-h { margin: 0; font: 800 1.35rem/1.2 var(--font-ui); color: var(--ink); }
+.lt-sc-s { margin: 0; font: 500 var(--small)/1.4 var(--font-ui); color: var(--muted); }
+.lt-rows { align-self: stretch; display: grid; gap: var(--s-3); margin: 0; padding: 0; list-style: none; }
+.lt-r { display: grid; gap: var(--s-1); border-width: 2px; }
+.lt-r.is-ok { border-color: var(--wl-ok); background: var(--wl-ok-soft); }
+.lt-r.is-bad { border-color: var(--err); }
+.lt-r-h { margin: 0; display: flex; align-items: baseline; gap: var(--s-3); }
+.lt-r-n { font: 800 1rem/1.4 var(--font-ui); color: var(--ink); }
+.lt-r-h .lt-r-w { flex: 1; min-width: 0; font-size: 1.15rem; }
+.lt-r-i { font: 800 1.1rem/1 var(--font-ui); }
+.lt-r.is-ok .lt-r-i { color: var(--wl-ok-text); }
+.lt-r.is-bad .lt-r-i { color: var(--danger); }
+.lt-r-sv { margin: 0; font: 600 var(--small)/1.4 var(--font-ui); color: var(--muted); }
+.lt-r-more { text-align: center; color: var(--muted); font: 600 var(--small)/1.4 var(--font-ui); }
+.lt-foot.is-end { grid-template-columns: 1fr 1fr; align-items: stretch; }
+.lt-foot.is-end .lt-save[hidden] ~ .lt-next, .lt-foot.is-end .lt-save[hidden] + .lt-next { grid-column: 1 / -1; }
+.lt-save { --wl-bg: var(--surface-2); --wl-fg: var(--warn); --wl-bd: var(--line); --wl-ed: var(--line); }
+:root[data-theme="contrast"] .lt-r.is-ok, :root[data-theme="contrast"] .lt-r.is-bad { background: #000; border-color: #fff; }
+:root[data-theme="contrast"] mark.lt-l { background: transparent; color: #fff; outline: 2px solid #fff; }
