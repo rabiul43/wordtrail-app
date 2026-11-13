@@ -401,7 +401,10 @@
     }
     const target = introTarget();
     const len = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[sec] || 0);
-    if (target > 1.5 && Math.max(cur, pend) < target - 0.5 && (!len || target < len - 1)) { seekAudio(target); }
+    if (target > 1.5 && Math.max(cur, pend) < target - 0.5 && (!len || target < len - 1)) {
+      (S.estA = S.estA || {})[S.book.id + ':' + sec] = target;   // remember the guessed notice end, so the clock starts at 0:00 here too (see playWin)
+      seekAudio(target);
+    }
   }
   function paintSkipIntro() {
     const b = document.getElementById('b-skipintro'); if (!b) return;

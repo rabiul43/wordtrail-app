@@ -460,7 +460,7 @@
   function playWin(i) {
     const raw = i === S.sec && isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[i] || 0);
     const c = cutFor(i);
-    let a = c && c[0] > 0 ? c[0] : 0, b = c && c[1] != null ? c[1] : raw;
+    let a = c && c[0] > 0 ? c[0] : (S.estA && S.book && S.estA[S.book.id + ':' + i] > 0 ? S.estA[S.book.id + ':' + i] : 0), b = c && c[1] != null ? c[1] : raw;
     if (!(b > a + 5)) { a = 0; b = raw; }   // a window that small is not a real cut
     return { a, b, d: Math.max(0, b - a), raw };
   }

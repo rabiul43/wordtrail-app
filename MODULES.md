@@ -92,7 +92,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `246-controls-search.js` | 69 | Controls sheet search box (Enter opens the one match), section nav that follows the scroll, keep highlighted line in view |
 | `247-player-menu.js` | 113 | Player menu: the three-dot button opens a dropdown (Timing, Text and reading, Live translation, Tracks, Settings, then "More" that opens Listen / Book / Fix rows in place, and "All controls" for the Controls sheet). Rows pass their tap to the existing buttons (markup `#dmenu` in `30-sheets-settings.html`, styles at the end of `97-controls-sheet.css`) |
 | `250-characters.js` | 501 | characters |
-| `260-audio-effects.js` | 432 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
+| `260-audio-effects.js` | 435 | Finer speed, silence skipping, voice boost, Loudness evener, Mono and left/right balance, lock screen / notification artwork, "Skip intro" button |
 | `265-notice-engine.js` | 314 | Notice engine: finds the spoken LibriVox intro/outro by matching words (timing file or on-device Whisper), caches cuts, read by `cutFor()`. Test: `node tools/notice_check.js` |
 | `270-sheets-nextup-back.js` | 303 | sheets, Pre-sync, Next up, Back button / swipe-back |
 | `280-downloads-progress.js` | 819 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
