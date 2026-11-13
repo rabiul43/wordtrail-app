@@ -134,7 +134,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `246-controls-search.js` | 69 | 4 | 0 | 4 |
 | `247-player-menu.js` | 113 | 0 | 0 | 12 |
 | `250-characters.js` | 501 | 37 | 7 | 13 |
-| `260-audio-effects.js` | 426 | 51 | 12 | 47 |
+| `260-audio-effects.js` | 432 | 51 | 12 | 47 |
 | `265-notice-engine.js` | 314 | 33 | 6 | 10 |
 | `270-sheets-nextup-back.js` | 303 | 31 | 11 | 53 |
 | `280-downloads-progress.js` | 819 | 87 | 30 | 56 |

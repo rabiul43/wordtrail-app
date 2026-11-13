@@ -5,6 +5,10 @@ const BOOK = { id: '9001', title: 'The Lantern Keeper', author: 'Mara Quill', qu
 
 // First visit: shows the welcome screen.
 async function openApp(page) {
+  // TEST ONLY: switch off "Smart detection" (the intro finder) to check if it freezes the player on the CI runner
+  await page.addInitScript(() => {
+    try { const p = JSON.parse(localStorage.getItem('wt:prefs') || '{}'); p.smartCut = false; localStorage.setItem('wt:prefs', JSON.stringify(p)); } catch (e) {}
+  });
   await page.goto('/');
   await expect(page.locator('#ob-overlay')).toBeVisible();
 }

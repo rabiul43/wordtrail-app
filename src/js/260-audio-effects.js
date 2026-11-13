@@ -385,17 +385,23 @@
   function autoSkipIntro(sec) {
     if (P.skipBtn === false) return;   // developer override
     if (!S.book || !S.secs || !S.secs[sec]) return;
-    // If extras are still loading, wait for them before deciding where to skip
+    // If extras are still loading, wait for them once, then decide where to skip (no re-queue loop on 404 / offline)
     const EX = S.EX;
-    if (EX && EX.p && EX.id === String(S.book.id) && !EX.d) {
-      EX.p.then(() => { if (S.sec === sec) autoSkipIntro(sec); });
+    if (!arguments[1] && EX && EX.p && EX.id === String(S.book.id) && !EX.d) {
+      EX.p.then(() => { if (S.sec === sec) autoSkipIntro(sec, true); });
       return;
     }
     const c = cutFor(sec);
-    if (c && c[0] > 1) return;   // cutFor already applied the right skip in loadAudio
+    const cur = isFinite(audio.currentTime) ? audio.currentTime : 0, pend = S.pendingSeek || 0;
+    if (c && c[0] > 1) {
+      // Exact end of the notice is known. loadAudio may have run BEFORE the extras arrived, so apply it here
+      // unless playback is already at or past it (loadAudio did it, or the listener moved on).
+      if (Math.max(cur, pend) < c[0] - 0.5) seekAudio(c[0]);
+      return;
+    }
     const target = introTarget();
     const len = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[sec] || 0);
-    if (target > 1.5 && (!len || target < len - 1)) { seekAudio(target); }
+    if (target > 1.5 && Math.max(cur, pend) < target - 0.5 && (!len || target < len - 1)) { seekAudio(target); }
   }
   function paintSkipIntro() {
     const b = document.getElementById('b-skipintro'); if (!b) return;
