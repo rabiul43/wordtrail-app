@@ -454,14 +454,25 @@
     loadAudio(i, time || 0, autoplay == null ? !audio.paused : autoplay);
     persist();
   }
+  /* The part of track i the listener actually hears: from the end of the spoken LibriVox notice to the start of the
+     "End of chapter" line. The clock, the bar and "left in book" all count inside this window, so the player starts at
+     0:00 and ends at the real length, and the cut seconds never look like a skipped part. { a, b, d } in audio seconds. */
+  function playWin(i) {
+    const raw = i === S.sec && isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[i] || 0);
+    const c = cutFor(i);
+    let a = c && c[0] > 0 ? c[0] : 0, b = c && c[1] != null ? c[1] : raw;
+    if (!(b > a + 5)) { a = 0; b = raw; }   // a window that small is not a real cut
+    return { a, b, d: Math.max(0, b - a), raw };
+  }
   function updateSeekUI(t) {
-    const d = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (S.durs[S.sec] || 0);
-    el.cur.textContent = fmt(t);
-    el.left.textContent = '-' + fmt(Math.max(0, d - t));
+    const w = playWin(S.sec), r = Math.min(w.d, Math.max(0, t - w.a));
+    el.cur.textContent = fmt(r);
+    el.left.textContent = '-' + fmt(Math.max(0, w.d - r));
+    el.seek.min = w.a; el.seek.max = w.b || 100;
     if (!S.seeking) el.seek.value = t;
-    el.seek.style.setProperty('--fill', (d ? Math.min(100, t / d * 100) : 0) + '%');
-    nrSeekUI(t, d);
-    try { dtSeekSync(t, d); } catch (e) { /* desktop bar not ready */ }
+    el.seek.style.setProperty('--fill', (w.d ? Math.min(100, r / w.d * 100) : 0) + '%');
+    nrSeekUI(t, w.raw);
+    try { dtSeekSync(t, w.raw); } catch (e) { /* desktop bar not ready */ }
     lpNote();
     paintBookProg();
   }
