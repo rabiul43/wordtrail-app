@@ -394,7 +394,8 @@
     const c = cutFor(sec);
     if (c && c[0] > 1) return;   // cutFor already applied the right skip in loadAudio
     const target = introTarget();
-    if (target > 1.5) { seekAudio(target); }
+    const len = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[sec] || 0);
+    if (target > 1.5 && (!len || target < len - 1)) { seekAudio(target); }
   }
   function paintSkipIntro() {
     const b = document.getElementById('b-skipintro'); if (!b) return;
