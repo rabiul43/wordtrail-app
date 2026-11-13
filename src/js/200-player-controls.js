@@ -117,7 +117,7 @@
     if (info && info.sure && info.audio) { HLP.seeks = []; return; }   // the narrator's own pauses confirm it: you are just navigating
     hlpShow();
   }
-  function userSeek(t) { hlpSeek(); seekAudio(t); }
+  function userSeek(t) { hlpSeek(); seekAudio(Math.max(playWin(S.sec).a, t)); }   // back 15 s near the start stops at the story, not inside the notice
   function hlpTapped() { if (HLP.cal) hlpHide(); }   // the one tap it asked for: tap-sync ends
   audio.addEventListener('pause', () => { if (!audio.ended && !audio.seeking && !S.loadingAudio) HLP.pausedAt = Date.now(); });
   document.addEventListener('click', e => {

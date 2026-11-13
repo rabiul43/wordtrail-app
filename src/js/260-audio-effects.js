@@ -385,8 +385,14 @@
   function autoSkipIntro(sec) {
     if (P.skipBtn === false) return;   // developer override
     if (!S.book || !S.secs || !S.secs[sec]) return;
+    // If extras are still loading, wait for them before deciding where to skip
+    const EX = S.EX;
+    if (EX && EX.p && EX.id === String(S.book.id) && !EX.d) {
+      EX.p.then(() => { if (S.sec === sec) autoSkipIntro(sec); });
+      return;
+    }
     const c = cutFor(sec);
-    if (c && c[0] > 0) return;   // cuts.json / extras already handles it
+    if (c && c[0] > 1) return;   // cutFor already applied the right skip in loadAudio
     const target = introTarget();
     if (target > 1.5) { seekAudio(target); }
   }

@@ -419,7 +419,7 @@
   /* ---------- audio ---------- */
   function loadAudio(i, time, autoplay) {
     S.sec = i; S.outroHit = false;
-    if (!time) { const c = cutFor(i); if (c && c[0] > 0) time = c[0]; else setTimeout(() => { if (S.sec === i) autoSkipIntro(i); }, 400); } // fresh start: skip the spoken intro (auto if no exact cut)
+    if (!time) { const c = cutFor(i); if (c && c[0] > 1) time = c[0]; else setTimeout(() => { if (S.sec === i) autoSkipIntro(i); }, 400); } // fresh start: skip to end of notice (auto estimate if no exact cut)
     if (autoplay && opGate()) { S.playWhenReady = true; autoplay = false; }   // the text is still opening: play the moment it is ready
     S.pendingSeek = time || 0;
     S.loadingAudio = true; S.resnap = true; driftHold();

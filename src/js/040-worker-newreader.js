@@ -112,8 +112,9 @@
   function nrPosOf(v) {
     const N = Math.max(1, S.secs.length), pos = Math.min(N, Math.max(0, v / NR.max * N)), i = Math.min(N - 1, Math.floor(pos));
     const d = i === S.sec ? nrDur() : (+S.durs[i] || 0);
-    let t = (pos - i) * d; if (i !== S.sec && t < 2) t = 0;   // a tap at the very start of another track: start it cleanly (skips the spoken intro)
-    return { pos, i, t, d };
+    let t = (pos - i) * d; if (i === S.sec) { const w = playWin(i); t = w.a + (pos - i) * w.d; } if (i !== S.sec && t < 2) t = 0;   // a tap at the very start of another track: start it cleanly (skips the spoken intro)
+    const w = i === S.sec ? playWin(i) : null;   // what the label shows: time inside the heard part of the track
+    return { pos, i, t, d, shown: w ? Math.max(0, t - w.a) : t, len: w ? w.d : d };
   }
   const nrSpd = v => { let s = String(+(+v).toFixed(2)); if (s.indexOf('.') < 0) s += '.0'; return s; };
   function nrSpeedUI() {
@@ -128,6 +129,7 @@
     if (!NR.on) return;
     nrSegs();
     const N = NR.segN || 1;
+    const w = playWin(S.sec); t = Math.min(w.d, Math.max(0, t - w.a)); d = w.d;
     NR.pos = S.sec + (d ? Math.min(1, Math.max(0, t / d)) : 0);
     if (NR.seeking) return;   // the finger is on the bar: it shows the finger, not the audio
     nrEl.seek.value = Math.round(NR.pos / N * NR.max);

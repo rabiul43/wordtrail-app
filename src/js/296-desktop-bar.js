@@ -4,11 +4,12 @@
   const DT_WIDE = window.matchMedia ? window.matchMedia('(min-width: 1100px)') : { matches: false };
   function dtSeekSync(t, d) {
     const sk = $('#mini-seek'); if (!sk) return;
-    $('#mini-cur').textContent = fmt(t);
-    $('#mini-left').textContent = '-' + fmt(Math.max(0, d - t));
-    sk.max = d || 100;
+    const w = playWin(S.sec), r = Math.min(w.d, Math.max(0, t - w.a));
+    $('#mini-cur').textContent = fmt(r);
+    $('#mini-left').textContent = '-' + fmt(Math.max(0, w.d - r));
+    sk.min = w.a; sk.max = w.b || 100;
     if (!sk._drag) sk.value = t;
-    sk.style.setProperty('--fill', (d ? Math.min(100, t / d * 100) : 0) + '%');
+    sk.style.setProperty('--fill', (w.d ? Math.min(100, r / w.d * 100) : 0) + '%');
   }
   let dtKey = '';
   function dtTracks() {

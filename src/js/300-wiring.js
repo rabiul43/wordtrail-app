@@ -141,7 +141,7 @@
       if (S.calibrate && !(S.plan[S.sec] && S.plan[S.sec].ids.length)) { S.calibrate = false; syncCalUI(); toast('This track has no text to sync.'); }
     });
 
-    el.seek.addEventListener('input', () => { S.seeking = true; const v = +el.seek.value; el.cur.textContent = fmt(v); el.left.textContent = '-' + fmt(Math.max(0, (audio.duration || S.durs[S.sec] || 0) - v)); el.seek.style.setProperty('--fill', (v / (+el.seek.max || 1) * 100) + '%'); });
+    el.seek.addEventListener('input', () => { S.seeking = true; const v = +el.seek.value, w = playWin(S.sec), r = Math.min(w.d, Math.max(0, v - w.a)); el.cur.textContent = fmt(r); el.left.textContent = '-' + fmt(Math.max(0, w.d - r)); el.seek.style.setProperty('--fill', (w.d ? r / w.d * 100 : 0) + '%'); });
     el.seek.addEventListener('change', () => { S.seeking = false; userSeek(+el.seek.value); });
 
     /* Long-press a sentence to translate it. The tap that follows the press is swallowed (trPressAt). */

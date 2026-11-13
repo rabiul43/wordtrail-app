@@ -512,7 +512,7 @@
   }
   /* ---------- extras: skip list per book, made by wt_extras.py from the timing pack (extras/extras-<id>.json on Hugging Face).
      Every book looks for the file. A book with no file (404) is remembered for a day. ---------- */
-  const EX = { id: null, d: null, p: null };
+  const EX = S.EX = { id: null, d: null, p: null };
   function loadExtras(b) {
     const id = String(b && b.id || '');
     if (!id) { EX.id = id; EX.d = null; EX.p = null; return Promise.resolve(); }
@@ -540,11 +540,12 @@
   function exCut(i) {
     if (P.skipExtras === false) return null;   // developer override
     const x = exTrack(i); if (!x) return null;
-    let a = 0, o = null;
+    let a = 0, o = null, hasHead = false;
     for (const c of x) {
-      if (c[2] === 'head' && !(c[0] > 0)) a = +c[1] || 0;
+      if (c[2] === 'head') { a = +c[1] || 0; hasHead = true; }   // c[1] is the end of the notice — always skip to here
       else if (c[2] === 'tail' && c[0] != null) o = +c[0];
     }
+    if (!hasHead && o == null) return null;   // nothing useful
     return [a, o];
   }
   document.addEventListener('wt-exskip', () => { if (S.model) replan(false); });
@@ -564,8 +565,9 @@
     const b = CUTS.d && CUTS.d.b[S.book.id], e0 = b && b[i], e = exCut(i) || (Array.isArray(e0) ? e0 : neCut(i));   // cuts.json first, then what the notice engine heard (265-notice-engine.js)
     if (!Array.isArray(e)) return null;
     const d = S.durs[i] || 0;
+    const fromExtras = e === exCut(i);   // extras values are already validated — trust them as-is
     let a = +e[0] || 0, o = e[1] == null ? null : +e[1];
-    if (!(a >= 0 && a < 90)) a = 0;
+    if (!fromExtras && !(a >= 0 && a < 90)) a = 0;   // clamp only non-extras estimates
     if (o != null && !(d > 0 && o > d * 0.75 && o < d)) o = null;
     return [a, o];
   }

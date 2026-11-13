@@ -289,13 +289,10 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
   }
   /* Detected while the track is already playing near its start: skip now, with an Undo. */
   function neApply(i) {
-    const c = neCut(i), e = neData()[i];
+    const c = neCut(i);
     if (!c || !(c[0] > 0) || i !== S.sec) return;
     const t = audio.currentTime || 0;
-    if (t < c[0] - 1.5 && t < 70) {
-      seekAudio(c[0]);
-      toast('Skipped the LibriVox notice', 6000, ['Undo', () => { if (e) { e.c = 'm'; neSave(); if (S.model) replan(false); } seekAudio(t); }]);
-    }
+    if (t < c[0] - 1.5 && t < 70) seekAudio(c[0]);   // silent: the player clock starts at the story (see playWin), so nothing looks skipped
   }
   async function neRun() {
     if (NEQ.busy) return;

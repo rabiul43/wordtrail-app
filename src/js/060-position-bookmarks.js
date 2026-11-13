@@ -203,7 +203,7 @@
     nrEl.seek.addEventListener('input', () => {
       NR.seeking = true; nrEl.wave.classList.add('drag');
       const p = nrPosOf(+nrEl.seek.value);
-      nrPaint(p.pos); nrEl.cur.textContent = hms(p.t); nrEl.tot.textContent = hms(p.d);
+      nrPaint(p.pos); nrEl.cur.textContent = hms(p.shown); nrEl.tot.textContent = hms(p.len);
     });
     const nrSeekEnd = commit => {
       if (!NR.seeking) return;

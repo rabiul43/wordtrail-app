@@ -558,9 +558,9 @@
     if (!S.book || !S.secs.length) return null;
     const cd = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : 0;
     let total = 0, before = 0;
-    S.secs.forEach((s, i) => { const d = (i === S.sec && cd) ? cd : (+S.durs[i] || 0); total += d; if (i < S.sec) before += d; });
+    S.secs.forEach((s, i) => { const d = playWin(i).d; total += d; if (i < S.sec) before += d; });   // the heard part only: cut notices do not count
     if (!(total > 0)) return null;
-    const cur = Math.min((i => (i === S.sec && cd) ? cd : (+S.durs[S.sec] || 0))(S.sec), Math.max(0, audio.currentTime || 0));
+    const cw = playWin(S.sec), cur = Math.min(cw.d, Math.max(0, (audio.currentTime || 0) - cw.a));
     const done = Math.min(total, before + cur), left = Math.max(0, total - done) / (P.speed || 1);
     let fin = 0; S.secs.forEach((s, i) => { if (lpFrac(i) >= 1) fin++; });
     return { pct: Math.min(100, Math.floor(done / total * 100)), left, fin, n: S.secs.length };
