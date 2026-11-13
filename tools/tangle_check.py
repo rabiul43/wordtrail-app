@@ -37,6 +37,14 @@ def current():
     return files, edges
 
 
+# Source files that are kept in src/js ON PURPOSE but are not part of the app (build.py does not use them). Each needs a reason here.
+UNSHIPPED = {
+    "src/js/167-word-notes-export.js": "My Words notes and exports: built and tested (tools/wordnotes_check.js), not shipped yet; see 169m",
+    "src/js/10-nature-water.js": "scene sound pack P-A, built by the sound pipeline (STATUS.md), not part of the app build",
+    "src/js/90-micro-abstract.js": "scene sound pack P-I, built by the sound pipeline (STATUS.md), not part of the app build",
+}
+
+
 def leftovers():
     """Files under src/js/ that build.py never uses."""
     text = open(os.path.join(ROOT, "build.py"), encoding="utf-8").read()
@@ -45,7 +53,7 @@ def leftovers():
     for r, _, fs in os.walk(os.path.join(ROOT, "src", "js")):
         for f in fs:
             found.add(os.path.relpath(os.path.join(r, f), ROOT).replace(os.sep, "/"))
-    return sorted(found - used)
+    return sorted(found - used - set(UNSHIPPED))
 
 
 def biggest_cycle(files, edges):
