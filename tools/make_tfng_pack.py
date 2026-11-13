@@ -8,6 +8,8 @@ Free: runs on a free Kaggle or Colab GPU, no keys, no paid API. Format and steps
     # 3. publish (keeps only r = 1) and check
     python tools/make_tfng_pack.py --publish packs/1342.ch3.tfng.json --reviewer "Your Name"
     python tools/make_tfng_pack.py --verify packs/1342.ch3.tfng.json.gz
+    # 4. the app finds a book's passages through an index file: rebuild it after every publish
+    python tools/make_tfng_pack.py --index packs --book 1342
 
 Without a model (hand-written statements, same checks): --engine table --table items.json
 Passage lines come from the same sentence splitter as the translation packs (tools/make_translation_pack.py), so line keys match the app.
@@ -259,6 +261,39 @@ def publish(args):
     print('wrote %s  (%d items: T %d, F %d, NG %d, %d bytes)' % (path, len(keep), counts['T'], counts['F'], counts['NG'], os.path.getsize(path)))
 
 
+def index(folder, book):
+    """Writes <folder>/<book>.tfng-index.json: the passages of a book that the app may try (the app cannot list a folder on a static host).
+    Only packs that pass check_pack, are published (reviewed, or sample) and have 3 or more approved items are listed."""
+    pre, suf, rows, bad = '%s.' % book, '.tfng.json.gz', [], []
+    for f in sorted(os.listdir(folder)):
+        if not (f.startswith(pre) and f.endswith(suf)):
+            continue
+        pack = read_pack(os.path.join(folder, f))
+        fails, counts = check_pack(pack)
+        if not (pack.get('reviewed') or pack.get('sample')):
+            fails.append('not reviewed')
+        if sum(counts.values()) < 3:
+            fails.append('fewer than 3 approved items')
+        if f != out_name(pack.get('book'), pack.get('passage')) + '.gz' or str(pack.get('book')) != str(book):
+            fails.append('the file name does not match book and passage')
+        if fails:
+            bad.append('%s: %s' % (f, '; '.join(fails)))
+        else:
+            rows.append({'id': pack['passage'], 'n': sum(counts.values())})
+    for b in bad:
+        print('FAIL  : ' + b)
+    if bad:
+        return 1
+    if not rows:
+        print('FAIL  : no published packs for book %s in %s' % (book, folder))
+        return 1
+    path = os.path.join(folder, '%s.tfng-index.json' % book)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump({'format': 'wordtrail-tfng-index', 'v': 1, 'book': str(book), 'passages': rows}, f, ensure_ascii=False, separators=(',', ':'))
+    print('wrote %s  (%d passages: %s)' % (path, len(rows), ', '.join(r['id'] for r in rows)))
+    return 0
+
+
 def verify(path):
     pack = read_pack(path)
     bad, counts = check_pack(pack)
@@ -296,12 +331,17 @@ def main():
     ap.add_argument('--publish', metavar='FILE', help='candidates file (.json) edited by a person -> the .json.gz with only r = 1 items')
     ap.add_argument('--reviewer', help='name of the person who read the items (required with --publish)')
     ap.add_argument('--sample', action='store_true', help='with --publish: mark the pack sample: true (a demo, never to ship)')
+    ap.add_argument('--index', metavar='FOLDER', help='write FOLDER/<book>.tfng-index.json from the published packs of --book (the app reads this file to find passages)')
     ap.add_argument('--verify', metavar='PACK', help='check a .json or .json.gz pack and print the counts')
     args = ap.parse_args()
     if args.verify:
         sys.exit(verify(args.verify))
     if args.publish:
         return publish(args)
+    if args.index:
+        if not args.book:
+            die('--index needs --book')
+        sys.exit(index(args.index, args.book))
     if not (args.text or args.sentences):
         die('give --text book.txt or --sentences sentences.json')
     if not args.book:

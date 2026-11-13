@@ -63,6 +63,10 @@ python tools/make_tfng_pack.py --publish BOOKID.ch3.tfng.json --reviewer "Your N
 python tools/make_tfng_pack.py --verify packs/BOOKID.ch3.tfng.json.gz
 ```
 `--verify` must show your counts and no `FAIL`. The file `packs/BOOKID.ch3.tfng.json.gz` is the finished pack.
+```
+python tools/make_tfng_pack.py --index packs --book BOOKID
+```
+This writes `packs/BOOKID.tfng-index.json`, the list the app reads to find your passages. Upload both files to the same place as your translation packs (`packs/`). Without the index file the app shows no trainer for that book.
 
 ## Notes
 - Do not put any token or password in a notebook.

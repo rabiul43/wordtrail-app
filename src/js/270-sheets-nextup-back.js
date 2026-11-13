@@ -225,7 +225,7 @@
   /* The search results belong to the Library home, so they only count while that tab is showing. (The Filters sheet is a .sheet and counts as one.) */
   const searchOn = () => curTab === 'library' && !!el.results && !el.results.hidden;
   function histLayers() {
-    return OB.layers() + (RL.on ? 1 : 0) + (QS.on ? 1 : 0) + (PP.on ? 1 : 0) + (TMR.on ? 1 : 0) + (SPK.on ? 1 : 0) + (TD.on ? 1 : 0) + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
+    return OB.layers() + (RL.on ? 1 : 0) + (QS.on ? 1 : 0) + (PP.on ? 1 : 0) + (TFS.on ? 1 : 0) + (TMR.on ? 1 : 0) + (SPK.on ? 1 : 0) + (WT2.on ? 1 : 0) + (TD.on ? 1 : 0) + ($$('.sheet').some(s => !s.hidden) ? 1 : 0) + (NR.on ? 1 : 0) + (el.player.hidden ? 0 : 1) +
       ((DET.book || DET.author) ? 1 + (DET.stack || []).length : 0) + (seeOpen ? 1 : 0) +
       (spOpen ? 1 : 0) + (spOpen && SP.mode === 'results' ? 1 : 0) + (curTab === 'shelf' && phoneUI() && !shelfHub ? 1 : 0) +   // a My Library page opened from its list (phones)
         // the Search page, and its result list on top of it
@@ -236,8 +236,10 @@
       if (RL.on) RL.close();   // the Review lesson sits above everything
       else if (QS.on) QS.close();   // the chapter questions (169g)
       else if (PP.on) PP.close();   // the paraphrase trainer (169p)
+      else if (TFS.on) TFS.close();   // True / False / Not Given (169u)
       else if (TMR.on) TMR.close();   // timed reading (169q)
       else if (SPK.on) SPK.close();   // Speaking Part 2 (169r)
+      else if (WT2.on) WT2.close();   // Writing Task 2 (169s)
       else if (TD.on) TD.close();   // the Today page (169c)
       else if (OB.layers()) OB.back();
       else if ($$('.sheet').some(s => !s.hidden)) sheetBack();   // from a Settings sub-page, back goes to Settings home

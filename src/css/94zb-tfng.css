@@ -1,0 +1,25 @@
+/* True / False / Not Given trainer (169u, TFS). The frame, progress bar, answer cards and feedback panel reuse .rl*, .qs* and .wl* (94f, 94m, 94-learn-ui);
+   this file adds the passage card with numbered lines, the statement, the three answers and the first-use card. Colours come from the theme tokens, so
+   dark, light, sepia and contrast all follow. A lit line has a bar and a tint, never colour alone. Remove it with 169u to go back. */
+.tf-pass { display: grid; gap: var(--s-2); }
+.tf-lab { margin: 0; font: 600 var(--small, .85rem)/1.2 var(--font-ui); color: var(--muted); }
+.tf-lines { display: grid; gap: .25rem; max-height: min(34vh, 19rem); overflow-y: auto; overscroll-behavior: contain; padding-inline-end: .25rem; }
+.tf-lines:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+.tf-line { display: flex; gap: .6rem; margin: 0; padding: .2rem .5rem; border-inline-start: 4px solid transparent; border-radius: 6px; font: 500 clamp(1.1rem, 4.6vw, 1.35rem)/1.7 var(--font-display); overflow-wrap: anywhere; }
+.tf-n { flex: none; min-width: 1.5em; font: 700 .8rem/2.5 var(--font-ui); text-align: end; color: var(--muted); }
+.tf-line.is-hit { background: var(--accent-soft); border-inline-start-color: var(--accent); }
+.tf-line.is-near { background: var(--surface-2); border-inline-start: 4px dashed var(--wl-info); }
+.tf-st { margin: 0; font: 800 clamp(1.3rem, 5.4vw, 1.6rem)/1.35 var(--font-ui); }
+.tf-opts { display: grid; gap: var(--s-3); }
+.tf-opt { justify-content: center; text-align: center; text-transform: uppercase; letter-spacing: .04em; font-weight: 800; }
+.tf-nochip { visibility: hidden; min-width: 44px; }
+.tf-rule { color: var(--muted); }
+.tf-more { display: block; margin-top: var(--s-2); }
+.tf-more[hidden] { display: none; }
+.tf-show { display: inline-flex; align-items: center; justify-self: start; gap: .45rem; min-height: 44px; padding: 0 .25rem; font: 800 .95rem/1 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: inherit; background: none; border: 0; text-decoration: underline; text-underline-offset: .25em; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tf-show:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); border-radius: 6px; }
+.tf-rules { display: grid; gap: var(--s-3); margin: 0; padding: 0; list-style: none; }
+.tf-row { display: grid; gap: .15rem; font: 500 var(--lead)/1.4 var(--font-ui); }
+.tf-rl { font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.tf-ex { display: grid; gap: var(--s-2); }
+.tf-exp { margin: 0; font: 500 1.05rem/1.5 var(--font-display); }

@@ -1,8 +1,8 @@
   /* ---------- Timed reading: passage, timer and reading speed (TMR, TRC; Task 58) ----------
      A full-screen reading practice, like an exam page: one passage of 600 to 900 words from a NON-FICTION chapter of the open book, cut into
      lettered paragraphs (A, B, C ...), a countdown timer (20 minutes, 5 to 60 in steps of 5) and the reader's speed in words per minute.
-     Calm: no lives, no score, no leaderboard. A speed is only a number to watch over weeks. The exam-style questions come in a later task (59);
-     nothing here depends on them.
+     Calm: no lives, no score, no leaderboard. A speed is only a number to watch over weeks. The exam-style questions are in 169t (Task 59,
+     they register through TMR.use); nothing here depends on them, and without 169t the screen ends with the Speed saved panel.
      Screens: 1 Get ready (book and chapter, size of the passage, minutes with - and +, Start)  2 Reading (passage card, timer chip at the top,
      speed chip, "I've finished reading")  3 Speed saved (feedback panel at the bottom)  or  Time is up (nothing saved, no blame).
      THE TIMER SURVIVES TURNING THE PHONE AND SWITCHING APPS. It is never counted second by second: the run keeps its own start and end as clock
@@ -159,6 +159,8 @@
     const addHist = e => { try { store.set(SPD, { v: 1, runs: TRC.merge(history(), [e]) }); } catch (x) { /* storage full: the speed is shown but not kept */ } };
     const savedMins = () => { let v = null; try { v = store.get(MINK, null); } catch (e) { v = null; } return TRC.minutes(v == null ? TRC.DEF_MIN : v); };
     const saved = () => { const r = loadRun(); return r && !r.rd && TRC.left(r.end, now(), r.mins) > 0 ? r : null; };
+    let QX = null;   // the question part (169t) registers here with TMR.use; while it is null nothing below changes
+    const qui = () => ({ run: L.run, foot: L.foot, scroll: L.scroll, save: () => saveRun(L.run), close });   // what 169t may use
 
     /* ----- the clock: always worked out from the run's own start and end, never counted ----- */
     function paintTime(sec) { const t = TRC.fmt(sec); if (L.tEl && L.tEl.textContent !== t) L.tEl.textContent = t; }
@@ -172,6 +174,7 @@
       const left = TRC.left(L.run.end, now(), L.run.mins);
       paintTime(left); say(left);
       if (left <= 0 && L.mode === 'read') timeUp();
+      else if (left <= 0 && L.mode === 'done' && QX) { try { QX.timesUp(); } catch (e) { /* questions not ready */ } }   // time ran out while questions were open (169t)
     }
     function stopTick() { if (L.timer) { clearInterval(L.timer); L.timer = 0; } }
     function startTick() { stopTick(); if (L.on && L.run && !document.hidden) L.timer = setInterval(sync, 500); }
@@ -258,6 +261,7 @@
       try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }
     }
     function finishedPanel() {
+      if (QX) { let used = false; try { used = QX.show(qui()); } catch (e) { used = false; } if (used) return; }   // the questions (169t) take the panel when they have some
       const r = L.run, st = TRC.stats(history()), n = Math.min(st.n, 5);
       panel(true, 'Speed saved', [r.wpm + ' words per minute', st.n > 1 ? 'Average of your last ' + n + ': ' + st.avg5 + '.' : 'This is your first one. Come back to see how your speed grows.'], doneBtn());
     }
@@ -280,8 +284,10 @@
       if (L.on) return true;
       const sv = loadRun();
       if (sv) {   // a run is waiting (this page may be a fresh load after the phone switched apps): carry on with the time that is left
-        if (!sv.rd && TRC.left(sv.end, now(), sv.mins) > 0) { open(); L.run = sv; drawRead(); return true; }
+        const more = !!(QX && sv.rd && sv.qs && !sv.qd);   // finished reading, questions still open
+        if ((!sv.rd || more) && TRC.left(sv.end, now(), sv.mins) > 0) { open(); L.run = sv; drawRead(); return true; }
         clearRun(); if (!sv.rd) toast('Your last timed reading ran out of time. Start a new one when you like.', 3000);
+        else if (more) toast('Time ran out before the questions were finished. Your speed was saved.', 3200);
       }
       let c = ctx; try { if (!c || c.bookId == null) c = LB.ctx(); } catch (e) { c = null; }
       if (!c || !S.book || !S.model || String(S.book.id) !== String(c.bookId)) { toast('Open a book to practise its chapters.', 2200); return false; }
@@ -297,13 +303,14 @@
     }
     function close() {
       if (!L.on) return;
+      try { if (QX) QX.off(); } catch (e) { /* nothing to reset */ }
       L.on = false; stopTick(); listen(false); L.root.hidden = true; L.run = null; L.pend = null; L.mode = '';
       clearRun();   // closing ends the practice; a speed that was finished is already in wt:readspeed
       try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }
       histSoon(); if (L.opener && L.opener.isConnected) L.opener.focus();
     }
     const current = () => L.run ? JSON.parse(JSON.stringify(L.run)) : null;
-    return { start, close, current, saved, history, stats: () => TRC.stats(history()), KEY: SPD, mergeJson: TRC.mergeJson, get on() { return L.on; } };
+    return { start, close, current, use: x => { QX = x && typeof x.show === 'function' ? x : null; }, saved, history, stats: () => TRC.stats(history()), KEY: SPD, mergeJson: TRC.mergeJson, get on() { return L.on; } };
   })();
 
   LearnHub.register({

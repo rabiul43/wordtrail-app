@@ -80,15 +80,20 @@
       clearInterval(timer); timer = setInterval(tick, 400);
     }
     const go = fn => { try { buzz('tick'); } catch (e) { /* no vibration */ } remember(); closeSheets(); setTimeout(fn, 60); };
+    let hooked = false;
+    function fill(c) {
+      grid.textContent = '';
+      LearnHub.shown(c).filter(t => t.inPlayer).forEach(t => { try { grid.append(LearnHub.tile(t, c, go)); } catch (e) { /* skip a broken tile */ } });
+      if (!grid.children.length) grid.append(h('p', { class: 'help' }, 'No study tools yet.'));
+    }
     function open() {
       const c = ctx(); if (!c) return;
       try { persist(true); } catch (e) { /* the place is still kept by the normal saving */ }
       build();
       sub.textContent = 'Your place is saved at ' + fmt(c.time);
       where.textContent = [c.book.title, c.chapterTitle].filter(Boolean).join(' · ');
-      grid.textContent = '';
-      LearnHub.list().filter(t => t.inPlayer).forEach(t => { try { grid.append(LearnHub.tile(t, c, go)); } catch (e) { /* skip a broken tile */ } });
-      if (!grid.children.length) grid.append(h('p', { class: 'help' }, 'No study tools yet.'));
+      fill(c);
+      if (!hooked) { hooked = true; LearnHub.onChange(() => { const sh = $('#sheet-learn'); if (sh && !sh.hidden) { const c2 = ctx(); if (c2) fill(c2); } }); }   // a tile whose pack is found later (169u) appears
       openSheet('sheet-learn');
       const f = $('.lhub-tile', grid); if (f) f.focus();
     }

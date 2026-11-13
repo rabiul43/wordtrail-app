@@ -44,6 +44,17 @@ The **pack** `<book id>.<passage id>.tfng.json.gz` is gzip of one UTF-8 JSON obj
 | `items[].chk` | Only in a candidates file: hints for the reviewer (`copies line N` = nearly word for word, so too easy; `same as item ...`). Removed on publish. |
 | `sample` | Only on demo packs: `true`. A reader must never use a pack with `sample: true`. |
 
+## Index file (how the app finds the passages)
+A static host cannot list a folder, so each book has `packs/<book id>.tfng-index.json`: `{ "format": "wordtrail-tfng-index", "v": 1, "book": "1342", "passages": [ { "id": "ch3", "n": 12 } ] }`.
+Make it with `python tools/make_tfng_pack.py --index packs --book 1342` after every publish. It lists only packs that pass the checks, are reviewed (or sample) and have 3 or more approved items.
+**No index file = no trainer for that book** (the Learn tile is hidden).
+
+## In the app (Task 61)
+The app asks for the index once per open book, when the Learn hub or the "Study this chapter" sheet is drawn (never during playback), and loads a passage only when a set is started.
+It uses only `r: 1` items of a pack with `reviewed.by`; it needs at least half of the pack's `lines` to be sentences of the open book (same hash), and offers only passages whose last matched line is in a chapter the reader has reached.
+Saved copies are kept for offline use and refreshed after 14 days.
+**Developer switch:** open the app with `?tfngsample=1` in the address and the sample pack (`sample: true`) is used for any open book, without the book match and the spoiler rule. Without the switch a sample pack is never used.
+
 ## Steps
 
 You need the book as a Project Gutenberg `.txt` file and this repository (`tools/` and `src/js/010-core.js`).
@@ -78,7 +89,9 @@ Fix the wording by hand, set `"r": 1` on every item that is right, delete the ot
 ```
 python tools/make_tfng_pack.py --publish packs/1342.ch3.tfng.json --reviewer "Your Name"
 python tools/make_tfng_pack.py --verify packs/1342.ch3.tfng.json.gz
+python tools/make_tfng_pack.py --index packs --book 1342
 ```
+Upload the `.json.gz` files and the `.tfng-index.json` to the same data host as the translation packs (`packs/`).
 `--publish` keeps only `r: 1` items, removes the hints, writes who reviewed, runs all the checks and writes the `.json.gz`. It refuses without `--reviewer`, and when no item is approved.
 
 ## Licences
@@ -91,5 +104,7 @@ The model path (`--engine hf`) was written to the documented `transformers` chat
 | File | Purpose |
 |---|---|
 | `tools/make_tfng_pack.py` | The script: make candidates, `--publish`, `--verify`. Uses the sentence splitter and key hash of `tools/make_translation_pack.py`. |
-| `tools/tfng_pack_check.py` | Automatic checks (no model). |
+| `tools/tfng_pack_check.py` | Automatic checks of the script (no model). |
+| `tools/tfng_screen_check.js` | Checks of the app side (167h, 169u, the Learn hub hook) in real Chromium. |
+| `packs/sample.tfng-index.json` | Index of the sample (book id `sample`). |
 | `tools/samples/sample-tfng-passage.json`, `sample-tfng-table.json`, `packs/sample.p1.tfng.json.gz` | The sample: a 10-line passage about honey bees written for the demo, 9 hand-written statements (3 T, 3 F, 3 NG). |

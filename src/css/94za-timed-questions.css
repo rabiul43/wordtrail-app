@@ -1,0 +1,64 @@
+/* Timed reading questions (169t, TQ). The question panel under the passage, as in the mock-up: a rounded sheet with the heading "Questions 1-5",
+   "2 of 5", the rule, cards (the one you are on has a gold border), numbered dots (green = answered) and a big button. The same sheet holds the review.
+   Reuses .tr*, .rl*, .wl*. Colours come from the theme tokens (dark, light, sepia, contrast). Remove it with 169t to go back. */
+.rl__foot:has(> .tq) { padding: 0; }
+.tq { box-sizing: border-box; display: flex; flex-direction: column; gap: var(--s-3); width: min(100%, 36rem); max-height: 62vh; max-height: min(62dvh, 34rem); margin: 0 auto; padding: var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom, 0px)); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-bottom: 0; border-radius: var(--r-xl) var(--r-xl) 0 0; }
+.tq--review { max-height: 58vh; max-height: min(58dvh, 36rem); }
+.tq__grab { flex: none; align-self: center; width: 2.6rem; height: .3rem; border-radius: 999px; background: var(--line); }
+.tq__head { flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); }
+.tq__title { margin: 0; font: 800 clamp(1.4rem, 5.4vw, 1.7rem)/1.2 var(--font-ui); letter-spacing: -.01em; }
+.tq__title:focus { outline: none; }
+.tq__of { flex: none; font: 600 1rem/1.2 var(--font-ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.tq__rule { flex: none; margin: 0; font: 500 var(--lead, 1rem)/1.4 var(--font-ui); color: var(--muted); }
+.tq__body { flex: 1 1 auto; min-height: 0; display: grid; align-content: start; gap: var(--s-3); overflow-y: auto; overscroll-behavior: contain; }
+.tq .wl-card { background: var(--surface-2); }
+.tq-card { display: flex; align-items: baseline; gap: var(--s-3); padding: var(--s-3) var(--s-4); }
+.tq-card.is-active { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
+.tq-n { flex: none; font: 800 1.15rem/1.4 var(--font-ui); color: var(--ink); }
+.tq-sent { flex: 1 1 auto; min-width: 0; margin: 0; font: 600 1.15rem/2.1 var(--font-ui); overflow-wrap: anywhere; }
+.tq-blank { box-sizing: border-box; width: 12rem; max-width: 100%; min-height: 44px; margin: 0 .2em; padding: 0 .3rem; text-align: center; font: 700 1.15rem/1.3 var(--font-ui); color: var(--accent); background: transparent; border: 0; border-bottom: 3px solid var(--accent); border-radius: 0; }
+.tq-blank:focus { outline: none; }
+.tq-blank:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tq-card--sum { display: block; }
+.tq-sum { margin: 0; font: 600 1.15rem/2.2 var(--font-ui); overflow-wrap: anywhere; }
+.tq-gap { box-sizing: border-box; min-width: 3.2rem; min-height: 44px; margin: 0 .2em; padding: 0 .6rem; font: 800 1.05rem/1.2 var(--font-ui); color: var(--accent); background: transparent; border: 0; border-bottom: 3px solid var(--accent); border-radius: 0; cursor: pointer; }
+.tq-gap.is-filled { color: var(--ink); }
+.tq-gap.is-active { background: var(--accent-soft); border-radius: var(--r-sm) var(--r-sm) 0 0; box-shadow: 0 0 0 2px var(--accent); }
+.tq-box { gap: var(--s-2); }
+.tq-word.wl-btn { min-width: 4.5rem; min-height: 48px; padding: .4rem 1rem; font-size: 1.05rem; text-transform: none; letter-spacing: 0; }
+.tq-word.is-used { opacity: .55; }
+.tq-heads-card { padding: var(--s-3) var(--s-4); }
+.tq-lab { margin: 0; font: 700 var(--small, .85rem)/1.3 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tq-heads { display: grid; gap: var(--s-2); margin: var(--s-2) 0 0; padding: 0; list-style: none; font: 600 1.05rem/1.4 var(--font-ui); }
+.tq-rn { display: inline-block; min-width: 2rem; color: var(--accent); }
+.tq-mh { display: grid; gap: var(--s-2); flex: 1 1 auto; min-width: 0; }
+.tq-picks { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.tq-pick { box-sizing: border-box; min-width: 48px; min-height: 48px; padding: 0 .9rem; font: 800 1.05rem/1 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 999px; cursor: pointer; }
+.tq-pick[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.tq__dots { flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); }
+.tq-dot { box-sizing: border-box; min-width: 48px; min-height: 44px; padding: 0 .8rem; font: 800 1.05rem/1 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 999px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.tq-dot.is-done { color: var(--wl-ok-text); background: var(--wl-ok-soft); border-color: var(--wl-ok); }
+.tq-dot.is-active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent); }
+.tq__next { flex: none; }
+.tq-rows { display: grid; gap: var(--s-3); margin: 0; padding: 0; list-style: none; }
+.tq-row { display: grid; gap: var(--s-2); padding: var(--s-3) var(--s-4); }
+.tq-row__top { display: flex; align-items: baseline; gap: var(--s-3); }
+.tq-mark { font: 800 1.05rem/1.3 var(--font-ui); }
+.tq-row--right { border-color: var(--wl-ok); }
+.tq-row--right .tq-mark { color: var(--wl-ok-text); }
+.tq-row--wrong .tq-mark { color: var(--accent); }
+.tq-row--none .tq-mark { color: var(--muted); }
+.tq-ans { margin: 0; font: 500 1.05rem/1.4 var(--font-ui); overflow-wrap: anywhere; }
+.tq-lineq { margin: 0; padding-inline-start: var(--s-3); font: 500 1.05rem/1.6 var(--font-display); border-inline-start: 3px solid var(--line); overflow-wrap: anywhere; }
+.tq-hit { color: var(--accent); }
+.tq-show.wl-btn { justify-self: start; min-height: 44px; margin: 0; padding: .35rem 1rem; font-size: .9rem; }
+mark.tq-line { color: inherit; background: var(--mark); border-radius: .2em; padding: 0 .08em; }
+:root[data-theme="contrast"] mark.tq-line { color: #000; }
+@media (orientation: landscape) and (max-height: 520px) {
+  /* phone turned sideways: the passage on the left, the question panel on the right, so the Next button never falls off the screen */
+  .rl.tr:has(> .rl__foot > .tq) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(17rem, 46%); grid-template-rows: auto minmax(0, 1fr); }
+  .rl.tr:has(> .rl__foot > .tq) > .rl__top { grid-column: 1 / -1; }
+  .rl.tr:has(> .rl__foot > .tq) > .rl__foot { min-height: 0; overflow: hidden; }
+  .tq, .tq--review { width: 100%; height: 100%; max-height: none; padding-top: var(--s-2); border-radius: var(--r-xl) 0 0 0; border-inline-width: 2px; }
+  .tq-sent, .tq-sum { line-height: 1.9; }
+}

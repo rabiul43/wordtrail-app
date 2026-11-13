@@ -65,7 +65,7 @@
     const ICON = { l: '\uD83C\uDFA7', r: '\uD83D\uDCD6', w: '\u270E', s: '\uD83C\uDFA4' };
     const TODAY = { l: 'Today: do one listening set', r: 'Today: answer one chapter set', w: 'Today: write one Task 2 essay', s: 'Today: practise speaking aloud' };
     const COUNTS = { l: 'A finished Listen and type set counts as one session.', r: 'A finished set of chapter questions counts as one session.', s: 'An Echo practice of 3 or more sentences counts as one session.', w: 'A finished paraphrase set counts as one session. For writing on paper or elsewhere, add sessions yourself.' };
-    const TOOL = { l: ['listentype'], r: ['questions', 'paraphrase'], w: ['paraphrase'], s: ['echo'] };   // Learn hub tiles that practise a skill (the first is the main button)
+    const TOOL = { l: ['listentype'], r: ['questions', 'paraphrase'], w: ['writing', 'paraphrase'], s: ['echo'] };   // Learn hub tiles that practise a skill (the first is the main button)
     let cur = null, edit = false;
     const read = () => { let v = null; try { v = store.get(KEY, null); } catch (e) { /* storage unavailable */ } return IEC.isObj(v) ? v : {}; };
     const sessions = n => n + (n === 1 ? ' session' : ' sessions');
