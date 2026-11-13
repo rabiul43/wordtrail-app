@@ -118,7 +118,7 @@
   <button type="button" id="dm-live" class="dm-it" role="menuitem" data-go="live"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 2.600 5.600 5.500 7M11 5c-.7 3.400-3 6.200-6.500 7.500M13 21l4-10 4 10M14.500 18h5"/></svg></span><span class="dm-t">Live translation</span><span class="dm-v"></span></button>
   <button type="button" class="dm-it" role="menuitem" data-go="tracks"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-headphones"/></svg></span><span class="dm-t">Tracks</span></button>
   <button type="button" class="dm-it" role="menuitem" data-go="settings"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-sliders"/></svg></span><span class="dm-t">Settings</span></button>
-  <button type="button" class="dm-it" role="menuitem" data-go="exskip"><span class="dm-i" aria-hidden="true"><i class="dm-dot"></i></span><span class="dm-t">Skip extras (test)</span><span class="dm-v"></span></button>
+
   <button id="dm-more" type="button" class="dm-it dm-morerow" role="menuitem" aria-expanded="false" aria-controls="dm-sub"><span class="dm-t">More</span><svg class="ic dm-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
   <div id="dm-sub" class="dm-sub" role="group" aria-label="More controls" hidden>
     <div class="dm-h" role="presentation">Listen</div>
@@ -327,7 +327,7 @@
     </div>
   </div>
   <div class="sp" data-sp="audio" hidden>
-    <div class="row"><label for="in-skipbtn"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>Skip intro button</h3><small style="color:var(--muted)">Shows for the first 30 seconds of a track, to jump past the spoken LibriVox notice</small></label><input id="in-skipbtn" type="checkbox"></div>
+
     <div class="row"><label for="in-smartrw"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-clock"/></svg>Smart rewind</h3><small style="color:var(--muted)">After a pause, or when you come back to a book, go back a few seconds (more after a longer break) so you don't lose the thread</small></label><input id="in-smartrw" type="checkbox"></div>
     <div class="row"><label for="in-autonext"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-download"/></svg>Download ahead</h3><small style="color:var(--muted)">Saves the next tracks while you listen, on Wi-Fi only, so a weak connection never stops the book. Remove them in Settings &gt; Storage</small></label><select id="in-autonext" class="num" style="width:auto"><option value="0">Off</option><option value="2">Next 2 tracks</option><option value="3">Next 3 tracks</option></select></div>
     <div class="row"><label style="flex:1"><h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-rain"/></svg>Sound</h3><small style="color:var(--muted)">Ambient sound, story sounds, music and the opening sound, all in one place. Presets, volume and a master switch are there too</small></label><button id="b-amb-set" class="btn small ghost" type="button" >Open sound mixer</button></div>
@@ -345,12 +345,7 @@
       <h3 style="margin:0"><svg class="ic hi" aria-hidden="true"><use href="#i-m-sliders"/></svg>Audio enhancer</h3>
       <div class="seg" id="seg-enh"><button data-v="off">Off</button><button data-v="clear">Clear voice</button><button data-v="night">Night</button><button data-v="voice">Voice boost</button><button data-v="restore">Old recording</button><button data-v="lowq">Low quality</button></div>
     </div>
-    <div class="row">
-      <label for="in-skipcuts" style="flex:1">Skip LibriVox intro and outro automatically</label><input id="in-skipcuts" type="checkbox">
-    </div>
-    <div class="row">
-      <label for="in-smartcut" style="flex:1"><h3 style="margin:0">Smart intro and outro detection</h3><small style="color:var(--muted)">Listens to the first and last minutes of a track to find the exact end of the LibriVox notice. Downloads a small speech model (about 40 MB) once, on Wi-Fi.</small></label><input id="in-smartcut" type="checkbox">
-    </div>
+
     <div class="row" style="margin-top:.5rem">
       <label for="in-nn" style="flex:1">Fold away text the narrator does not read (tables, almanacs, notes) into a tap-to-show line</label><input id="in-nn" type="checkbox">
     </div>
@@ -423,6 +418,16 @@
   <div class="sp" data-sp="dev" hidden>
     <div class="dev-search"><input id="dev-q" type="search" placeholder="Search developer settings" aria-label="Search developer settings" autocomplete="off"></div>
     <p id="dev-none" class="dev-none" hidden>No settings match.</p>
+    <div class="synccard">
+      <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>LibriVox skip (developer)</h3>
+      <p class="help">These are on by default. Turn them off here to test or debug the raw audio without any skipping.</p>
+      <div class="row"><label for="in-skipbtn" style="flex:1">Auto-skip intro on track start</label><input id="in-skipbtn" type="checkbox"></div>
+      <div class="row"><label for="in-skipcuts" style="flex:1">Skip LibriVox intro and outro from timing data</label><input id="in-skipcuts" type="checkbox"></div>
+      <div class="row"><label for="in-skipextras" style="flex:1">Skip extras (wt_extras.py cuts)</label><input id="in-skipextras" type="checkbox"></div>
+      <div class="row">
+        <label for="in-smartcut" style="flex:1"><strong>Smart intro detection</strong><br><small style="color:var(--muted)">Downloads a speech model (~40 MB, Wi-Fi) to find exact notice boundaries.</small></label><input id="in-smartcut" type="checkbox">
+      </div>
+    </div>
     <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-code"/></svg>Learn UI preview</h3>
       <details id="wl-prev"><summary>Show components</summary>
         <div class="row"><p class="help" style="flex:1 1 100%">Shows every component of the learning screens. Developer use only.</p><div class="wl-prev" id="wl-prev-body"></div></div>

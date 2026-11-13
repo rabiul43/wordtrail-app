@@ -372,9 +372,8 @@
     apply(have ? mk(have) : (b.cover ? SZ.map(sizes => ({ src: b.cover, sizes })) : []));
     if (have === undefined) msArt(b).then(u => { if (u) apply(mk(u)); });
   }
-  /* ---------- "Skip intro" button: for tracks that have no automatic skip time (see cuts.json) ----------
-     Shows for the first 30 seconds of a track and jumps to where the text starts (the app's own estimate), or about 15 s in
-     when there is no text. Settings > Audio can turn it off. */
+  /* ---------- auto-skip intro: when a track starts from the beginning and has no cuts.json entry,
+     jump to where the text starts (neHint or the plan's cLo estimate) automatically. ---------- */
   function introTarget() {
     const hint = neHint(S.sec);   // exact time heard by the notice engine (265-notice-engine.js)
     if (hint > 3) return Math.max(0, hint - 0.2);
@@ -383,19 +382,19 @@
     if (!(t > 3 && t < 75)) t = 15;
     return Math.max(0, t - 0.4);
   }
+  function autoSkipIntro(sec) {
+    if (P.skipBtn === false) return;   // developer override
+    if (!S.book || !S.secs || !S.secs[sec]) return;
+    const c = cutFor(sec);
+    if (c && c[0] > 0) return;   // cuts.json / extras already handles it
+    const target = introTarget();
+    if (target > 1.5) { seekAudio(target); }
+  }
   function paintSkipIntro() {
     const b = document.getElementById('b-skipintro'); if (!b) return;
-    let show = false;
-    if (S.book && P.skipBtn !== false && !el.player.hidden && S.secs && S.secs[S.sec]) {
-      const c = cutFor(S.sec), t = audio.currentTime || 0;
-      show = !(c && c[0] > 0) && t < 30 && introTarget() > t + 1.5;
-    }
-    if (b.hidden === show) b.hidden = !show;
+    b.hidden = true;   // button no longer shown; kept in HTML for compat
   }
   function initSkipIntro() {
-    const b = document.getElementById('b-skipintro'); if (!b) return;
-    b.addEventListener('click', () => { buzz('light'); seekAudio(introTarget()); b.hidden = true; });
-    ['timeupdate', 'loadedmetadata', 'seeked', 'emptied', 'play'].forEach(ev => audio.addEventListener(ev, paintSkipIntro));
     paintSkipIntro();
   }
 

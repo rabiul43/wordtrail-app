@@ -369,6 +369,7 @@
     $('#in-idle').addEventListener('change', e => { P.idleWork = e.target.checked; savePrefs(); hbSync(); idleTimersSync(); });
     $('#in-net').addEventListener('change', e => { P.fastNet = e.target.checked; savePrefs(); });
     $('#in-skipbtn').addEventListener('change', e => { P.skipBtn = e.target.checked; savePrefs(); paintSkipIntro(); });
+    $('#in-skipextras').addEventListener('change', e => { P.skipExtras = e.target.checked ? undefined : false; savePrefs(); document.dispatchEvent(new Event('wt-exskip')); toast(P.skipExtras !== false ? 'Skip extras on' : 'Skip extras off'); });
     $('#in-smartrw').addEventListener('change', e => { P.smartRewind = e.target.checked; savePrefs(); });
     $('#in-autonext').addEventListener('change', e => { P.autoNext = e.target.value; savePrefs(); AP.key = ''; if (e.target.value !== '0') autoPrefetch(true); });
     $('#in-offforce').addEventListener('click', () => offSetForce(P.offForce !== true));

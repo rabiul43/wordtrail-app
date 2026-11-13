@@ -538,7 +538,7 @@
   }
   /* [introEnd, outroStart|null] from the extras file, or null when the file has nothing for this track. */
   function exCut(i) {
-    if (P.skipExtras === false) return null;   // TEST switch in the player menu (remove later)
+    if (P.skipExtras === false) return null;   // developer override
     const x = exTrack(i); if (!x) return null;
     let a = 0, o = null;
     for (const c of x) {
@@ -547,8 +547,7 @@
     }
     return [a, o];
   }
-  /* TEST switch (player menu > Skip extras): the menu saves the setting and sends this event. Remove with the test. */
-  document.addEventListener('wt-exskip', () => { if (S.model) replan(false); toast('Skip extras (test): ' + (P.skipExtras === false ? 'Off' : 'On')); });
+  document.addEventListener('wt-exskip', () => { if (S.model) replan(false); });
   /* Where to jump when playback is inside a middle cut (or a head cut that keeps a spoken title), else null. */
   function exSkipTo(i, t) {
     if (P.skipCuts === false || P.skipExtras === false) return null;

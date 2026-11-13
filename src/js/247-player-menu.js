@@ -9,7 +9,6 @@
       const viaSheet = tile => () => { qkOpt(''); qkPaint(); openSheet('sheet-quick'); const t = $('#' + tile); if (t) t.click(); };   // open Controls with that panel showing
       const press = id => () => { const b = $('#' + id); if (b) b.click(); };
       const GO = {
-        exskip: () => { P.skipExtras = P.skipExtras === false; savePrefs(); document.dispatchEvent(new Event('wt-exskip')); },   // TEST switch, remove later
         timing: press('b-timing'), text: press('btn-aa'), live: press('btn-live'), tracks: press('btn-tracks'), settings: () => openSettingsHome(),
         sound: () => ambOpen(),
         bm: press('b-bm'), chars: press('b-chars'), hl: press('b-hl'), clips: press('b-clips'), textsync: press('b-textsync'),
@@ -59,7 +58,7 @@
         try { qkPaint(); } catch (e) { /* values below may be one tap old */ }
         const txt = id => { const n = $('#' + id); return n ? n.textContent : ''; };
         const val = (go, v) => { const n = $('[data-go="' + go + '"] .dm-v', mn); if (n) n.textContent = v; };
-        val('speed', txt('qk-v-speed')); val('sleep', txt('qk-v-sleep')); val('exskip', P.skipExtras === false ? 'Off' : 'On');
+        val('speed', txt('qk-v-speed')); val('sleep', txt('qk-v-sleep'));
         val('sound', txt('qk-v-amb') !== 'Off' || txt('qk-v-mus') !== 'Off' ? 'On' : 'Off');
         const lv = $('#btn-live'); val('live', lv && lv.getAttribute('aria-pressed') === 'true' ? 'On' : '');
         Object.keys(SRC).forEach(go => { const r = $('[data-go="' + go + '"]', mn), s = $('#' + SRC[go]); if (r) r.hidden = !s || s.hidden; });
