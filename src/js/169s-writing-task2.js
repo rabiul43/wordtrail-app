@@ -13,7 +13,7 @@
      form: -s -es -ed -d -ing, y to ies/ied; saved phrases must appear as written). My Words is only read, never changed.
      Draft: autosaved 500 ms after the last key, and at once when the page is hidden or closed. Closing the screen keeps the draft.
      Storage: ONE key. wt:writing = { v: 1, n, d } n = prompts shown (for rotating), d = the draft or absent:
-       d = { pid, text, start, end, mins, fin, logged }   pid = prompt id, text = the essay (max 20,000 characters), start/end = clock ms,
+       d = { pid, text, start, end, mins, fin, logged, sc }   sc = ticked self-check box ids (169v; missing = none)   pid = prompt id, text = the essay (max 20,000 characters), start/end = clock ms,
        mins = 40, fin = 1 once Finish was tapped, logged = 1 once the Writing session was counted. Device only: not synced, not in backups.
        Lazy clean: anything with the wrong shape is ignored, nothing is deleted from other keys.
      Log: IE.log('w') (169o) once per essay with 100 or more words when Finish is tapped (WRC.COUNT_W); a shorter one is not counted and the panel says so.
@@ -109,7 +109,7 @@
       if (!d || typeof d !== 'object' || typeof d.pid !== 'string' || !byId(d.pid) || typeof d.text !== 'string') return null;
       const start = Number(d.start), end = Number(d.end);
       if (!isFinite(start) || !isFinite(end) || end <= start) return null;
-      return { pid: d.pid, text: d.text.slice(0, MAX_TEXT), start, end, mins: MINS, fin: d.fin ? 1 : 0, logged: d.logged ? 1 : 0 };
+      return { pid: d.pid, text: d.text.slice(0, MAX_TEXT), start, end, mins: MINS, fin: d.fin ? 1 : 0, logged: d.logged ? 1 : 0, sc: Array.isArray(d.sc) ? d.sc.filter(x => typeof x === 'string').slice(0, 40) : [] };
     }
     return { MINS, MIN_WORDS, COUNT_W, MAX_TEXT, THEMES, PROMPTS, byId, byTheme, pick, countWords, left, fmt, forms, analyse, clean };
   })();
@@ -243,8 +243,8 @@
       L.cnt = h('span', { class: 'tr-chip wr-count', 'aria-live': 'off' }); L.acd = h('span', { class: 'tr-chip wr-acad-chip' });
       L.rows = h('div', { class: 'wr-rows' });
       L.note = h('p', { class: 'tr-lab', id: 'wr-help' }, 'Saved on this device as you type.');
-      L.scroll.append(promptCard(p), h('div', { class: 'wr-editor' }, L.back, L.ta), h('div', { class: 'tr-chips wr-chips' }, L.cnt, L.acd), L.rows, L.note);
-      L.foot.append(btn('Finish writing', true, finish));
+      L.scroll.append(promptCard(p), h('div', { class: 'wr-editor' }, L.back, L.ta), h('div', { class: 'tr-chips wr-chips' }, L.cnt, L.acd), L.rows, L.note, SCW.card());
+      L.foot.append(btn('Finish and self-check', true, finish));
       mirror(); sync();
       if (resumed) L.live.textContent = 'Your draft is back.';
       try { L.ta.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
@@ -265,6 +265,7 @@
         counted ? 'Counted as a Writing session.' : 'Under ' + WRC.COUNT_W + ' words, so it was not counted this time. Try a little longer next time.',
         'Your essay is saved on this device. There is no score.'],
         [btn('New essay', true, newEssay), btn('Keep editing', false, reopen)]);
+      SCW.draw(L.scroll, L.d, saveDraft);   // the self-check checklist (169v)
     }
     function reopen() { if (!L.d) return; L.d.fin = 0; saveDraft(); drawWrite(true); startTick(); }
     function newEssay() { dropDraft(); L.d = null; L.pid = ''; drawStart(); }

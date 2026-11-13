@@ -53,7 +53,7 @@ ok(two.spans.length === 2 && two.spans[1].s === 19, 'analyse: spans count from t
 const e = C.analyse('', M, ['x']); ok(e.words === 0 && !e.acad.length && !e.mine.length && !e.spans.length, 'analyse: empty text gives nothing');
 const n = C.analyse('Hello there friend', null, null); ok(n.words === 3 && !n.acad.length && !n.links.length && !n.mine.length, 'analyse: no word list and no saved words still counts words');
 // ---- draft clean-up
-const d0 = { pid: 'b1', text: 'hello', start: 1000, end: 1000 + 2400000, mins: 40, fin: 0, logged: 0 };
+const d0 = { pid: 'b1', text: 'hello', start: 1000, end: 1000 + 2400000, mins: 40, fin: 0, logged: 0, sc: [] };
 ok(JSON.stringify(J(C.clean(d0))) === JSON.stringify(d0), 'clean: a good draft is returned as it is');
 ok(C.clean(null) === null && C.clean({}) === null && C.clean(Object.assign({}, d0, { pid: 'zz' })) === null && C.clean(Object.assign({}, d0, { text: 5 })) === null && C.clean(Object.assign({}, d0, { end: 500 })) === null && C.clean(Object.assign({}, d0, { start: 'x' })) === null, 'clean: wrong shapes are ignored');
 ok(C.clean(Object.assign({}, d0, { text: 'x'.repeat(30000) })).text.length === C.MAX_TEXT, 'clean: very long text is cut at ' + C.MAX_TEXT + ' characters');
