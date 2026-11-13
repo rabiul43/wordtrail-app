@@ -9,8 +9,10 @@ async function openApp(page) {
   await expect(page.locator('#ob-overlay')).toBeVisible();
 }
 
-// Picks Medium, continues, keeps the default language and starts reading.
+// Keeps the default goal (Enjoy stories) and continues, picks Medium, continues, keeps the default language and starts reading.
 async function completeOnboarding(page) {
+  await page.locator('#ob-next-g').click();
+  await expect(page.locator('#ob-step-0')).toBeVisible();
   await page.locator('#ob-pick-1').click();
   await page.locator('#ob-next-0').click();
   await expect(page.locator('#ob-step-1')).toBeVisible();

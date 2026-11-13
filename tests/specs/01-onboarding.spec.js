@@ -6,6 +6,8 @@ const saved = page => page.evaluate(() => ({ onboarded: localStorage.getItem('wt
 test.describe('onboarding', () => {
   test('first visit: pick a level, pick a language, finish', async ({ page }) => {
     await openApp(page);
+    await expect(page.locator('#ob-step-g')).toBeVisible();             // first card: the goal (Enjoy stories is preselected)
+    await page.locator('#ob-next-g').click();
     await expect(page.getByText("What's your English reading level?")).toBeVisible();
     await expect(page.locator('#ob-next-0')).toBeDisabled();            // Continue waits for a choice
 
