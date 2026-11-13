@@ -198,6 +198,7 @@
     function paintGate() {
       document.documentElement.toggleAttribute('data-learn', tabOn());   // no attribute = Standard: every [data-lrn] element is hidden by CSS
       try { KU.sync(); } catch (e) { /* reader not ready */ }          // underline new words + coverage chip follow the mode, live
+      try { AW.sync(); } catch (e) { /* reader not ready */ }          // academic and linking words follow the mode (161f)
       try { OW.sync(); } catch (e) { /* reader not ready */ }          // old words and idioms (purple and blue lines, the Old use card)
       try { loadTod(); } catch (e) { /* Home not ready */ }            // the morning review card on Home
       try { rmSync(); } catch (e) { /* reader not ready */ }           // reading modes (English / Both / Translation): Standard = English only

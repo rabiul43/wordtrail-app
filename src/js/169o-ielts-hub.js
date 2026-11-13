@@ -11,7 +11,8 @@
        Merge across devices: per day the LARGER value of each skill (IE.mergeJson), so a merge never loses a day and can be repeated. Last 400 days kept.
      What counts as one session (real activity, logged whatever the goal is, so practice is never lost when the goal changes):
        Listening  a finished Listen and type set (169k)        Reading   a finished set of chapter questions (169g)
-       Speaking   an Echo practice with 3 or more sentences (169h)   Writing   no tool in the app: the person adds a session by hand (skill sheet)
+       Speaking   an Echo practice with 3 or more sentences (169h)   Writing   a finished Paraphrase set (169p, Task 56); essays elsewhere are added by hand (skill sheet)
+       A finished Paraphrase set (169p) adds one Reading AND one Writing session. The skill sheet lists every tool of a skill (TOOL), the first as the main button.
        Any skill can also get a session added by hand ("I practised somewhere else") and the last one of today taken back (Undo).
      API (later tasks call these): IE.log(skill, n = 1) with skill 'l' | 'r' | 'w' | 's'   IE.undo(skill)   IE.month(now) -> { l, r, w, s }   IE.focus(now) -> ['w']
        IE.paint() redraws the section when it is on screen   IE.mergeJson(a, b)   IE.KEY
@@ -63,8 +64,8 @@
     const KEY = 'wt:ielts', NAME = IEC.NAME, SK = IEC.SK;
     const ICON = { l: '\uD83C\uDFA7', r: '\uD83D\uDCD6', w: '\u270E', s: '\uD83C\uDFA4' };
     const TODAY = { l: 'Today: do one listening set', r: 'Today: answer one chapter set', w: 'Today: write one Task 2 essay', s: 'Today: practise speaking aloud' };
-    const COUNTS = { l: 'A finished Listen and type set counts as one session.', r: 'A finished set of chapter questions counts as one session.', s: 'An Echo practice of 3 or more sentences counts as one session.', w: 'Writing happens on paper or elsewhere, so you add your sessions yourself.' };
-    const TOOL = { l: 'listentype', r: 'questions', s: 'echo' };
+    const COUNTS = { l: 'A finished Listen and type set counts as one session.', r: 'A finished set of chapter questions counts as one session.', s: 'An Echo practice of 3 or more sentences counts as one session.', w: 'A finished paraphrase set counts as one session. For writing on paper or elsewhere, add sessions yourself.' };
+    const TOOL = { l: ['listentype'], r: ['questions', 'paraphrase'], w: ['paraphrase'], s: ['echo'] };   // Learn hub tiles that practise a skill (the first is the main button)
     let cur = null, edit = false;
     const read = () => { let v = null; try { v = store.get(KEY, null); } catch (e) { /* storage unavailable */ } return IEC.isObj(v) ? v : {}; };
     const sessions = n => n + (n === 1 ? ' session' : ' sessions');
@@ -142,12 +143,12 @@
     let open = '';
     function drawSkill() {
       const sk = open, body = $('#ie-sk-body'); if (!sk || !body) return;
-      const n = month()[sk], t = TOOL[sk] ? LearnHub.list().find(x => x.id === TOOL[sk]) : null, td = todayN(sk);
+      const n = month()[sk], ts = (TOOL[sk] || []).map(id => LearnHub.list().find(x => x.id === id)).filter(Boolean), t = ts[0] || null, td = todayN(sk);
       $('#ie-sk-title').textContent = NAME[sk];
       body.textContent = '';
       body.append(h('p', { class: 'ie-sh-n' }, sessions(n) + ' this month'), h('p', { class: 'ie-sh-p' }, COUNTS[sk]));
       const row = h('div', { class: 'ie-sh-btns' });
-      if (t) row.append(h('button', { type: 'button', class: 'wl-btn wl-btn--primary wl-btn--block', onclick: () => { closeSheets(); let c = null; try { c = LB.ctx(); } catch (e) { /* no player */ } try { t.open(c); } catch (e) { toast('Could not open that.', 1800); } } }, 'Practise: ' + (typeof t.title === 'string' ? t.title : NAME[sk])));
+      ts.forEach((t, k) => row.append(h('button', { type: 'button', class: 'wl-btn ' + (k ? 'wl-btn--secondary' : 'wl-btn--primary') + ' wl-btn--block', onclick: () => { closeSheets(); let c = null; try { c = LB.ctx(); } catch (e) { /* no player */ } try { t.open(c); } catch (e) { toast('Could not open that.', 1800); } } }, 'Practise: ' + (typeof t.title === 'string' ? t.title : NAME[sk]))));
       row.append(h('button', { type: 'button', class: 'wl-btn wl-btn--secondary wl-btn--block', onclick: () => { log(sk); drawSkill(); paint(); } }, t ? 'I practised somewhere else (add one)' : 'I did a session (add one)'));
       if (td > 0) row.append(h('button', { type: 'button', class: 'wl-btn wl-btn--secondary wl-btn--block', onclick: () => { undo(sk); drawSkill(); paint(); } }, 'Undo one from today'));
       body.append(row);

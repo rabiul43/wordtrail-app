@@ -1,0 +1,12 @@
+{"_about": "Hand-written for the demo (not model output). r = 1 only so the sample can be published; no person has reviewed it.",
+ "items": [
+  {"st": "The warmth in the centre of the hive helps young bees to develop.", "a": "T", "why": "Line 1 says young bees need this warmth to grow.", "sup": [1], "r": 1},
+  {"st": "Some bees cool the hive by moving air with their wings.", "a": "T", "why": "Lines 3 and 4 say workers fan their wings to push warm air out and pull cooler air in.", "sup": [3, 4], "r": 1},
+  {"st": "Water that dries on the walls of the hive helps to lower the temperature.", "a": "T", "why": "Line 6 says the drying water takes heat away.", "sup": [6], "r": 1},
+  {"st": "The bees at the edge of the winter ball never change their position.", "a": "F", "why": "Line 9 says the bees on the outside slowly swap places with those in the middle.", "sup": [9], "r": 1},
+  {"st": "The bees fan their wings at the back of the hive, far from the entrance.", "a": "F", "why": "Line 3 says the workers stand near the entrance when they fan.", "sup": [3], "r": 1},
+  {"st": "In winter the bees make heat by fanning their wings near the entrance.", "a": "F", "why": "Line 8 says they make heat by shivering their flight muscles inside a ball.", "sup": [8], "r": 1},
+  {"st": "A hive can hold more than fifty thousand bees in summer.", "a": "NG", "why": "The passage never says how many bees live in a hive.", "sup": [], "r": 1},
+  {"st": "The queen stays in the middle of the ball because she is the largest bee.", "a": "NG", "why": "Line 8 puts the ball around the queen but gives no reason for it.", "sup": [], "r": 1},
+  {"st": "Bees prefer to collect water from clean streams rather than from ponds.", "a": "NG", "why": "Line 5 names ponds and streams but does not say which the bees prefer.", "sup": [], "r": 1}
+ ]}

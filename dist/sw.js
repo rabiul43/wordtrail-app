@@ -9,6 +9,10 @@
  *  3. The font files are kept, so text keeps its look offline: our own fonts/*.woff2 (cache first: their names carry a hash,
  *     so a file never changes) and, for the few fonts still loaded from elsewhere, the Google Fonts files.
  *  4. The catalogue (catalog.json) is kept: network first, the saved copy only when the network fails or is slow.
+ *  6. The learning pack files of a book (word list vocab/<id>.json and translation pack packs/<id>.<lang>.json.gz, from the data hosts) are
+ *     kept in 'wt-learn-v1' ONLY when the page saves them there ("Download learning pack", 283-learning-pack.js). A kept file is served when
+ *     the network fails or is slow; the network answer is used (and renews the kept file) when it is quick. A file the page did not keep is
+ *     never saved here.
  *  5. Book covers are kept (cache first, at most COVER_MAX of them, renewed in the background after COVER_FRESH), so Home
  *     paints its covers at once and still looks complete offline. Covers are saved only when the host allows a normal
  *     (CORS) request: an opaque answer would count about 7 MB of storage each, so those are never saved.
@@ -19,7 +23,7 @@
  */
 'use strict';
 
-const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', CATALOG = 'wt-catalog-v1', COVERS = 'wt-covers-v1', NET_WAIT = 3000;
+const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', CATALOG = 'wt-catalog-v1', COVERS = 'wt-covers-v1', LEARN = 'wt-learn-v1', NET_WAIT = 3000;
 const CAT_WAIT = 6000;                 // catalogue: after this long the saved copy is used (the app itself gives up at 8 s)
 const COVER_MAX = 600, COVER_FRESH = 14 * 864e5, COVER_BIG = 1.5e6; // covers kept, age before a quiet refresh, largest file kept
 let coverPuts = 0;
@@ -42,8 +46,8 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     // Remove only our own older caches. Anything else (for example 'wt-amb-rec') is left exactly as it is.
-    const keep = [SHELL, FONTS, LANG, CATALOG, COVERS];
-    for (const k of await caches.keys()) if (/^wt-(shell|fonts|lang|catalog|covers)-/.test(k) && !keep.includes(k)) await caches.delete(k);
+    const keep = [SHELL, FONTS, LANG, CATALOG, COVERS, LEARN];
+    for (const k of await caches.keys()) if (/^wt-(shell|fonts|lang|catalog|covers|learn)-/.test(k) && !keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
     schedulePrune();                                         // old covers beyond the limit go once things are quiet, not now
   })());
@@ -163,6 +167,22 @@ async function catalog(event) {
   return Promise.race([net.catch(() => stale()), slow]);
 }
 
+// Learning pack files (the data hosts of fetchText, 070): vocab/<id>.json and packs/<id>.<lang>.json.gz. Only files the page kept are touched.
+const isLearn = u => (u.hostname === 'huggingface.co' && /\/data\/(vocab|packs)\/[^/]+$/.test(u.pathname)) ||
+                     (u.hostname === 'raw.githubusercontent.com' && /\/main\/(vocab|packs)\/[^/]+$/.test(u.pathname));
+async function learn(event) {
+  const cache = await caches.open(LEARN), req = event.request, saved = await cache.match(req.url);
+  if (!saved) return fetch(req);                              // not kept by the page: exactly as before there was a service worker
+  const net = fetch(req).then(r => {
+    if (!r || !r.ok) throw new Error('bad response');          // an error page never replaces a kept file
+    event.waitUntil(cache.put(req.url, r.clone()).catch(() => {}));
+    return r;
+  });
+  event.waitUntil(net.catch(() => {}));
+  const slow = new Promise(res => setTimeout(() => res(saved.clone()), NET_WAIT));
+  return Promise.race([net.catch(() => saved.clone()), slow]);
+}
+
 // Covers: the image hosts the app draws covers from. Only covers, never audio or text.
 function isCover(u) {
   const h = u.hostname, p = u.pathname;
@@ -230,6 +250,7 @@ self.addEventListener('fetch', event => {
   if (url.origin === self.location.origin && /\/i18n-[a-z-]+\.json$/.test(url.pathname)) { event.respondWith(lang(event)); return; }
   if (url.origin === self.location.origin && url.href.startsWith(ROOT + 'fonts/') && url.pathname.endsWith('.woff2')) { event.respondWith(ownFont(event)); return; }
   if (FONT_HOSTS.includes(url.hostname)) { event.respondWith(font(event)); return; }
+  if (isLearn(url)) { event.respondWith(learn(event)); return; }
   if (isCatalog(url)) { event.respondWith(catalog(event)); return; }
   if (isCover(url) && (req.destination === 'image' || req.destination === '')) { event.respondWith(cover(event)); return; }
   // everything else: not handled, the browser does what it always did

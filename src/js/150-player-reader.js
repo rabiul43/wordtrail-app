@@ -84,6 +84,7 @@
     if (done) { clearTimeout(R.tid); if (S.rb === R) S.rb = null; }
     if (done && typeof owChapter === 'function') owChapter(R.i);   // old words and idioms (161d): once per chapter, when it is built
     if (done && typeof kuChapter === 'function') kuChapter(R.i);   // new words underline and coverage (161e): once per chapter, when it is built
+    if (done && typeof awChapter === 'function') awChapter(R.i);   // academic and linking words (161f): once per chapter, when it is built
     if (!first && typeof hlPaint === 'function') hlPaint();   // highlights and notes on the sentences just added
   }
   function rbNext(R) {
@@ -318,7 +319,7 @@
 
   function unwrapWords() {
     const sp = S.wSp;
-    if (sp && S.model && S.model.sents[S.wId]) { fillSentence(sp, S.model.sents[S.wId]); sp.classList.remove('hw'); if (typeof owRepaint === 'function') owRepaint(S.wId); if (typeof kuRepaint === 'function') kuRepaint(S.wId); }
+    if (sp && S.model && S.model.sents[S.wId]) { fillSentence(sp, S.model.sents[S.wId]); sp.classList.remove('hw'); if (typeof owRepaint === 'function') owRepaint(S.wId); if (typeof kuRepaint === 'function') kuRepaint(S.wId); if (typeof awRepaint === 'function') awRepaint(S.wId); }
     S.wSp = null; S.wEls = null; S.wTimes = null; S.wId = -1; S.wIdx = -1;
   }
   function wrapWords(sp, id) {

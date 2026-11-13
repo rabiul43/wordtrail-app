@@ -1,0 +1,12 @@
+/* Academic words (Task 53): blue line, gold mark for linking words, and the Academic tag in the word panel. Colours follow the mock-up.
+   The marks are CSS Custom Highlights (no change to the text), so each theme names its colours here. */
+::highlight(wt-acad) { text-decoration-line: underline; text-decoration-color: #8AB4FF; text-decoration-thickness: 2px; }
+::highlight(wt-link) { background-color: rgba(227, 177, 92, .22); color: #F2C46D; }
+:root[data-theme="light"] ::highlight(wt-acad), :root[data-theme="white"] ::highlight(wt-acad), :root[data-theme="sepia"] ::highlight(wt-acad) { text-decoration-color: #24569F; }
+:root[data-theme="light"] ::highlight(wt-link), :root[data-theme="white"] ::highlight(wt-link), :root[data-theme="sepia"] ::highlight(wt-link) { background-color: rgba(138, 90, 0, .16); color: #6B4300; }
+:root[data-theme="contrast"] ::highlight(wt-acad) { text-decoration-color: #7DB4FF; text-decoration-thickness: 3px; }
+:root[data-theme="contrast"] ::highlight(wt-link) { background-color: #000; color: #FFE600; }
+
+.wp-tag { display: inline-block; margin-top: var(--s-2, .5rem); padding: .15rem .7rem; font: 700 var(--small)/1.3 var(--font-ui); color: #8AB4FF; background: rgba(138, 180, 255, .12); border: 2px solid #4C78C9; border-radius: var(--r-pill); }
+:root[data-theme="light"] .wp-tag, :root[data-theme="white"] .wp-tag, :root[data-theme="sepia"] .wp-tag { color: #24569F; background: rgba(36, 86, 159, .08); border-color: #24569F; }
+:root[data-theme="contrast"] .wp-tag { color: #7DB4FF; background: #000; border-color: #7DB4FF; }

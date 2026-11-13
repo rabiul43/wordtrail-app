@@ -47,7 +47,7 @@
       const my = ++seq;
       box.textContent = ''; box.hidden = false;
       const e = vocEntry(w, '', sentence);
-      const sub = h('div', { class: 'wp-sub' }), tabs = h('div', { class: 'wp-tabs', role: 'tablist', 'aria-label': 'About this word', hidden: true });
+      const sub = h('div', { class: 'wp-sub' }), at = typeof AW !== 'undefined' ? AW.tag(w) : null, tabs = h('div', { class: 'wp-tabs', role: 'tablist', 'aria-label': 'About this word', hidden: true });
       const body = h('div', { class: 'wp-body', 'aria-live': 'polite' }, h('p', { class: 'wp-text dim' }, 'Looking up…'));
       const save = h('button', { class: 'wl-btn wl-btn--primary wl-btn--block', 'data-lrn': true, type: 'button', 'aria-pressed': 'false' });   // Standard mode: look up and translate only, no saving
       const paint = () => { const on = myWords().some(x => x.w === e.w); save.setAttribute('aria-pressed', String(on)); save.textContent = ''; save.append(h('span', { 'aria-hidden': 'true' }, '★'), h('span', {}, on ? 'Saved' : 'Save word')); };
@@ -63,7 +63,7 @@
       back.addEventListener('click', trClose);
       paint();
       box.append(h('div', { class: 'wp' },
-        h('div', { class: 'wp-head' }, h('div', { class: 'wp-id' }, h('strong', { class: 'wp-word' }, w), sub), prButtons(w, PR.ref, true)),
+        h('div', { class: 'wp-head' }, h('div', { class: 'wp-id' }, h('strong', { class: 'wp-word' }, w), sub, at ? h('span', { class: 'wp-tag', title: 'Academic Word List, family of ' + at.h }, 'Academic \u00b7 Sublist ' + at.n) : null), prButtons(w, PR.ref, true)),
         tabs, body, save, back));
 
       /* the translation card: hidden until a translation arrives (a failed or empty one just leaves it out) */

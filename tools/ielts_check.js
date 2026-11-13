@@ -26,7 +26,7 @@ ok(C.weeks(G.fromChoice('learn', now, null), now) === null && C.weeks(G.fromChoi
 // ---- wiring (static)
 const b = src('build.py'); ok(b.indexOf('169m-class-worksheet.js') < b.indexOf('169o-ielts-hub.js') && /94v-ielts-hub\.css/.test(b) && /28f-sheet-ielts\.html/.test(b), 'build.py loads the new js, css and sheet');
 ok(/IE\.log\('r'\)/.test(src('src/js/169g-question-screen.js')) && /IE\.log\('l'\)/.test(src('src/js/169k-listen-type.js')) && /IE\.log\('s'\)/.test(src('src/js/169h-echo-mode.js')), 'questions, Listen and type and Echo log their sessions');
-const sy = src('src/js/295-account-sync.js'); ok(/k === 'wt:learnlog' \|\| k === 'wt:ielts'\]/.test(sy) && /k === 'wt:ielts'\) return IE\.mergeJson/.test(sy) && /BK_KEYS = \[[^\]]*'wt:ielts'/.test(src('src/js/290-backup-maintenance.js')), 'wt:ielts is in the sync category, has a merge rule, and is in backups');
+const sy = src('src/js/295-account-sync.js'); ok(/k === 'wt:learnlog' \|\| k === 'wt:ielts'(?: \|\| k === 'wt:readspeed')?\]/.test(sy) && /k === 'wt:ielts'\) return IE\.mergeJson/.test(sy) && /BK_KEYS = \[[^\]]*'wt:ielts'/.test(src('src/js/290-backup-maintenance.js')), 'wt:ielts is in the sync category, has a merge rule, and is in backups');
 // ---- real Chromium
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { console.error('ielts_check: playwright is not installed'); process.exit(2); }
 const built = path.join(root, 'dist', 'index.html'); if (!fs.existsSync(built)) { console.error('ielts_check: run python build.py first'); process.exit(2); }

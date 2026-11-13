@@ -282,5 +282,5 @@
       } catch (e) { return { ok: false, reason: 'none' }; }
     }
 
-    return { VER: QG_VER, guard, furthest, usable, sentences, build, vocabWords, forChapter, key, sig: qgSig, split };
+    return { VER: QG_VER, guard, furthest, usable, sentences, build, vocabWords, forChapter, key, sig: qgSig, split, askable, toks: qgToks, rng, seedOf, shuffle };
   })();

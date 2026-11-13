@@ -1,0 +1,8 @@
+/* Paraphrase trainer (169p, PS). The frame, progress bar, numbered answers and feedback panel reuse .rl*, .qs* and .wl* (94f, 94m, 94-learn-ui);
+   this file only adds the Original card, the underlined word and the Swap ideas chips. Colours come from the theme tokens. Remove it with 169p to go back. */
+.pp-orig { display: grid; gap: var(--s-2); }
+.pp-lab { margin: 0; font: 600 var(--small, .85rem)/1.2 var(--font-ui); color: var(--muted); }
+.pp-hit { text-decoration: underline; text-decoration-color: var(--wl-info); text-decoration-thickness: 3px; text-underline-offset: .22em; }
+.pp-ideas { display: grid; gap: var(--s-3); }
+.pp-chips { display: flex; flex-wrap: wrap; gap: var(--s-3); margin: 0; padding: 0; list-style: none; }
+.pp-chip { display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: .4rem 1.1rem; font: 700 1rem/1.2 var(--font-ui); color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 999px; overflow-wrap: anywhere; }
