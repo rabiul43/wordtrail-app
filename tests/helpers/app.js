@@ -5,8 +5,8 @@ const BOOK = { id: '9001', title: 'The Lantern Keeper', author: 'Mara Quill', qu
 
 // First visit: shows the welcome screen.
 async function openApp(page) {
-  // CI check: no background audio alignment / intro detection while the tests run (set once, so a reload keeps the saved prefs)
-  await page.addInitScript(() => { try { if (!localStorage.getItem('wt:prefs')) localStorage.setItem('wt:prefs', JSON.stringify({ bgAlign: 'off', smartSync: false, autoStart: false, fastCheck: false, smartCut: false })); } catch (e) { /* no storage */ } });
+  // CI check: no sound-wave display / audio enhancer while the tests run (set once, so a reload keeps the saved prefs)
+  await page.addInitScript(() => { try { if (!localStorage.getItem('wt:prefs')) localStorage.setItem('wt:prefs', JSON.stringify({ viz: 'off', enh: 'off' })); } catch (e) { /* no storage */ } });
   await page.goto('/');
   await expect(page.locator('#ob-overlay')).toBeVisible();
 }
