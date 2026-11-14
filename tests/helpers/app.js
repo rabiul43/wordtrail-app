@@ -5,10 +5,8 @@ const BOOK = { id: '9001', title: 'The Lantern Keeper', author: 'Mara Quill', qu
 
 // First visit: shows the welcome screen.
 async function openApp(page) {
-  // TEST ONLY: switch off "Smart detection" (the intro finder) to check if it freezes the player on the CI runner
-  await page.addInitScript(() => {
-    try { const p = JSON.parse(localStorage.getItem('wt:prefs') || '{}'); p.smartCut = false; localStorage.setItem('wt:prefs', JSON.stringify(p)); } catch (e) {}
-  });
+  // CI check: no background audio alignment / intro detection while the tests run (set once, so a reload keeps the saved prefs)
+  await page.addInitScript(() => { try { if (!localStorage.getItem('wt:prefs')) localStorage.setItem('wt:prefs', JSON.stringify({ bgAlign: 'off', smartSync: false, autoStart: false, fastCheck: false, smartCut: false })); } catch (e) { /* no storage */ } });
   await page.goto('/');
   await expect(page.locator('#ob-overlay')).toBeVisible();
 }
