@@ -132,7 +132,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/sound-screen.js` | 189 | 13 | 5 | 78 |
 | `sound/sound-tabs.js` | 48 | 4 | 3 | 1 |
 | `246-controls-search.js` | 69 | 4 | 0 | 4 |
-| `247-player-menu.js` | 116 | 0 | 0 | 14 |
+| `247-player-menu.js` | 122 | 0 | 0 | 14 |
 | `250-characters.js` | 501 | 37 | 7 | 13 |
 | `260-audio-effects.js` | 445 | 52 | 14 | 49 |
 | `265-notice-engine.js` | 318 | 34 | 5 | 10 |

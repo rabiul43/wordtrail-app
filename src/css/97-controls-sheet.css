@@ -106,3 +106,19 @@
 .play.buffering::after, .mini-play.buffering::after, .nr-play.buffering::after { content: ""; position: absolute; inset: -6px; border-radius: inherit; border: 3px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); animation: wtbuf .9s linear infinite; pointer-events: none; }
 @keyframes wtbuf { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .play.buffering::after, .mini-play.buffering::after, .nr-play.buffering::after { animation: none; } }
+
+/* Notice skip card (More tools): a small section after the tool list. Green tick when the notice is skipped, grey otherwise. */
+.ns { display: grid; gap: .6rem; margin: 1.1rem .1rem .6rem; --nsc: #6EE7A0; --nsbg: #17331F; }
+:root[data-theme="sepia"] .ns { --nsc: #1F7A46; --nsbg: #D9E8CF; }
+:root[data-theme="contrast"] .ns { --nsc: #00FF7F; --nsbg: #000; }
+.ns-h { font-size: .75rem; letter-spacing: .12em; font-weight: 700; color: var(--accent); }
+.ns-card { display: grid; gap: .8rem; padding: 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 1.1rem; }
+.ns-st { display: flex; gap: .85rem; align-items: center; }
+.ns-ic { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
+.ns-ic svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.ns-on .ns-ic { background: var(--nsbg); color: var(--nsc); }
+.ns-t { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.ns-d { font-size: var(--label); color: var(--muted); line-height: 1.35; margin-top: .1rem; }
+.ns-rep { display: flex; align-items: center; gap: .6rem; min-height: 2.75rem; padding: 0; margin: 0; background: none; border: 0; border-top: 1px solid var(--line); padding-top: .2rem; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-align: left; }
+.ns-rep svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ns-rep:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .4rem; }

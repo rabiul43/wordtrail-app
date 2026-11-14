@@ -389,16 +389,16 @@
     const cur = isFinite(audio.currentTime) ? audio.currentTime : 0, pend = S.pendingSeek || 0;
     if (Math.max(cur, pend) < c[0] - 0.5) seekAudio(c[0]);   // not already at or past it (loadAudio may have done it, or the listener moved on)
   }
-  /* What the "Notice skip" row in More tools says about the open track. */
+  /* What the Notice skip card (More tools) says about the open track: { k: on | none | na | off | wait, t: title, d: one line }. */
   function skipState() {
-    if (!S.book || S.sec == null) return ['', ''];
-    if (P.skipNotice === false) return ['Off in Settings', 'The notice plays. Turn it on under Settings > Audio.'];
+    if (!S.book || S.sec == null) return null;
+    if (P.skipNotice === false) return { k: 'off', t: 'Notice skip is off', d: 'Turn it on under Settings > Audio.' };
     const i = S.sec, c = (() => { try { return cutFor(i); } catch (e) { return null; } })();
-    if (c && c[0] > 1) return ['On for this book', 'The notice at the start of this chapter is skipped.'];
+    if (c && c[0] > 1) return { k: 'on', t: 'Notice skipped', d: 'This chapter starts at the first word of the story.' };
     const EX = S.EX, mine = EX && EX.id === String(S.book.id);
-    if (mine && !EX.done && !EX.d) return ['Checking\u2026', 'Looking for a skip file for this book.'];
-    if (mine && EX.d) return ['Nothing to skip here', 'This book has a skip file, and it found no notice to skip in this chapter. It plays from the start.'];
-    return ['Not available for this book', 'There is no skip file for this book yet, so every chapter plays from the start.'];
+    if (mine && !EX.done && !EX.d) return { k: 'wait', t: 'Checking\u2026', d: 'Looking for skip data for this book.' };
+    if (mine && EX.d) return { k: 'none', t: 'Plays from the start', d: 'No notice in this chapter.' };
+    return { k: 'na', t: 'Not available for this book yet', d: 'Every chapter plays from the start.' };
   }
   /* "Skip was wrong" (More tools): quietly notes the book, the track and what the skip did, so wrong skips can be found and fixed.
      Kept on this device (wt:skipbad, newest 50) and sent once, anonymously, to the stats service as kind "skipbad" when stats sharing is on. */
