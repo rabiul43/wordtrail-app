@@ -35,6 +35,7 @@ test.describe('bookmarks', () => {
     // and it is listed under the book in My Library
     await page.locator('#btn-back').click();
     await page.locator('.tab[data-tab="shelf"]').click();
+    await page.locator('.lt-saved').click();                    // on a phone My Library opens on tiles: open the Saved page
     await expect(page.locator('#shelf-list .card', { hasText: BOOK.title })).toBeVisible();
     await expect(page.locator('#shelf-list .bm-go')).toHaveAttribute('aria-label', /Go to bookmark, Track 1/);
   });
@@ -51,6 +52,7 @@ test.describe('bookmarks', () => {
     await expect(page.locator('#player')).toBeVisible();
     await page.locator('#btn-back').click();
     await page.locator('.tab[data-tab="shelf"]').click();
+    await page.locator('.lt-saved').click();                    // on a phone My Library opens on tiles: open the Saved page
     await expect(page.locator('#shelf-list .bm-go')).toHaveAttribute('aria-label', /Go to bookmark, Track 1/);
   });
 });

@@ -109,6 +109,7 @@
     const todo = (only || b.secs.map((_, i) => i)).filter(i => !isLocal(b.id, i, b.secs[i].url));
     if (!todo.length) { if (!only) dqClear(); return; }
     if (!only) dqSet(b);
+    try { exPin(b); } catch (e) { /* skip times are a bonus */ }   // keep this book's skip times on the device for offline listening
     dlPersist();   // after the user's tap: ask the browser to keep the saved audio; the answer is shown in Settings > Storage
     dmUsedPct().then(pct => { if (pct != null && pct > 90 && !DL.warned) { DL.warned = true; toast('Storage is almost full (' + Math.round(pct) + '% used). The download may not fit.', 6000); } });
     const ctl = new AbortController(), q = todo.slice();

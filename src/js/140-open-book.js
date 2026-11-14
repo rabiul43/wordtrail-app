@@ -512,25 +512,44 @@
   }
   /* ---------- extras: skip list per book, made by wt_extras.py from the timing pack (extras/extras-<id>.json on Hugging Face).
      Every book looks for the file. A book with no file (404) is remembered for a day. ---------- */
-  const EX = S.EX = { id: null, d: null, p: null };
+  const EX = S.EX = { id: null, d: null, p: null, done: false };
   function loadExtras(b) {
     const id = String(b && b.id || '');
     if (!id) { EX.id = id; EX.d = null; EX.p = null; return Promise.resolve(); }
     if (EX.id === id && EX.p) return EX.p;
-    EX.id = id; EX.d = null;
-    return EX.p = (async () => {
-      let c = store.get('wt:ex:' + id, null);
-      if (!(c && Date.now() - c.t < (c.d ? 600e3 : c.m ? 86400e3 : 0))) {
-        try {
-          const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-          const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/extras-' + encodeURIComponent(id) + '.json', { signal: ctl.signal }); clearTimeout(to);
-          if (r.status === 404) { c = { t: Date.now(), m: 1, d: null }; store.set('wt:ex:' + id, c); }
-          else if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.tracks) { c = { t: Date.now(), d: j.tracks }; store.set('wt:ex:' + id, c); } }
-        } catch (e) { /* missing or offline: use the saved copy, or behave as before */ }
-      }
+    EX.id = id; EX.d = null; EX.done = false;
+    /* The saved copy is kept and used straight away, however old it is, so a book never waits for the network to know
+       where its notice ends. A copy older than a day is refreshed quietly in the background; a "no file" answer is
+       remembered for a day. A book saved for offline listening keeps its copy for good (c.pin, set by dlStart). */
+    const key = 'wt:ex:' + id, DAY = 86400e3;
+    let c = store.get(key, null);
+    if (c && c.d) EX.d = c.d;
+    const fresh = !!c && Date.now() - c.t < DAY && (!!c.d || !!c.m);
+    const refresh = async () => {
+      try {
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+        const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/extras-' + encodeURIComponent(id) + '.json', { signal: ctl.signal }); clearTimeout(to);
+        if (r.status === 404) { if (!(c && c.pin && c.d)) { c = { t: Date.now(), m: 1, d: null }; store.set(key, c); } }   // a saved-for-offline copy is never dropped by a 404
+        else if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.tracks) { c = { t: Date.now(), d: j.tracks }; if (c0pin) c.pin = 1; store.set(key, c); } }
+      } catch (e) { /* missing or offline: keep the saved copy, or behave as before */ }
+      const before = JSON.stringify(EX.d);
       if (EX.id === id) EX.d = c && c.d ? c.d : null;
-      if (EX.d && S.book && String(S.book.id) === id && S.model) replan(false);
-    })();
+      if (EX.d && S.book && String(S.book.id) === id && S.model && JSON.stringify(EX.d) !== before) replan(false);
+    };
+    const c0pin = !!(c && c.pin);
+    return EX.p = (async () => {
+      if (fresh) { if (EX.d && S.book && String(S.book.id) === id && S.model) replan(false); return; }
+      if (c && c.d) { refresh(); if (S.book && String(S.book.id) === id && S.model) replan(false); return; }   // saved copy in hand: refresh without making anyone wait
+      await refresh();
+    })().then(() => { if (EX.id === id) EX.done = true; });
+  }
+  /* Keeps a book's skip times on the device for good (used when the book is downloaded for offline listening). */
+  function exPin(b) {
+    const id = String(b && b.id || ''); if (!id) return;
+    loadExtras(b).then(() => {
+      const c = store.get('wt:ex:' + id, null);
+      if (c && c.d && !c.pin) store.set('wt:ex:' + id, Object.assign({}, c, { pin: 1 }));
+    });
   }
   function exTrack(i) {
     const x = EX.d && S.book && EX.id === String(S.book.id) ? EX.d[i] : null;
@@ -551,7 +570,7 @@
   document.addEventListener('wt-exskip', () => { if (S.model) replan(false); });
   /* Where to jump when playback is inside a middle cut (or a head cut that keeps a spoken title), else null. */
   function exSkipTo(i, t) {
-    if (P.skipCuts === false || P.skipExtras === false) return null;
+    if (P.skipCuts === false || P.skipExtras === false || P.skipNotice === false) return null;
     const x = exTrack(i); if (!x) return null;
     for (const c of x) {
       const mid = c[2] === 'mid' || (c[2] === 'head' && c[0] > 0);
@@ -561,7 +580,7 @@
   }
   /* [introEnd, outroStart|null] for a track, or null (then the fixed lead/outro apply). */
   function cutFor(i) {
-    if (P.skipCuts === false || !S.book) return null;
+    if (P.skipCuts === false || P.skipNotice === false || !S.book) return null;
     const b = CUTS.d && CUTS.d.b[S.book.id], e0 = b && b[i], e = exCut(i) || (Array.isArray(e0) ? e0 : neCut(i));   // cuts.json first, then what the notice engine heard (265-notice-engine.js)
     if (!Array.isArray(e)) return null;
     const d = S.durs[i] || 0;

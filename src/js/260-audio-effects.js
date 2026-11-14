@@ -372,39 +372,49 @@
     apply(have ? mk(have) : (b.cover ? SZ.map(sizes => ({ src: b.cover, sizes })) : []));
     if (have === undefined) msArt(b).then(u => { if (u) apply(mk(u)); });
   }
-  /* ---------- auto-skip intro: when a track starts from the beginning and has no cuts.json entry,
-     jump to where the text starts (neHint or the plan's cLo estimate) automatically. ---------- */
-  function introTarget() {
-    const hint = neHint(S.sec);   // exact time heard by the notice engine (265-notice-engine.js)
-    if (hint > 3) return Math.max(0, hint - 0.2);
-    const p = S.plan && S.plan[S.sec];
-    let t = p && p.ids && p.ids.length ? p.cLo : 0;
-    if (!(t > 3 && t < 75)) t = 15;
-    return Math.max(0, t - 0.4);
-  }
+  /* ---------- notice skip: ONLY from evidence. When a track starts from the beginning, jump to the exact end of the notice if a
+     skip file (extras or cuts.json) says where it is. With no skip file, or no notice found for the track, play from the start:
+     a guess could cut into the story when a narrator starts reading straight away. ---------- */
   function autoSkipIntro(sec) {
-    if (P.skipBtn === false) return;   // developer override
+    if (P.skipBtn === false || P.skipNotice === false) return;   // developer override / the listener turned the notice skip off
     if (!S.book || !S.secs || !S.secs[sec]) return;
-    // If extras are still loading, wait for them once, then decide where to skip (no re-queue loop on 404 / offline)
+    // The skip file may still be arriving when the track opens: wait for it once, then apply it (no re-queue loop on 404 / offline)
     const EX = S.EX;
     if (!arguments[1] && EX && EX.p && EX.id === String(S.book.id) && !EX.d) {
       EX.p.then(() => { if (S.sec === sec) autoSkipIntro(sec, true); });
       return;
     }
     const c = cutFor(sec);
+    if (!(c && c[0] > 1)) return;   // no evidence: play from the start
     const cur = isFinite(audio.currentTime) ? audio.currentTime : 0, pend = S.pendingSeek || 0;
-    if (c && c[0] > 1) {
-      // Exact end of the notice is known. loadAudio may have run BEFORE the extras arrived, so apply it here
-      // unless playback is already at or past it (loadAudio did it, or the listener moved on).
-      if (Math.max(cur, pend) < c[0] - 0.5) seekAudio(c[0]);
-      return;
-    }
-    const target = introTarget();
-    const len = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[sec] || 0);
-    if (target > 1.5 && Math.max(cur, pend) < target - 0.5 && (!len || target < len - 1)) {
-      (S.estA = S.estA || {})[S.book.id + ':' + sec] = target;   // remember the guessed notice end, so the clock starts at 0:00 here too (see playWin)
-      seekAudio(target);
-    }
+    if (Math.max(cur, pend) < c[0] - 0.5) seekAudio(c[0]);   // not already at or past it (loadAudio may have done it, or the listener moved on)
+  }
+  /* What the "Notice skip" row in More tools says about the open track. */
+  function skipState() {
+    if (!S.book || S.sec == null) return ['', ''];
+    if (P.skipNotice === false) return ['Off in Settings', 'The notice plays. Turn it on under Settings > Audio.'];
+    const i = S.sec, c = (() => { try { return cutFor(i); } catch (e) { return null; } })();
+    if (c && c[0] > 1) return ['On for this book', 'The notice at the start of this chapter is skipped.'];
+    const EX = S.EX, mine = EX && EX.id === String(S.book.id);
+    if (mine && !EX.done && !EX.d) return ['Checking\u2026', 'Looking for a skip file for this book.'];
+    if (mine && EX.d) return ['Nothing to skip here', 'This book has a skip file, and it found no notice to skip in this chapter. It plays from the start.'];
+    return ['Not available for this book', 'There is no skip file for this book yet, so every chapter plays from the start.'];
+  }
+  /* "Skip was wrong" (More tools): quietly notes the book, the track and what the skip did, so wrong skips can be found and fixed.
+     Kept on this device (wt:skipbad, newest 50) and sent once, anonymously, to the stats service as kind "skipbad" when stats sharing is on. */
+  function skipBad() {
+    if (!S.book || S.sec == null) { toast('Open a book first.', 2000); return; }
+    const i = S.sec, c = (() => { try { return cutFor(i); } catch (e) { return null; } })();
+    let src = 'none'; try { if (exCut(i)) src = 'extras'; else if (c && c[0] > 0) src = 'cuts'; } catch (e) { /* keep none */ }
+    const rec = { b: String(S.book.id), k: i, to: c && c[0] > 0 ? Math.round(c[0] * 10) / 10 : 0, at: Math.round((audio.currentTime || 0) * 10) / 10, src, t: Date.now() };
+    const list = store.get('wt:skipbad', []) || [];
+    list.push(rec); store.set('wt:skipbad', list.slice(-50));
+    try {
+      if (typeof STATS_API !== 'undefined' && STATS_API && P.shareStats !== false) {
+        fetch(STATS_API + '/e', { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify({ b: rec.b, k: 'skipbad', d: statDev(), tr: rec.k, to: rec.to, src: rec.src }), keepalive: true }).catch(() => {});
+      }
+    } catch (e) { /* the note on this device is enough */ }
+    toast('Thanks, noted.', 2000);
   }
   function paintSkipIntro() {
     const b = document.getElementById('b-skipintro'); if (!b) return;

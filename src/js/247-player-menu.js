@@ -40,13 +40,16 @@
         ['b-trail', 'Where was I?', 'Go back after a seek, or to where you fell asleep'], ['b-ver', 'Reader', 'Choose who reads this book'],
         ['b-shadow', 'Shadow reading', 'Say a sentence after the narrator and compare'], ['b-quiz', 'Quick quiz', 'Test yourself on the chapter you are in'],
         ['qk-clip', 'Clip', 'Save a short audio snippet to share'], ['b-cal', 'Tap to align', 'Line up the highlight by tapping'],
-        ['btn-nr', 'Focus page', 'Just the text and the essentials'], ['btn-howto', 'How to use', 'Double-tap, press and hold, swipe']
+        ['btn-nr', 'Focus page', 'Just the text and the essentials'], ['btn-howto', 'How to use', 'Double-tap, press and hold, swipe'],
+        ['@skipinfo', 'Notice skip', ''], ['@skipbad', 'Skip was wrong', 'Tell us if this chapter started in the wrong place']
       ];
       const toolsOpen = () => {
         const host = $('#tools-body'); if (!host) return;
         host.textContent = '';
         const list = h('div', { class: 'tl-list' });
         TOOLS.forEach(([id, t, d]) => {
+          if (id === '@skipinfo') { const [st, why] = skipState(); list.append(h('button', { type: 'button', class: 'tl-row', onclick: () => closeSheets() }, h('span', { class: 'tl-t' }, 'Notice skip: ' + st), h('span', { class: 'tl-d' }, why))); return; }
+          if (id === '@skipbad') { list.append(h('button', { type: 'button', class: 'tl-row', onclick: () => { buzz('tick'); closeSheets(); skipBad(); } }, h('span', { class: 'tl-t' }, t), h('span', { class: 'tl-d' }, d))); return; }
           const src = $('#' + id); if (!src || src.hidden) return;
           list.append(h('button', { type: 'button', class: 'tl-row', onclick: () => { buzz('tick'); closeSheets(); setTimeout(() => src.click(), 60); } },
             h('span', { class: 'tl-t' }, t), h('span', { class: 'tl-d' }, d)));

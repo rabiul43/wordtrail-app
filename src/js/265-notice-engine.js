@@ -14,6 +14,7 @@
      Results are cached per book in localStorage ('wt:ne:<id>') and read by cutFor() (140-open-book.js), so the existing
      skip, plan and progress code needs no change. Settings > Audio > "Smart intro and outro detection" turns it off. */
   const NE_V = 1;
+  const NE_ON = false;   // OFF: the app skips only from a skip file (extras / cuts.json). No speech model is downloaded and nothing is guessed. Set true to bring the on-device finder back.
   const NE_END_KEY = new Set(['chapter', 'section', 'book', 'part', 'volume', 'story', 'poem', 'act', 'scene', 'canto', 'preface', 'introduction', 'epilogue', 'prologue', 'appendix']);
   const NE_CREDIT = new Set(['recording', 'recorded', 'read', 'reading', 'red', 'narrated', 'proofread', 'edited']);
 const NE_LEAD = new Set(['this', 'is', 'the', 'that', 'thats']);
@@ -245,6 +246,7 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
   function neSave() { if (S.book && NEQ.bk === S.book.id) store.set('wt:ne:' + S.book.id, NEQ.d); }
   /* Trusted cut for cutFor(): [introEnd, outroStart|null], or null. */
   function neCut(i) {
+    if (!NE_ON) return null;
     if (P.smartCut === false || !S.book) return null;
     const e = neData()[i];
     if (!e || e.v !== NE_V) return null;
@@ -253,6 +255,7 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
   }
   /* A weaker find: only moves the Skip intro button to the exact time. */
   function neHint(i) {
+    if (!NE_ON) return 0;
     if (P.smartCut === false || !S.book) return 0;
     const e = neData()[i];
     return e && e.v === NE_V && e.c === 'm' && e.a > 3 ? e.a : 0;
@@ -264,8 +267,9 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
     for (const id of p.ids) { const s = S.model.sents[id]; if (!s || s.h) continue; out.push(...toks(s.t)); if (out.length >= 24) break; }
     return out.length >= 6 ? out.slice(0, 24) : null;
   }
-  function neAllowed() { return P.smartCut !== false && bgAllowed() && 'Worker' in window; }
+  function neAllowed() { return NE_ON && P.smartCut !== false && bgAllowed() && 'Worker' in window; }
   async function neDetect(i) {
+    if (!NE_ON) return;
     const book = S.book, sec = S.secs && S.secs[i];
     if (!book || !sec || P.smartCut === false) return;
     const d = neData();
@@ -290,7 +294,7 @@ const NE_THIS = new Set(['recording', 'reading', 'book', 'chapter', 'section', '
   /* Detected while the track is already playing near its start: skip now, with an Undo. */
   function neApply(i) {
     const c = neCut(i);
-    if (!c || !(c[0] > 0) || i !== S.sec) return;
+    if (P.skipNotice === false || !c || !(c[0] > 0) || i !== S.sec) return;
     const t = audio.currentTime || 0;
     if (t < c[0] - 1.5 && t < 70) seekAudio(c[0]);   // silent: the player clock starts at the story (see playWin), so nothing looks skipped
   }

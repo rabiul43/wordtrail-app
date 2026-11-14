@@ -419,6 +419,7 @@
   /* ---------- audio ---------- */
   function loadAudio(i, time, autoplay) {
     S.sec = i; S.outroHit = false;
+    if (time > 0) { const c0 = cutFor(i); if (c0 && c0[0] > 1 && time < c0[0] - 1) time = c0[0]; }   // a saved place inside the notice (closed the app in the first seconds) resumes at the story
     if (!time) { const c = cutFor(i); if (c && c[0] > 1) time = c[0]; else setTimeout(() => { if (S.sec === i) autoSkipIntro(i); }, 400); } // fresh start: skip to end of notice (auto estimate if no exact cut)
     if (autoplay && opGate()) { S.playWhenReady = true; autoplay = false; }   // the text is still opening: play the moment it is ready
     S.pendingSeek = time || 0;
@@ -460,7 +461,7 @@
   function playWin(i) {
     const raw = i === S.sec && isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (+S.durs[i] || 0);
     const c = cutFor(i);
-    let a = c && c[0] > 0 ? c[0] : (S.estA && S.book && S.estA[S.book.id + ':' + i] > 0 ? S.estA[S.book.id + ':' + i] : 0), b = c && c[1] != null ? c[1] : raw;
+    let a = c && c[0] > 0 ? c[0] : 0, b = c && c[1] != null ? c[1] : raw;
     if (!(b > a + 5)) { a = 0; b = raw; }   // a window that small is not a real cut
     return { a, b, d: Math.max(0, b - a), raw };
   }
