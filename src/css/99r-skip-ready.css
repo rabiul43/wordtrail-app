@@ -12,3 +12,8 @@
 .synced-empty-ic svg { width: 1.7rem; height: 1.7rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 :root[data-theme="contrast"] .sk-hint { color: var(--ink); }
 html[dir="rtl"] .sk-hint { text-align: start; }
+/* two sub-tabs: Skip the notice / Clean starts */
+.sk-tabs { display: flex; gap: .5rem; }
+.sk-tabs .sk-tab { flex: 1 1 0; min-height: 2.75rem; justify-content: center; text-align: center; }
+.sk-clean { color: var(--ok, #3f9d5a); }
+:root[data-theme="contrast"] .sk-clean { color: var(--ink); }

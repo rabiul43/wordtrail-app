@@ -30,7 +30,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `040-worker-newreader.js` | 157 | background worker, new reader |
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 239 | position recovery |
-| `070-network-data.js` | 694 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
+| `070-network-data.js` | 696 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 400 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 757 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 235 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
@@ -98,7 +98,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `280-downloads-progress.js` | 820 | download a book for offline listening, auto-download the next tracks, chapter progress, whole-book progress |
 | `281-book-download-card.js` | 216 | The "Listen offline" card on the book details page: Download / Continue, progress + Cancel, Downloaded + Remove, and the mobile-data sheet. Uses `dlStart`, `dlCancel`, `dmDrop` from `280`/`030` and `fetchFull` from `133`; `ddPaint` is called by `paintCards` (`120`) and `paintDl` (`280`). Strings are in `src/i18n/*.json` |
 | `282-library-hub.js` | 148 | My Library on phones (under 700px): the Downloads tab is not in the bottom bar; My Library opens on a list of pages (Saved, Downloads, Following, Rated, Synced books) with counts, `libHubDraw`, `phoneUI`, `libHubTitle`. State `shelfHub` / `shelfHubNext` is in `080`; styles `99e-library-hub.css` |
-| `282b-skip-ready.js` | 75 | Skip ready books: a page in My Library next to Synced books (state `shelfMode` = `'sk'`): the books whose LibriVox notice skipping is ready, from `extras/index.json` (loaded by `SKX` in `070`, saved copy `wt:skipidx`, refreshed after a day). Row = book info the app already has + "12 of 14 chapters skip the notice". Does not change how skipping works. `renderSkip`; styles `99r-skip-ready.css` |
+| `282b-skip-ready.js` | 88 | Skip ready books: a page in My Library next to Synced books (state `shelfMode` = `'sk'`): the books whose LibriVox notice skipping is ready, from `extras/index.json` (loaded by `SKX` in `070`, saved copy `wt:skipidx`, refreshed after a day). Row = book info the app already has + "12 of 14 chapters skip the notice". Does not change how skipping works. `renderSkip`; styles `99r-skip-ready.css` |
 | `290-backup-maintenance.js` | 400 | Backup and restore, sync dashboard |
 | `295-account-sync.js` | 618 | Account sign-in (Google, Firebase) and cloud sync of settings, favourites, bookmarks, progress. Uses `storeHook` from `030` |
 | `205-audio-stall.js` | 71 | Weak connection: when the narrator audio stalls or waits for 8 s with no data (`stalled` / `waiting`), shows one message and reloads the same track at the same spot (up to 3 tries, a bit longer apart), then gives up with a message; retries once when the browser comes back online. Saved (blob:) copies are never retried |

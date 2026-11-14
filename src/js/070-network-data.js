@@ -323,7 +323,7 @@
      Asked for only when the "Skip ready books" page opens (not at start-up). A saved copy (wt:skipidx) is used straight away; a copy older than
      a day is refreshed quietly in the background (onNew is called if the list changed). No saved copy and no network: ready stays false and the page
      shows its calm "not available yet" message. A failed download is not retried for a minute. */
-  const SKX = { map: new Map(), ready: false, promise: null, failedAt: 0, t: 0 };
+  const SKX = { map: new Map(), clean: null, ready: false, promise: null, failedAt: 0, t: 0, err: '' };   // clean: Map of books whose every chapter starts with the story, or null when the list has none yet
   const SKX_KEY = 'wt:skipidx', SKX_DAY = 86400e3;
   function skxFill(j) {   // keeps only well-formed entries: [with, total], whole numbers, 1 <= with <= total
     const m = new Map();
@@ -337,8 +337,9 @@
   SKX.load = onNew => {
     let d = store.get(SKX_KEY, null);
     const have = !!(d && d.d && d.d.v === 1 && d.d.b && typeof d.d.b === 'object');
-    if (have) { SKX.map = skxFill(d.d); SKX.ready = true; SKX.t = d.t || 0; }
-    const stale = !have || Date.now() - (d.t || 0) >= SKX_DAY;
+    if (have) { SKX.map = skxFill(d.d); SKX.clean = d.d.c && typeof d.d.c === 'object' ? skxFill({ b: d.d.c }) : null; SKX.ready = true; SKX.t = d.t || 0; }
+    /* a saved copy from before the clean-starts list existed is looked at again after 10 minutes, not after a day */
+    const stale = !have || Date.now() - (d.t || 0) >= SKX_DAY || (d.d.c === undefined && Date.now() - (d.t || 0) >= 600e3);
     if (!stale) return Promise.resolve();
     if (SKX.promise) return have ? Promise.resolve() : SKX.promise;
     if (Date.now() - SKX.failedAt < 60e3) return Promise.resolve();
@@ -351,10 +352,11 @@
           if (!r.ok) throw new Error('HTTP ' + r.status);
           const j = await r.json();
           if (!(j && j.v === 1 && j.b && typeof j.b === 'object')) throw new Error('not a skip list');
-          const before = SKX.ready ? JSON.stringify([...SKX.map]) : '';
+          const before = SKX.ready ? JSON.stringify([[...SKX.map], SKX.clean ? [...SKX.clean] : null]) : '';
           store.set(SKX_KEY, { t: Date.now(), d: j });
-          SKX.map = skxFill(j); SKX.ready = true; SKX.t = Date.now(); SKX.err = '';
-          if (onNew && before !== JSON.stringify([...SKX.map])) onNew();
+          SKX.map = skxFill(j); SKX.clean = j.c && typeof j.c === 'object' ? skxFill({ b: j.c }) : null; SKX.ready = true; SKX.t = Date.now(); SKX.err = '';
+          const after = JSON.stringify([[...SKX.map], SKX.clean ? [...SKX.clean] : null]);
+          if (onNew && before !== after) onNew();
           return;
         } catch (e) { SKX.err = (e && e.name === 'AbortError') ? 'timed out' : String(e && e.message || e); }
       }
