@@ -249,19 +249,19 @@
     try { shelfHooks.ask(shelfMode !== 'dl' && (!phone || hub)); } catch (e) { /* goal question (169n) not ready */ }   // the one-time goal card shows on the start of My Library only
     let learn = false; try { learn = shelfHooks.top(hub); } catch (e) { /* Learn switch not ready: Books */ }
     if (learn) {   // Learn (169): none of the Books pages is shown; the switch and Learn panel are drawn by shelfHooks.top
-      ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });
+      ['saved', 'fol', 'rt', 'dl', 'ra', 'sk'].forEach(m => { $('#shelf-' + m).hidden = true; });
       $('#shelf-hub').hidden = true; $('#shelf-back').hidden = true; $('#shelf-seg').hidden = true;
       $('#shelf-title').textContent = 'My Library'; $('#shelf-sub').textContent = ''; $('#shelf').dataset.mode = 'learn';
       return;
     }
     $('#shelf-hub').hidden = !hub; $('#shelf-back').hidden = !(phone && !hub);
     if (hub) {   // phones: the list of pages (282) and nothing else
-      ['saved', 'fol', 'rt', 'dl', 'ra'].forEach(m => { $('#shelf-' + m).hidden = true; });
+      ['saved', 'fol', 'rt', 'dl', 'ra', 'sk'].forEach(m => { $('#shelf-' + m).hidden = true; });
       $('#shelf-seg').hidden = true; $('#shelf-title').textContent = 'My Library'; $('#shelf-sub').textContent = '';
       $('#shelf').dataset.mode = 'hub'; libHubDraw();
       return;
     }
-    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-fol').hidden = shelfMode !== 'fol'; $('#shelf-rt').hidden = shelfMode !== 'rt'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-dl').hidden = shelfMode !== 'dl';
+    $('#shelf-saved').hidden = shelfMode !== 'saved'; $('#shelf-fol').hidden = shelfMode !== 'fol'; $('#shelf-rt').hidden = shelfMode !== 'rt'; $('#shelf-ra').hidden = shelfMode !== 'ra'; $('#shelf-sk').hidden = shelfMode !== 'sk'; $('#shelf-dl').hidden = shelfMode !== 'dl';
     $('#shelf').dataset.mode = shelfMode;
     /* Downloads is its own tab (no chip): same page, own title, no chips. My Library keeps the Saved, Following, Rated and Synced books chips. */
     $('#shelf-title').textContent = phone ? libHubTitle(shelfMode) : shelfMode === 'dl' ? 'Downloads' : 'My Library';
@@ -274,7 +274,7 @@
       const em = $('#shelf-rt-empty'); em.textContent = '';
       em.append(h('h2', {}, 'No ratings yet'), h('p', {}, 'Rate a book when you finish it, and it will show up here.'));
     }
-    else if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
+    else if (shelfMode === 'ra') { $('#shelf-sub').textContent = ''; renderSynced(); } else if (shelfMode === 'sk') { $('#shelf-sub').textContent = ''; renderSkip(); } else if (shelfMode === 'dl') renderShelfDl(); else renderShelf();
   }
   function tabHlPaint() {   // the Downloads tab lights up on the Downloads page, and on the Library while it shows only downloads (offline)
     const dlTab = !phoneUI();   // on phones Downloads is a page inside My Library, not a tab

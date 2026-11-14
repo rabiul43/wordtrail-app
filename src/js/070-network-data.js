@@ -318,6 +318,47 @@
   })());
   setTimeout(() => PKI.load().then(() => paintCards()).catch(() => {}), 1200);
 
+  /* ---------- books whose LibriVox notice skipping is ready: extras/index.json (written by the Kaggle notebook, cell 7c) ----------
+     { v:1, b:{ "<book id>": [chapters with a notice cut, total chapters] } } lists only the READY books (the notebook decides what ready means).
+     Asked for only when the "Skip ready books" page opens (not at start-up). A saved copy (wt:skipidx) is used straight away; a copy older than
+     a day is refreshed quietly in the background (onNew is called if the list changed). No saved copy and no network: ready stays false and the page
+     shows its calm "not available yet" message. A failed download is not retried for a minute. */
+  const SKX = { map: new Map(), ready: false, promise: null, failedAt: 0, t: 0 };
+  const SKX_KEY = 'wt:skipidx', SKX_DAY = 86400e3;
+  function skxFill(j) {   // keeps only well-formed entries: [with, total], whole numbers, 1 <= with <= total
+    const m = new Map();
+    for (const k in j.b) {
+      const v = j.b[k];
+      if (Array.isArray(v) && Number.isInteger(v[0]) && Number.isInteger(v[1]) && v[1] > 0 && v[0] > 0 && v[0] <= v[1]) m.set(String(k), [v[0], v[1]]);
+    }
+    return m;
+  }
+  SKX.peek = () => { try { const d = store.get(SKX_KEY, null); return d && d.d && d.d.b ? skxFill(d.d).size : null; } catch (e) { return null; } };   // the count from the saved copy, or null (no network used)
+  SKX.load = onNew => {
+    let d = store.get(SKX_KEY, null);
+    const have = !!(d && d.d && d.d.v === 1 && d.d.b && typeof d.d.b === 'object');
+    if (have) { SKX.map = skxFill(d.d); SKX.ready = true; SKX.t = d.t || 0; }
+    const stale = !have || Date.now() - (d.t || 0) >= SKX_DAY;
+    if (!stale) return Promise.resolve();
+    if (SKX.promise) return have ? Promise.resolve() : SKX.promise;
+    if (Date.now() - SKX.failedAt < 60e3) return Promise.resolve();
+    const go = (async () => {
+      try {
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
+        const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/index.json', { signal: ctl.signal }); clearTimeout(to);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const j = await r.json();
+        if (!(j && j.v === 1 && j.b && typeof j.b === 'object')) throw new Error('not a skip list');
+        const before = SKX.ready ? JSON.stringify([...SKX.map]) : '';
+        store.set(SKX_KEY, { t: Date.now(), d: j });
+        SKX.map = skxFill(j); SKX.ready = true; SKX.t = Date.now();
+        if (onNew && before !== JSON.stringify([...SKX.map])) onNew();
+      } catch (e) { SKX.failedAt = Date.now(); /* offline or missing: keep the saved copy, if any */ }
+    })().then(() => { SKX.promise = null; });
+    SKX.promise = go;
+    return have ? Promise.resolve() : go;   // with a saved copy nobody waits for the network
+  };
+
   /* ---------- moods.json and similar.json (built by build_moods.py from the full book texts) ---------- */
   function jsonLoader(name, idbKey, ok) {
     const o = { data: null, ready: false, promise: null };

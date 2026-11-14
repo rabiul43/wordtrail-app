@@ -1,0 +1,14 @@
+/* Skip ready books page (My Library, next to Synced books). Code: 282b-skip-ready.js.
+   The rows reuse the Synced books styles (.synced-row ...), so every theme (dark, black, white, sepia, high contrast) already applies.
+   This file only adds what is new: the page container, the hint line, and the icon inside the calm message circle. */
+#shelf-sk { display: grid; gap: .9rem; align-content: start; grid-template-columns: minmax(0, 1fr); max-width: 100%; box-sizing: border-box; }
+#shelf-sk[hidden] { display: none; }
+#shelf-sk > * { min-width: 0; max-width: 100%; }
+/* "Try again" in the calm message: a pill like the other call-to-action buttons */
+.sk-retry { min-height: 2.75rem; margin-top: .4rem; padding: 0 1.4rem; border: 0; border-radius: var(--r-pill); background: var(--accent); color: var(--accent-ink); font: 700 .95rem/1 inherit; cursor: pointer; }
+.sk-retry:focus-visible { outline: var(--focus-w) solid var(--focus-ring); outline-offset: var(--focus-off); }
+:root[data-theme="contrast"] .sk-retry { border: 2px solid var(--ink); }
+.sk-hint { color: var(--accent); font-weight: 600; }
+.synced-empty-ic svg { width: 1.7rem; height: 1.7rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+:root[data-theme="contrast"] .sk-hint { color: var(--ink); }
+html[dir="rtl"] .sk-hint { text-align: start; }

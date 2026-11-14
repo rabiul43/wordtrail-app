@@ -51,7 +51,7 @@ def check(path):
                 odd.append('track %s: notice ends at %.1fs (usual range %d to %d s)' % (k, e, HEAD_MIN, HEAD_MAX))
             heads[k] = e
         else:
-            info.append('track %s: no head cut, so the app will guess the start' % k)
+            info.append('track %s: no head cut, so the app plays this chapter from the start' % k)
         if t and t[0][0] is not None:
             if t[0][0] < TAIL_MIN_START: odd.append('track %s: outro starts at %.1fs, very early' % (k, t[0][0]))
             if h and h[0][1] and t[0][0] <= h[0][1]: bad.append('track %s: outro starts before the notice ends' % k)

@@ -4,14 +4,15 @@
      and the back arrow in its header (or the phone's Back) returns to the list. Wider screens keep the chips and the Downloads tab.
      State: shelfHub / shelfHubNext (080). Styles: 99e-library-hub.css. */
   function phoneUI() { return !(window.matchMedia && matchMedia('(min-width: 700px)').matches); }
-  const LH_TITLES = { saved: 'Saved', fol: 'Following', rt: 'Rated', ra: 'Synced books', dl: 'Downloads' };
+  const LH_TITLES = { saved: 'Saved', fol: 'Following', rt: 'Rated', ra: 'Synced books', sk: 'Skip ready books', dl: 'Downloads' };
   function libHubTitle(m) { return LH_TITLES[m] || 'My Library'; }
   const LH_ICONS = {
     saved: ['M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z'],
     dl: ['M12 3v13M7 11l5 5 5-5', 'M5 20h14'],
     fol: ['M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z', 'M3 20c.5-3.3 2.7-5 6-5s5.5 1.7 6 5', 'M18 8v6M15 11h6'],
     rt: ['M12 4l2.4 5 5.4.7-4 3.8 1 5.4-4.8-2.6-4.8 2.6 1-5.4-4-3.8 5.4-.7z'],
-    ra: ['M4 12a8 8 0 0 1 13.7-5.6L20 8.5', 'M20 4v4.5h-4.5', 'M20 12a8 8 0 0 1-13.7 5.6L4 15.5', 'M4 20v-4.5h4.5']
+    ra: ['M4 12a8 8 0 0 1 13.7-5.6L20 8.5', 'M20 4v4.5h-4.5', 'M20 12a8 8 0 0 1-13.7 5.6L4 15.5', 'M4 20v-4.5h4.5'],
+    sk: ['M6 6l9 6-9 6z', 'M18.5 6v12']   // skip forward: a play triangle and a bar
   };
   function lhSvg(paths, cls) {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -30,6 +31,7 @@
     if (signed || fol) rows.push(['fol', plural(fol, 'Author')]);
     if (signed) rows.push(['rt', plural(rt, 'Title')]);
     rows.push(['ra', 'Books with read-along']);
+    rows.push(['sk', 'Books that skip the notice']);   // 282b: more than half of the chapters start without the spoken LibriVox notice
     return rows;
   }
   function libHubDraw() {
@@ -134,6 +136,7 @@
     const grid = h('div', { class: 'lt-grid' }, ltTile('saved', ic('saved'), num.saved, 'Saved', 'Titles'), ltTile('dl', ic('dl'), num.dl, 'Downloads', '', bar));
     if ('fol' in num) grid.append(ltTile('fol', ltAvatars(), num.fol, 'Following', 'Authors'));
     if ('rt' in num) grid.append(ltTile('rt', ltStars(), num.rt, 'Rated', 'Titles'));
+    { const n = SKX.peek(); grid.append(ltTile('sk', ic('sk'), n == null ? '\u2013' : n, 'Skip ready books', 'Books')); }   // the count comes from the saved copy of the list: no download here
     host.append(h('p', { class: 'lt-lead' }, 'Your reading, all in one place'), ltHero(), grid);
     ltStorage(bar);
     try {

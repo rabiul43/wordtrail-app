@@ -350,6 +350,7 @@
     <button type="button" class="chip" data-m="fol" aria-pressed="false">Following</button>
     <button type="button" class="chip" data-m="rt" aria-pressed="false">Rated</button>
     <button type="button" class="chip" data-m="ra" aria-pressed="false">Synced books</button>
+    <button type="button" class="chip" data-m="sk" aria-pressed="false">Skip ready books</button>
   </div>
   <div id="shelf-saved">
     <div id="shelf-list" class="list"></div>
@@ -389,6 +390,12 @@
     <span id="synced-count" class="synced-count"></span>
     <div id="synced-filters" class="synced-filters" role="group" aria-label="Filter synced books"></div>
     <div id="synced-list" class="synced-list"></div>
+  </div>
+  <!-- Skip ready books (282b-skip-ready.js): books where more than half of the chapters have a notice cut in the skip list on Hugging Face -->
+  <div id="shelf-sk" hidden>
+    <span id="skip-count" class="synced-count"></span>
+    <div id="skip-filters" class="synced-filters" role="group" aria-label="Order of skip ready books"></div>
+    <div id="skip-list" class="synced-list"></div>
   </div>
   <div id="shelf-learn" hidden></div>
 </main>
