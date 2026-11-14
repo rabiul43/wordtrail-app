@@ -343,17 +343,22 @@
     if (SKX.promise) return have ? Promise.resolve() : SKX.promise;
     if (Date.now() - SKX.failedAt < 60e3) return Promise.resolve();
     const go = (async () => {
-      try {
-        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
-        const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/index.json', { signal: ctl.signal }); clearTimeout(to);
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const j = await r.json();
-        if (!(j && j.v === 1 && j.b && typeof j.b === 'object')) throw new Error('not a skip list');
-        const before = SKX.ready ? JSON.stringify([...SKX.map]) : '';
-        store.set(SKX_KEY, { t: Date.now(), d: j });
-        SKX.map = skxFill(j); SKX.ready = true; SKX.t = Date.now();
-        if (onNew && before !== JSON.stringify([...SKX.map])) onNew();
-      } catch (e) { SKX.failedAt = Date.now(); /* offline or missing: keep the saved copy, if any */ }
+      /* two tries: the second adds a changing query so an old "not found" kept by the network is not reused. SKX.err keeps the reason for the page. */
+      for (let k = 0; k < 2; k++) {
+        try {
+          const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 20000);
+          const r = await fetch('https://huggingface.co/datasets/rabiul43/wordtrail-packs/resolve/main/extras/index.json' + (k ? '?t=' + Date.now() : ''), { signal: ctl.signal, cache: 'no-store' }); clearTimeout(to);
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const j = await r.json();
+          if (!(j && j.v === 1 && j.b && typeof j.b === 'object')) throw new Error('not a skip list');
+          const before = SKX.ready ? JSON.stringify([...SKX.map]) : '';
+          store.set(SKX_KEY, { t: Date.now(), d: j });
+          SKX.map = skxFill(j); SKX.ready = true; SKX.t = Date.now(); SKX.err = '';
+          if (onNew && before !== JSON.stringify([...SKX.map])) onNew();
+          return;
+        } catch (e) { SKX.err = (e && e.name === 'AbortError') ? 'timed out' : String(e && e.message || e); }
+      }
+      SKX.failedAt = Date.now();   // offline or missing: keep the saved copy, if any
     })().then(() => { SKX.promise = null; });
     SKX.promise = go;
     return have ? Promise.resolve() : go;   // with a saved copy nobody waits for the network

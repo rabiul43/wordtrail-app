@@ -30,7 +30,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `040-worker-newreader.js` | 157 | background worker, new reader |
 | `050-audio-clips.js` | 358 | audio clips |
 | `060-position-bookmarks.js` | 239 | position recovery |
-| `070-network-data.js` | 689 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
+| `070-network-data.js` | 694 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 400 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 757 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
 | `100-home-covers.js` | 235 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |

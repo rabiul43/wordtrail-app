@@ -49,7 +49,7 @@
       list.textContent = '';
       if (!SKX.ready) {   // no saved copy and no download: calm message, nothing guessed
         countEl.textContent = ''; bar.textContent = '';
-        list.append(skMessage('sk', 'Not available yet', 'The list of books that skip the notice could not be loaded. It may not be published yet, or you may be offline. Please check again later.', true));
+        list.append(skMessage('sk', 'Not available yet', 'The list of books that skip the notice could not be loaded. It may not be published yet, or you may be offline. Please check again later.' + (SKX.err ? ' (' + SKX.err + ')' : ''), true));
         return;
       }
       const items = [...SKX.map].map(([id, v]) => ({ id, v, m: skMeta(id) }));
