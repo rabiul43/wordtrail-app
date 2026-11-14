@@ -3,7 +3,7 @@
  "summary": {
   "files": 135,
   "dependencies": 930,
-  "pointing_to_a_later_file": 275,
+  "pointing_to_a_later_file": 274,
   "largest_cycle": 94
  },
  "dependencies": [
@@ -581,12 +581,12 @@
   "260-audio-effects.js -> 040-worker-newreader.js",
   "260-audio-effects.js -> 080-ui-shell-favourites.js",
   "260-audio-effects.js -> 100-home-covers.js",
+  "260-audio-effects.js -> 131-book-stats-share.js",
   "260-audio-effects.js -> 140-open-book.js",
   "260-audio-effects.js -> 150-player-reader.js",
   "260-audio-effects.js -> 200-player-controls.js",
   "260-audio-effects.js -> 233-scene-chapters-label.js",
   "260-audio-effects.js -> 250-characters.js",
-  "260-audio-effects.js -> 265-notice-engine.js",
   "260-audio-effects.js -> 270-sheets-nextup-back.js",
   "260-audio-effects.js -> 290-backup-maintenance.js",
   "260-audio-effects.js -> sound/ambient-mix.js",
