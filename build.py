@@ -90,6 +90,7 @@ PARTS = [
     ('file', 'src/css/99j-player-style-clean.css'),
     ('file', 'src/css/99k-player-style-glass.css'),
     ('file', 'src/css/99l-opening.css'),
+    ('file', 'src/css/99l2-opening-styles.css'),
     ('file', 'src/css/99m-detail-stage.css'),
     ('file', 'src/css/99n-detail-modern.css'),
     ('file', 'src/css/99o-library-tiles.css'),

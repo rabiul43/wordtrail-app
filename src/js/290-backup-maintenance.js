@@ -380,6 +380,7 @@
   function fillSettings() {
     covSegSync();
     pstyleSegSync();
+    ostSegSync();
     homeCustPaint();
     dmRender();
     devStartup();

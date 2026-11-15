@@ -36,6 +36,7 @@
       el.cur.textContent = '0:00'; el.left.textContent = '-0:00'; el.seek.value = 0; el.seek.style.setProperty('--fill', '0%');
       ['#book-prog', '#nr-bp', '#trk-sum'].forEach(q => { const x = $(q); if (x) x.hidden = true; });
       document.title = (b.title || 'Wordtrail') + ' \u00b7 Wordtrail';
+      ostSet(b);   // the Opening style screen (133) names the same book
     } catch (e) { /* cosmetic: the header above still names the right book */ }
   }
   let openSeq = 0;   // each openBook() takes a number; one that is no longer the newest stops when it wakes up (a slow book must not take over the player from a book opened after it)

@@ -393,6 +393,11 @@
       P.playerStyle = b.dataset.v === 'glass' ? 'glass' : 'clean'; savePrefs(); applyPlayerStyle(); pstyleSegSync();
       toast('Player style: ' + (P.playerStyle === 'glass' ? 'Glass' : 'Clean'), 2000);
     }));
+    applyOpenStyle(); ostSegSync();   // Opening style (090): the first-paint script already set it; this keeps it in step with P
+    $$('#seg-opstyle button').forEach(b => b.addEventListener('click', () => {
+      P.openStyle = OST_ALL.indexOf(b.dataset.v) >= 0 ? b.dataset.v : 'classic'; savePrefs(); applyOpenStyle(); ostSegSync();
+      toast('Opening style: ' + OST_NAME[P.openStyle], 2000);
+    }));
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyHome); } catch (e) { /* old browser: applies on the next start */ }
     stHomeInit();   // New Home design: genre chips and the search / account buttons (090)
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyHdr); } catch (e) { /* old browser: the setting applies on the next start */ }

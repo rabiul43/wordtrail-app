@@ -22,11 +22,14 @@
     const on = opGate();
     $$('#b-play, #mini-play, #nr-play').forEach(b => {
       b.classList.toggle('opening', on);
+      b.classList.toggle('queued', on && !!S.playWhenReady);   // the press was heard: it starts when the text is ready (Wide play bar says so)
       if (on) { b.style.setProperty('--op', String(n)); b.dataset.pct = pct; b.setAttribute('aria-busy', 'true'); b.setAttribute('aria-label', 'Opening the book ' + pct); }
       else if (b.classList.contains('opening') || b.dataset.pct) { b.classList.remove('opening'); delete b.dataset.pct; b.style.removeProperty('--op'); b.removeAttribute('aria-busy'); b.setAttribute('aria-label', audio.paused ? 'Play' : 'Pause'); }
     });
     if (el.player) el.player.classList.toggle('opening', on);
+    ostProg(n);
   }
+  function opQueued() { const n = Math.round(OP.f * 100); opPaintBtn(n + '%', n); }
   function opRelease() {
     opPaintBtn('0%', 0);
     el.page.classList.add('op-in'); setTimeout(() => el.page.classList.remove('op-in'), 700);
@@ -37,18 +40,88 @@
     Object.assign(OP, { active: true, home: !!home, f: 0, key: 'list', t0: Date.now(), title: title || '', detail: '', timed: true, ui: null });
     OP.timer = setInterval(paintOpen, 500);
     paintOpen();
+    if (!home) { try { ostShow(true); } catch (e) { /* cosmetic */ } }
   }
   function endOpen() {
     clearInterval(OP.timer);
     if (OP.active && OP.home) progress(false);
     OP.active = false; OP.home = false; OP.ui = null;
     try { opRelease(); } catch (e) { /* cosmetic */ }
+    try { ostShow(false); } catch (e) { /* cosmetic */ }
   }
   function setOpen(f, key, detail, timed) {
     if (!OP.active) return;
     if (key !== OP.key) { OP.key = key; OP.t0 = Date.now(); }
     OP.f = Math.max(OP.f, Math.min(1, f)); OP.detail = detail || ''; OP.timed = !!timed;
     paintOpen();
+  }
+  /* ---------- Opening style screen (Settings > Reading > Opening style) ----------
+     While a book opens, spotlight | aurora | book | ribbon | bloom show ONE calm full-screen card (cover, title, author, a progress cue) instead of the
+     player, and fade to the reader when the text is ready. The person never sees steps or placeholder lines. classic = the page as before;
+     bar = the player stays but its Play button becomes a wide bar that fills (css only, 99l2). The look is all CSS (html[data-open-style]);
+     this code only builds the pieces, copies the book's cover/title and sets --op (0-100). Nothing runs on an audio tick. */
+  const OST_LABEL = { aurora: 'Getting your book ready', bloom: 'Tuning in', book: 'Opening\u2026', ribbon: 'Marking your place\u2026' };
+  let ostEl = null, ostBook = null, ostTimer = 0;
+  const ostScreenStyle = () => ['spotlight', 'aurora', 'book', 'ribbon', 'bloom'].indexOf(ostStyleOf()) >= 0;
+  function ostSet(b) { ostBook = b || null; if (ostEl) ostSync(); }
+  function ostBuild() {
+    if (ostEl || !el.player) return ostEl;
+    const root = h('div', { class: 'op-screen', role: 'group', 'aria-label': 'Opening the book', hidden: '' });
+    const back = h('button', { class: 'op-back', type: 'button', 'aria-label': 'Back' });
+    back.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-back"/></svg>';
+    back.addEventListener('click', () => { const x = $('#btn-back'); if (x) x.click(); });
+    const bg = h('div', { class: 'op-bg', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'));
+    const cone = h('div', { class: 'op-cone', 'aria-hidden': 'true' });
+    const card = h('div', { class: 'op-card' });
+    const cov = h('div', { class: 'op-cov' }), refl = h('div', { class: 'op-refl', 'aria-hidden': 'true' });
+    const cw = h('div', { class: 'op-cwrap', 'aria-hidden': 'true' });
+    cw.innerHTML = '<i class="op-r"></i><i class="op-r op-r2"></i><i class="op-r op-r3"></i><div class="op-lite"></div><i class="op-frame"></i>';
+    cw.append(cov); cw.insertAdjacentHTML('beforeend', '<i class="op-rib"></i>');
+    const t = h('h2', { class: 'op-t' }), a = h('p', { class: 'op-a' });
+    const bars = h('div', { class: 'op-bars', 'aria-hidden': 'true' });
+    const hs = [14, 24, 32, 20, 30, 38, 22, 34, 26, 40, 18, 30, 36, 22, 28, 12, 20, 16, 26, 14, 22, 12, 18, 10];
+    hs.forEach(n => bars.append(h('i', { style: 'height:' + Math.round(n * .8) + 'px' })));
+    const pill = h('div', { class: 'op-pill', 'aria-hidden': 'true' }, h('i'));
+    const dots = h('div', { class: 'op-dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'));
+    const l = h('p', { class: 'op-l', role: 'status' });
+    card.append(cw, refl, t, a, bars, pill, dots, l);
+    root.append(bg, cone, back, card);
+    el.player.append(root);
+    ostEl = { root, cov, refl, t, a, l, bars: [...bars.children], id: null };
+    return ostEl;
+  }
+  function ostSync() {
+    if (!ostEl) return;
+    const b = ostBook || S.book, pt = $('#ptitle');
+    const title = b && b.title ? b.title : (pt && pt.firstChild ? pt.firstChild.textContent : '');
+    let au = b ? String(b.authors || '').trim() : (pt && pt.lastChild && pt.lastChild !== pt.firstChild ? pt.lastChild.textContent : '');
+    if (/^unknown/i.test(au)) au = '';
+    ostEl.t.textContent = title; ostEl.a.textContent = au; ostEl.a.hidden = !au;
+    ostEl.l.textContent = OST_LABEL[ostStyleOf()] || '';
+    const id = b ? String(b.id) : '';
+    if (id !== ostEl.id || !ostEl.cov.firstChild) {
+      ostEl.id = id;
+      [ostEl.cov, ostEl.refl].forEach(n => { n.textContent = ''; if (b) n.append(h('div', { class: 'pcover-poster op-poster' }, coverBox(b, 'pcover-art'))); });
+    }
+  }
+  function ostProg(n) {
+    if (!ostEl || !OP.active) return;   // after the book is open the screen only fades out; it keeps its last progress
+    ostEl.root.style.setProperty('--op', String(n));
+    const k = Math.round(n * ostEl.bars.length / 100);
+    ostEl.bars.forEach((x, i) => x.classList.toggle('on', i < k));
+  }
+  function ostShow(on) {
+    clearTimeout(ostTimer);
+    if (on) {
+      if (!ostScreenStyle()) { if (ostEl) ostEl.root.hidden = true; return; }
+      ostBuild(); if (!ostEl) return;
+      ostSync(); ostProg(Math.round(OP.f * 100));
+      ostEl.root.hidden = false;
+      requestAnimationFrame(() => { if (ostEl && OP.active) ostEl.root.classList.add('on'); });
+    } else if (ostEl) {
+      ostEl.root.classList.remove('on');
+      ostTimer = setTimeout(() => { if (ostEl && !ostEl.root.classList.contains('on')) ostEl.root.hidden = true; }, 450);
+    }
   }
   function loadingNote() {
     const head = h('strong', {}, 'Opening the book…'), lbl = h('small');

@@ -1,0 +1,104 @@
+/* Opening styles (Settings > Reading > Opening style): html[data-open-style] = classic | spotlight | aurora | book | ribbon | bloom | bar.
+   classic = 99l-opening.css as before. spotlight / aurora / book / ribbon / bloom = one calm full-screen card (#player > .op-screen, built by 133 `osBuild`)
+   shown while the book opens, faded out when the text is ready. bar = the Play button in the dock becomes a wide bar that fills.
+   --op (0-100) is set on .op-screen and on the play buttons by 133. Remove this file and its build.py line to take the feature out of the look. */
+.op-screen { --acc: var(--accent, #E7B85A); --op-ph: clamp(11rem, 30dvh, 14.5rem); position: absolute; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); background: #07060b; color: #F6EFE3; font-family: var(--font-ui); opacity: 0; transition: opacity .35s var(--ease, ease); overflow: hidden; }
+.op-screen[hidden] { display: none; }
+.op-screen.on { opacity: 1; }
+.op-back { position: absolute; top: calc(.5rem + env(safe-area-inset-top)); inset-inline-start: .6rem; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: inherit; cursor: pointer; z-index: 3; border-radius: 50%; }
+.op-back:focus-visible { outline: var(--focus-w, 2px) solid var(--focus-ring, #fff); outline-offset: 2px; }
+.op-card { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.op-cwrap { position: relative; display: grid; place-items: center; }
+.op-cwrap > * { grid-area: 1 / 1; }
+.op-screen .pcover-poster { height: var(--op-ph); animation: none; box-shadow: 0 20px 60px rgba(120, 96, 230, .35), 0 0 0 1px rgba(255, 255, 255, .06); }
+.op-t { margin: 1.5rem 1.5rem 0; max-width: 20rem; text-align: center; font: 800 clamp(1.45rem, 6.4vw, 1.8rem)/1.15 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+.op-a { margin: .5rem 0 0; color: #B4AEC4; font-size: .9rem; text-align: center; }
+.op-l { margin: .9rem 0 0; min-height: 1em; font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: #B4AEC4; font-weight: 600; text-align: center; }
+/* pieces: all hidden until a style asks for them */
+.op-bg, .op-bg i, .op-cone, .op-r, .op-lite, .op-frame, .op-refl, .op-rib, .op-bars, .op-pill, .op-dots { display: none; }
+.op-refl .pcover-poster { box-shadow: none; }
+@keyframes op-pulse { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(1.05); opacity: 0; } }
+@keyframes op-dot { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+
+/* ---- Spotlight ---- */
+html[data-open-style="spotlight"] .op-screen { --op-ph: clamp(11rem, 30dvh, 14.5rem); justify-content: flex-start; padding-top: calc(16dvh + env(safe-area-inset-top)); }
+html[data-open-style="spotlight"] .op-cone { display: block; position: absolute; left: 50%; top: 0; width: min(90vw, 440px); height: 64%; transform: translateX(-50%); background: linear-gradient(color-mix(in srgb, var(--acc) 30%, transparent), transparent); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
+html[data-open-style="spotlight"] .op-frame { display: block; position: absolute; inset: -9px; border-radius: 22px; padding: 3px; background: conic-gradient(var(--acc) calc(max(var(--op, 0), 6) * 1%), #2a2735 0); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+html[data-open-style="spotlight"] .op-refl { display: flex; align-items: flex-end; justify-content: center; width: 100%; height: 84px; margin-top: 6px; overflow: hidden; transform: scaleY(-1); opacity: .22; -webkit-mask-image: linear-gradient(#000, transparent 80%); mask-image: linear-gradient(#000, transparent 80%); }
+html[data-open-style="spotlight"] .op-t { margin-top: -1rem; }
+html[data-open-style="spotlight"] .op-a { text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; font-weight: 600; margin-top: .9rem; }
+
+/* ---- Aurora glass ---- */
+html[data-open-style="aurora"] .op-bg { display: block; position: absolute; inset: 0; overflow: hidden; }
+html[data-open-style="aurora"] .op-bg i { display: block; position: absolute; border-radius: 50%; filter: blur(64px); }
+html[data-open-style="aurora"] .op-bg i:nth-child(1) { width: 320px; height: 320px; left: -90px; top: -40px; background: #6d4df2; opacity: .75; }
+html[data-open-style="aurora"] .op-bg i:nth-child(2) { width: 280px; height: 280px; right: -110px; top: 36%; background: #d94fa8; opacity: .5; }
+html[data-open-style="aurora"] .op-bg i:nth-child(3) { width: 260px; height: 260px; left: 20px; bottom: -90px; background: #f0b24a; opacity: .4; }
+html[data-open-style="aurora"] .op-card { width: min(82vw, 330px); padding: 2rem 0 1.8rem; border-radius: 40px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
+html[data-open-style="aurora"] .op-screen { --op-ph: clamp(10rem, 28dvh, 14.5rem); }
+html[data-open-style="aurora"] .op-cwrap { transform: rotate(-4deg); }
+html[data-open-style="aurora"] .op-a { color: #D2CCE0; }
+html[data-open-style="aurora"] .op-pill { display: block; width: 70%; height: 10px; margin-top: 1.7rem; border-radius: 5px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+html[data-open-style="aurora"] .op-pill i { display: block; height: 100%; width: calc(max(var(--op, 0), 6) * 1%); border-radius: 5px; background: linear-gradient(90deg, #8f7bff, #ff7ac6, #ffc65c); transition: width .4s; }
+html[data-open-style="aurora"] .op-l { text-transform: none; letter-spacing: 0; font-size: .82rem; font-weight: 400; color: #D2CCE0; }
+
+/* ---- Book opens ---- */
+html[data-open-style="book"] .op-screen, html[data-open-style="ribbon"] .op-screen, html[data-open-style="bloom"] .op-screen { background: radial-gradient(circle at 50% 36%, rgba(110, 90, 220, .36), transparent 58%), #07060b; }
+html[data-open-style="book"] .op-screen { --op-ph: clamp(10rem, 25dvh, 12.5rem); }
+html[data-open-style="book"] .op-lite { display: block; align-self: stretch; justify-self: stretch; border-radius: 6px 14px 14px 6px; background: radial-gradient(circle at 30% 50%, #fff3cf, var(--acc) 55%, #8a5f1c); box-shadow: 0 0 90px 24px color-mix(in srgb, var(--acc) 45%, transparent); }
+html[data-open-style="book"] .op-cov { transform: perspective(900px) rotateY(calc(-20deg - var(--op, 0) * .4deg)); transform-origin: left center; transition: transform .5s; }
+html[data-open-style="book"] .op-t { margin-top: 2rem; }
+html[data-open-style="book"] .op-a { display: none; }
+html[data-open-style="book"] .op-dots { display: flex; gap: 8px; margin-top: 1.3rem; }
+html[data-open-style="book"] .op-dots i, html[data-open-style="ribbon"] .op-dots i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--acc); animation: op-dot 1.2s ease-in-out infinite; }
+html[data-open-style="book"] .op-dots i:nth-child(2) { animation-delay: .2s; } html[data-open-style="book"] .op-dots i:nth-child(3) { animation-delay: .4s; }
+html[data-open-style="book"] .op-l { color: var(--acc); }
+
+/* ---- Ribbon ---- */
+html[data-open-style="ribbon"] .op-screen { --op-ph: clamp(12rem, 36dvh, 19.5rem); }
+html[data-open-style="ribbon"] .op-cwrap .pcover-poster { border-radius: 20px; box-shadow: 0 20px 70px rgba(120, 96, 230, .4), 0 0 0 1px rgba(255, 255, 255, .06); }
+html[data-open-style="ribbon"] .op-rib { display: block; align-self: start; justify-self: end; margin-inline-end: 11%; width: 26px; height: calc(max(var(--op, 0), 12) * .9%); max-height: 90%; z-index: 2; background: linear-gradient(var(--acc), color-mix(in srgb, var(--acc) 72%, #000)); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 90%, 0 100%); filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .4)); transition: height .5s; }
+html[data-open-style="ribbon"] .op-l { color: var(--acc); text-transform: none; letter-spacing: .04em; font-size: .82rem; margin-top: 1.4rem; }
+
+/* ---- Sound bloom ---- */
+html[data-open-style="bloom"] .op-screen { --op-ph: clamp(9rem, 22dvh, 11.5rem); }
+html[data-open-style="bloom"] .op-r { display: block; position: absolute; left: 50%; top: 50%; width: 190%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; border: 1px solid var(--acc); animation: op-pulse 3.2s ease-out infinite; pointer-events: none; }
+html[data-open-style="bloom"] .op-r2 { animation-delay: 1.1s; } html[data-open-style="bloom"] .op-r3 { animation-delay: 2.2s; }
+html[data-open-style="bloom"] .op-t { margin-top: 3.2rem; }
+html[data-open-style="bloom"] .op-bars { display: flex; align-items: center; gap: 3px; height: 34px; margin-top: 1.7rem; }
+html[data-open-style="bloom"] .op-bars i { display: block; width: 4px; border-radius: 2px; background: #2a2735; transition: background .3s; }
+html[data-open-style="bloom"] .op-bars i.on { background: var(--acc); }
+
+@media (prefers-reduced-motion: reduce) { .op-screen, .op-screen * { animation: none !important; transition: none !important; } }
+html[data-lite] .op-screen *, html[data-calm] .op-screen * { animation: none !important; }
+html[data-lite] .op-bg i { filter: none; opacity: .35; }
+
+/* ---- Wide play bar: the dock stays; Play becomes one wide bar that fills while the text opens ---- */
+html[data-open-style="bar"] .player.opening .ctl { flex-wrap: wrap; row-gap: .6rem; }
+html[data-open-style="bar"] .player.opening .ctl .ib { flex: 1; }
+html[data-open-style="bar"] .player.opening #b-play { order: -1; flex: 0 0 100%; width: 100%; height: 3.75rem; border-radius: 2rem; background: var(--surface-2); color: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .6rem; cursor: progress; }
+html[data-open-style="bar"] .player.opening #b-play::before { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(max(var(--op, 0), 6) * 1%); padding: 0; border-radius: 0; background: color-mix(in srgb, var(--accent) 55%, #000); -webkit-mask: none; mask: none; transition: width .4s; }
+html[data-open-style="bar"] .player.opening #b-play::after { content: "Play now"; position: relative; inset: auto; display: block; z-index: 1; font: 700 1rem var(--font-ui); letter-spacing: 0; color: #fff; }
+html[data-open-style="bar"] .player.opening #b-play.queued::after { content: "Starts when ready"; }
+html[data-open-style="bar"] .player.opening #b-play .ic { opacity: 1; position: relative; z-index: 1; color: #fff; }
+
+/* ---- Settings cards: small pictures ---- */
+.os-th { position: relative; display: block !important; background: #07060b; border: 1px solid #2a2735; }
+.os-th i { position: absolute; left: 50%; top: 50%; width: 26px; height: 34px; margin: -17px 0 0 -13px; border-radius: 5px; background: linear-gradient(#d9ceb4 0 45%, #3b2f6b 45%); }
+.os-th b { position: absolute; display: block; }
+.os-th-classic i { top: 22px; width: 22px; height: 28px; margin: -14px 0 0 -11px; }
+.os-th-classic b { left: 20%; right: 20%; top: 56%; height: 5px; border-radius: 3px; background: #1d1d22; box-shadow: 0 10px 0 #1d1d22; }
+.os-th-spot b { left: 50%; top: 0; width: 76%; height: 100%; transform: translateX(-50%); background: linear-gradient(rgba(231, 184, 90, .4), transparent); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
+.os-th-spot i { outline: 2px solid #E7B85A; outline-offset: 3px; }
+.os-th-aurora { background: radial-gradient(circle at 18% 20%, #6d4df2, transparent 55%), radial-gradient(circle at 88% 78%, rgba(217, 79, 168, .8), transparent 55%), #07060b; }
+.os-th-aurora b { inset: 9px 24%; border: 1px solid rgba(255, 255, 255, .25); background: rgba(255, 255, 255, .08); border-radius: 10px; }
+.os-th-aurora i { transform: rotate(-4deg) scale(.8); margin-top: -21px; }
+.os-th-book { background: radial-gradient(circle at 50% 50%, rgba(231, 184, 90, .35), transparent 62%), #07060b; }
+.os-th-book b { left: 50%; top: 50%; width: 26px; height: 34px; margin: -17px 0 0 -13px; border-radius: 3px 6px 6px 3px; background: radial-gradient(circle at 30% 50%, #fff3cf, #E7B85A 60%, #8a5f1c); }
+.os-th-book i { margin-left: -13px; transform: perspective(160px) rotateY(-55deg); transform-origin: left center; z-index: 1; }
+.os-th-ribbon i { width: 30px; height: 40px; margin: -20px 0 0 -15px; }
+.os-th-ribbon b { left: 50%; top: 50%; width: 6px; height: 22px; margin: -20px 0 0 4px; background: #E7B85A; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); z-index: 1; }
+.os-th-bloom b { left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 1px solid rgba(231, 184, 90, .7); box-shadow: 0 0 0 8px rgba(231, 184, 90, .12); }
+.os-th-bar { background: #121418; }
+.os-th-bar i { top: 30%; width: 20px; height: 26px; margin: -13px 0 0 -10px; }
+.os-th-bar b { left: 12%; right: 12%; top: 58%; height: 16px; border-radius: 9px; background: linear-gradient(90deg, #E7B85A 60%, #2a2412 60%); }
