@@ -52,7 +52,7 @@ const pad = n => String(n).padStart(2, '0'), ymd = d => d.getFullYear() + '-' + 
   const seed = { 'wt:onboarded': '1', 'wt:words': JSON.stringify(WORDS), 'wt:prefs': goal(), 'wt:ielts': JSON.stringify({ [ymd(T)]: { l: 4, r: 3, s: 2 }, [lastMonth]: { l: 9, w: 9 } }) };
   const pg = await open(seed); await learn(pg);
   ok(await pg.evaluate(() => !!document.querySelector('.ie-hub')), 'IELTS goal: the Learn hub starts with the IELTS section');
-  ok(await pg.evaluate(() => document.querySelectorAll('.ie-skill').length === 4 && !!document.querySelector('.lhub-tile[data-tile="words"]') && !!document.querySelector('.lhub-tile[data-tile="review"]')), 'four skill cards, and the usual tiles (My Words, Review) are still below');
+  ok(await pg.evaluate(() => document.querySelectorAll('.ie-skill').length === 4 && !!document.querySelector('#shelf-learn [data-tile="words"]') && !!document.querySelector('#shelf-learn [data-tile="review"]')), 'four skill cards, and the usual tiles (My Words, Review) are still below');
   ok(/42 days/.test(await txt(pg, '.ie-exam')) && /target 7\.0/.test(await txt(pg, '.ie-exam')) && /Week 3 of 8/.test(await txt(pg, '.ie-exam')), 'exam card: 42 days, date and target 7.0, Week 3 of 8 (from the seeded dates)');
   ok(/4 sessions/.test(await txt(pg, '.ie-l')) && /3 sessions/.test(await txt(pg, '.ie-r')) && /0 sessions/.test(await txt(pg, '.ie-w')) && /2 sessions/.test(await txt(pg, '.ie-s')), 'real counts from wt:ielts: Listening 4, Reading 3, Writing 0, Speaking 2 (last month\'s 9 + 9 not counted)');
   ok(await pg.evaluate(() => { const f = [...document.querySelectorAll('.ie-focus')]; return f.length === 1 && !!f[0].closest('.ie-w'); }), 'one Focus tag, on Writing (the least practised)');
@@ -78,7 +78,7 @@ const pad = n => String(n).padStart(2, '0'), ymd = d => d.getFullYear() + '-' + 
   // switching goals both ways: the log is never touched
   const logBefore = JSON.stringify(await ielts(pg));
   await pg.evaluate(() => { const c = document.getElementById('in-examon'); c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); }); await pg.waitForTimeout(400); await learn(pg);
-  ok(await pg.evaluate(() => !document.querySelector('.ie-hub')) && await pg.evaluate(() => !!document.querySelector('.lhub-tile[data-tile="words"]')), 'exam off (Learn mode stays): no IELTS section, the tiles are there');
+  ok(await pg.evaluate(() => !document.querySelector('.ie-hub')) && await pg.evaluate(() => !!document.querySelector('#shelf-learn [data-tile="words"]')), 'exam off (Learn mode stays): no IELTS section, the tiles are there');
   await pg.evaluate(() => { const c = document.getElementById('in-learnmode'); c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); }); await pg.waitForTimeout(300);
   await pg.evaluate(() => { const c = document.getElementById('in-learnmode'); c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); const e = document.getElementById('in-examon'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); }); await pg.waitForTimeout(400); await learn(pg);
   ok(JSON.stringify(await ielts(pg)) === logBefore, 'switching Learn off/on and IELTS off/on leaves wt:ielts byte for byte the same');
@@ -86,7 +86,7 @@ const pad = n => String(n).padStart(2, '0'), ymd = d => d.getFullYear() + '-' + 
   ok(JSON.parse(await pg.evaluate(() => localStorage.getItem('wt:words'))).length === 1, 'saved words untouched');
   // learn mode without an exam: no section
   const p2 = await open({ 'wt:onboarded': '1', 'wt:prefs': goal({ exam: null }) }); await learn(p2);
-  ok(await p2.evaluate(() => !document.querySelector('.ie-hub') && !!document.querySelector('.lhub-grid')), 'Learn English (no exam): no IELTS section, tiles as before');
+  ok(await p2.evaluate(() => !document.querySelector('.ie-hub') && !!document.querySelector('.lsc-list')), 'Learn English (no exam): no IELTS section, tiles as before');
   // exam on, no date, empty log: calm start
   const p3 = await open({ 'wt:onboarded': '1', 'wt:prefs': goal({ exam: { on: true, kind: 'ielts', date: '', target: null, from } }) }); await learn(p3);
   ok(/When is your exam/.test(await txt(p3, '.ie-exam')) && await p3.evaluate(() => document.querySelectorAll('.ie-skill').length === 4 && document.querySelectorAll('.ie-focus').length === 0) && /Today.s plan/i.test(await txt(p3, '.ie-today')), 'no date and no practice yet: "When is your exam?", four cards at 0, no Focus tag, Today opens the plan');

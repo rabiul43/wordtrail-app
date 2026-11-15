@@ -1,0 +1,88 @@
+/* Learn screen (169w-learn-screen.js), drawn from the mock-up. Only .lsc-* classes, plus the Learn-screen scoped bits at the end (hidden app bar, bar pill).
+   Colours come from the theme variables; the Black theme (the mock-up's look) gets the exact values below. Remove this file, 169w and their build.py lines to go back to the tile grid. */
+#shelf-learn.lsc {
+  --lsc-bg: var(--bg); --lsc-card: var(--surface); --lsc-line: var(--line); --lsc-gold: var(--accent); --lsc-gold-ink: var(--accent-ink);
+  --lsc-review-bg: var(--accent-soft); --lsc-review-line: color-mix(in srgb, var(--accent) 32%, var(--bg));
+  --lsc-gold-tile: color-mix(in srgb, var(--accent) 18%, var(--surface)); --lsc-gold-c: var(--accent);
+  --lsc-blue-c: #6F93C9; --lsc-red-c: #E8836E; --lsc-green-c: #5CC4A6;
+  --lsc-blue-tile: color-mix(in srgb, var(--lsc-blue-c) 16%, var(--surface)); --lsc-red-tile: color-mix(in srgb, var(--lsc-red-c) 16%, var(--surface)); --lsc-green-tile: color-mix(in srgb, var(--lsc-green-c) 16%, var(--surface));
+  box-sizing: border-box; width: 100%; padding: 0 0 1.5rem; max-width: 40rem; margin: 0 auto; font-family: var(--font-ui); color: var(--ink);
+}
+:root[data-theme="black"] #shelf-learn.lsc {
+  --lsc-bg: #0A0A0B; --lsc-card: #141416; --lsc-line: #26262A; --lsc-review-bg: #1B1710; --lsc-review-line: #4A3B1B;
+  --lsc-gold-tile: #332C20; --lsc-blue-tile: #262D39; --lsc-red-tile: #372926; --lsc-green-tile: #22312E; --lsc-blue-c: #7C9FD6; --lsc-red-c: #EE8B76; --lsc-green-c: #5FCDB0;
+}
+:root[data-theme="contrast"] #shelf-learn.lsc { --lsc-gold-ink: #000; --lsc-blue-c: #FFF; --lsc-red-c: #FFF; --lsc-green-c: #FFF; --lsc-gold-tile: #000; --lsc-blue-tile: #000; --lsc-red-tile: #000; --lsc-green-tile: #000; }
+
+/* header */
+.lsc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: max(1.35rem, env(safe-area-inset-top, 0px)) .15rem 1.2rem; }
+.lsc-head__t { min-width: 0; }
+.lsc-title { margin: 0; font: 800 2.35rem/1.05 var(--font-display); letter-spacing: -.015em; color: var(--ink); }
+.lsc-sub { margin: .45rem 0 0; font: 500 .95rem/1.3 var(--font-ui); color: var(--muted); }
+.lsc-avatar { flex: none; width: 2.9rem; height: 2.9rem; margin: .15rem .1rem 0 0; padding: 0; border-radius: 50%; border: 2px solid var(--lsc-gold); background: var(--surface-2); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:root[data-theme="black"] .lsc-avatar { background: #26262A; }
+.lsc-avatar:focus-visible, .lsc-hero:focus-visible, .lsc-review:focus-visible, .lsc-row:focus-visible { outline: var(--focus-w, 3px) solid var(--focus-ring, var(--lsc-gold)); outline-offset: 2px; }
+
+/* Today card */
+.lsc-hero { display: flex; align-items: center; gap: 1.4rem; width: calc(100% + .2rem); box-sizing: border-box; margin: 0 -.1rem; padding: 1.4rem 1.5rem; text-align: left; font: inherit; color: var(--lsc-gold-ink); background: var(--lsc-gold); border: 0; border-radius: 30px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lsc-hero:active { transform: scale(.985); }
+.lsc-ring { flex: none; width: 5rem; height: 5rem; display: block; }
+.lsc-ring svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.lsc-ring circle { fill: none; }
+.lsc-ring__track { stroke: color-mix(in srgb, var(--lsc-gold-ink) 22%, transparent); stroke-width: 9; }
+.lsc-ring__fill { stroke: var(--lsc-gold-ink); stroke-width: 9; stroke-linecap: round; }
+.lsc-ring .lsc-ring__dot { fill: var(--lsc-gold-ink); }
+.lsc-ring__play { fill: var(--lsc-gold-ink); stroke: none; }
+.lsc-hero__txt { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.lsc-hero__k { font: 800 .78rem/1.2 var(--font-ui); letter-spacing: .14em; color: color-mix(in srgb, var(--lsc-gold-ink) 62%, transparent); }
+.lsc-hero__n { margin-top: .1rem; font: 800 1.7rem/1.15 var(--font-display); letter-spacing: -.01em; }
+.lsc-hero__go { margin-top: .5rem; padding: .45rem 1.1rem; font: 700 .95rem/1.2 var(--font-ui); color: #F3EEE3; background: #1A1405; border-radius: 999px; }
+:root[data-theme="contrast"] .lsc-hero__go { color: #FFE600; background: #000; }
+
+/* Review row */
+.lsc-review { display: flex; align-items: center; gap: .9rem; width: calc(100% + .2rem); box-sizing: border-box; margin: .75rem -.1rem 0; padding: .95rem 1rem .95rem 1rem; text-align: left; font: inherit; color: var(--ink); background: var(--lsc-review-bg); border: 1px solid var(--lsc-review-line); border-radius: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lsc-count { flex: none; min-width: 2.35rem; box-sizing: border-box; padding: .5rem .45rem; text-align: center; font: 800 1.05rem/1 var(--font-ui); color: var(--lsc-gold-ink); background: var(--lsc-gold); border-radius: 999px; font-variant-numeric: tabular-nums; }
+:root[data-theme="black"] .lsc-count { background: #E0B15A; }
+:root[data-calm] .lsc-count { display: none; }
+
+/* groups and rows */
+.lsc-group { margin: 1.75rem -.1rem 0; }
+#shelf-learn .lsc-label { margin: 0 0 .6rem; padding: 0 .35rem; font: 700 .76rem/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.lsc-list { display: flex; flex-direction: column; gap: .56rem; }
+.lsc-row { display: flex; align-items: center; gap: .9rem; width: 100%; box-sizing: border-box; margin: 0; padding: .72rem 1rem; text-align: left; font: inherit; color: var(--ink); background: var(--lsc-card); border: 1px solid var(--lsc-line); border-radius: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.lsc-row:active, .lsc-review:active { filter: brightness(1.15); }
+.lsc-row__txt { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: .12rem; }
+.lsc-row__t { font: 800 1.03rem/1.2 var(--font-ui); color: var(--ink); }
+.lsc-row__s { font: 500 .88rem/1.25 var(--font-ui); color: var(--muted); }
+.lsc-go { flex: none; width: 1rem; height: 1rem; display: block; opacity: .75; }
+.lsc-go svg { display: block; width: 100%; height: 100%; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+[dir="rtl"] .lsc-go { transform: scaleX(-1); }
+
+/* icon tiles */
+.lsc-ic { flex: none; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; border-radius: 12px; }
+.lsc-ic svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.lsc-ic--gold { color: var(--lsc-gold-c); background: var(--lsc-gold-tile); }
+.lsc-ic--blue { color: var(--lsc-blue-c); background: var(--lsc-blue-tile); }
+.lsc-ic--red { color: var(--lsc-red-c); background: var(--lsc-red-tile); }
+.lsc-ic--green { color: var(--lsc-green-c); background: var(--lsc-green-tile); }
+:root[data-theme="contrast"] .lsc-ic { border: 1px solid #FFF; }
+:root[data-theme="contrast"] .lsc-row, :root[data-theme="contrast"] .lsc-review { border-color: #FFF; }
+@media (min-width: 700px) { #shelf-learn.lsc { padding-top: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .lsc-hero:active { transform: none; } }
+
+/* Learn screen only, on phones: the title is drawn by the screen itself, so the shared header bar steps aside; the bottom bar lights the active tab as a pill */
+@media (max-width: 699.98px) {
+  html:has(#shelf[data-mode="learn"]:not([hidden])) #appbar { display: none; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) #shelf > .tab-head { display: none; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tabbar { padding-top: .35rem; padding-bottom: max(1.45rem, env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--line); }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab { min-height: 0; gap: 0; padding-top: 0; padding-bottom: 0; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab::before { display: none; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab .tab-ic { width: 3.75rem; height: 2.2rem; margin-bottom: -.2rem; display: grid; place-items: center; background: transparent; border-radius: 999px; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] { color: var(--accent); }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic { margin-top: .5rem; background: var(--accent-soft); }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic + span { margin-top: .2rem; }
+  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] svg { transform: none; animation: none; fill: none; }
+}
+:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) .tabbar { background: #0F0F11; border-top-color: #26262A; }
+:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic { background: #292418; }
+:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])), :root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) body { background: #0A0A0B; }

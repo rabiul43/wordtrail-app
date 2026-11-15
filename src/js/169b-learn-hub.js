@@ -14,6 +14,7 @@
        LearnHub.shown(ctx)      the tiles that pass show, sorted (the hub and 169e draw these; list() still returns every registered tile)
        LearnHub.onChange(fn)    fn() runs on every LearnHub.refresh() (169e redraws its open sheet)
        LearnHub.head(fn)        fn() returns a node (or null) drawn ABOVE the tiles each time the hub is drawn; used by the IELTS hub (169o) when an exam is on
+       LearnHub.headNodes()  the nodes of every head (169w draws them above its own cards)
        LearnHub.unregister(id)  LearnHub.has(id)  LearnHub.list()  LearnHub.refresh()  (redraws when Learn is on screen)
      The hub is drawn by LSW.render (169), each time Learn opens. A tile whose functions throw is skipped, never the whole hub.
      Styles 94h-learn-hub.css. Tiles that are registered here: My Words, Review (at the end of this file). */
@@ -53,7 +54,7 @@
       host.textContent = ''; top.forEach(n => host.append(n)); if (ts.length) host.append(grid);
     }
     function refresh() { hooks.forEach(fn => { try { fn(); } catch (e) { /* a broken hook is skipped */ } }); if (!$('#shelf-learn').hidden) applyShelfMode(); }
-    return { head: fn => { if (typeof fn === 'function' && heads.indexOf(fn) < 0) heads.push(fn); }, register, unregister, has: id => tiles.some(x => x.id === id), list, shown, onChange: fn => { if (typeof fn === 'function' && hooks.indexOf(fn) < 0) hooks.push(fn); }, tile, draw, refresh };
+    return { headNodes: () => { const top = []; heads.forEach(fn => { try { const n = fn(); if (n) top.push(n); } catch (e) { /* a broken head is skipped */ } }); return top; }, head: fn => { if (typeof fn === 'function' && heads.indexOf(fn) < 0) heads.push(fn); }, register, unregister, has: id => tiles.some(x => x.id === id), list, shown, onChange: fn => { if (typeof fn === 'function' && hooks.indexOf(fn) < 0) hooks.push(fn); }, tile, draw, refresh };
   })();
   LSW.render = LearnHub.draw;
 
