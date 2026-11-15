@@ -56,13 +56,12 @@
     paintOpen();
   }
   /* ---------- Opening style screen (Settings > Reading > Opening style) ----------
-     While a book opens, spotlight | aurora | book | ribbon | bloom show ONE calm full-screen card (cover, title, author, a progress cue) instead of the
-     player, and fade to the reader when the text is ready. The person never sees steps or placeholder lines. classic = the page as before;
-     bar = the player stays but its Play button becomes a wide bar that fills (css only, 99l2). The look is all CSS (html[data-open-style]);
+     While a book opens, spotlight | bloom show ONE calm full-screen card (cover, title, author, a progress cue) instead of the
+     player, and fade to the reader when the text is ready. The person never sees steps or placeholder lines. classic = the page as before. The look is all CSS (html[data-open-style]);
      this code only builds the pieces, copies the book's cover/title and sets --op (0-100). Nothing runs on an audio tick. */
-  const OST_LABEL = { aurora: 'Getting your book ready', bloom: 'Tuning in', book: 'Opening\u2026', ribbon: 'Marking your place\u2026' };
+  const OST_LABEL = { bloom: 'Tuning in' };
   let ostEl = null, ostBook = null, ostTimer = 0;
-  const ostScreenStyle = () => ['spotlight', 'aurora', 'book', 'ribbon', 'bloom'].indexOf(ostStyleOf()) >= 0;
+  const ostScreenStyle = () => ['spotlight', 'bloom'].indexOf(ostStyleOf()) >= 0;
   function ostSet(b) { ostBook = b || null; if (ostEl) ostSync(); }
   function ostBuild() {
     if (ostEl || !el.player) return ostEl;
@@ -70,22 +69,19 @@
     const back = h('button', { class: 'op-back', type: 'button', 'aria-label': 'Back' });
     back.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-back"/></svg>';
     back.addEventListener('click', () => { const x = $('#btn-back'); if (x) x.click(); });
-    const bg = h('div', { class: 'op-bg', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'));
     const cone = h('div', { class: 'op-cone', 'aria-hidden': 'true' });
     const card = h('div', { class: 'op-card' });
     const cov = h('div', { class: 'op-cov' }), refl = h('div', { class: 'op-refl', 'aria-hidden': 'true' });
     const cw = h('div', { class: 'op-cwrap', 'aria-hidden': 'true' });
-    cw.innerHTML = '<i class="op-r"></i><i class="op-r op-r2"></i><i class="op-r op-r3"></i><div class="op-lite"></div><i class="op-frame"></i>';
-    cw.append(cov); cw.insertAdjacentHTML('beforeend', '<i class="op-rib"></i>');
+    cw.innerHTML = '<i class="op-r"></i><i class="op-r op-r2"></i><i class="op-r op-r3"></i><i class="op-frame"></i>';
+    cw.append(cov);
     const t = h('h2', { class: 'op-t' }), a = h('p', { class: 'op-a' });
     const bars = h('div', { class: 'op-bars', 'aria-hidden': 'true' });
     const hs = [14, 24, 32, 20, 30, 38, 22, 34, 26, 40, 18, 30, 36, 22, 28, 12, 20, 16, 26, 14, 22, 12, 18, 10];
     hs.forEach(n => bars.append(h('i', { style: 'height:' + Math.round(n * .8) + 'px' })));
-    const pill = h('div', { class: 'op-pill', 'aria-hidden': 'true' }, h('i'));
-    const dots = h('div', { class: 'op-dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'));
     const l = h('p', { class: 'op-l', role: 'status' });
-    card.append(cw, refl, t, a, bars, pill, dots, l);
-    root.append(bg, cone, back, card);
+    card.append(cw, refl, t, a, bars, l);
+    root.append(cone, back, card);
     el.player.append(root);
     ostEl = { root, cov, refl, t, a, l, bars: [...bars.children], id: null };
     return ostEl;
@@ -101,6 +97,13 @@
     const id = b ? String(b.id) : '';
     if (id !== ostEl.id || !ostEl.cov.firstChild) {
       ostEl.id = id;
+      /* the card takes its colour from the cover (coverColor in 100: same colour the app accent uses) */
+      const rs = ostEl.root.style; rs.removeProperty('--acc'); rs.removeProperty('--acc-bg');
+      if (b) coverColor(b).then(c => {
+        if (!ostEl || ostEl.id !== id || !c) return;
+        const hu = Math.round(c.h), sa = Math.max(55, Math.min(88, Math.round(c.s || 60)));
+        rs.setProperty('--acc', 'hsl(' + hu + ' ' + sa + '% 62%)'); rs.setProperty('--acc-bg', 'hsl(' + hu + ' ' + Math.round(sa * .55) + '% 6%)');
+      }).catch(() => { /* keep the app accent */ });
       [ostEl.cov, ostEl.refl].forEach(n => { n.textContent = ''; if (b) n.append(h('div', { class: 'pcover-poster op-poster' }, coverBox(b, 'pcover-art'))); });
     }
   }

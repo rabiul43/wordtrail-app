@@ -395,7 +395,7 @@
     }));
     applyOpenStyle(); ostSegSync();   // Opening style (090): the first-paint script already set it; this keeps it in step with P
     $$('#seg-opstyle button').forEach(b => b.addEventListener('click', () => {
-      P.openStyle = OST_ALL.indexOf(b.dataset.v) >= 0 ? b.dataset.v : 'classic'; savePrefs(); applyOpenStyle(); ostSegSync();
+      P.openStyle = OST_ALL.indexOf(b.dataset.v) >= 0 ? b.dataset.v : 'classic'; savePrefs(); try { localStorage.setItem('wt:openstyle', P.openStyle); } catch (e) { /* storage blocked */ } applyOpenStyle(); ostSegSync();
       toast('Opening style: ' + OST_NAME[P.openStyle], 2000);
     }));
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyHome); } catch (e) { /* old browser: applies on the next start */ }

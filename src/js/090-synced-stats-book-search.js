@@ -689,8 +689,8 @@
   const playerStyleOf = () => P.playerStyle === 'clean' ? 'clean' : 'glass';
   function applyPlayerStyle() { document.documentElement.setAttribute('data-player-style', playerStyleOf()); }
   /* Opening style (Settings > Reading): <html data-open-style> picks the screen shown while a book opens (99l2 css; screen built by 133). Saved as P.openStyle (synced with the other settings). */
-  const OST_ALL = ['classic','spotlight','aurora','book','ribbon','bloom','bar'];
-  const OST_NAME = { classic: 'Classic', spotlight: 'Spotlight', aurora: 'Aurora glass', book: 'Book opens', ribbon: 'Ribbon', bloom: 'Sound bloom', bar: 'Wide play bar' };
+  const OST_ALL = ['classic','spotlight','bloom'];
+  const OST_NAME = { classic: 'Classic', spotlight: 'Spotlight', bloom: 'Sound bloom' };
   const ostStyleOf = () => OST_ALL.indexOf(P.openStyle) >= 0 ? P.openStyle : 'classic';
   function applyOpenStyle() { document.documentElement.setAttribute('data-open-style', ostStyleOf()); }
   function ostSegSync() { const v = ostStyleOf(); $$('#seg-opstyle button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }

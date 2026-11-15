@@ -339,8 +339,10 @@
   const learnOn = () => { try { return GL.tabOn(); } catch (e) { return false; } };
   /* Player style (Playback + Sleep timer sheets): 'clean' | 'glass'. Settings saved before this existed keep 'clean'; a fresh install (nothing saved yet) gets 'glass'. The first-paint script in 00-head.html uses the same rule. */
   if (P.playerStyle !== 'clean' && P.playerStyle !== 'glass') P.playerStyle = Object.keys(window.__wtP || {}).length ? 'clean' : 'glass';
-  /* Opening style (the screen shown while a book opens, Settings > Reading). Settings saved before this existed keep 'classic'; a fresh install gets 'aurora'. Same rule as the first-paint script in 00-head.html. */
-  if (['classic','spotlight','aurora','book','ribbon','bloom','bar'].indexOf(P.openStyle) < 0) P.openStyle = Object.keys(window.__wtP || {}).length ? 'classic' : 'aurora';
+  /* Opening style (the screen shown while a book opens, Settings > Reading). Settings saved before this existed keep 'classic'; a fresh install gets 'spotlight'. Same rule as the first-paint script in 00-head.html. */
+  /* The choice is also kept under its own key (wt:openstyle, this device): a settings sync or restore that brings back older settings can not undo it. */
+  try { const o2 = localStorage.getItem('wt:openstyle'); if (['classic','spotlight','bloom'].indexOf(o2) >= 0) P.openStyle = o2; } catch (e) { /* storage blocked */ }
+  if (['classic','spotlight','bloom'].indexOf(P.openStyle) < 0) P.openStyle = Object.keys(window.__wtP || {}).length ? 'classic' : 'spotlight';
   /* Haptics: one small vocabulary of vibrations, used the same way everywhere. Off switch: Settings > Audio. */
   guideDoc('audio', 'Haptic feedback', "Small vibrations when you tap play, skip, change speed and reach your goal. Turn them off in Settings > Audio.");
   const HAPTIC = { tick: 6, light: 10, medium: 16, heavy: 26, success: [16, 50, 28], goal: [20, 60, 20, 60, 44] };
