@@ -261,6 +261,7 @@ PARTS = [
     ('file', 'src/js/sound/opening-sound.js'),
     ('file', 'src/js/sound/story-rules.js'),
     ('file', 'src/js/sound/story-sounds.js'),
+    ('file', 'src/js/sound/ambient-spot.js'),
     ('file', 'src/js/sound/story-engine.js'),
     ('file', 'src/js/sound/story-transitions.js'),
     ('file', 'src/js/sound/ambient-intensity.js'),

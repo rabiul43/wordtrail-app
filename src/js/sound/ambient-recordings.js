@@ -58,18 +58,18 @@
     Object.keys(AMB.live).forEach(x => { if (AMB_REC_KEYS.has(x) && (!k || x === k)) ambLayerOff(x); });
     ambApply(0.6);
   }
+  const AMB_R2 = 'https://pub-94b7e1b846f843dfbe430f5b3caf7680.r2.dev/';
   async function ambRecManifest() {
-    const set = (d, base) => { if (!d || typeof d !== 'object') return; AMB.recMap = {}; Object.keys(d).forEach(k => { const m = d[k]; if (AMB_REC_KEYS.has(k) && m && m.file) { try { AMB.recMap[k] = { url: new URL(m.file, base).href, by: m.by || '', license: m.license || '' }; } catch (e) { /* bad address */ } } }); };
+    const set = (d) => { if (!d || typeof d !== 'object') return; AMB.recMap = {}; Object.keys(d).forEach(k => { const m = d[k]; if (AMB_REC_KEYS.has(k) && m && m.file) { try { AMB.recMap[k] = { url: new URL(m.file, AMB_R2).href, by: m.by || '', license: m.license || '' }; } catch (e) { /* bad address */ } } }); };
     try {
       const c = store.get('wt:ambrec', null);
-      if (c && c.d) set(c.d, c.base);
+      if (c && c.d) set(c.d);
       if (c && Date.now() - c.t < 24 * 3600e3) return;
-      const base = 'https://raw.githubusercontent.com/' + ghCfg().repo + '/main/';
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-      const r = await fetch(base + 'recordings.json', { signal: ctl.signal }); clearTimeout(to);
+      const r = await fetch(AMB_R2 + 'recordings.json', { signal: ctl.signal }); clearTimeout(to);
       if (!r.ok) return;
-      const d = await r.json(); set(d, base); store.set('wt:ambrec', { t: Date.now(), d, base }); ambRecPaint();
-    } catch (e) { /* offline, or no recordings.json in the repo yet */ }
+      const d = await r.json(); set(d); store.set('wt:ambrec', { t: Date.now(), d }); ambRecPaint();
+    } catch (e) { /* offline or CORS not set yet */ }
   }
   function ambRecPaint() {
     $$('#seg-ambsrc button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (P.ambSrc || 'hybrid'))));

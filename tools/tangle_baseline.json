@@ -1,9 +1,9 @@
 {
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
-  "files": 142,
-  "dependencies": 978,
-  "pointing_to_a_later_file": 278,
+  "files": 143,
+  "dependencies": 981,
+  "pointing_to_a_later_file": 279,
   "largest_cycle": 95
  },
  "dependencies": [
@@ -822,7 +822,6 @@
   "sound/ambient-mix.js -> sound/sound-screen.js",
   "sound/ambient-recordings.js -> 030-helpers-offline-audio.js",
   "sound/ambient-recordings.js -> 080-ui-shell-favourites.js",
-  "sound/ambient-recordings.js -> 180-sync-alignment.js",
   "sound/ambient-recordings.js -> 270-sheets-nextup-back.js",
   "sound/ambient-recordings.js -> sound/ambient-engine.js",
   "sound/ambient-recordings.js -> sound/ambient-layers.js",
@@ -838,6 +837,10 @@
   "sound/ambient-scenes.js -> sound/ambient-intensity.js",
   "sound/ambient-scenes.js -> sound/ambient-mix.js",
   "sound/ambient-scenes.js -> sound/sound-screen.js",
+  "sound/ambient-spot.js -> sound/ambient-recordings.js",
+  "sound/ambient-spot.js -> sound/ambient-scenes.js",
+  "sound/ambient-spot.js -> sound/sound-cache.js",
+  "sound/ambient-spot.js -> sound/story-sounds.js",
   "sound/ambient-synth.js -> 150-player-reader.js",
   "sound/ambient-synth.js -> sound/ambient-scenes.js",
   "sound/ambient-synth.js -> sound/story-sounds.js",
