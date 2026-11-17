@@ -17,6 +17,9 @@
      right = Good, one letter off = Hard, wrong or missed = Again; with Show first letters on, a right word counts as Hard). Once per word per session.
      Storage: no key of its own (results live in memory until the next session: LN.last()); My Words entries are changed only through WS.update / WS.saveWithContext.
      Setting: none. Words are in src/i18n/*.json.
+     Task 6 (level, 169x): from the 6th answered sentence on, the 10 sentences are picked AROUND the learner's level (`LNC.pickSet(..., { target, d })`) and one word
+     (Comfortable / Stretching / Challenging) tells how the set sits against it; every finished or closed session updates the level (`wt:lvl`, this device only).
+     No level yet = the first 10 sentences as before. Hooks are marked "level"; the rest of the file does not know about it.
      Registered in the Learn hub (169b) as the tile "Listen and type"; the same tile is in the player's "Study this chapter" sheet (169e).
        LNC.check(typed, target, V)   pure (V = LNC.variants(list), optional): { words: [{ w, v: ok|close|no|miss, t, alt? }], nVar, tw: [{ w, v: ok|close|no|extra }], extra: [typed words], ok, close, wrong, miss, nExtra, total, v: ok|near|no }
        LNC.variants(list)   pure: Map word -> [{ w, side }] from "uk|us" pairs   LNC.diff(typed, target)   pure: { tgt, typ: [{ c, bad }], n, why }
@@ -133,11 +136,16 @@
       const errors = wrong + miss + nExtra;
       return { words: ws, tw, extra, ok, close, wrong, miss, nExtra, nVar: ws.filter(x => x.alt).length, total: n, v: n > 0 && errors === 0 ? (close === 0 ? 'ok' : 'near') : 'no' };
     }
-    /* up to `size` sentence numbers for one session: from k to the end of the track, then from its start; texts[i] is the sentence, hidden(i) true when it is not narrated */
-    function pickSet(texts, hidden, k, size) {
+    /* up to `size` sentence numbers for one session: from k to the end of the track, then from its start; texts[i] is the sentence, hidden(i) true when it is not narrated.
+       Task 6 (level): `opt = { target, d }` is optional. target = the learner's level (0..100) and d(i) = the difficulty of sentence i (see 169x). With both,
+       the session is built AROUND the level instead of taking the first 10: about 6 slightly above it (0 to 14 points: where learning happens), 2 a little below
+       it and 2 easy (more than 6 below, for confidence), the easiest of those first. A missing bucket is filled with the sentences nearest to level + 5.
+       Same rules for what may be picked (not hidden, not a heading, 3 to 20 words, no repeats). Without `opt` (no level yet) nothing changes. */
+    function pickSet(texts, hidden, k, size, opt) {
       const n = Array.isArray(texts) ? texts.length : 0, want = size > 0 ? size : SIZE, out = [], seen = new Set();
+      const lvl = !!(opt && typeof opt.d === 'function' && typeof opt.target === 'number' && isFinite(opt.target)), cap = lvl ? n : want;
       const take = i => {
-        if (out.length >= want || hidden(i)) return;
+        if (out.length >= cap || hidden(i)) return;
         const t = str(texts[i]); if (!/\p{Ll}/u.test(t)) return;   // a heading in capitals, or no letters
         const c = words(t).length, key = t.trim().toLowerCase();
         if (c < MIN_W || c > MAX_W || seen.has(key)) return;
@@ -146,7 +154,18 @@
       const s = Math.max(0, Math.min(k | 0, n - 1));
       for (let i = s; i < n; i++) take(i);
       for (let i = 0; i < s; i++) take(i);
-      return out;
+      if (!lvl || out.length <= want) return out.slice(0, want);
+      const L = opt.target, items = out.map((i, pos) => { const v = opt.d(i), d = typeof v === 'number' && isFinite(v) ? v : L; return { i, pos, d }; }), used = new Set(), pick = [];
+      const near = (list, c, m) => { list.slice().sort((a, b) => Math.abs(a.d - c) - Math.abs(b.d - c) || a.pos - b.pos).slice(0, m).forEach(x => { if (!used.has(x.pos)) { used.add(x.pos); pick.push(x); } }); };
+      const nEasy = want >= 5 ? Math.max(1, Math.round(want * 0.2)) : 0, nNear = want >= 5 ? Math.max(1, Math.round(want * 0.2)) : 0, nUp = want - nEasy - nNear;
+      near(items.filter(x => x.d - L < -6), L - 10, nEasy);
+      near(items.filter(x => x.d - L >= -6 && x.d - L < 0), L - 3, nNear);
+      near(items.filter(x => x.d - L >= 0 && x.d - L <= 14), L + 6, nUp);
+      near(items.filter(x => !used.has(x.pos)), L + 5, want - pick.length);
+      pick.sort((a, b) => a.pos - b.pos);
+      const e = pick.findIndex(x => x.d - L < -6);
+      if (want >= 5 && e > 0) pick.unshift(pick.splice(e, 1)[0]);   // an easy one first
+      return pick.map(x => x.i);
     }
     /* the hint line, one piece per word: "___" (letters), "s__" (letters and first letter) or "s…" (first letter only); [] when no hint is on */
     function pattern(target, hint, first) {
@@ -178,7 +197,7 @@
   })();
 
   const LN = (() => {
-    const st = { on: false, p: null, set: [], i: 0, step: '', plays: 0, hint: false, first: false, snap: null, tok: 0, watch: 0, playing: false, fail: false, res: [], chk: null, graded: new Set() };
+    const st = { on: false, p: null, set: [], i: 0, step: '', plays: 0, hint: false, first: false, snap: null, tok: 0, watch: 0, playing: false, fail: false, res: [], chk: null, graded: new Set(), dif: {}, word: '' };
     let last = null, VM = null;
     const q = id => document.getElementById(id);
     const hid = k => { const s = S.model && st.p && S.model.sents[st.p.ids[k]]; return !s || !!s.h; };
@@ -268,7 +287,7 @@
     /* ----- the screen ----- */
     function paintPlay() {
       q('lt-play').classList.toggle('is-playing', st.playing);
-      q('lt-plays').textContent = st.plays ? 'Played ' + st.plays + (st.plays === 1 ? ' time' : ' times') + ' · tap 🐢 for slow' : '';
+      q('lt-plays').textContent = st.plays ? 'Played ' + st.plays + (st.plays === 1 ? ' time' : ' times') + ' · tap the turtle for slow' : '';
       q('lt-status').textContent = st.fail ? 'The audio did not start. Tap the speaker to try again.' : '';
     }
     function paint() {
@@ -277,6 +296,7 @@
       q('lt-main').hidden = end; q('lt-end').hidden = !end;
       q('lt-pos').textContent = end ? '' : 'Sentence ' + (st.i + 1) + ' of ' + n; q('lt-sep').hidden = end;
       q('lt-ch').textContent = chapterOf(st.p.ids[st.set[Math.min(st.i, n - 1)]]);
+      q('lt-lv').textContent = end ? '' : st.word; q('lt-lv-w').hidden = end || !st.word;   // level: one word, never a number
       const pr = q('lt-prog'), pct = Math.round(100 * (end ? n : st.i + (done ? 1 : 0)) / n);
       pr.setAttribute('aria-valuenow', String(pct)); pr.style.setProperty('--wl-p', pct + '%');
       const fl = perfect(); q('lt-flame-n').textContent = String(fl); q('lt-flame').setAttribute('aria-label', fl + ' perfect so far');
@@ -397,10 +417,15 @@
       if (!S.book || !S.model || !p) { toast('Open a book that has its text lined up with the audio first.', 4000); return false; }
       st.p = p;
       const texts = p.ids.map(id => { const s = S.model.sents[id]; return s ? s.t : ''; });
-      const set = LNC.pickSet(texts, hid, Core.locate(p.starts, nowT() + P.nudge), LNC.SIZE);
+      /* level (169x): aim the 10 sentences at the learner's level; no level yet (under 5 answers) = the first 10 as before */
+      const dur = i => (i + 1 < p.starts.length && p.starts[i + 1] > p.starts[i] ? p.starts[i + 1] - p.starts[i] : null), dif = i => LVX.d(texts[i], dur(i));
+      let target = null; try { target = LVX.target('type'); } catch (e) { target = null; }
+      const set = LNC.pickSet(texts, hid, Core.locate(p.starts, nowT() + P.nudge), LNC.SIZE, target == null ? null : { target, d: dif });
       if (!set.length) { toast('This track has no sentences to type. Try another track.', 4000); return false; }
       st.snap = { bookId: String(S.book.id), sec: S.sec, time: nowT(), playing: !audio.paused && !audio.ended };
       st.on = true; st.set = set; st.i = 0; st.res = []; st.playing = false; st.graded = new Set();
+      st.dif = {}; st.word = '';
+      try { set.forEach(i => { st.dif[i] = dif(i); }); if (target != null) st.word = LVX.word('type', set.map(i => st.dif[i])); } catch (e) { st.dif = {}; st.word = ''; }   // level: never stops a session
       stopAudio();
       openSheet('sheet-lt');
       if (window.visualViewport) { window.visualViewport.addEventListener('resize', vv); window.visualViewport.addEventListener('scroll', vv); vv(); }
@@ -413,6 +438,7 @@
       halt(); stopAudio();
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vv); window.visualViewport.removeEventListener('scroll', vv); }
       const sh = q('sheet-lt'); sh.style.height = ''; sh.style.top = '';
+      try { LVX.record('type', st.res.filter(r => r && st.dif[r.k] != null).map(r => ({ d: st.dif[r.k], o: LVE.outcome(r) }))); } catch (e) { /* the level is only a helper */ }
       if (st.res.some(Boolean)) last = { bookId: String(S.book ? S.book.id : ''), title: S.book ? S.book.title || '' : '', sec: S.sec, ts: Date.now(), res: st.res.filter(Boolean).map(r => Object.assign({}, r)) };
       const snap = st.snap; st.snap = null;
       if (!snap || !S.book || String(S.book.id) !== snap.bookId) return;
@@ -441,7 +467,7 @@
   })();
 
   LearnHub.register({
-    id: 'listentype', order: 50, icon: '✍', title: 'Listen and type', subtitle: 'Type what you hear',
+    id: 'listentype', order: 50, icon: '#i-m-pen', title: 'Listen and type', subtitle: 'Type what you hear',
     playerSubtitle: ctx => (ctx && ctx.time ? 'Starts at ' + fmt(ctx.time) : 'Type what you hear'),
     open: () => { LN.start(); }
   });

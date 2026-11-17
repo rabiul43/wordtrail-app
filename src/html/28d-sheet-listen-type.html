@@ -2,17 +2,17 @@
   <header class="lt-head">
     <button id="lt-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     <div id="lt-prog" class="wl-progress lt-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this session"><span class="wl-progress__fill"></span></div>
-    <span id="lt-flame" class="wl-pill lt-flame" role="img" aria-label=""><span aria-hidden="true">&#128293;</span> <span id="lt-flame-n" aria-hidden="true">0</span></span>
+    <span id="lt-flame" class="wl-pill lt-flame" role="img" aria-label=""><svg class="ic" aria-hidden="true"><use href="#i-m-flame"/></svg> <span id="lt-flame-n" aria-hidden="true">0</span></span>
   </header>
   <div class="body lt-body">
     <div class="lt-top">
       <h2 id="lt-title" class="lt-title" tabindex="-1">Type what you hear</h2>
-      <p class="lt-where"><span id="lt-pos"></span><span id="lt-sep"> &middot; </span><span id="lt-ch"></span></p>
+      <p class="lt-where"><span id="lt-pos"></span><span id="lt-sep"> &middot; </span><span id="lt-ch"></span><span id="lt-lv-w" hidden> &middot; <span class="sr-only">Difficulty: </span><span id="lt-lv" class="lt-lv"></span></span></p>
     </div>
     <div id="lt-main" class="lt-main">
       <div class="lt-play">
-        <button id="lt-play" class="lt-big" type="button" aria-label="Play the sentence"><span aria-hidden="true">&#128266;</span></button>
-        <button id="lt-slow" class="lt-turtle" type="button" aria-label="Play slowly"><span aria-hidden="true">&#128034;</span></button>
+        <button id="lt-play" class="lt-big" type="button" aria-label="Play the sentence"><svg class="ic" aria-hidden="true"><use href="#i-m-speaker"/></svg></button>
+        <button id="lt-slow" class="lt-turtle" type="button" aria-label="Play slowly"><svg class="ic" aria-hidden="true"><use href="#i-m-turtle"/></svg></button>
       </div>
       <p id="lt-plays" class="lt-plays" role="status"></p>
       <div class="wl-card lt-card">
@@ -21,7 +21,7 @@
         <textarea id="lt-in" class="lt-in" rows="3" maxlength="400" lang="en" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence you hear&hellip;"></textarea>
       </div>
       <div class="lt-hints">
-        <button id="lt-hint" class="lt-chip" type="button" aria-pressed="false"><span aria-hidden="true">&#128161;</span> <span id="lt-hint-l"></span></button>
+        <button id="lt-hint" class="lt-chip" type="button" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-m-bulb"/></svg> <span id="lt-hint-l"></span></button>
         <button id="lt-first" class="lt-chip" type="button" aria-pressed="false">Show first letters</button>
       </div>
       <p id="lt-status" class="lt-status" role="status"></p>

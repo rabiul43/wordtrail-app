@@ -55,9 +55,12 @@
     function chapterOf(id) {
       try { const c = S.model.chapters && S.model.chapters.find(x => id >= x.start && id < x.end); return [S.book.title, c && c.title].filter(Boolean).join(', '); } catch (e) { return S.book ? S.book.title : ''; }
     }
+    function paintN(el, n) {
+      if (typeof n === 'string' && n.indexOf('#i-') === 0) { const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), us = document.createElementNS('http://www.w3.org/2000/svg', 'use'); sv.setAttribute('class', 'ic ec-ic'); sv.setAttribute('aria-hidden', 'true'); us.setAttribute('href', n); sv.append(us); el.textContent = ''; el.append(sv); } else el.textContent = n;
+    }
     function setRing(pct, n, u) {
       const r = q('ec-ring'); r.style.setProperty('--wl-p', Math.max(0, Math.min(100, pct)).toFixed(1) + '%');
-      if (n !== st.n) { q('ec-n').textContent = n; st.n = n; }
+      if (n !== st.n) { paintN(q('ec-n'), n); st.n = n; }   // n is text, or an icon id such as #i-m-speaker (a drawn icon, no emoji)
       if (u !== st.u) { q('ec-u').textContent = u; st.u = u; }
     }
     function paint() {
@@ -75,7 +78,7 @@
         if (i === at) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
       });
       ring.classList.toggle('is-wait', step === 'listen');
-      if (step === 'listen') { setRing(100, st.fail ? '!' : '\uD83D\uDD0A', st.fail ? '' : 'Listening\u2026'); ring.setAttribute('aria-label', 'Listening to the narrator'); }
+      if (step === 'listen') { setRing(100, st.fail ? '!' : '#i-m-speaker', st.fail ? '' : 'Listening\u2026'); ring.setAttribute('aria-label', 'Listening to the narrator'); }
       else if (step === 'next' || step === 'end') { setRing(100, '\u2713', ''); ring.setAttribute('aria-label', step === 'end' ? 'Finished' : 'Next sentence'); }
       q('ec-status').textContent = st.fail ? 'The audio did not start. Tap Hear again.' : (step === 'end' ? 'That was the last sentence in this track.' : '');
       q('ec-slow').setAttribute('aria-pressed', String(st.slow));
@@ -206,7 +209,7 @@
   })();
 
   LearnHub.register({
-    id: 'echo', order: 40, icon: '\uD83D\uDDE3', title: 'Echo', subtitle: 'Hear it, say it back',
+    id: 'echo', order: 40, icon: '#i-m-mic', title: 'Echo', subtitle: 'Hear it, say it back',
     playerSubtitle: ctx => (ctx && ctx.time ? 'Starts at ' + fmt(ctx.time) : 'Hear it, say it back'),
     open: () => { EM.start(); }
   });

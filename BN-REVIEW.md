@@ -112,3 +112,97 @@ Western digits are kept everywhere (the app prints them that way: 2 ঘণ্ট
 | Idiom | বাগধারা | Same question |
 | It means | এর অর্থ | Fine for a card heading? |
 | Other old words in this chapter | এই অধ্যায়ের অন্যান্য পুরনো শব্দ | "পুরনো শব্দ" or "সেকেলে শব্দ"? |
+## Listening level word (Task 6, new, unreviewed)
+
+Shown beside the chapter name on the Listen and type screen: how the 10 sentences sit against the learner's level. One word, never a score.
+
+| English | Current | Question |
+|---|---|---|
+| Comfortable | স্বচ্ছন্দ | Mostly easier than the learner's level. Does a child read this as "easy for me", or is সহজ clearer? |
+| Stretching | একটু কঠিন | A little harder than the level (where learning happens). Is "একটু কঠিন" (a bit hard) encouraging enough, or is there a kinder word? |
+| Challenging | বেশ কঠিন | Clearly harder than the level. Is it too discouraging for a 9 to 10 year old? |
+| Difficulty: | কঠিনতা: | Read aloud by screen readers before the word only |
+
+## Listening rows on Learn (Task 5, new, unreviewed)
+
+Lines under "Listen and type" and "Echo" on the Learn screen. N is a number. Never shown in Calm mode.
+
+| English | Current | Question |
+|---|---|---|
+| N sets today | আজ Nটি সেট | "সেট" for a set of 10 sentences: clear for a Class 4 child? |
+| Last set: N of M right | শেষ সেট: Mটির মধ্যে Nটি ঠিক | Natural? |
+| N practices today | আজ Nবার অনুশীলন | Fine? |
+| N on your practice list | অনুশীলন তালিকায় Nটি | Fine? |
+| N takes this week | এই সপ্তাহে Nটি রেকর্ডিং | "take" = one recording of the learner's voice |
+| N of 12 this month | এই মাসে ১২টির মধ্যে Nটি | Read aloud by screen readers for the small ring |
+
+## Fill the gaps (Task 7, new, unreviewed)
+
+The new Listening mode: a sentence with a few words missing; the learner types only those. Other lines of the screen are the same as in Listen and type.
+
+| English | Current | Question |
+|---|---|---|
+| Fill the gaps | শূন্যস্থান পূরণ করুন | Do Class 4 children know "শূন্যস্থান" from their school books? |
+| Fill in the missing words | হারানো শব্দগুলো লিখুন | The line under the tile. "হারানো" or "বাদ পড়া"? |
+| Hint: letters | ইঙ্গিত: অক্ষর | Shows how many letters each missing word has |
+| Perfect. Every blank is right. | চমৎকার! প্রতিটি শূন্যস্থান ঠিক। | Fine for a child? |
+
+## Speed ladder (Task 8, new, unreviewed)
+
+A Listening mode: the same sentence at four speeds; it gets faster after a right answer and slower after a wrong one. The other lines of the screen are the same as in Listen and type.
+
+| English | Current | Question |
+|---|---|---|
+| Speed ladder | গতির সিঁড়ি | Is "গতির সিঁড়ি" clear, or is there a simpler word for "ladder"? |
+| Hear it faster, step by step | ধাপে ধাপে দ্রুত শুনুন | The line under the tile. |
+| Very slow | খুব ধীর | The four speed names: খুব ধীর / ধীর / সাধারণ / দ্রুত. Right for a learner? |
+| Very slow (0.7x) | খুব ধীর (0.7x) |  |
+| Slow (0.85x) | ধীর (0.85x) |  |
+| Normal (1x) | সাধারণ (1x) |  |
+| Fast (1.2x) | দ্রুত (1.2x) |  |
+| Fastest today: Very slow | আজকের সবচেয়ে দ্রুত: খুব ধীর |  |
+| Fastest today: Slow | আজকের সবচেয়ে দ্রুত: ধীর |  |
+| Fastest today: Normal | আজকের সবচেয়ে দ্রুত: সাধারণ |  |
+| Fastest today: Fast | আজকের সবচেয়ে দ্রুত: দ্রুত |  |
+| Play one step slower | এক ধাপ ধীরে শুনুন |  |
+| Play one step faster | এক ধাপ দ্রুত শুনুন |  |
+| Next sentence: one step faster. | পরের বাক্য: এক ধাপ দ্রুত। |  |
+| Next sentence: one step slower. | পরের বাক্য: এক ধাপ ধীর। |  |
+| Next sentence: the same speed. | পরের বাক্য: একই গতি। |  |
+| The fastest speed you followed. | আপনি সবচেয়ে দ্রুত যে গতিতে বুঝতে পেরেছেন। |  |
+| You followed the fastest step. Great listening! | আপনি সবচেয়ে দ্রুত ধাপও বুঝতে পেরেছেন। দারুণ শোনা! |  |
+| No sentence was fully right this time. Slow speeds are a good place to practise. | এবার কোনো বাক্য পুরোপুরি ঠিক হয়নি। ধীর গতিতে অনুশীলন করা ভালো। |  |
+| Keep practising | অনুশীলন চালিয়ে যান |  |
+| Perfect | নিখুঁত |  |
+| Almost | প্রায় |  |
+
+## Task 9: Which word did you hear? and Write it in full (no native review yet)
+
+| English | Current | Question |
+|---|---|---|
+| Which word did you hear? | আপনি কোন শব্দটি শুনলেন? | |
+| Write it in full | পুরো করে লিখুন | |
+| Choose the word you heard. | যে শব্দটি শুনেছেন সেটি বেছে নিন। | |
+| Type the words in full. | শব্দগুলো পুরো করে লিখুন। | |
+| Right. You heard it. | ঠিক। আপনি শব্দটি ধরতে পেরেছেন। | |
+| Not quite. Listen again. | ঠিক হয়নি। আবার শুনুন। | |
+| Perfect. Written in full. | চমৎকার! পুরো করে লেখা হয়েছে। | |
+| Almost. Check the spelling. | প্রায় হয়ে গেছে। বানান দেখুন। | |
+| The word was: | শব্দটি ছিল: | |
+| You chose: | আপনি বেছেছেন: | |
+| Sound pair: | ধ্বনির জোড়া: | |
+| In full: | পুরো রূপ: | |
+| Said fast it can sound like: | দ্রুত বললে শোনাতে পারে: | |
+| You wrote: | আপনি লিখেছেন: | |
+| Every answer was right. | প্রতিটি উত্তর ঠিক ছিল। | |
+| Some answers were different. Here they are. | কিছু উত্তর আলাদা ছিল। সেগুলো এখানে। | |
+| Your weakest sound so far: | এ পর্যন্ত আপনার সবচেয়ে কঠিন ধ্বনি: | |
+| Hardest to catch so far: | এ পর্যন্ত ধরা সবচেয়ে কঠিন: | |
+| Looking for practice for this book… | এই বইয়ের জন্য অনুশীলন খোঁজা হচ্ছে… | |
+| No sound practice found for this book. It may not exist yet, or you may be offline. | এই বইয়ের জন্য ধ্বনি-অনুশীলন পাওয়া যায়নি। হয়তো এখনও তৈরি হয়নি, অথবা আপনি অফলাইনে আছেন। | |
+| This track has too little practice. Try another track. | এই ট্র্যাকে অনুশীলনের উপাদান খুব কম। অন্য ট্র্যাক চেষ্টা করুন। | |
+| Hear it fast, write it in full | দ্রুত শুনুন, পুরো করে লিখুন | |
+| Tell similar words apart | কাছাকাছি শব্দগুলো আলাদা করুন | |
+| Your weakest sound: X (pattern) | আপনার সবচেয়ে কঠিন ধ্বনি: X | X is a letter pair such as "th / s", kept in English letters. Is "ধ্বনি" clear to a learner, or is "উচ্চারণ" better? |
+| Hardest to catch: X (pattern) | ধরা সবচেয়ে কঠিন: X | X is a word such as "gonna". Natural wording? |
+| Played N time(s) (pattern) | বাজানো হয়েছে N বার | Same wording as the older "Played" line. |

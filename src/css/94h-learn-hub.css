@@ -4,8 +4,11 @@
 .lhub-tile { display: flex; flex-direction: column; align-items: flex-start; gap: .2rem; min-height: 6.5rem; padding: var(--s-3, .75rem) var(--s-4, 1rem); font: inherit; }
 .lhub-tile:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .lhub-top { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 1.6rem; }
-.lhub-ic { font-size: 1.35rem; line-height: 1; color: var(--ink); }
+.lhub-ic { font-size: 1.35rem; line-height: 1; color: var(--ink); display: inline-flex; }
+.lhub-ic .ic { width: 1.5rem; height: 1.5rem; }   /* a sprite icon (Task 5) */
+.lhub-end { display: inline-flex; align-items: center; gap: .4rem; }
+.lhub-ring { --wl-ring-size: 1.5rem; --wl-ring-w: 4px; --wl-ring-hole: var(--surface); }   /* this month's practice of the skill, full at 12 sessions */
 .lhub-title { font: 800 1.1rem/1.2 var(--font-ui); color: var(--ink); }
 .lhub-sub { font: 500 .85rem/1.3 var(--font-ui); color: var(--muted); }
-:root[data-calm] .lhub-badge { display: none; }   /* Calm mode: no counts */
+:root[data-calm] .lhub-badge, :root[data-calm] .lhub-today, :root[data-calm] .lhub-ring { display: none; }   /* Calm mode: no counts, no rings, no pills */
 @media (min-width: 700px) { .lhub-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

@@ -2,7 +2,8 @@
      The Learn side of My Library (switch in 169) shows a grid of tiles. The hub knows no feature: it draws only what has been registered.
        LearnHub.register({ id, title, subtitle, icon, open, badge })   add a tile, or replace the tile with the same id (never two)
            title, subtitle  text, or a function returning text (worked out each time the hub is drawn)
-           icon             one short glyph, e.g. '★'
+           icon             one short glyph, e.g. '★', or '#i-name' for an icon of the SVG sprite (10-body-views.html), drawn as <svg><use></svg> (Task 5: no emoji)
+           ring             optional: function returning { p: 0..100, label } (a small progress ring and a screen-reader label) or null; never drawn in Calm mode
            open             function called on tap; it opens the feature the usual way (a sheet, a lesson layer), so Back and history work as before
            badge            optional: a number, or a function returning one; 0 or empty = no badge (gold badge, hidden in Calm mode)
            order            optional number; tiles are sorted by order, then by the order they were registered
@@ -11,6 +12,9 @@
                             ctx = { book, bookId, chapter (index, -1 if unknown), chapterTitle, track, time (seconds) }; open(ctx) gets the same ctx there
            show             optional: function(ctx) returning false hides the tile (in the hub and in the player sheet); default shown. Used by True / False / Not Given (169u)
                             when the open book has no pack. A throwing show hides the tile. The tile appears when LearnHub.refresh() is called after the answer is known.
+       LearnHub.patch(id, { subtitle, icon, ring, playerSubtitle })   change those fields of a tile that is already registered (Task 5: 169y gives the Listening rows live state);
+                                the tile's open, title, order and badge are left alone; false when there is no such tile
+       LearnHub.today(fn)       fn() returns the ids of the tiles that are in today's plan; they get a "Today" pill (hidden in Calm mode). Nothing calls it yet: the daily plan comes with task 12
        LearnHub.shown(ctx)      the tiles that pass show, sorted (the hub and 169e draw these; list() still returns every registered tile)
        LearnHub.onChange(fn)    fn() runs on every LearnHub.refresh() (169e redraws its open sheet)
        LearnHub.head(fn)        fn() returns a node (or null) drawn ABOVE the tiles each time the hub is drawn; used by the IELTS hub (169o) when an exam is on
@@ -19,12 +23,12 @@
      The hub is drawn by LSW.render (169), each time Learn opens. A tile whose functions throw is skipped, never the whole hub.
      Styles 94h-learn-hub.css. Tiles that are registered here: My Words, Review (at the end of this file). */
   const LearnHub = (() => {
-    const tiles = [], heads = [], hooks = [];
+    const tiles = [], heads = [], hooks = [], todayFns = [];
     let seq = 0;
     const val = (v, a) => { try { return typeof v === 'function' ? v(a) : v; } catch (e) { return ''; } };
     function register(t) {
       if (!t || typeof t.id !== 'string' || !t.id || typeof t.open !== 'function' || !t.title) return false;
-      const rec = { id: t.id, title: t.title, subtitle: t.subtitle || '', icon: t.icon || '', open: t.open, badge: t.badge, order: typeof t.order === 'number' ? t.order : 0, inPlayer: t.player !== false, ps: t.playerSubtitle, show: t.show, seq: seq++ };
+      const rec = { id: t.id, title: t.title, subtitle: t.subtitle || '', icon: t.icon || '', open: t.open, badge: t.badge, order: typeof t.order === 'number' ? t.order : 0, ring: t.ring, inPlayer: t.player !== false, ps: t.playerSubtitle, show: t.show, seq: seq++ };
       const i = tiles.findIndex(x => x.id === t.id);
       if (i >= 0) { rec.seq = tiles[i].seq; tiles[i] = rec; } else tiles.push(rec);
       return true;
@@ -33,13 +37,27 @@
     const list = () => tiles.slice().sort((a, b) => a.order - b.order || a.seq - b.seq);
     const visible = (t, ctx) => { try { return typeof t.show === 'function' ? t.show(ctx) !== false : true; } catch (e) { return false; } };
     const shown = ctx => list().filter(t => visible(t, ctx));
-    function tile(t, ctx, go) {   // ctx and go are used only by the player sheet (169e): go(fn) closes the sheet, then runs fn
-      const n = Number(val(t.badge)) || 0;
+    function patch(id, f) {
+      const t = tiles.find(x => x.id === id); if (!t || !f || typeof f !== 'object') return false;
+      ['subtitle', 'icon', 'ring'].forEach(k => { if (f[k] != null) t[k] = f[k]; });
+      if (f.playerSubtitle != null) t.ps = f.playerSubtitle;
+      return true;
+    }
+    const todayIds = () => { const o = new Set(); todayFns.forEach(fn => { try { (fn() || []).forEach(x => o.add(String(x))); } catch (e) { /* a broken plan hides the pill */ } }); return o; };
+    function iconNode(v) {   // '#i-name' = a sprite icon; anything else is plain text
+      const s = String(val(v) || '');
+      if (s.indexOf('#i-') !== 0) return s;
+      const sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), us = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      sv.setAttribute('class', 'ic'); sv.setAttribute('aria-hidden', 'true'); us.setAttribute('href', s); sv.append(us); return sv;
+    }
+    function tile(t, ctx, go, today) {   // ctx and go are used only by the player sheet (169e): go(fn) closes the sheet, then runs fn
+      const n = Number(val(t.badge)) || 0, rg = val(t.ring), pct = rg && typeof rg === 'object' && isFinite(rg.p) ? Math.max(0, Math.min(100, rg.p)) : null;
       const b = h('button', { type: 'button', class: 'wl-card wl-card--tap lhub-tile', 'data-tile': t.id });
       b.append(
-        h('span', { class: 'lhub-top' }, h('span', { class: 'lhub-ic', 'aria-hidden': 'true' }, String(val(t.icon) || '')), n > 0 ? h('span', { class: 'wl-badge lhub-badge', 'aria-hidden': 'true' }, n > 99 ? '99+' : String(n)) : ''),
+        h('span', { class: 'lhub-top' }, h('span', { class: 'lhub-ic', 'aria-hidden': 'true' }, iconNode(t.icon)), h('span', { class: 'lhub-end' }, today && today.has(t.id) && !ctx ? h('span', { class: 'wl-badge lhub-today' }, 'Today') : '', pct != null && pct > 0 && !ctx ? h('span', { class: 'wl-ring lhub-ring', style: '--wl-p:' + pct.toFixed(1) + '%', 'aria-hidden': 'true' }) : '', n > 0 ? h('span', { class: 'wl-badge lhub-badge', 'aria-hidden': 'true' }, n > 99 ? '99+' : String(n)) : '')),
         h('span', { class: 'lhub-title' }, String(val(t.title) || '')),
-        h('span', { class: 'lhub-sub' }, String((ctx && t.ps != null ? val(t.ps, ctx) : val(t.subtitle)) || ''))
+        h('span', { class: 'lhub-sub' }, String((ctx && t.ps != null ? val(t.ps, ctx) : val(t.subtitle)) || '')),
+        pct != null && pct > 0 && !ctx && rg.label ? h('span', { class: 'sr-only' }, String(rg.label)) : ''
       );
       b.addEventListener('click', () => { const run = () => { try { t.open(ctx); } catch (e) { toast('Could not open that.', 1800); } }; if (go) go(run); else run(); });
       return b;
@@ -49,12 +67,12 @@
       const ts = shown(), top = [];
       heads.forEach(fn => { try { const n = fn(); if (n) top.push(n); } catch (e) { /* a broken head is skipped */ } });
       if (!ts.length && !top.length) { emptyView(host); return; }
-      const grid = h('div', { class: 'lhub-grid' });
-      ts.forEach(t => { try { grid.append(tile(t)); } catch (e) { /* skip a broken tile */ } });
+      const grid = h('div', { class: 'lhub-grid' }), td = todayIds();
+      ts.forEach(t => { try { grid.append(tile(t, undefined, undefined, td)); } catch (e) { /* skip a broken tile */ } });
       host.textContent = ''; top.forEach(n => host.append(n)); if (ts.length) host.append(grid);
     }
     function refresh() { hooks.forEach(fn => { try { fn(); } catch (e) { /* a broken hook is skipped */ } }); if (!$('#shelf-learn').hidden) applyShelfMode(); }
-    return { headNodes: () => { const top = []; heads.forEach(fn => { try { const n = fn(); if (n) top.push(n); } catch (e) { /* a broken head is skipped */ } }); return top; }, head: fn => { if (typeof fn === 'function' && heads.indexOf(fn) < 0) heads.push(fn); }, register, unregister, has: id => tiles.some(x => x.id === id), list, shown, onChange: fn => { if (typeof fn === 'function' && hooks.indexOf(fn) < 0) hooks.push(fn); }, tile, draw, refresh };
+    return { headNodes: () => { const top = []; heads.forEach(fn => { try { const n = fn(); if (n) top.push(n); } catch (e) { /* a broken head is skipped */ } }); return top; }, head: fn => { if (typeof fn === 'function' && heads.indexOf(fn) < 0) heads.push(fn); }, register, unregister, patch, today: fn => { if (typeof fn === 'function' && todayFns.indexOf(fn) < 0) todayFns.push(fn); }, has: id => tiles.some(x => x.id === id), list, shown, onChange: fn => { if (typeof fn === 'function' && hooks.indexOf(fn) < 0) hooks.push(fn); }, tile, draw, refresh };
   })();
   LSW.render = LearnHub.draw;
 

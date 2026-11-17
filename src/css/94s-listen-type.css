@@ -11,6 +11,7 @@
 .lt-top { align-self: stretch; text-align: start; }
 .sheet.lt .lt-title { margin: 0; font: 800 1.6rem/1.2 var(--font-ui); color: var(--ink); outline: 0; }
 .lt-where { margin: var(--s-1) 0 0; color: var(--muted); font: 500 var(--small)/1.3 var(--font-ui); }
+.lt-lv { font-weight: 700; color: var(--ink); }   /* the level word of this set (169x); text only, nothing to hide in Calm mode */
 .lt-main, .lt-end { align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
 .lt-play { display: flex; align-items: center; justify-content: center; gap: var(--s-4); }
 .lt-big, .lt-turtle {
@@ -20,6 +21,11 @@
 }
 .lt-big { width: 6.4rem; height: 6.4rem; font-size: 2.6rem; border-radius: 1.6rem; color: var(--accent-ink); background: var(--accent); border-color: var(--accent); box-shadow: 0 8px 0 color-mix(in srgb, var(--accent) 62%, var(--wl-edge-mix, #666)); }
 .lt-turtle { width: 4.2rem; height: 4.2rem; font-size: 1.8rem; border-radius: 1.2rem; }
+/* the icons are drawn (SVG sprite, Task 5): they replace the emoji that used the font size */
+.lt-big .ic { width: 2.8rem; height: 2.8rem; }
+.lt-turtle .ic { width: 2rem; height: 2rem; }
+.lt-flame .ic { width: 1.1rem; height: 1.1rem; vertical-align: -.15em; }
+.lt-chip .ic { width: 1rem; height: 1rem; vertical-align: -.15em; }
 .lt-big:active, .lt-turtle:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
 .lt-big:focus-visible, .lt-turtle:focus-visible, .lt-chip:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .lt-big.is-playing { animation: lt-pulse 1.1s ease-in-out infinite; }
@@ -80,7 +86,7 @@
 :root[data-theme="contrast"] .lt-w.is-close, :root[data-theme="contrast"] .lt-w.is-bad { color: #fff; }
 :root[data-theme="contrast"] .lt-big, :root[data-theme="contrast"] .lt-turtle, :root[data-theme="contrast"] .lt-chip { border-color: #fff; }
 @media (prefers-reduced-motion: reduce) { .lt-big, .lt-turtle, .lt-chip { transition: none; } .lt-big.is-playing { animation: none; } }
-@media (max-height: 640px) { .sheet.lt textarea.lt-in { min-height: 3.6rem; } .lt-big { width: 4.8rem; height: 4.8rem; font-size: 2rem; } .lt-turtle { width: 3.4rem; height: 3.4rem; } .lt-fb { max-height: 30vh; } }
+@media (max-height: 640px) { .sheet.lt textarea.lt-in { min-height: 3.6rem; } .lt-big { width: 4.8rem; height: 4.8rem; font-size: 2rem; } .lt-big .ic { width: 2.2rem; height: 2.2rem; } .lt-turtle .ic { width: 1.7rem; height: 1.7rem; } .lt-turtle { width: 3.4rem; height: 3.4rem; } .lt-fb { max-height: 30vh; } }
 
 /* Task 46: exact letters under the answer, and the "Your answers" part of the end screen */
 .lt-fixes { display: grid; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }

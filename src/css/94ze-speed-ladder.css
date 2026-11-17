@@ -1,0 +1,10 @@
+/* Speed ladder (169zb, Task 8). The sheet reuses the Listen and type styles (.sheet.lt, .lt-*); only the speed row and the end list are new. */
+.sl-speed { display: flex; align-items: center; justify-content: center; gap: .6rem; flex-wrap: wrap; margin: .25rem 0 .5rem; }
+.sl-speed .lt-chip { min-height: 44px; min-width: 44px; }
+.sl-speed .lt-chip:disabled { opacity: .45; }
+.sl-now { margin: 0; text-align: center; color: var(--muted); font: 500 .85rem/1.3 var(--font-ui); }
+.sl-now-k { display: block; }
+.sl-rate { display: block; color: var(--ink); font: 700 1.05rem/1.3 var(--font-ui); }
+.sl-steps { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; margin: .75rem 0; padding: 0; }
+.sl-step-s { font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .sl-speed .lt-chip { transition: none; } }

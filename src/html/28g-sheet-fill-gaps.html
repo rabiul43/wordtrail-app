@@ -1,0 +1,46 @@
+<section id="sheet-fg" class="sheet ced lt fg" hidden role="dialog" aria-modal="true" aria-labelledby="fg-title">
+  <header class="lt-head">
+    <button id="fg-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="fg-prog" class="wl-progress lt-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this session"><span class="wl-progress__fill"></span></div>
+    <span id="fg-flame" class="wl-pill lt-flame" role="img" aria-label=""><svg class="ic" aria-hidden="true"><use href="#i-m-flame"/></svg> <span id="fg-flame-n" aria-hidden="true">0</span></span>
+  </header>
+  <div class="body lt-body">
+    <div class="lt-top">
+      <h2 id="fg-title" class="lt-title" tabindex="-1">Fill the gaps</h2>
+      <p class="lt-where"><span id="fg-pos"></span><span id="fg-sep"> &middot; </span><span id="fg-ch"></span><span id="fg-lv-w" hidden> &middot; <span class="sr-only">Difficulty: </span><span id="fg-lv" class="lt-lv"></span></span></p>
+    </div>
+    <div id="fg-main" class="lt-main">
+      <div class="lt-play">
+        <button id="fg-play" class="lt-big" type="button" aria-label="Play the sentence"><svg class="ic" aria-hidden="true"><use href="#i-m-speaker"/></svg></button>
+        <button id="fg-slow" class="lt-turtle" type="button" aria-label="Play slowly"><svg class="ic" aria-hidden="true"><use href="#i-m-turtle"/></svg></button>
+      </div>
+      <p id="fg-plays" class="lt-plays" role="status"></p>
+      <div class="wl-card lt-card">
+        <p class="sr-only">Type the missing words</p>
+        <div id="fg-sent" class="fg-sent" role="group" aria-label="Fill in the missing words"></div>
+      </div>
+      <div class="lt-hints">
+        <button id="fg-hint" class="lt-chip" type="button" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-m-bulb"/></svg> <span>Hint: letters</span></button>
+        <button id="fg-first" class="lt-chip" type="button" aria-pressed="false">Show first letters</button>
+      </div>
+      <p id="fg-status" class="lt-status" role="status"></p>
+    </div>
+    <div id="fg-end" class="lt-end" hidden>
+      <div class="wl-card lt-score">
+        <div id="fg-ring" class="lt-ring" role="img" aria-label="Score"><span id="fg-ring-t" class="lt-ring-t"></span></div>
+        <div class="lt-score-t"><p id="fg-sc-h" class="lt-sc-h"></p><p id="fg-sc-s" class="lt-sc-s"></p></div>
+      </div>
+      <ol id="fg-rows" class="lt-rows" hidden></ol>
+    </div>
+  </div>
+  <footer id="fg-foot" class="lt-foot">
+    <div id="fg-fb" class="lt-fb" hidden role="status">
+      <p id="fg-fb-t" class="lt-fb-t"></p>
+      <p id="fg-fb-a" class="lt-fb-a"></p>
+      <ul id="fg-fb-d" class="lt-fixes" hidden></ul>
+    </div>
+    <button id="fg-check" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Check</button>
+    <button id="fg-save" class="wl-btn wl-btn--block lt-save" type="button" hidden></button>
+    <button id="fg-next" class="wl-btn wl-btn--primary wl-btn--block" type="button" hidden>Continue</button>
+  </footer>
+</section>

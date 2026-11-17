@@ -15,6 +15,8 @@
 .ec-ring.is-wait { opacity: .55; }
 .ec-ringin { position: relative; display: grid; gap: var(--s-1); justify-items: center; }
 .ec-n { font: 800 3.4rem/1 var(--font-ui); color: var(--ink); font-variant-numeric: tabular-nums; }
+.ec-n .ec-ic { width: 3.4rem; height: 3.4rem; }   /* the speaker drawn in the ring while the narrator plays (an icon, not an emoji) */
+.ec-take-b .ic, .ec-row-b .ic, .ec-rec .ic, #ec-rec .ic, #ec-again .ic { width: 1rem; height: 1rem; vertical-align: -.15em; }
 .ec-u { font: 500 var(--lead)/1.2 var(--font-ui); color: var(--muted); }
 .ec-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }
 .ec-step { min-height: 40px; padding: .3rem 1rem; color: var(--muted); }
@@ -28,4 +30,4 @@
 .ec-foot { padding: var(--s-3) var(--s-4) max(var(--s-4), env(safe-area-inset-bottom)); background: var(--surface); }
 :root[data-theme="contrast"] .ec-step.is-now { background: #000; border-color: #fff; color: #fff; }
 @media (prefers-reduced-motion: reduce) { .ec-ring { transition: none; } }
-@media (max-height: 640px) { .ec-ring { --wl-ring-size: 9rem; } .ec-n { font-size: 2.4rem; } .ec-card { max-height: 24vh; } }
+@media (max-height: 640px) { .ec-ring { --wl-ring-size: 9rem; } .ec-n { font-size: 2.4rem; } .ec-n .ec-ic { width: 2.4rem; height: 2.4rem; } .ec-card { max-height: 24vh; } }

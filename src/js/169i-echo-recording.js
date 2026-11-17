@@ -228,7 +228,7 @@
       m.appendChild(s); m.appendChild(i);
       const bx = document.createElement('div'); bx.className = 'ec-row-b';
       const p = document.createElement('button'); p.type = 'button'; p.className = 'wl-btn wl-btn--secondary wl-btn--small'; p.setAttribute('data-play', r.id);
-      const pi = document.createElement('span'); pi.setAttribute('aria-hidden', 'true'); pi.textContent = '\u25B6 '; const pl = document.createElement('span'); pl.textContent = 'Play mine'; p.appendChild(pi); p.appendChild(pl);
+      const pi = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), pu = document.createElementNS('http://www.w3.org/2000/svg', 'use'); pi.setAttribute('class', 'ic'); pi.setAttribute('aria-hidden', 'true'); pu.setAttribute('href', '#i-play'); pi.appendChild(pu); p.append(pi, ' '); const pl = document.createElement('span'); pl.textContent = 'Play mine'; p.appendChild(pl);
       p.addEventListener('click', () => playMine(r.blob, r.id));
       const d = document.createElement('button'); d.type = 'button'; d.className = 'wl-btn wl-btn--secondary wl-btn--small'; d.textContent = 'Delete';
       d.addEventListener('click', async () => {

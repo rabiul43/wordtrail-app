@@ -1,7 +1,7 @@
   /* ---------- Learn screen (LS) ----------
      The look of the Learn tab, drawn from the mock-up: a big "Learn" title with the account button, a gold Today card (ring, minutes, Start practice),
      a Review row with the number of words waiting, then the tiles of the hub (LearnHub, 169b) as rows, in four groups:
-       YOUR WORDS (words, worksheet)   READING (questions, paraphrase, timedreading, tfng)   SPEAKING AND WRITING (speaking2, writing)   LISTENING (echo, listentype)
+       YOUR WORDS (words, worksheet)   READING (questions, paraphrase, timedreading, tfng)   SPEAKING AND WRITING (speaking2, writing)   LISTENING (echo, listentype, fillgaps, speedladder)
      A tile that is registered later and is in no group goes into a last group, MORE, so nothing is ever lost. A tile hidden by its own `show` stays hidden.
      It replaces only how the hub is drawn (LSW.render); every tile, its subtitle, its badge and its open() still come from LearnHub. The IELTS head
      (169o, LearnHub.headNodes) is drawn between the Review row and the groups. Today = TD.today() (169c): minutes so far and the daily goal; a tap opens the Today plan.
@@ -21,6 +21,8 @@
       writing: I('<path d="M4 20l1-4.2L16.6 4.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.2 19z"/><path d="M14.5 6.3l3.2 3.2"/>'),
       echo: I('<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3.5" y="13" width="4" height="7" rx="1.6"/><rect x="16.5" y="13" width="4" height="7" rx="1.6"/>'),
       listentype: I('<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.1M10 10h.1M13.5 10h.1M17 10h.1M7 14h10"/>'),
+      fillgaps: I('<path d="M3 8h4M17 8h4M3 17h18"/><rect x="9" y="4.5" width="6" height="7" rx="1.5" stroke-dasharray="2.2 2"/>'),
+      speedladder: I('<path d="M3 20h4.5v-4.5H12V11h4.5V6.5H21"/>'),
       more: I('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>'),
       go: I('<path d="M9 5l7 7-7 7"/>')
     };
@@ -28,7 +30,7 @@
       { id: 'words', label: 'Your words', tone: 'gold', ids: ['words', 'worksheet'] },
       { id: 'reading', label: 'Reading', tone: 'blue', ids: ['questions', 'paraphrase', 'timedreading', 'tfng'] },
       { id: 'sw', label: 'Speaking and writing', tone: 'red', ids: ['speaking2', 'writing'] },
-      { id: 'listening', label: 'Listening', tone: 'green', ids: ['echo', 'listentype'] }
+      { id: 'listening', label: 'Listening', tone: 'green', ids: ['echo', 'listentype', 'fillgaps', 'speedladder'] }
     ];
     const SPECIAL = ['today', 'review'];   // drawn as the two cards at the top, never as rows
     const svg = (k, cls) => { const s = h('span', { class: cls, 'aria-hidden': 'true' }); s.innerHTML = ICON[k] || ICON.more; return s; };

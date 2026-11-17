@@ -324,7 +324,7 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, reg: null };
   });
   await t('My recordings: the list, count, play, delete one, empty message; closing it hears the sentence again', async () => {
     await toRepeat(2); await click('ec-mine');
-    assert.ok(!(await ev(() => document.getElementById('ec-lib').hidden))); assert.strictEqual(await text('ec-lib-n'), '20 / 20');
+    assert.ok(!(await ev(() => document.getElementById('ec-lib').hidden))); await until(async () => (await text('ec-lib-n')) === '20 / 20', 'the count (the list loads from IndexedDB, so it is not there at the click)'); assert.strictEqual(await text('ec-lib-n'), '20 / 20');
     await until(async () => (await ev(() => document.querySelectorAll('#ec-lib-l .ec-row').length)) === 20, '20 rows');
     assert.strictEqual(await ev(() => document.querySelector('#ec-lib-l .ec-row-s').textContent), 'n24');
     const n = await ev(() => T.audios.length); await ev(() => document.querySelector('#ec-lib-l [data-play]').click());

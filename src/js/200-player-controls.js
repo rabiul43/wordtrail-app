@@ -398,7 +398,7 @@
       .catch(() => false).then(ok => { delete I18N_LOADING[c]; return ok; });
     return I18N_LOADING[c];
   }
-  const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results, #ob-q-hd, #ob-q-opts';   // book text and the placement-test questions are English on purpose
+  const I18N_SKIP = '#reader, #page, #hl-list, #ch-list, .hl-list, .results, #results, #ob-q-hd, #ob-q-opts, .sd-word';   // book text and the placement-test questions are English on purpose
   const I18N_UI = '.wt-ui';   // app messages that sit inside the book area (such as the "text not found" card) are translated even there
   const I18N_REC = new WeakMap();   // text node -> { o: original text, tr: text we put there }
   let i18nObs = null;

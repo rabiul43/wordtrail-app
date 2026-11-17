@@ -22,6 +22,11 @@ try {
   const ctx = {}; vm.createContext(ctx);
   LNC = vm.runInContext(SRC.slice(a, b) + '\n({ SIZE, SLOW, MIN_W, MAX_W, fold, words, spans, check, pickSet, pattern, variants, diff, varNote, rows, spell });', ctx);
 } catch (e) { console.error('listen_type_check: cannot load: ' + e.message); process.exit(2); }
+let LVE;   // the level engine (169x, Task 6): only used to work out what the browser part should show
+try {
+  const L = rd('src/js/169x-listen-level.js'), a = L.indexOf('/*LVE-START*/'), b = L.indexOf('/*LVE-END*/');
+  LVE = vm.runInContext(L.slice(a, b) + '\n({ sent, outcome, word, level, update, clean, MIN_N });', vm.createContext({}));
+} catch (e) { console.error('listen_type_check: cannot load 169x: ' + e.message); process.exit(2); }
 const J = x => JSON.parse(JSON.stringify(x));   // plain objects (the helpers come from another vm context)
 
 (async () => {
@@ -149,7 +154,7 @@ async function browserPart(chromium) {
   const s150 = rd('src/js/150-player-reader.js'), s140 = rd('src/js/140-open-book.js');
   const real = [grab(s150, '  function sentTime(', /\n/), grab(s140, '  function shPlan()', /\n/), grab(s140, '  function shClip(', /\n  }\n/)].join('\n');
   const css = ['10-base-layout', '94-learn-ui', '20-home-library', '40-player-sheets-chips', '60-reading-search', '80-progress-v10', '94s-listen-type'].map(f => rd('src/css/' + f + '.css')).join('\n');
-  const html = `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><html data-theme="dark"><head><style>${css}
+  const mkHtml = withLv => `<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><html data-theme="dark"><head><style>${css}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui)} .sheet.ced{animation:none}</style></head><body><div id="backdrop" hidden></div>${rd('src/html/28d-sheet-listen-type.html')}<script type="application/json" id="lt-variants">${rd('src/data/spelling-variants.json')}</script>
 <script>
 window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
@@ -175,11 +180,13 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
   const WS = { get: w => WSstore[w] || null, update: (w, fn) => { const e = fn(WSstore[w]); WSstore[w] = e; WSlog.push(['update', w, e.g, e.kind]); return e; }, saveWithContext: (w, ctx) => { WSlog.push(['save', w, ctx.s]); WSstore[w] = { w }; return WSstore[w]; }, all: () => Object.values(WSstore) };
   const SRS = { AGAIN: 0, HARD: 1, GOOD: 2, review: (t, g, now, o) => Object.assign({}, t, { g, kind: o.kind }) };
   ${real}
-  window.run = new Function('S','P','audio','Core','nowT','seekAudio','openSheet','closeSheets','toast','onPlayFail','goTrack','fmt','guideDoc','LearnHub','sentTime','shPlan','shClip','h','WS','SRS',
+  ${withLv ? 'const LV = new Function(' + JSON.stringify(rd('src/js/169x-listen-level.js') + '\nreturn { LVE, LVX };') + ')();' : 'const LV = {};'}
+  window.run = new Function('S','P','audio','Core','nowT','seekAudio','openSheet','closeSheets','toast','onPlayFail','goTrack','fmt','guideDoc','LearnHub','sentTime','shPlan','shClip','h','WS','SRS','LVX','LVE',
     ${JSON.stringify(SRC + '\nreturn { LN, LNC };')});
-  window.api = window.run(S, P, audio, Core, nowT, seekAudio, openSheet, closeSheets, toast, onPlayFail, goTrack, fmt, guideDoc, LearnHub, sentTime, shPlan, shClip, h, WS, SRS);
+  window.api = window.run(S, P, audio, Core, nowT, seekAudio, openSheet, closeSheets, toast, onPlayFail, goTrack, fmt, guideDoc, LearnHub, sentTime, shPlan, shClip, h, WS, SRS, LV.LVX, LV.LVE);
 })();
 </script></body></html>`;
+  const html = mkHtml(false);
   let browser;
   try { browser = await chromium.launch({ channel: 'chrome' }).catch(() => chromium.launch()); } catch (e) { console.error('listen_type_check: no browser: ' + e.message); process.exit(2); }
   const page = await browser.newPage({ viewport: { width: 390, height: 780 } });
@@ -211,7 +218,7 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
       const r = await ev(() => ({ ct: audio.currentTime, paused: audio.paused, rate: audio.playbackRate, pos: document.getElementById('lt-pos').textContent, plays: document.getElementById('lt-plays').textContent, dis: document.getElementById('lt-check').disabled, title: document.getElementById('lt-title').textContent, prog: document.getElementById('lt-prog').getAttribute('aria-valuenow'), ch: document.getElementById('lt-ch').textContent }));
       assert.ok(r.paused, 'paused after the clip'); assert.strictEqual(r.rate, 1.5, 'saved speed restored');
       assert.ok(r.ct >= (k + 1) * 3 - 0.2 && r.ct < (k + 1) * 3 + 0.9, 'stopped at the end of the clip: ' + r.ct + ' k=' + k);
-      assert.strictEqual(r.pos, 'Sentence ' + (i + 1) + ' of 10'); assert.strictEqual(r.plays, 'Played 1 time · tap 🐢 for slow'); assert.strictEqual(r.dis, true, 'Check is off while the box is empty');
+      assert.strictEqual(r.pos, 'Sentence ' + (i + 1) + ' of 10'); assert.strictEqual(r.plays, 'Played 1 time · tap the turtle for slow'); assert.strictEqual(r.dis, true, 'Check is off while the box is empty');
       assert.strictEqual(r.title, 'Type what you hear'); assert.strictEqual(r.prog, String(i * 10)); assert.strictEqual(r.ch, 'Dracula · Chapter 3');
       if (i === 0) await shot('1-type');
       const typed = i === 2 ? sentOf(k).replace('old ', '') : i === 4 ? sentOf(k).replace('number', 'numbr').replace('Sentence', 'sentence') : i === 6 ? 'I do not know' : sentOf(k).toLowerCase().replace(/\./, '');
@@ -260,9 +267,9 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
   await t('play again counts; the turtle plays at 0.7x and the saved speed comes back; Hint and first letters; help is noted, never blocks', async () => {
     await reset(10 * 3 + 0.5, false); await ev(() => api.LN.start()); await clipDone();
     await ev(() => { T.seeks = []; T.rates = []; }); await click('lt-play'); await clipDone();
-    assert.strictEqual(await $t('lt-plays'), 'Played 2 times · tap 🐢 for slow'); assert.ok(Math.abs((await ev(() => T.seeks[0])) - 30.02) < 1e-9);
+    assert.strictEqual(await $t('lt-plays'), 'Played 2 times · tap the turtle for slow'); assert.ok(Math.abs((await ev(() => T.seeks[0])) - 30.02) < 1e-9);
     await click('lt-slow'); await page.waitForTimeout(40); assert.strictEqual(await ev(() => audio.playbackRate), 0.7); await clipDone();
-    assert.strictEqual(await ev(() => audio.playbackRate), 1.5); assert.strictEqual(await $t('lt-plays'), 'Played 3 times · tap 🐢 for slow');
+    assert.strictEqual(await ev(() => audio.playbackRate), 1.5); assert.strictEqual(await $t('lt-plays'), 'Played 3 times · tap the turtle for slow');
     assert.strictEqual(await $t('lt-hint-l'), 'Hint: 10 words'); assert.strictEqual(await ev(() => document.getElementById('lt-pat').hidden), true);
     await click('lt-hint'); const a = await ev(() => ({ p: document.getElementById('lt-pat').textContent, hid: document.getElementById('lt-pat').hidden, pr: document.getElementById('lt-hint').getAttribute('aria-pressed'), al: document.getElementById('lt-pat').getAttribute('aria-label') }));
     assert.strictEqual(a.hid, false); assert.strictEqual(a.pr, 'true'); assert.strictEqual(a.p.trim().split(/\s+/).length, 10); assert.ok(/^_{8}\s/.test(a.p)); assert.strictEqual(a.al, 'Letters per word: 8, 6, 2, 2, 3, 3, 4, 2, 4, 4');
@@ -331,6 +338,76 @@ window.T = { seeks: [], quiet: [], toasts: [], plays: 0, rates: [], reg: null };
     const g = await ev(() => { const r = id => document.getElementById(id).getBoundingClientRect(); return { h: innerHeight, w: innerWidth, check: r('lt-check'), play: r('lt-play'), inp: r('lt-in'), ox: document.documentElement.scrollWidth > innerWidth }; });
     assert.ok(g.check.bottom <= g.h && g.play.top >= 0 && g.inp.bottom < g.check.top && g.check.right <= g.w && !g.ox, JSON.stringify(g)); assert.ok(g.check.height >= 44 && g.play.width >= 44);
     await ev(() => api.LN.close());
+  });
+
+  /* ---- level (Task 6): a second page with the REAL 169x loaded; the level lives in localStorage 'wt:lvl' ---- */
+  const html2 = mkHtml(true);
+  const lvPage = async seed => {
+    const pg = await browser.newPage({ viewport: { width: 390, height: 780 } }), e = [];
+    pg.on('pageerror', x => e.push(x.message)); pg.on('console', m => { if (m.type() === 'error') e.push(m.text()); });
+    if (seed) await pg.addInitScript(v => { try { localStorage.setItem('wt:lvl', v); } catch (x) { /* ignore */ } }, JSON.stringify(seed));
+    await pg.route('http://localhost/**', r => (/favicon/.test(r.request().url()) ? r.fulfill({ status: 204 }) : r.fulfill({ status: 200, contentType: 'text/html', body: html2 })));
+    await pg.goto('http://localhost/');
+    return { pg, e };
+  };
+  const stored = pg => pg.evaluate(() => { try { return JSON.parse(localStorage.getItem('wt:lvl')); } catch (x) { return null; } });
+  const answerN = async (pg, n, good) => {   // answer n sentences: all right (good) or all wrong
+    for (let i = 0; i < n; i++) {
+      await pg.waitForFunction(() => audio.paused && !document.getElementById('lt-play').classList.contains('is-playing'), null, { timeout: 4000 });
+      const k = Math.floor(((await pg.evaluate(() => audio.currentTime)) + 0.3) / 3) - 1;
+      await pg.fill('#lt-in', good ? sentOf(k) : 'zzz qqq');
+      await pg.evaluate(() => document.getElementById('lt-check').click());
+      await pg.evaluate(() => document.getElementById('lt-next').click());
+    }
+  };
+  const dOf = LVE.sent(sentOf(5), 3, null).d;   // every sentence of the stand-in book is about this hard (same words, one number, 3 s each)
+  const lv = pg => pg.evaluate(() => ({ hid: document.getElementById('lt-lv-w').hidden, w: document.getElementById('lt-lv').textContent }));
+  await t('level: no level yet = no word and the usual 10 sentences; the finished session is saved; the next one shows a word', async () => {
+    const { pg, e } = await lvPage(null);
+    try {
+      assert.strictEqual(await pg.evaluate(() => api.LN.start()), true);
+      let x = await lv(pg); assert.strictEqual(x.hid, true); assert.strictEqual(x.w, '');
+      assert.strictEqual(await pg.evaluate(() => document.getElementById('lt-pos').textContent), 'Sentence 1 of 10');
+      await answerN(pg, 10, true); await pg.evaluate(() => api.LN.close());
+      const s1 = await stored(pg); assert.strictEqual(s1.s.type.n, 10); assert.ok(s1.s.type.l > 35, 'ten perfect sentences raise the level from its start: ' + s1.s.type.l);
+      assert.strictEqual(await pg.evaluate(() => api.LN.start()), true);
+      x = await lv(pg); assert.strictEqual(x.hid, false); assert.ok(['Comfortable', 'Stretching', 'Challenging'].includes(x.w), x.w); assert.ok(!/\d{2,}|%/.test(x.w), 'a word, never a number');
+      assert.strictEqual(await pg.evaluate(() => document.getElementById('lt-pos').textContent), 'Sentence 1 of 10');
+      await pg.evaluate(() => api.LN.close()); assert.deepStrictEqual(e, []);
+    } finally { await pg.close(); }
+  });
+  await t('level: the word follows the level (a low level: Challenging; near: Stretching; a high level: Comfortable)', async () => {
+    for (const [l, want] of [[Math.max(0, dOf - 30), 'Challenging'], [dOf - 4, 'Stretching'], [Math.min(100, dOf + 25), 'Comfortable']]) {
+      const { pg } = await lvPage({ v: 1, s: { type: { l, n: 12, ts: 1, h: [] } } });
+      try { await pg.evaluate(() => api.LN.start()); assert.strictEqual((await lv(pg)).w, want, 'level ' + l + ' vs sentences at ' + dOf); await pg.evaluate(() => api.LN.close()); } finally { await pg.close(); }
+    }
+  });
+  await t('level: closing half way saves the answers so far; a poor session lowers the level, a good one raises it', async () => {
+    let { pg, e } = await lvPage({ v: 1, s: { type: { l: 50, n: 12, ts: 1, h: [] } } });
+    try {
+      await pg.evaluate(() => api.LN.start()); await answerN(pg, 3, false); await pg.evaluate(() => api.LN.close());
+      const s = await stored(pg); assert.strictEqual(s.s.type.n, 15); assert.ok(s.s.type.l < 50 && s.s.type.l >= 50 - 3 * 4, 'three wrong answers: down, by no more than 4 each: ' + s.s.type.l);
+      assert.strictEqual(s.s.type.h.length, 3); assert.ok(s.s.type.h.every(p => p[1] === 0), 'the wrong answers are saved as outcome 0');
+      assert.deepStrictEqual(e, []);
+    } finally { await pg.close(); }
+    ({ pg, e } = await lvPage({ v: 1, s: { type: { l: 20, n: 12, ts: 1, h: [] } } }));
+    try {
+      await pg.evaluate(() => api.LN.start()); await answerN(pg, 4, true); await pg.evaluate(() => api.LN.close());
+      const s = await stored(pg); assert.ok(s.s.type.l > 20 && s.s.type.l <= 20 + 4 * 4, 'four right answers: up, by no more than 4 each: ' + s.s.type.l);
+      assert.deepStrictEqual(e, []);
+    } finally { await pg.close(); }
+  });
+  await t('level: a damaged or blocked store never stops a session; another skill key is left alone', async () => {
+    const { pg, e } = await lvPage(null);
+    try {
+      await pg.evaluate(() => { localStorage.setItem('wt:lvl', '{not json'); });
+      assert.strictEqual(await pg.evaluate(() => api.LN.start()), true); await answerN(pg, 2, true); await pg.evaluate(() => api.LN.close());
+      assert.strictEqual((await stored(pg)).s.type.n, 2);
+      await pg.evaluate(() => { localStorage.setItem('wt:lvl', JSON.stringify({ v: 1, s: { type: { l: 40, n: 8, ts: 1, h: [] }, speed: { l: 77, n: 9, ts: 1, h: [] } } })); });
+      await pg.evaluate(() => api.LN.start()); await answerN(pg, 1, true); await pg.evaluate(() => api.LN.close());
+      const s = await stored(pg); assert.strictEqual(s.s.speed.l, 77); assert.strictEqual(s.s.speed.n, 9); assert.strictEqual(s.s.type.n, 9);
+      assert.deepStrictEqual(e, []);
+    } finally { await pg.close(); }
   });
   await browser.close();
 }

@@ -1,0 +1,13 @@
+/* Fill the gaps (169z, Task 7). The sheet reuses the Listen and type styles (.sheet.lt, .lt-*); only the sentence with its boxes is new. */
+.fg-sent { font: 500 var(--body-l, 1.25rem)/2.6 var(--font-read, var(--font-ui)); color: var(--ink); overflow-wrap: anywhere; }
+.fg-gap {
+  box-sizing: border-box; display: inline-block; width: 7.2ch; min-width: 5.5rem; max-width: 100%; min-height: 44px; margin: 0 .15em; padding: 0 .5em; vertical-align: middle;
+  font: 600 1rem/1.2 var(--font-ui); color: var(--ink); text-align: center; background: var(--surface); border: 2px solid var(--line); border-radius: .7rem;
+}
+.fg-gap::placeholder { color: var(--muted); letter-spacing: .12em; opacity: 1; }
+.fg-gap:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.fg-gap:read-only { background: var(--surface-2); }
+.fg-gap.is-ok { border-color: var(--ok, #2e9d5b); }
+.fg-gap.is-close { border-color: var(--warn, #d9922b); }
+.fg-gap.is-bad { border-color: var(--bad, #d6453d); text-decoration: line-through; }
+:root[data-theme="contrast"] .fg-gap { border-color: #fff; }

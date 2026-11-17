@@ -1,0 +1,46 @@
+<section id="sheet-sd" class="sheet ced lt sd" hidden role="dialog" aria-modal="true" aria-labelledby="sd-title">
+  <header class="lt-head">
+    <button id="sd-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="sd-prog" class="wl-progress lt-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this session"><span class="wl-progress__fill"></span></div>
+    <span id="sd-flame" class="wl-pill lt-flame" role="img" aria-label=""><svg class="ic" aria-hidden="true"><use href="#i-m-flame"/></svg> <span id="sd-flame-n" aria-hidden="true">0</span></span>
+  </header>
+  <div class="body lt-body">
+    <div class="lt-top">
+      <h2 id="sd-title" class="lt-title" tabindex="-1">Which word did you hear?</h2>
+      <p class="lt-where"><span id="sd-pos"></span><span id="sd-sep"> &middot; </span><span id="sd-ch"></span><span id="sd-lv-w" hidden> &middot; <span class="sr-only">Difficulty: </span><span id="sd-lv" class="lt-lv"></span></span></p>
+    </div>
+    <div id="sd-main" class="lt-main">
+      <div class="lt-play">
+        <button id="sd-play" class="lt-big" type="button" aria-label="Play the sentence"><svg class="ic" aria-hidden="true"><use href="#i-m-speaker"/></svg></button>
+        <button id="sd-slow" class="lt-turtle" type="button" aria-label="Play slowly"><svg class="ic" aria-hidden="true"><use href="#i-m-turtle"/></svg></button>
+      </div>
+      <p id="sd-plays" class="lt-plays" role="status"></p>
+      <p id="sd-prompt" class="lt-plays sd-prompt"></p>
+      <div class="wl-card lt-card">
+        <div id="sd-sent" class="sd-sent sd-word" lang="en" role="group" aria-label="The sentence"></div>
+      </div>
+      <div id="sd-opts" class="sd-opts" role="group" aria-label="Choose the word you heard"></div>
+      <div class="lt-hints">
+        <button id="sd-hint" class="lt-chip" type="button" aria-pressed="false" hidden><svg class="ic" aria-hidden="true"><use href="#i-m-bulb"/></svg> <span>Hint: letters</span></button>
+      </div>
+      <p id="sd-status" class="lt-status" role="status"></p>
+    </div>
+    <div id="sd-end" class="lt-end" hidden>
+      <div class="wl-card lt-score">
+        <div id="sd-ring" class="lt-ring" role="img" aria-label="Score"><span id="sd-ring-t" class="lt-ring-t"></span></div>
+        <div class="lt-score-t"><p id="sd-sc-h" class="lt-sc-h"></p><p id="sd-sc-s" class="lt-sc-s"></p></div>
+      </div>
+      <p id="sd-weak" class="lt-sc-s sd-weak" hidden></p>
+      <ol id="sd-rows" class="lt-rows" hidden></ol>
+    </div>
+  </div>
+  <footer id="sd-foot" class="lt-foot">
+    <div id="sd-fb" class="lt-fb" hidden role="status">
+      <p id="sd-fb-t" class="lt-fb-t"></p>
+      <p id="sd-fb-a" class="lt-fb-a sd-word" lang="en"></p>
+      <ul id="sd-fb-d" class="lt-fixes" hidden></ul>
+    </div>
+    <button id="sd-check" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Check</button>
+    <button id="sd-next" class="wl-btn wl-btn--primary wl-btn--block" type="button" hidden>Continue</button>
+  </footer>
+</section>

@@ -1,0 +1,49 @@
+<section id="sheet-sl" class="sheet ced lt sl" hidden role="dialog" aria-modal="true" aria-labelledby="sl-title">
+  <header class="lt-head">
+    <button id="sl-x" class="ib" type="button" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="sl-prog" class="wl-progress lt-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Place in this session"><span class="wl-progress__fill"></span></div>
+  </header>
+  <div class="body lt-body">
+    <div class="lt-top">
+      <h2 id="sl-title" class="lt-title" tabindex="-1">Speed ladder</h2>
+      <p class="lt-where"><span id="sl-pos"></span><span id="sl-sep"> &middot; </span><span id="sl-ch"></span></p>
+    </div>
+    <div id="sl-main" class="lt-main">
+      <div class="lt-play">
+        <button id="sl-play" class="lt-big" type="button" aria-label="Play the sentence"><svg class="ic" aria-hidden="true"><use href="#i-m-speaker"/></svg></button>
+      </div>
+      <div class="sl-speed">
+        <button id="sl-down" class="lt-chip" type="button" aria-label="Play one step slower"><svg class="ic" aria-hidden="true"><use href="#i-m-turtle"/></svg> <span>Slower</span></button>
+        <p class="sl-now"><span class="sl-now-k">Speed</span> <b id="sl-rate" class="sl-rate" role="status"></b></p>
+        <button id="sl-up" class="lt-chip" type="button" aria-label="Play one step faster"><svg class="ic" aria-hidden="true"><use href="#i-m-zap"/></svg> <span>Faster</span></button>
+      </div>
+      <p id="sl-plays" class="lt-plays" role="status"></p>
+      <div class="wl-card lt-card">
+        <label class="sr-only" for="sl-in">Type the sentence you hear</label>
+        <textarea id="sl-in" class="lt-in" rows="3" maxlength="400" lang="en" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence you hear&hellip;"></textarea>
+      </div>
+      <p id="sl-status" class="lt-status" role="status"></p>
+    </div>
+    <div id="sl-end" class="lt-end" hidden>
+      <div class="wl-card lt-score">
+        <div class="lt-score-t"><p id="sl-sc-h" class="lt-sc-h"></p><p id="sl-sc-s" class="lt-sc-s"></p></div>
+      </div>
+      <ul id="sl-steps" class="lt-sum sl-steps"></ul>
+      <p id="sl-all" class="lt-all" hidden>All sentences were perfect.</p>
+      <h3 id="sl-prac-h" class="lt-prac-h" hidden>Sentences to practise</h3>
+      <ul id="sl-prac" class="lt-prac"></ul>
+    </div>
+  </div>
+  <footer id="sl-foot" class="lt-foot">
+    <div id="sl-fb" class="lt-fb" hidden role="status">
+      <p id="sl-fb-t" class="lt-fb-t"></p>
+      <p id="sl-fb-a" class="lt-fb-a"></p>
+      <p id="sl-fb-s" class="lt-fb-s"></p>
+      <p id="sl-fb-n" class="lt-fb-s"></p>
+      <p id="sl-fb-yl" class="lt-fb-yl" hidden>You typed</p>
+      <p id="sl-fb-y" class="lt-fb-y" hidden></p>
+    </div>
+    <button id="sl-check" class="wl-btn wl-btn--primary wl-btn--block" type="button" disabled>Check</button>
+    <button id="sl-next" class="wl-btn wl-btn--primary wl-btn--block" type="button" hidden>Continue</button>
+  </footer>
+</section>

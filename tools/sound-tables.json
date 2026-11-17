@@ -1,0 +1,32 @@
+{
+ "format": "wordtrail-sound-tables", "v": 1,
+ "license": "CC0-1.0 (written for Wordtrail; word pairs are plain facts of English, no dictionary or book was copied). A person must confirm this before shipping.",
+ "sounds": [
+  { "id": "i-ee", "label": "i / ee", "pairs": [["ship","sheep"],["bit","beat"],["sit","seat"],["live","leave"],["fill","feel"],["hit","heat"],["slip","sleep"],["chip","cheap"],["lip","leap"],["it","eat"]] },
+  { "id": "u-oo", "label": "u / oo", "pairs": [["full","fool"],["pull","pool"],["foot","food"],["soot","suit"]] },
+  { "id": "a-e", "label": "a / e", "pairs": [["bat","bet"],["man","men"],["pan","pen"],["sat","set"],["bad","bed"],["land","lend"],["pack","peck"],["had","head"]] },
+  { "id": "a-u", "label": "a / u", "pairs": [["cat","cut"],["ran","run"],["hat","hut"],["cap","cup"],["back","buck"],["fan","fun"],["bad","bud"],["lack","luck"]] },
+  { "id": "e-ay", "label": "e / ay", "pairs": [["let","late"],["wet","wait"],["pen","pain"],["men","main"],["west","waist"],["test","taste"]] },
+  { "id": "o-oa", "label": "o / oa", "pairs": [["not","note"],["hop","hope"],["cod","code"],["slop","slope"],["rod","road"],["got","goat"]] },
+  { "id": "th-s", "label": "th / s", "pairs": [["think","sink"],["thank","sank"],["thin","sin"],["thick","sick"],["path","pass"],["math","mass"],["thing","sing"]] },
+  { "id": "th-t", "label": "th / t", "pairs": [["three","tree"],["thin","tin"],["thought","taught"],["bath","bat"],["thank","tank"],["thick","tick"]] },
+  { "id": "v-w", "label": "v / w", "pairs": [["very","wary"],["vine","wine"],["vest","west"],["vet","wet"],["vent","went"],["verse","worse"]] },
+  { "id": "s-sh", "label": "s / sh", "pairs": [["sip","ship"],["sort","short"],["see","she"],["seat","sheet"],["sock","shock"],["save","shave"],["sell","shell"],["sin","shin"]] },
+  { "id": "ch-sh", "label": "ch / sh", "pairs": [["chip","ship"],["choose","shoes"],["chair","share"],["cheap","sheep"],["watch","wash"],["catch","cash"],["march","marsh"]] },
+  { "id": "l-r", "label": "l / r", "pairs": [["light","right"],["lock","rock"],["long","wrong"],["lice","rice"],["lead","read"],["glass","grass"],["flesh","fresh"],["play","pray"],["fly","fry"],["blue","brew"],["clown","crown"],["alive","arrive"]] },
+  { "id": "p-b", "label": "p / b", "pairs": [["pit","bit"],["park","bark"],["pack","back"],["pay","bay"],["rope","robe"],["cap","cab"],["pig","big"],["pull","bull"],["cup","cub"]] },
+  { "id": "t-d", "label": "t / d", "pairs": [["tie","die"],["time","dime"],["town","down"],["tip","dip"],["ten","den"],["tear","dear"],["try","dry"],["bet","bed"],["seat","seed"],["write","ride"],["wrote","rode"]] },
+  { "id": "k-g", "label": "k / g", "pairs": [["coat","goat"],["cap","gap"],["came","game"],["class","glass"],["back","bag"],["pick","pig"],["duck","dug"]] },
+  { "id": "f-p", "label": "f / p", "pairs": [["fan","pan"],["fine","pine"],["fast","past"],["fair","pair"],["fill","pill"],["leaf","leap"]] }
+ ],
+ "chunks": [
+  { "c": "going to", "said": "gonna" }, { "c": "want to", "said": "wanna" }, { "c": "wants to", "said": "wanna" },
+  { "c": "got to", "said": "gotta" }, { "c": "have to", "said": "hafta" }, { "c": "has to", "said": "hasta" },
+  { "c": "had to", "said": "hadda" }, { "c": "used to", "said": "usta" }, { "c": "ought to", "said": "oughta" },
+  { "c": "kind of", "said": "kinda" }, { "c": "sort of", "said": "sorta" }, { "c": "a lot of", "said": "a lotta" },
+  { "c": "lots of", "said": "lotsa" }, { "c": "out of", "said": "outta" }, { "c": "let me", "said": "lemme" },
+  { "c": "give me", "said": "gimme" }, { "c": "did you", "said": "didja" }, { "c": "would have", "said": "woulda" },
+  { "c": "could have", "said": "coulda" }, { "c": "should have", "said": "shoulda" }, { "c": "must have", "said": "musta" },
+  { "c": "might have", "said": "mighta" }, { "c": "what do you", "said": "whaddya" }, { "c": "don't know", "said": "dunno" }
+ ]
+}
