@@ -31,7 +31,7 @@
   function ambRecLayer(k, buf) {
     const ctx = AMB.ctx, g = ctx.createGain(); g.gain.value = 0; g.connect(AMB.duck); AMB.g[k] = g;
     const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(g); s.start(0, Math.random() * Math.max(0.1, buf.duration - 0.5));
-    AMB.live[k] = { nodes: [s], lfos: [], off: 0, rec: true };
+    AMB.live[k] = { nodes: [s], lfos: [], off: 0, rec: true }; sndNowPaint();
   }
   async function ambRecLoad(k) {
     if (!AMB.ctx || AMB.rec[k] || AMB.recBusy[k] || Date.now() - (AMB.recFail[k] || 0) < 60000) return;
@@ -56,7 +56,7 @@
   function ambSrcRefresh(k) {   // the source or a recording changed: rebuild the steady sounds so they use the right one
     if (!AMB.built) return;
     Object.keys(AMB.live).forEach(x => { if (AMB_REC_KEYS.has(x) && (!k || x === k)) ambLayerOff(x); });
-    ambApply(0.6);
+    ambApply(0.6); sndNowPaint();
   }
   const AMB_R2 = 'https://pub-94b7e1b846f843dfbe430f5b3caf7680.r2.dev/';
   async function ambRecManifest() {

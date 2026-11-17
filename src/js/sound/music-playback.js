@@ -185,6 +185,10 @@
         else if (MUS.live) rows.push(['Music', 'loading']);
         else rows.push(['Music', 'not playing yet']);
       }
+      if (sndOn() && P.ambOn === true && AMB.on) {   // Ambient: only real recordings that are playing now (not generated, not the reader's own test file); credit comes from AMB.recMap
+        const live = Object.keys(AMB.live || {}).filter(k => AMB.live[k] && AMB.live[k].rec && AMB.recMap && AMB.recMap[k] && !(P.ambRecUser || {})[k]);
+        if (live.length) rows.push(['Ambient', live.map(k => AMB_REC_NAMES[k] || k).join(', '), Array.from(new Set(live.map(k => AMB.recMap[k].by).filter(Boolean))).join(', ')]);
+      }
       const sc = sndOn() && !!AMB.lbl && !!S.book && AMB.lblBook === String(S.book.id), scOff = sc && P.ambOn !== true;   // the scene shows whenever Sound is on and a scene is known; with Background sounds off it comes with a "Turn on sounds" button
       if (sc) rows.push(['Scene', AMB.lbl]);
       const b1 = $('#snd-now-amb'); if (b1) b1.hidden = !scOff;
