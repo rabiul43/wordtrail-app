@@ -9,13 +9,13 @@
        WF.find(q, f)          saved words for a search text q and a filter f ('all' | 'hard' | 'due' | 'b:<book id>' | 'c:<collection>')
        WF.create(name)        { ok, name, existed } or { ok:false, why:'empty'|'limit' }
        WF.rename(from, to)    { ok, n, name } or { ok:false, why:'empty'|'missing'|'exists' }
-       WF.render(list, help, words)   vocRender (160) calls it for the My words tab        WF.show(on)   shows or hides the extra parts */
+       WF.render(list, help, words)   vocRender (160) calls it for the My words tab (it also shows the "My hard words" button, 168b, when a word is hard)        WF.show(on)   shows or hides the extra parts */
   const WF = (() => {
     const KEY = 'wt:wcols', MAX_NAMES = 40, MAX_LEN = 40;
     const k = x => String(x == null ? '' : x).trim().toLowerCase();
     const str = x => (typeof x === 'string' ? x : '');
     const clean = x => String(x == null ? '' : x).trim().slice(0, MAX_LEN);
-    const W = { q: '', f: 'all', words: [], list: null, help: null, base: '', bar: null, dock: null, go: null, rowF: null, rowC: null, colbar: null, panel: null, panelKind: '', timer: 0 };
+    const W = { q: '', f: 'all', words: [], list: null, help: null, base: '', bar: null, dock: null, go: null, rowF: null, rowC: null, rowH: null, colbar: null, panel: null, panelKind: '', timer: 0 };
 
     /* ----- data (no screen code) ----- */
     const stored = () => { const l = store.get(KEY, []); return Array.isArray(l) ? l.filter(x => typeof x === 'string' && x.trim()) : []; };
@@ -95,6 +95,10 @@
           h('button', { class: 'wl-btn wl-btn--secondary wl-btn--small', type: 'button', onclick: () => openPanel('rename') }, 'Rename'),
           h('button', { class: 'wl-btn wl-btn--secondary wl-btn--small', type: 'button', onclick: () => openPanel('add') }, 'Add words'));
       }
+    }
+    function paintHard() {   // the "My hard words" button (168b) shows only when there is at least one hard word
+      let on = false; try { on = HW.any(W.words); } catch (e) { on = false; }
+      if (W.rowH) W.rowH.hidden = !on;
     }
     function paintGo() {
       const n = dueN(); W.go.hidden = !n; W.dock.hidden = !n;
@@ -181,7 +185,8 @@
       W.rowC = h('div', { class: 'wf__row', role: 'group', 'aria-label': 'Collections' });
       W.colbar = h('div', { class: 'wf__colbar', hidden: true });
       W.panel = h('div', { class: 'wf__panel wl-card', hidden: true });
-      W.bar = h('div', { class: 'wf', id: 'wf-bar' }, q, W.rowF, W.rowC, W.colbar, W.panel);
+      W.rowH = h('div', { class: 'wf__hwrow', hidden: true }, h('button', { class: 'wl-btn wl-btn--secondary wl-btn--small wf__hw', type: 'button', id: 'wf-hw', onclick: () => HW.open() }, 'My hard words'));
+      W.bar = h('div', { class: 'wf', id: 'wf-bar' }, q, W.rowF, W.rowH, W.rowC, W.colbar, W.panel);
       list.before(W.bar);
       W.go = h('button', { class: 'wl-btn wl-btn--primary wl-btn--block wf__go', type: 'button', id: 'wf-go', onclick: () => {
         if (RL.start()) return;   // the Review lesson (168); the old Review tab below stays as the fallback
@@ -191,7 +196,7 @@
     }
     function render(list, help, words) {
       W.words = words; W.help = help; W.base = help.textContent; ensure(list);
-      W.bar.hidden = false; EP.prepare(); paintBar(); paintGo(); drawList();
+      W.bar.hidden = false; EP.prepare(); paintBar(); paintHard(); paintGo(); drawList();
       EP.offer(W.bar, () => render(list, help, WS.all()));   // 103b: Essay phrases
     }
     function show(on) { if (!on && W.bar) { W.bar.hidden = true; W.dock.hidden = true; closePanel(); } }

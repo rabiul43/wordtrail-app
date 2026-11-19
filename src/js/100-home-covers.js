@@ -35,6 +35,49 @@
   }
   const coverVariant = title => (covHash(title) >>> 9) % 4;
 
+  /* ------ our own copy of every cover (Hugging Face dataset, made by the Kaggle covers notebook) ------
+     covers/index.json      {"v":1,"b":{"<LibriVox id>":"se,ol,lv"}}  which pictures exist for a book; the FIRST one is the program's best pick
+     covers/overrides.json  {"v":1,"b":{"<id>":{"best":"ol","off":["lv"]}}}  my choices from the dashboard: "best" goes first, "off" is removed
+     covers/<floor(id/1000)>/<id>/<source>.webp   source = se (Standard Ebooks), ol (Open Library), pg (Gutenberg), lv (LibriVox)
+     To use another dataset, change COV_REPO (and, if overrides.json lives somewhere else, COV_OVR_URL). */
+  const COV_REPO = 'rabiul43/Book_Covers';
+  const COV_ROOT = (HF_PROXY || 'https://huggingface.co') + '/datasets/' + COV_REPO + '/resolve/main/covers/';   // the Worker go-between when it is set (same as fetch does for other Hugging Face files)
+  const COV_IDX_URL = 'https://huggingface.co/datasets/' + COV_REPO + '/resolve/main/covers/index.json';          // fetch() sends this through the Worker by itself
+  const COV_OVR_URL = 'https://huggingface.co/datasets/' + COV_REPO + '/resolve/main/covers/overrides.json';
+  const COV_ORDER = ['se', 'ol', 'pg', 'lv'];
+  const COV_WAIT = 5000;                  // a picture of our copy that has not loaded after this long is given up on: the next one is tried
+  const COV_IDX_TTL = 12 * 3600e3, COV_OVR_TTL = 20 * 60e3, COV_START_WAIT = 2500;
+  const COV = { idx: null, ovr: null, promise: null };
+  async function covFetchJson(url, key, ttl) {
+    let d; try { d = await idb.get(key); } catch (e) { d = undefined; }
+    if (d && d.j && Date.now() - (d.fetched || 0) < ttl) return d.j;
+    try {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+      const r = await fetch(url, { signal: ctl.signal, cache: 'no-cache' }); clearTimeout(to);
+      if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.b && typeof j.b === 'object') { idb.set(key, { j, fetched: Date.now() }); return j; } }
+    } catch (e) { /* offline or not made yet: the saved copy below */ }
+    return d && d.j ? d.j : null;           // a saved copy of any age is better than none
+  }
+  /* Loads both files once (saved copies are used at once; old ones are renewed). Never rejects; no files = our copy is simply not used. */
+  function covLoad() {
+    return COV.promise || (COV.promise = Promise.all([covFetchJson(COV_IDX_URL, 'covidx', COV_IDX_TTL), covFetchJson(COV_OVR_URL, 'covovr', COV_OVR_TTL)])
+      .then(([i, o]) => { COV.idx = i && i.b; COV.ovr = o && o.b; COV.ready = true; }, () => { COV.ready = true; }));
+  }
+  setTimeout(() => covLoad(), 300);         // start early, so the first covers do not wait
+  /* The pictures of our copy for one book, best first: my override, else the program's pick, then the others in the order se, ol, pg, lv. */
+  function covOwn(b) {
+    const id = String(b && b.id != null ? b.id : '');
+    if (!/^\d{1,9}$/.test(id) || !COV.idx) return [];
+    const e = COV.idx[id], o = COV.ovr && COV.ovr[id];
+    if (typeof e !== 'string' && !(o && o.best)) return [];
+    const have = typeof e === 'string' ? e.split(',').filter(x => COV_ORDER.includes(x)) : [];
+    const off = o && Array.isArray(o.off) ? o.off : [];
+    let best = o && COV_ORDER.includes(o.best) && !off.includes(o.best) ? o.best : have.find(x => !off.includes(x));
+    const rest = COV_ORDER.filter(x => x !== best && have.includes(x) && !off.includes(x));
+    const dir = COV_ROOT + Math.floor(+id / 1000) + '/' + id + '/';
+    return (best ? [best].concat(rest) : rest).map(x => dir + x + '.webp');
+  }
+
   /* One cover builder for every card, tile, resume card and the mini-player.
      Order: LibriVox art, then the Internet Archive image, then Open Library (looked up by title and author),
      and a generated cover (tinted, with the title) is always underneath, so no book is ever blank. */
@@ -204,23 +247,29 @@
     const title = String(b.title || '').trim(), au = String(b.authors || '').split(',')[0].trim();
     const ini = (title.replace(/^(the|a|an)\s+/i, '').charAt(0) || '?').toUpperCase();
     box.append(h('span', { class: 'gc-i' }, ini), h('span', { class: 'gc-t' }, title), h('span', { class: 'gc-a' }, au));
-    const srcs = coverSources(b);
-    let i = 0, olTried = false;
+    /* Order: my override, the program's pick and the other pictures of our copy (each given COV_WAIT to load), then the old
+       sources (LibriVox art, Internet Archive, then Open Library), and the tinted box above stays if all fail. */
+    let own = [], old = coverSources(b), i = 0, j = 0, olTried = false, tm = 0, started = false;
     const img = h('img', { alt: '', loading: 'lazy', decoding: 'async' });
+    const arm = ms => { clearTimeout(tm); tm = ms ? setTimeout(() => { if (tok === box._cvT && !img.classList.contains('loaded')) next(); }, ms) : 0; };
     const next = () => {
-      if (tok !== box._cvT) return;
-      if (i < srcs.length) { img.src = srcs[i++]; return; }
+      if (tok !== box._cvT) { clearTimeout(tm); return; }
+      if (i < own.length) { arm(COV_WAIT); img.src = own[i++]; return; }
+      arm(0);
+      if (j < old.length) { img.src = old[j++]; return; }
       if (olTried) { img.remove(); return; }
       olTried = true;
       let pr; try { pr = openLibraryCover(b); } catch (e) { pr = null; }
       if (!pr || !pr.then) { img.remove(); return; }
       pr.then(u => { if (tok !== box._cvT) return; if (u) img.src = u; else img.remove(); }, () => img.remove());
     };
-    img.addEventListener('load', () => { if (tok === box._cvT) img.classList.add('loaded'); });
+    const start = () => { if (started || tok !== box._cvT) return; started = true; try { own = covOwn(b); } catch (e) { own = []; } next(); };
+    img.addEventListener('load', () => { clearTimeout(tm); if (tok === box._cvT) img.classList.add('loaded'); });
     img.addEventListener('error', next);
     box.append(img);
     if (mark) box.append(mark);
-    next();
+    if (COV.ready) start();
+    else { covLoad().then(start); setTimeout(start, COV_START_WAIT); }   // the lists are normally ready at once; after 2.5 s the old sources start anyway
   }
   function coverBox(b, cls) {
     const box = h('div', { class: cls, 'aria-hidden': 'true', 'data-cv': '' });

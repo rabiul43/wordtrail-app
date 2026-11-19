@@ -6,6 +6,7 @@
      places or stage still gets a card (its old example sentence and book count as one place; stage comes from WM.stage).
        WC.strength(e)   0-4 filled segments    WC.places(e)   the places (list of { s, bid, bt })
        WC.card(e)       one card (Element)     WC.render(host, words)   fills the list host; vocRender (160) calls it
+       The "hard" badge on a card comes from HW (168b): HW.badge(e), null under the threshold and in Calm mode
        WC.keep          scroll position to put back after Remove re-draws the list (set by the card, read by vocRender) */
   const WC = (() => {
     const LABEL = { new: 'New', learning: 'Learning', familiar: 'Familiar', mastered: 'Mastered' };
@@ -37,6 +38,7 @@
       return (a > 0 ? '\u2026' : '') + s.slice(a, b).trim() + (b < s.length ? '\u2026' : '');
     }
 
+    const hardBadge = e => { try { return HW.badge(e); } catch (err) { return null; } };   // 168b is built later: never let it break a card
     function card(e) {
       const st = stageOf(e), n = strength(e), ps = places(e), note = str(e.note).trim();
       const withText = ps.filter(c => str(c.s).trim()), shown = withText.slice(0, 2), rest = ps.length - shown.length;
@@ -45,6 +47,7 @@
         h('span', { class: 'wc__top' },
           h('span', { class: 'wc__id' }, h('strong', { class: 'wc__w' }, str(e.w)),
             e.hard === true ? h('span', { class: 'wc__flag', role: 'img', 'aria-label': 'Hard', title: 'Hard' }, '\u2691') : null,
+            hardBadge(e),   // small "hard" badge above the threshold (168b); null in Calm mode
             str(e.lv) ? h('span', { class: 'vlv' }, e.lv) : null),
           h('span', { class: 'wc__st' }, LABEL[st])),
         h('span', { class: 'wc__bar', role: 'img', 'aria-label': 'Strength ' + n + ' of 4' }, ...seg));

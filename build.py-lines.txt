@@ -1,0 +1,10 @@
+Add each line to PARTS in build.py, directly after the line shown above it:
+
+after   ('file', 'src/css/94f-review-lesson.css'),
+add     ('file', 'src/css/94f2-hard-words.css'),
+
+after   ('file', 'src/html/28i-sheet-sound-drill.html'),
+add     ('file', 'src/html/28j-sheet-hard-words.html'),
+
+after   ('file', 'src/js/168-review-lesson.js'),
+add     ('file', 'src/js/168b-hard-words.js'),

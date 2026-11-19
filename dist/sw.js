@@ -13,7 +13,7 @@
  *     kept in 'wt-learn-v1' ONLY when the page saves them there ("Download learning pack", 283-learning-pack.js). A kept file is served when
  *     the network fails or is slow; the network answer is used (and renews the kept file) when it is quick. A file the page did not keep is
  *     never saved here.
- *  5. Book covers are kept (cache first, at most COVER_MAX of them, renewed in the background after COVER_FRESH), so Home
+ *  5. Book covers (our own small .webp copies first, then the older image hosts) are kept (cache first, at most COVER_MAX of them, renewed in the background after COVER_FRESH), so Home
  *     paints its covers at once and still looks complete offline. Covers are saved only when the host allows a normal
  *     (CORS) request: an opaque answer would count about 7 MB of storage each, so those are never saved.
  *
@@ -25,7 +25,7 @@
 
 const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', CATALOG = 'wt-catalog-v1', COVERS = 'wt-covers-v1', LEARN = 'wt-learn-v1', NET_WAIT = 3000;
 const CAT_WAIT = 6000;                 // catalogue: after this long the saved copy is used (the app itself gives up at 8 s)
-const COVER_MAX = 600, COVER_FRESH = 14 * 864e5, COVER_BIG = 1.5e6; // covers kept, age before a quiet refresh, largest file kept
+const COVER_MAX = 1000, COVER_FRESH = 14 * 864e5, COVER_BIG = 1.5e6; // covers kept, age before a quiet refresh, largest file kept
 let coverPuts = 0;
 const noCors = new Set();              // cover hosts that answered a plain request but refused a CORS one: not tried again this run
 const ROOT = new URL('./', self.registration.scope).href; // the page, whatever it is called (query strings are ignored)
@@ -186,6 +186,8 @@ async function learn(event) {
 // Covers: the image hosts the app draws covers from. Only covers, never audio or text.
 function isCover(u) {
   const h = u.hostname, p = u.pathname;
+  // Our own small covers (Hugging Face dataset, or the wordtrail-hf Worker in front of it): /datasets/<owner>/<repo>/resolve/main/covers/<folder>/<id>/<source>.webp
+  if (/^\/datasets\/[^/]+\/[^/]+\/resolve\/main\/covers\/\d+\/\d+\/(se|ol|pg|lv)\.webp$/.test(p)) return true;
   if (h === 'covers.openlibrary.org' || h === 'images.weserv.nl') return true;
   if (h === 'archive.org' || h === 'www.archive.org') return p.startsWith('/services/img/') || /\.(jpe?g|png|webp)$/i.test(p);
   if (h === 'cdn.jsdelivr.net') return p.startsWith('/gh/standardebooks/');

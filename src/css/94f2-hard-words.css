@@ -1,0 +1,22 @@
+/* My hard words (hw-): the sheet, the small difficulty meter, and the "hard" badge on word cards (wc__hard). Built on the learning UI kit (94-learn-ui.css).
+   Only .hw*, .wf__hw* and .wc__hard classes. Remove this file, 168b-hard-words.js, 28j-sheet-hard-words.html and their build.py lines (and the HW calls in
+   165 and 166, and the `only` / `after` options in 168) to go back. Calm mode (:root[data-calm]) hides the meter and the badge as well as the JS skipping them. */
+.hw__list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.hw__row { --wl-cbg: var(--surface-2); display: grid; gap: .35rem; padding: .75rem .95rem; }
+.hw__top { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.hw__w { font: 700 1.3rem/1.2 var(--font-display); overflow-wrap: anywhere; min-width: 0; }
+.hw__last { font: 500 var(--small)/1.4 var(--font-ui); color: var(--muted); }
+.hw__meter { flex: none; display: block; width: 4.5rem; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.hw__fill { display: block; height: 100%; width: var(--hw-p, 0%); border-radius: 4px; background: var(--accent); }
+.hw__meter.is-hard .hw__fill { background: var(--wl-bad-text); }
+.hw__dock { position: sticky; bottom: 0; z-index: 2; margin: .8rem -1.2rem 0; padding: .7rem 1.2rem .2rem; background: linear-gradient(to bottom, transparent, var(--surface) .7rem); }
+.hw__dock:has(> [hidden]) { display: none; }
+:root[data-theme="contrast"] .hw__meter { outline: 1px solid #FFFFFF; }
+/* the entry button under the My words filters (166) */
+.wf__hwrow { display: flex; padding-top: .35rem; }
+.wf__hwrow[hidden] { display: none; }
+/* the badge on a word card (165) */
+.wc__hard { align-self: center; padding: .05rem .5rem; font: 700 .72rem/1.5 var(--font-ui); letter-spacing: .04em; text-transform: lowercase; color: var(--wl-bad-text); background: var(--wl-bad-soft); border: 1.5px solid var(--wl-bad-text); border-radius: 999px; }
+/* Calm mode: no scores, no badge. The words, the last review date and the Practise button stay. */
+:root[data-calm] .hw__meter, :root[data-calm] .wc__hard { display: none; }
+@media (prefers-reduced-motion: reduce) { .hw__fill { transition: none; } }

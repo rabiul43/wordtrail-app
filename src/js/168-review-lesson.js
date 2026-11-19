@@ -18,9 +18,11 @@
                                      A meaning-match question gets its bank later, in prep (the meaning may come from the dictionary)
        RL.prep(q, rnd)               Promise: a ready question, or the fill/typed question to ask instead, or null when the word cannot be asked now
        RL.plan(all, now, max, rnd, mix)   mix true: build() for each word (the lesson does this); mix false or left out: fill questions only, as before
+       RL.plan(all, now, max, rnd, mix, only)   only = a list of words: ask just those (in that order), due or not, instead of the due words. My hard words (168b) uses it
        RL.grade(w, ok, now, kind, verdict)   sends the grade; kind 'fill' (default) | 'mm' | 'type'; verdict 'ok' | 'close' | 'no' (default from ok).
                                      Returns the new entry or null. Typed 'close' (one letter off) is Hard, 'no' is Again
-       RL.start()                    opens the lesson; false when there is nothing to ask      RL.close()   RL.on   true while open */
+       RL.start()                    opens the lesson; false when there is nothing to ask      RL.close()   RL.on   true while open
+       RL.start({ words, max, after })   the same, but only for `words` (up to `max` questions), and `after()` is called when the lesson closes */
   const RL = (() => {
     const SIZE = 10, { str, key, rxWord, shuffle } = RT;   // the shared helpers live in 167b
 
@@ -73,9 +75,11 @@
       if (!b) return q.fb || null;
       return Object.assign(q, { def, bank: b.bank, answer: b.answer, ready: true });
     }
-    function plan(all, now, max, rnd, mix) {
+    function plan(all, now, max, rnd, mix, only) {
       const words = (all || []).filter(e => e && typeof e.w === 'string' && key(e.w));
-      const due = words.filter(e => SRS.isDue(e, now)).sort((a, b) => (a.due || 0) - (b.due || 0));
+      let due;   // only (a list of words, in the order to ask them): ask just those, due or not (My hard words, 168b); left out: the due words, most overdue first
+      if (Array.isArray(only)) { const at = new Map(only.map((w, i) => [key(w), i])); due = words.filter(e => at.has(key(e.w))).sort((a, b) => at.get(key(a.w)) - at.get(key(b.w))); }
+      else due = words.filter(e => SRS.isDue(e, now)).sort((a, b) => (a.due || 0) - (b.due || 0));
       const qs = []; let skipped = 0;
       for (const e of due) { if (qs.length >= (max || SIZE)) break; const q = mix ? build(e, words, rnd) : question(e, words, rnd); if (q) qs.push(q); else skipped++; }
       return { qs, skipped, due: due.length };
@@ -87,7 +91,7 @@
     }
 
     /* ----- screen ----- */
-    const L = { on: false, root: null, qs: [], i: 0, right: 0, missed: [], n: 0, finished: false, seq: 0, tok: 0, res: [], opener: null, fill: null, bar: null };
+    const L = { on: false, after: null, root: null, qs: [], i: 0, right: 0, missed: [], n: 0, finished: false, seq: 0, tok: 0, res: [], opener: null, fill: null, bar: null };
     const setBar = n => {
       const pct = L.qs.length ? Math.round(100 * n / L.qs.length) : 0;
       if (L.fill) L.fill.style.setProperty('--wl-p', pct + '%'); if (L.bar) L.bar.setAttribute('aria-valuenow', String(n));
@@ -231,15 +235,16 @@
       });
     }
 
-    function start() {
-      const p = plan(WS.all(), Date.now(), SIZE, undefined, true);
+    function start(o) {   // o (optional): { words: [word, ...] ask only these, max: how many questions, after: function to call when the lesson closes }
+      o = o && typeof o === 'object' ? o : {};
+      const p = plan(WS.all(), Date.now(), o.max > 0 ? o.max : SIZE, undefined, true, Array.isArray(o.words) ? o.words : undefined);
       if (!p.qs.length) return false;   // nothing can be asked: the caller opens the old Review tab
       if (!L.root) {
         L.root = h('div', { class: 'rl', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'rl-title', hidden: true });
         L.root.addEventListener('keydown', ev => { if (ev.key === 'Escape') { ev.stopPropagation(); close(); } });
         document.body.append(L.root);
       }
-      Object.assign(L, { on: true, qs: p.qs, i: 0, right: 0, missed: [], res: [], n: 0, finished: false, opener: document.activeElement });
+      Object.assign(L, { on: true, qs: p.qs, i: 0, right: 0, missed: [], res: [], n: 0, finished: false, opener: document.activeElement, after: typeof o.after === 'function' ? o.after : null });
       L.root.hidden = false; draw(); histSoon(); return true;
     }
     function close() {
@@ -249,6 +254,7 @@
       if (L.n && !L.finished) toast('Progress saved.', 1600);
       try { LearnHub.refresh(); } catch (e) { /* hub not ready */ }   // counts on the Learn hub changed
       try { TD.refresh(); } catch (e) { /* Today not ready */ }   // the Today page shows the new numbers
+      if (L.after) { const f = L.after; L.after = null; try { f(); } catch (e) { /* the screen under the lesson redraws itself next time */ } }   // e.g. My hard words (168b) redraws its list
       histSoon(); if (L.opener && L.opener.isConnected) L.opener.focus();
     }
 
