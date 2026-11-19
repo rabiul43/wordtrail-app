@@ -631,6 +631,7 @@
   let hfWhy = '';   // why our own copy could not be used this time (shown in the Details line when every route fails)
   async function getHfText(id) {
     hfWhy = '';
+    const why = x => { hfWhy = hfWhy ? hfWhy + ' / ' + x : x; };   // keep what each try said
     const n = parseInt(id, 10);
     if (!(n > 0)) return null;
     const url = 'https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(n / 1000) + '/' + n + '.txt.gz';
@@ -642,17 +643,17 @@
       for (const [name, go] of tries) {
         try {
           const r = await go();
-          if (r.status === 404 && name === 'direct') { hfWhy = 'not in our copy (404)'; return null; }
-          if (!r.ok) { hfWhy = name + ' HTTP ' + r.status; continue; }
+          if (r.status === 404 && name === 'direct') { why('not in our copy (404)'); return null; }
+          if (!r.ok) { why(name + ' HTTP ' + r.status); continue; }
           const buf = new Uint8Array(await r.arrayBuffer());
           let t;
           if (buf[0] === 0x1f && buf[1] === 0x8b) {          // still gzip: unpack it here
-            if (typeof DecompressionStream === 'undefined') { hfWhy = 'this browser cannot unpack gzip'; return null; }
+            if (typeof DecompressionStream === 'undefined') { why('this browser cannot unpack gzip'); return null; }
             t = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
           } else t = new TextDecoder('utf-8').decode(buf);   // the host already unpacked it
           if (t.length >= 4000 && !/^\s*<(!doctype|html)/i.test(t)) return t;
-          hfWhy = name + ' returned no text';
-        } catch (e) { hfWhy = name + (e && e.name === 'AbortError' ? ' timed out' : ' blocked'); if (e && e.name === 'AbortError') return null; }
+          why(name + ' returned no text');
+        } catch (e) { why(name + (e && e.name === 'AbortError' ? ' timed out' : ' blocked')); if (e && e.name === 'AbortError') return null; }
       }
       return null;
     } finally { clearTimeout(to); }
