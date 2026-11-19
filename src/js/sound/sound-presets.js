@@ -52,13 +52,13 @@
     if (set.scene) { const sc = AMB_SCENES.find(x => x.k === set.scene); P.amb = ambFull(sc ? sc.L : { rain: 45, brown: 25 }); }
     P.ambOn = true; P.sndOn = true; AMB.auto = null; AMB.autoId = null; AMB.preset = k;
     if (set.scene) ambSaveMix(); else savePrefs();
-    ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint();
+    ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint(); gsSave();
   }
   function ambPresetUndo() {
     const u = AMB.undo; if (!u) return;
     Object.keys(u.v).forEach(x => { P[x] = u.v[x]; }); P.amb = u.amb; P.ambOn = u.on; P.sndOn = u.snd;
     AMB.auto = null; AMB.autoId = null; AMB.preset = ''; AMB.undo = null;
-    ambSaveMix(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint();
+    ambSaveMix(); ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint(); gsSave();
   }
 
   /* Scene preview: a tap on a scene plays it for about 5 seconds and shows "Use this". Without a confirm the old mix comes back. */
@@ -72,7 +72,7 @@
     AMB.prevIv = setInterval(() => { left--; if (left <= 0) ambSceneRevert(); else ambScenePaintPrev(left); }, 1000);
   }
   function ambSceneEnd() { clearInterval(AMB.prevIv); AMB.prevIv = 0; AMB.prevSnap = null; AMB.prevK = ''; const b = $('#amb-prev'); if (b) b.hidden = true; AMB.preview = false; ambSync(); }   // the preview is over (kept or not): silent again unless the book is playing with sounds on
-  function ambSceneKeep() { if (!AMB.prevSnap) return; ambSceneEnd(); toast('Scene saved.'); }
+  function ambSceneKeep() { if (!AMB.prevSnap) return; ambSceneEnd(); gsSave(); toast('Scene saved.'); }
   function ambSceneRevert() {   // the time is up (or the screen closed) and nobody tapped "Use this": put the old mix back
     const sn = AMB.prevSnap; ambSceneEnd(); if (!sn) return;
     if (sn.amb) P.amb = sn.amb; else delete P.amb;

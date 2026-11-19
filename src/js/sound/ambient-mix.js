@@ -39,7 +39,9 @@
   function ambBookCheck() {   // when the book changes, switch to its saved mix (or the last one used for its kind)
     if (!S.book || AMB.bookId === String(S.book.id)) return;
     AMB.bookId = String(S.book.id); ambSpaceReset(); AMB.auto = null; AMB.autoId = null;
-    const sug = ambSuggest(S.book), m = (P.ambBook || {})[AMB.bookId] || (sug && (P.ambG || {})[sug.k]);
+    const sug = ambSuggest(S.book), own = (P.ambBook || {})[AMB.bookId], g = !own && AMB.preset !== 'sleep' ? ambGenreRule(S.book) : null, gs = g && gsGet(g.k);
+    if (gs) { gsApply(gs, g); return; }   // no mix of its own for this book: the genre's remembered sound comes before the suggested scene (a book's own mix always wins)
+    const m = own || (sug && (P.ambG || {})[sug.k]);
     if (m) { P.amb = Object.assign(ambLevels(), m); savePrefs(); ambApply(0.9); }
     else if (sug && AMB.preset !== 'sleep') { P.amb = ambFull(sug.L); savePrefs(); ambApply(0.9); }   // a book with no saved mix starts on the scene that suits it (not saved as the reader's own choice, so it follows the genre rules)
   }

@@ -605,7 +605,7 @@
           if (failed < started) return;                  // another route is still working
           if (started < order.length) launch();          // every route so far failed: add the next one at once
           else if (unv) { done = true; clearTimeout(timer); if (meta) { meta.unverified = true; meta.route = unv.name; } resolve(unv.t); }   // nothing better answered: use it for now, but do not keep it
-          else { done = true; clearTimeout(timer); const err = new Error('Download failed (' + errs.join(', ') + ')'); err.download = true; reject(err); }
+          else { done = true; clearTimeout(timer); const err = new Error('Download failed (' + (hfWhy ? 'hf ' + hfWhy + ', ' : '') + errs.join(', ') + ')'); err.download = true; reject(err); }
         });
       };
       launch();
@@ -628,22 +628,34 @@
      Gutenberg serves them, gzip-compressed. Asked through the existing Hugging Face Worker (see the fetch wrapper in 030). A book that is
      not there (404), a slow answer or anything odd returns null, and the usual routes run as before. */
   const BOOK_TEXT_REPO = 'rabiul43/Book_Text';
+  let hfWhy = '';   // why our own copy could not be used this time (shown in the Details line when every route fails)
   async function getHfText(id) {
+    hfWhy = '';
     const n = parseInt(id, 10);
     if (!(n > 0)) return null;
-    const c = new AbortController(), to = setTimeout(() => c.abort(), 15000);
+    const url = 'https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(n / 1000) + '/' + n + '.txt.gz';
+    /* First through the fetch wrapper (the wordtrail-hf Worker), then straight to Hugging Face. A Request object is not rewritten by the wrapper.
+       Only a real 404 (the book is not in our copy) skips the second try; any other answer or error from the Worker used to end here silently. */
+    const tries = [['worker', () => fetch(url, { signal: c.signal })], ['direct', () => fetch(new Request(url), { signal: c.signal })]];
+    const c = new AbortController(), to = setTimeout(() => c.abort(), 20000);
     try {
-      const r = await fetch('https://huggingface.co/datasets/' + BOOK_TEXT_REPO + '/resolve/main/texts/' + Math.floor(n / 1000) + '/' + n + '.txt.gz', { signal: c.signal });
-      if (!r.ok) return null;
-      const buf = new Uint8Array(await r.arrayBuffer());
-      let t;
-      if (buf[0] === 0x1f && buf[1] === 0x8b) {          // still gzip: unpack it here
-        if (typeof DecompressionStream === 'undefined') return null;
-        t = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-      } else t = new TextDecoder('utf-8').decode(buf);   // the host already unpacked it
-      return t.length >= 4000 && !/^\s*<(!doctype|html)/i.test(t) ? t : null;
-    } catch (e) { return null; }
-    finally { clearTimeout(to); }
+      for (const [name, go] of tries) {
+        try {
+          const r = await go();
+          if (r.status === 404 && name === 'direct') { hfWhy = 'not in our copy (404)'; return null; }
+          if (!r.ok) { hfWhy = name + ' HTTP ' + r.status; continue; }
+          const buf = new Uint8Array(await r.arrayBuffer());
+          let t;
+          if (buf[0] === 0x1f && buf[1] === 0x8b) {          // still gzip: unpack it here
+            if (typeof DecompressionStream === 'undefined') { hfWhy = 'this browser cannot unpack gzip'; return null; }
+            t = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+          } else t = new TextDecoder('utf-8').decode(buf);   // the host already unpacked it
+          if (t.length >= 4000 && !/^\s*<(!doctype|html)/i.test(t)) return t;
+          hfWhy = name + ' returned no text';
+        } catch (e) { hfWhy = name + (e && e.name === 'AbortError' ? ' timed out' : ' blocked'); if (e && e.name === 'AbortError') return null; }
+      }
+      return null;
+    } finally { clearTimeout(to); }
   }
   async function getGutenberg0(id, cb) {
     const key = 'g:' + id;

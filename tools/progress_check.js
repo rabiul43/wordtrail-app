@@ -132,5 +132,62 @@ t('book time: memory first, written about once a minute, merge keeps the larger 
   const big = {}; for (let i = 0; i < 450; i++) big['b' + i] = i + 1;
   assert.strictEqual(Object.keys(BT.merge(big, {})).length, 400);
 });
+
+/* ---- four more charts: level, part of speech, learned per day, skill balance ---- */
+t('empty data gives empty arrays of the right size for the new charts', () => {
+  const m = PG.calc({ words: [], log: {}, days: {} }, NOW);
+  assert.deepStrictEqual(norm(m.cefr), [0, 0, 0, 0, 0, 0, 0]);
+  assert.deepStrictEqual(norm(m.pos), [0, 0, 0, 0, 0, 0]);
+  assert.deepStrictEqual(norm(m.learned), new Array(30).fill(0));
+  assert.deepStrictEqual(norm(m.skills), { l: 0, r: 0, w: 0, s: 0 });
+  assert.strictEqual(m.month, '2026-11'); assert.strictEqual(m.dayStarts.length, 30);
+});
+t('level: A1..C2 in order, odd spellings read, no or bad level = Unknown, nothing dropped', () => {
+  const words = [w('a', 1, { lv: 'A1' }), w('b', 1, { lv: 'b1' }), w('c', 1, { lv: ' B2 ' }), w('d', 1, { lv: 'C1 \u00b7 Advanced' }), w('e', 1, { lv: 'C2' }), w('f', 1, { lv: 'C3' }), w('g', 1, { lv: '' }), w('h', 1), w('i', 1, { lv: 7 }), w('j', 1, { lv: 'A2' }), w('k', 1, { lv: 'B1' })];
+  const m = PG.calc({ words, log: {}, days: {} }, NOW);
+  assert.deepStrictEqual(norm(m.cefr), [1, 1, 2, 1, 1, 1, 4]);   // A1 A2 B1 B1 B2 C1 C2 | C3, '', none, 7
+  assert.strictEqual(m.cefr.reduce((x, y) => x + y, 0), m.collected);
+  assert.strictEqual(PG.cefrOf('a2'), 'A2'); assert.strictEqual(PG.cefrOf('XB1X'), ''); assert.strictEqual(PG.cefrOf(null), '');
+});
+t('part of speech: first part of speech of an entry; other; unknown; the word is counted once', () => {
+  assert.strictEqual(PG.posOf(['noun', 'verb']), 'noun'); assert.strictEqual(PG.posOf(['Verb']), 'verb'); assert.strictEqual(PG.posOf('adjective'), 'adjective');
+  assert.strictEqual(PG.posOf(['', 'adverb']), 'adverb'); assert.strictEqual(PG.posOf(['preposition']), 'other'); assert.strictEqual(PG.posOf(['interjection', 'noun']), 'other');
+  assert.strictEqual(PG.posOf([]), 'unknown'); assert.strictEqual(PG.posOf(null), 'unknown'); assert.strictEqual(PG.posOf([5, null]), 'unknown');
+  const words = [w('cat', 1), w('Run ', 1), w('big', 1), w('very', 1), w('of', 1), w('zzz', 1), w('constructor', 1), w('odd', 1)];
+  const pos = { cat: 'noun', run: 'verb', big: 'adjective', very: 'adverb', of: 'other', odd: 'bogus' };
+  const m = PG.calc({ words, log: {}, days: {}, pos }, NOW);
+  assert.deepStrictEqual(norm(m.pos), [1, 1, 1, 1, 1, 3]);   // zzz (no data), constructor (a name on every object), odd (bad value) = Unknown
+  assert.strictEqual(m.pos.reduce((x, y) => x + y, 0), m.collected);
+  assert.deepStrictEqual(norm(PG.calc({ words, log: {}, days: {} }, NOW).pos), [0, 0, 0, 0, 0, 8]);   // no lookup yet: all Unknown
+});
+t('learned per day: last 30 days, today is the last bar, same rule as Reading analytics', () => {
+  const words = [
+    w('today', 40, { acq: NOW - 3600e3 }),            // today
+    w('edge', 40, { acq: NOW - 29 * DAY }),           // 29 days ago = the first bar
+    w('old', 40, { acq: NOW - 30 * DAY }),            // 30 days ago: outside
+    w('later', 40, { acq: NOW + DAY }),               // in the future: outside
+    w('gap', 3, { iv: 20 }),                          // no acq, interval 14+: learned when it was saved (3 days ago)
+    w('short', 3, { iv: 5 }),                         // interval under 14: not learned
+    w('two', 40, { acq: NOW - 3600e3 * 2 }),          // today again
+    w('none', 3)];
+  const m = PG.calc({ words, log: {}, days: {} }, NOW);
+  assert.strictEqual(m.learned.length, 30);
+  assert.strictEqual(m.learned[29], 2); assert.strictEqual(m.learned[0], 1); assert.strictEqual(m.learned[26], 1);
+  assert.strictEqual(m.learned.reduce((x, y) => x + y, 0), 4);
+  const d0 = new Date(NOW); assert.strictEqual(m.dayStarts[29], new Date(d0.getFullYear(), d0.getMonth(), d0.getDate()).getTime());
+  for (let i = 1; i < 30; i++) assert.ok(m.dayStarts[i] > m.dayStarts[i - 1]);
+});
+t('skills: sessions this calendar month only, junk ignored', () => {
+  const ielts = { '2026-11-02': { l: 2, r: 1 }, '2026-11-09': { l: 1, w: 3, s: 1 }, '2026-10-31': { l: 9 }, '2026-12-01': { r: 9 }, bad: { l: 5 }, '2026-11-05': 'x', '2026-11-06': { l: -3, r: '4', w: 1.9 } };
+  assert.deepStrictEqual(norm(PG.calc({ words: [], log: {}, days: {}, ielts }, NOW).skills), { l: 3, r: 1, w: 4, s: 1 });
+  assert.deepStrictEqual(norm(PG.calc({ words: [], log: {}, days: {}, ielts: [1, 2] }, NOW).skills), { l: 0, r: 0, w: 0, s: 0 });
+  assert.deepStrictEqual(norm(PG.calc({ words: [], log: {}, days: {}, ielts: null }, NOW).skills), { l: 0, r: 0, w: 0, s: 0 });
+});
+t('the new numbers do not change the old ones', () => {
+  const words = [w('a', 1, { lv: 'B1' }), mast('b', 50, 3)];
+  const m = PG.calc({ words, log: {}, days: {}, pos: { a: 'noun' }, ielts: { [day(0)]: { l: 1 } } }, NOW);
+  eq(m, { collected: 2, mastered: 1 }); assert.strictEqual(m.cs[7], 2);
+});
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

@@ -58,3 +58,14 @@
 .pg-ms-t { flex: 1 1 auto; min-width: 0; }
 .pg-ms-n { flex: none; font: 600 1rem/1.2 var(--font-ui); color: var(--muted); font-variant-numeric: tabular-nums; }
 .pg-ms .is-done .pg-ms-n { color: var(--wl-ok-text); }
+/* Four more charts: level, part of speech, learned per day, skill balance. Colours come from the theme variables, so dark and contrast themes follow. */
+.pg-bar { fill: var(--accent); stroke: none; }
+.pg-bar--u { fill: var(--muted); opacity: .55; }
+.pg-tick--s { font-size: 9.5px; }
+.pg-lab { fill: var(--ink); font: 700 12px var(--font-ui); }
+.pg-labn { fill: var(--accent); font-weight: 800; }
+.pg-ring { fill: none; stroke: color-mix(in srgb, var(--line) 60%, transparent); stroke-width: 1; }
+.pg-area { fill: color-mix(in srgb, var(--accent) 22%, transparent); stroke: var(--accent); stroke-width: 3; stroke-linejoin: round; }
+.pg-empty { margin: 0; padding: var(--s-2) 0; font: 500 1.05rem/1.4 var(--font-ui); color: var(--muted); }
+:root[data-theme="contrast"] .pg-bar { stroke: #000; stroke-width: 1; }
+:root[data-theme="contrast"] .pg-bar--u { opacity: 1; fill: var(--ink); }

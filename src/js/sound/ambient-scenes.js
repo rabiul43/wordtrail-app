@@ -43,17 +43,67 @@
     } catch (e) { /* offline, or no ambient.json in the repo: keep the built-in list */ }
   }
   try { ambSetMap(JSON.parse(document.getElementById('amb-map').textContent)); } catch (e) { /* built-in list unreadable */ }
-  function ambSuggest(b) {
+  function ambGenreRule(b) {   // the book's first matching genre rule: { k: rule key (the genre), sc: its suggested scene, re, row: the genre row, lowercased }. The one place that matches rules: ambSuggest and the per-genre memory both use it
     if (!b) return null;
     const row = b.genres || ((CAT.books || []).find(x => x.id === String(b.id)) || {}).genres || '';
     const text = (String(row) + ' ' + (b.title || '')).toLowerCase();
-    for (const [k, re] of AMB_RULES) if (re.test(text)) return AMB_SCENES.find(s => s.k === k) || null;
+    for (const [k, re] of AMB_RULES) if (re.test(text)) { const sc = AMB_SCENES.find(s => s.k === k); return sc ? { k, sc, re, row: String(row).toLowerCase() } : null; }
     return null;
+  }
+  function ambSuggest(b) { const g = ambGenreRule(b); return g ? g.sc : null; }
+  /* Sound remembered per genre: P.genreSound = { <genre rule key>: { scene, intensity, musicOn, cuesOn } }. It is part of wt:prefs, so account
+     sync and backups carry it like every other setting. A book's own saved mix (P.ambBook) always wins; this is used only for a book with none. */
+  function gsGet(k) {
+    const m = P.genreSound, r = m && typeof m === 'object' && !Array.isArray(m) && k !== '__proto__' && Object.prototype.hasOwnProperty.call(m, k) ? m[k] : null;
+    return r && typeof r === 'object' && !Array.isArray(r) ? r : null;
+  }
+  function ambGenreLabel(g) {   // "Mystery": the whole word the rule matched in the book's genre row, else the scene's name
+    const m = g.re.exec(g.row);
+    if (m && m[0].trim()) {
+      let s = m.index, e = m.index + m[0].length;
+      while (s > 0 && /[a-z]/.test(g.row[s - 1])) s--;
+      while (e < g.row.length && /[a-z]/.test(g.row[e])) e++;
+      const w = g.row.slice(s, e).trim();
+      if (w.length > 2) return w.charAt(0).toUpperCase() + w.slice(1);
+    }
+    return g.sc.n;
+  }
+  function ambSceneKey() {   // the scene the current levels are exactly equal to, or '' for the reader's own mix
+    const L = ambLevels();
+    for (const sc of AMB_SCENES) { const f = ambFull(sc.L); if (AMB_SOUNDS.every(([k]) => (L[k] || 0) === f[k])) return sc.k; }
+    return '';
+  }
+  function gsSave() {   // the reader changed the scene, intensity, music or story sounds: remember them for this book's genre
+    if (!S.book) return;
+    const g = ambGenreRule(S.book); if (!g || g.k === '__proto__') return;
+    if (!P.genreSound || typeof P.genreSound !== 'object' || Array.isArray(P.genreSound)) P.genreSound = {};
+    P.genreSound[g.k] = { scene: ambSceneKey(), intensity: P.ambInt == null ? 100 : P.ambInt, musicOn: P.musOn === true, cuesOn: P.ambCues !== false };
+    savePrefs(); gsPaint();
+  }
+  function gsApply(gs, g) {   // a book with no mix of its own opens on the genre's saved sound
+    const sc = gs.scene ? AMB_SCENES.find(x => x.k === gs.scene) : null, last = (P.ambG || {})[g.k];
+    P.amb = sc ? ambFull(sc.L) : last ? Object.assign(ambLevels(), last) : ambFull(g.sc.L);   // a saved scene; or the reader's own mix last used for this genre; or the suggested scene
+    if (typeof gs.intensity === 'number' && isFinite(gs.intensity)) P.ambInt = Math.max(0, Math.min(100, Math.round(gs.intensity)));
+    const mus = P.musOn === true;
+    if (typeof gs.musicOn === 'boolean') P.musOn = gs.musicOn;
+    if (typeof gs.cuesOn === 'boolean') P.ambCues = gs.cuesOn;
+    savePrefs(); ambApply(0.9);
+    try { ambRefresh(); } catch (e) { /* the Sound sheet is not built yet: it paints from P when it opens */ }
+    try { if (mus !== (P.musOn === true)) { if (P.musOn === true && sndOn()) { musicAttach(); musicPlay(); } else musicPause(); qkPaint(); } } catch (e) { /* music is optional here */ }
+  }
+  function gsPaint() {   // the "Remembered for Mystery" line in the Sound sheet
+    const box = $('#amb-gs'); if (!box) return;
+    const g = S.book ? ambGenreRule(S.book) : null, on = !!(g && gsGet(g.k));
+    box.hidden = !on; if (on) $('#amb-gs-t').textContent = 'Remembered for ' + ambGenreLabel(g);
+  }
+  function gsReset() {
+    const g = S.book ? ambGenreRule(S.book) : null; if (!g || !gsGet(g.k)) { gsPaint(); return; }
+    const n = ambGenreLabel(g); delete P.genreSound[g.k]; savePrefs(); gsPaint();
+    toast('Sound for ' + n + ' is no longer remembered.');
   }
   const ambFull = L => { const o = {}; AMB_SOUNDS.forEach(([k]) => { o[k] = L[k] || 0; }); return o; };
   function ambMatchScene() {
-    const L = ambLevels(); AMB.sceneK = '';
-    for (const sc of AMB_SCENES) { const f = ambFull(sc.L); if (AMB_SOUNDS.every(([k]) => (L[k] || 0) === f[k])) { AMB.sceneK = sc.k; break; } }
+    AMB.sceneK = ambSceneKey();
     const sug = ambSuggest(S.book);
     $$('#amb-scenes .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === AMB.sceneK ? 'true' : 'false'));
     ambGroups();
@@ -67,6 +117,7 @@
     const card = $('#amb-sug');
     if (sug) { $('#amb-sug-n').textContent = sug.n; $('#amb-sug-for').textContent = sug0 ? 'Suggested for \u201c' + (S.book.title || 'this book') + '\u201d' : 'Suggested for tonight: quieter and softer'; }
     card.hidden = !sug; card.dataset.k = sug ? sug.k : '';
+    gsPaint();
   }
   function ambUseScene(k) {
     const sc = AMB_SCENES.find(x => x.k === k); if (!sc) return;
@@ -74,4 +125,5 @@
     const c = $('#in-ambon'); if (c) c.checked = true;
     savePrefs(); AMB_SOUNDS.forEach(([n]) => { $('#amb-' + n).value = String(P.amb[n] || 0); });
     ambSaveMix(); ambApply(0.9); ambSync(); ambMatchScene();
+    if (!AMB.prevK) gsSave();   // a scene only being previewed is not remembered until "Use this"
   }

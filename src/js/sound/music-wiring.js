@@ -34,7 +34,7 @@
   function musOnSet(on) {   // the Music tile's switch: the same effect as the switch in the Music panel
     if (on && !sndOn()) { P.sndOn = true; sndApplyAll(); }
     P.musOn = on; P.musHint = true; const c = $('#in-muson'); if (c) c.checked = on;
-    savePrefs(); sndPaint();
+    savePrefs(); sndPaint(); gsSave();
     if (on) { musicAttach(); musicPlay(); } else musicPause();
     try { qkPaint(); } catch (e) { /* the tile is optional */ }
   }

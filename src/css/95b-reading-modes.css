@@ -19,6 +19,18 @@
 .page.rm-tr .s[data-tr]::after { display: block; font-size: var(--rm-fs); line-height: 1.7; }
 .page.rm-tr .s.now[data-tr] { box-shadow: 0 0 0 .22rem var(--mark); }
 .page.rm-tr .s.now.hw[data-tr] { box-shadow: 0 0 0 .22rem var(--accent-soft); }
+/* Translation help (Both only): Hard and On tap draw a line only for the sentences marked data-show; the others read as plain running text. */
+.rm-help { display: flex; align-items: center; gap: .6rem; max-width: 26rem; margin: .4rem auto 0; }
+.rm-help[hidden] { display: none; }
+.rm-hl { flex: none; font-size: .75rem; font-weight: 650; color: var(--muted); }
+.rm-seg2 { flex: 1 1 auto; margin: 0; padding: .15rem; border-width: 1px; border-radius: 12px; min-width: 0; }
+.rm-b2 { min-height: 34px; font-size: .82rem; border-radius: 9px; padding: 0 .25rem; }
+.rm-b2[aria-pressed="true"] { box-shadow: none; }
+.page.rm-both.rm-sel .s { display: inline; margin-block: 0; }
+.page.rm-both.rm-sel .s[data-tr]::after { content: none; }
+.page.rm-both.rm-sel .s[data-show][data-tr] { display: block; margin-block: .1em .6em; }
+.page.rm-both.rm-sel .s[data-show][data-tr]::after { content: attr(data-tr); display: block; margin-top: .25em; font-size: .84em; line-height: 1.6; color: var(--muted); }
+.page.rm-both.rm-sel .s.now[data-show][data-tr]::after { color: var(--ink); }
 @media (min-width: 1100px) {
   .player > .reader > .rm-bar { grid-column: 2; grid-row: 1; align-self: start; width: 100%; max-width: 46rem; justify-self: center; box-sizing: border-box; }
   .player > .reader > .page { padding-top: 4.6rem; }
