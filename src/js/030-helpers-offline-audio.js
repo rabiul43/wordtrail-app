@@ -333,8 +333,15 @@
     paintCards(); paintDl(); dmRender();
   }
 
-  const P = Object.assign({ theme: 'auto', size: 1.24, speed: 1, nudge: 0.15, recents: [], viz: (reduceMotion || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'off' : 'bars' }, store.get('wt:prefs', {}));
+  const P = Object.assign({ theme: 'auto', size: 1.24, speed: 1, nudge: 0.15, recents: [], viz: 'off' }, store.get('wt:prefs', {}));
   const savePrefs = () => store.set('wt:prefs', P);
+  /* Narrator audio path (fix for "choppy, noisy, old-recording" sound, worst on a new device).
+     The sound wave used to default to 'bars' on every non-iOS device. Any visualizer (or enhancer, mono, balance...) makes the player send the
+     narrator through Web Audio (createMediaElementSource + the shared AudioContext), which re-samples the MP3 to the context's rate, runs it
+     through the filter/compressor chain and depends on the audio thread keeping up. On a fresh phone that is exactly what everyone got by default.
+     Now a fresh install plays the narrator straight through the browser's own player (no graph). Devices that saved the old default 'bars' or
+     'wave' are moved to 'off' ONCE; the person can switch it back on in Settings > Audio at any time. */
+  if (!P.audioPathV2) { P.audioPathV2 = 1; if (P.viz && P.viz !== 'off') P.viz = 'off'; try { savePrefs(); } catch (e) { /* storage blocked */ } }
   /* Learn mode (GL, 169l) on? The one question every learning feature asks. Standard mode = false. Safe to call before GL exists (start-up): false. */
   const learnOn = () => { try { return GL.tabOn(); } catch (e) { return false; } };
   /* Player style (Playback + Sleep timer sheets): 'clean' | 'glass'. Settings saved before this existed keep 'clean'; a fresh install (nothing saved yet) gets 'glass'. The first-paint script in 00-head.html uses the same rule. */

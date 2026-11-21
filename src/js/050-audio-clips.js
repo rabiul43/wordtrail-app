@@ -85,8 +85,7 @@
     try {
       const { data, t0 } = await clBytes({ sec, a, b }, true);
       const Ctx = window.AudioContext || window.webkitAudioContext, ctx = new Ctx();
-      const buf = await new Promise((ok, no) => { const q = ctx.decodeAudioData(data, ok, no); if (q && q.catch) q.catch(no); });
-      try { ctx.close(); } catch (e) { /* ignore */ }
+      let buf; try { buf = await new Promise((ok, no) => { const q = ctx.decodeAudioData(data, ok, no); if (q && q.catch) q.catch(no); }); } finally { try { ctx.close(); } catch (e) { /* ignore */ } }   // closed even when the decode fails
       const sr = buf.sampleRate, ch = buf.getChannelData(0);
       for (let i = Math.max(0, Math.ceil(a / pk.res)); i <= Math.min(pk.N - 1, Math.floor(b / pk.res)); i++) {
         const s0 = Math.floor((i * pk.res - t0) * sr), s1 = Math.min(ch.length, Math.floor(((i + 1) * pk.res - t0) * sr));
@@ -330,8 +329,7 @@
     try {
       const { data, t0 } = await clBytes(c);
       const Ctx = window.AudioContext || window.webkitAudioContext, ctx = new Ctx();
-      const buf = await new Promise((ok, no) => { const p = ctx.decodeAudioData(data, ok, no); if (p && p.catch) p.catch(no); });
-      try { ctx.close(); } catch (e) { /* ignore */ }
+      let buf; try { buf = await new Promise((ok, no) => { const p = ctx.decodeAudioData(data, ok, no); if (p && p.catch) p.catch(no); }); } finally { try { ctx.close(); } catch (e) { /* ignore */ } }   // closed even when the decode fails
       const wav = wavOf(buf, c.a - t0, c.b - t0);
       const nm = ((S.book.title || 'clip') + ' - ' + c.name).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90);
       download(nm + '.wav', wav, 'audio/wav');

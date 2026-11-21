@@ -35,7 +35,9 @@
   function audioCtx() {   // the ONE AudioContext of the app, shared by ambient, music, the opening sound and the narrator's sound wave / enhancer; created on first use, so music works with ambient off
     if (AMB.ctx) return AMB.ctx;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
-    try { AMB.ctx = new AC(); } catch (e) { return null; }
+    /* latencyHint 'playback': bigger audio buffers, so the shared graph (narrator enhancer, ambient, music) does not under-run on a weak or busy phone
+       (an under-run is the stuttering, crackling "bad phone line" sound). Nothing here is played live from a key press, so the extra few tens of ms do not matter. */
+    try { AMB.ctx = new AC({ latencyHint: 'playback' }); } catch (e) { try { AMB.ctx = new AC(); } catch (e2) { return null; } }
     return AMB.ctx;
   }
   ctxHook.get = audioCtx;   // the player's sound wave (150) takes the same context through this

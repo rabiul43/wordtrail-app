@@ -494,6 +494,7 @@
   function preloadNext() {
     const n = S.secs[S.sec + 1];
     if (!n) return;
+    const nc = navigator.connection; if (nc && (nc.saveData || /^(slow-2g|2g|3g)$/.test(nc.effectiveType || ''))) return;   // the next track would compete with the one playing for a weak connection
     if (isLocal(S.book.id, S.sec + 1, n.url)) { if (!dlUrls.has(dlKey(S.book.id, S.sec + 1))) warmUrl(S.book.id, S.sec + 1); return; } // saved: nothing to buffer
     if (preloaded !== n.url) { preloaded = n.url; pre.preload = 'auto'; pre.src = px(n.url); }
   }
@@ -567,19 +568,25 @@
     const comp = c.createDynamicsCompressor(); comp.knee.value = 20; comp.attack.value = 0.01; comp.release.value = 0.25;
     const gain = c.createGain();
     const lim = c.createDynamicsCompressor(); lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.1;
-    src.connect(lev); lev.connect(hp); hp.connect(lo); lo.connect(mid); mid.connect(pres); pres.connect(hs); hs.connect(lp); lp.connect(comp); comp.connect(gain); gain.connect(lim);
+    /* Transparent when nothing is switched on: the narrator goes src -> dry -> mix, untouched (no EQ, no compressor/limiter look-ahead and make-up gain).
+       The enhancer chain only gets signal while the enhancer or the loudness evener is actually on (enhApply sets dry / wetIn). */
+    const dry = c.createGain(), wetIn = c.createGain(); dry.gain.value = 1; wetIn.gain.value = 0;
+    src.connect(dry); src.connect(wetIn); wetIn.connect(lev);
+    lev.connect(hp); hp.connect(lo); lo.connect(mid); mid.connect(pres); pres.connect(hs); hs.connect(lp); lp.connect(comp); comp.connect(gain); gain.connect(lim);
     const mix = c.createGain(); mix.channelCountMode = 'explicit'; mix.channelInterpretation = 'speakers'; mix.channelCount = 2;
     const pan = c.createStereoPanner ? c.createStereoPanner() : null;  // older browsers: no balance, mono still works
     /* A listening-only analyser on what the listener really hears of the narrator (after the loudness evener, the EQ, the compressor,
        the make-up gain and the limiter). Smart mix (sound/smart-mix.js) measures the voice here; vgraph sits before all of that. */
-    let mon = null; try { mon = c.createAnalyser(); mon.fftSize = 2048; mon.smoothingTimeConstant = 0; lim.connect(mon); } catch (e) { mon = null; }
-    lim.connect(mix); if (pan) { mix.connect(pan); pan.connect(c.destination); } else mix.connect(c.destination);
-    enh = { mix, pan, lev, hp, lo, mid, pres, hs, lp, comp, gain, lim, mon };
+    let mon = null; try { mon = c.createAnalyser(); mon.fftSize = 2048; mon.smoothingTimeConstant = 0; lim.connect(mon); dry.connect(mon); } catch (e) { mon = null; }   // mon hears the chain OR the dry path (only one carries signal at a time)
+    dry.connect(mix); lim.connect(mix); if (pan) { mix.connect(pan); pan.connect(c.destination); } else mix.connect(c.destination);
+    enh = { mix, pan, lev, hp, lo, mid, pres, hs, lp, comp, gain, lim, mon, dry, wetIn };
     enhApply();
   }
   function enhApply() {
     if (!enh) return;
     const p = ENH[P.enh] || ENH.off;
+    const proc = P.enh !== 'off' || !!P.level, t0 = vctx.currentTime;   // the chain is used only when the enhancer or the loudness evener is on
+    enh.dry.gain.setTargetAtTime(proc ? 0 : 1, t0, 0.01); enh.wetIn.gain.setTargetAtTime(proc ? 1 : 0, t0, 0.01);
     enh.hp.frequency.value = p.hp; enh.lo.gain.value = p.lo; enh.mid.gain.value = p.mid || 0;
     enh.pres.gain.value = p.pres; enh.hs.gain.value = p.hs;
     enh.lp.frequency.value = p.lp;
@@ -754,7 +761,7 @@
     const t = audio.currentTime, d = t - STAT_T.last; STAT_T.last = t;
     if (d > 0 && d < 1.5) { STAT_T.sec += d; if (STAT_T.sec >= 60) { STAT_T.done = id; statSend(id, 'start'); } }
   });
-  audio.addEventListener('error', () => { if (S.book && /^blob:/.test(audio.currentSrc || audio.src)) { try { dlBroken(S.sec); } catch (e) { S.loadingAudio = false; S.pendingSeek = 0; } return; } if (vizCorsRetry()) return; S.loadingAudio = false; if (S.book) toast('This track could not be loaded. The file may be unavailable right now.', 4500); });
+  audio.addEventListener('error', () => { if (S.book && /^blob:/.test(audio.currentSrc || audio.src)) { try { dlBroken(S.sec); } catch (e) { S.loadingAudio = false; S.pendingSeek = 0; } return; } if (vizCorsRetry()) return; if (stallOnError()) return; S.loadingAudio = false; if (S.book) toast('This track could not be loaded. The file may be unavailable right now.', 4500); });
 
   function sentTime(p, k) { return Math.max(0, p.starts[k] - P.nudge + 0.02); }
   function seekAudio(t) {

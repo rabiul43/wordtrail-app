@@ -55,6 +55,7 @@
 .dm-chev { flex: none; width: 1.2rem; height: 1.2rem; color: var(--accent); transition: transform .18s ease; }
 .dm-morerow[aria-expanded="true"] .dm-chev { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) { .dm-chev { transition: none; } }
+.dmenu > .dm-h { margin-top: .3rem; padding-top: .8rem; border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); }   /* the Learn group header in the main list */
 .dm-sub { margin: .2rem 0; padding: 0 0 .3rem; border-radius: 12px; background: color-mix(in srgb, var(--ink) 4%, transparent); }
 .dm-sub[hidden] { display: none; }
 .dm-sub .dm-it { min-height: 2.75rem; font-size: .93rem; }
@@ -122,3 +123,5 @@
 .ns-rep { display: flex; align-items: center; gap: .6rem; min-height: 2.75rem; padding: 0; margin: 0; background: none; border: 0; border-top: 1px solid var(--line); padding-top: .2rem; font: inherit; font-weight: 600; color: var(--accent); cursor: pointer; text-align: left; }
 .ns-rep svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .ns-rep:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .4rem; }
+
+.ad-out { margin: .5rem 0; padding: .7rem; max-height: 26rem; overflow: auto; white-space: pre-wrap; word-break: break-word; font: .72rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface-2); border-radius: 10px; user-select: text; }

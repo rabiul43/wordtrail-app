@@ -1,5 +1,6 @@
 /* Player menu: the three-dot button in the top bar opens a small dropdown with the five things people reach for most
-   (Timing, Text and reading, Live translation, Tracks, Settings). "More" opens the rest in place, grouped as Listen, Book and Fix.
+   (Tracks, Reader, Text and reading, Sound and music, Bookmark and note, Settings), then a Learn group (Live translation, Words, Quick quiz,
+   Shadow reading, Study this chapter; everything except Live translation is hidden in Standard mode by [data-lrn]). "More" opens the rest in place, grouped as Book and Fix (Timing is a Fix row).
    Every row passes its tap on to the button that already does the job (those buttons live in the Controls sheet, so nothing is
    duplicated); "All controls" opens the full Controls sheet with its search and sections. */
   { const btn = $('#btn-topmore'), mn = $('#dmenu'), more = $('#dm-more'), sub = $('#dm-sub');
@@ -12,6 +13,7 @@
         timing: press('b-timing'), text: press('btn-aa'), live: press('btn-live'), tracks: press('btn-tracks'), settings: () => openSettingsHome(),
         sound: () => ambOpen(),
         bm: press('b-bm'), chars: press('b-chars'), hl: press('b-hl'), clips: press('b-clips'), textsync: press('b-textsync'),
+        reader: press('b-ver'), words: press('b-words'), quiz: press('b-quiz'), shadow: press('b-shadow'), find: press('b-find'), cal: press('b-cal'),
         tools: () => toolsOpen(),
         learn: () => LB.open()   // Study this chapter sheet (169e)
       };
@@ -34,12 +36,9 @@
         if (on) { xPaint(k); const r = $('[data-go="' + k + '"]', mn); if (r) requestAnimationFrame(() => r.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' })); }
       };
       /* "More tools": a small list (name + one line each) for everything the menu does not show; each row passes its tap to the button that already does the job. */
-      const TOOLS = [
-        ['qk-read', 'Hide player', 'Hide the player and just read'], ['b-words', 'Words', 'Look up words and review the ones you saved'],
-        ['b-next', 'Next up', 'Similar books, and what to listen to next'], ['b-find', 'Search this book', 'Find a word or quote and jump to it'],
-        ['b-trail', 'Where was I?', 'Go back after a seek, or to where you fell asleep'], ['b-ver', 'Reader', 'Choose who reads this book'],
-        ['b-shadow', 'Shadow reading', 'Say a sentence after the narrator and compare'], ['b-quiz', 'Quick quiz', 'Test yourself on the chapter you are in'],
-        ['qk-clip', 'Clip', 'Save a short audio snippet to share'], ['b-cal', 'Tap to align', 'Line up the highlight by tapping'],
+      const TOOLS = [   // what the menu itself does not show (Reader, Words, Quick quiz, Shadow reading, Search this book and Tap to align now have their own rows)
+        ['qk-read', 'Hide player', 'Hide the player and just read'], ['b-next', 'Next up', 'Similar books, and what to listen to next'],
+        ['b-trail', 'Where was I?', 'Go back after a seek, or to where you fell asleep'], ['qk-clip', 'Clip', 'Save a short audio snippet to share'],
         ['btn-nr', 'Focus page', 'Just the text and the essentials'], ['btn-howto', 'How to use', 'Double-tap, press and hold, swipe']
       ];
       const toolsOpen = () => {
@@ -62,7 +61,7 @@
         }
         openSheet('sheet-tools');
       };
-      const SRC = { timing: 'b-timing', text: 'btn-aa', live: 'btn-live', tracks: 'btn-tracks', bm: 'b-bm', chars: 'b-chars', hl: 'b-hl', clips: 'b-clips', textsync: 'b-textsync' };
+      const SRC = { timing: 'b-timing', text: 'btn-aa', live: 'btn-live', tracks: 'btn-tracks', bm: 'b-bm', chars: 'b-chars', hl: 'b-hl', clips: 'b-clips', textsync: 'b-textsync', reader: 'b-ver', words: 'b-words', quiz: 'b-quiz', shadow: 'b-shadow', find: 'b-find', cal: 'b-cal' };
       const fill = () => {   // current values on the rows, and hide a row whose button is not available right now
         try { qkPaint(); } catch (e) { /* values below may be one tap old */ }
         const txt = id => { const n = $('#' + id); return n ? n.textContent : ''; };

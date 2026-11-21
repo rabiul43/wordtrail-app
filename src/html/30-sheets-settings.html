@@ -113,26 +113,31 @@
 </section>
 
 <div id="dmenu" class="dmenu" role="menu" aria-label="Player menu" hidden>
-  <button type="button" id="dm-timing" class="dm-it" role="menuitem" data-go="timing"><span class="dm-i" aria-hidden="true"><i class="dm-dot"></i></span><span class="dm-t">Timing</span></button>
-  <button type="button" class="dm-it" role="menuitem" data-go="text"><span class="dm-i" aria-hidden="true"><span class="qk-aa">Aa</span></span><span class="dm-t">Text and reading</span></button>
-  <button type="button" id="dm-live" class="dm-it" role="menuitem" data-go="live"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 2.600 5.600 5.500 7M11 5c-.7 3.400-3 6.200-6.500 7.500M13 21l4-10 4 10M14.500 18h5"/></svg></span><span class="dm-t">Live translation</span><span class="dm-v"></span></button>
   <button type="button" class="dm-it" role="menuitem" data-go="tracks"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-headphones"/></svg></span><span class="dm-t">Tracks</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="reader"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4a4 4 0 1 0 .01 0zM5 20c0-4 3-6 7-6s7 2 7 6"/></svg></span><span class="dm-t">Reader</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="text"><span class="dm-i" aria-hidden="true"><span class="qk-aa">Aa</span></span><span class="dm-t">Text and reading</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="sound"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-rain"/></svg></span><span class="dm-t">Sound and music</span><span class="dm-v"></span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="bm"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="dm-t">Bookmark and note</span></button>
   <button type="button" class="dm-it" role="menuitem" data-go="settings"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-sliders"/></svg></span><span class="dm-t">Settings</span></button>
-
+  <div class="dm-h" role="presentation" data-lrn>Learn</div>
+  <button type="button" id="dm-live" class="dm-it" role="menuitem" data-go="live"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h9M8.5 3v2M6 5c.6 3.2 2.600 5.600 5.500 7M11 5c-.7 3.400-3 6.200-6.500 7.500M13 21l4-10 4 10M14.500 18h5"/></svg></span><span class="dm-t">Live translation</span><span class="dm-v"></span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="words" data-lrn><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg></span><span class="dm-t">Words</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="quiz" data-lrn><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 .01 0zM8 12l3 3 5-6"/></svg></span><span class="dm-t">Quick quiz</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="shadow" data-lrn><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V7a3 3 0 0 1 3-3zM6 11v1a6 6 0 0 0 12 0v-1M12 18v3"/></svg></span><span class="dm-t">Shadow reading</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="learn" data-lrn><span class="dm-i" aria-hidden="true">&#127891;</span><span class="dm-t">Study this chapter</span></button>
   <button id="dm-more" type="button" class="dm-it dm-morerow" role="menuitem" aria-expanded="false" aria-controls="dm-sub"><span class="dm-t">More</span><svg class="ic dm-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
   <div id="dm-sub" class="dm-sub" role="group" aria-label="More controls" hidden>
-    <div class="dm-h" role="presentation">Listen</div>
-    <button type="button" class="dm-it" role="menuitem" data-go="sound"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-rain"/></svg></span><span class="dm-t">Sound and music</span><span class="dm-v"></span></button>
-    <div class="dm-h" role="presentation">Book</div>
-    <button type="button" class="dm-it" role="menuitem" data-go="bm"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-bm"/></svg></span><span class="dm-t">Bookmark and note</span></button>
-    <button type="button" class="dm-it" role="menuitem" data-go="chars"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="dm-t">Characters</span></button>
-    <button type="button" class="dm-it" role="menuitem" data-go="hl"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="dm-t">Highlights and notes</span></button>
-    <button type="button" class="dm-it" role="menuitem" data-go="clips"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="dm-t">Audio clips</span></button>
-    <div class="dm-h" role="presentation">Fix</div>
-    <button type="button" class="dm-it" role="menuitem" data-go="textsync"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="dm-t">Fix highlight sync</span></button>
-    <button type="button" class="dm-it dm-all" role="menuitem" data-go="tools"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">More tools</span><span class="dm-v">&#8250;</span></button>
+  <div class="dm-h" role="presentation">Book</div>
+  <button type="button" class="dm-it" role="menuitem" data-go="hl"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-pen"/></svg></span><span class="dm-t">Highlights and notes</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="chars"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-people"/></svg></span><span class="dm-t">Characters</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="clips"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-wave"/></svg></span><span class="dm-t">Audio clips</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="find"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M11 5a6 6 0 1 0 .01 0zM16 16l4 4"/></svg></span><span class="dm-t">Search this book</span></button>
+  <div class="dm-h" role="presentation">Fix</div>
+  <button type="button" id="dm-timing" class="dm-it" role="menuitem" data-go="timing"><span class="dm-i" aria-hidden="true"><i class="dm-dot"></i></span><span class="dm-t">Timing</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="textsync"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-clock"/></svg></span><span class="dm-t">Fix highlight sync</span></button>
+  <button type="button" class="dm-it" role="menuitem" data-go="cal"><span class="dm-i" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 .01 0zM12 10a2 2 0 1 0 .01 0z"/></svg></span><span class="dm-t">Tap to align</span></button>
+  <button type="button" class="dm-it dm-all" role="menuitem" data-go="tools"><span class="dm-i" aria-hidden="true"><svg class="ic"><use href="#i-m-sliders"/></svg></span><span class="dm-t">More tools</span><span class="dm-v">&#8250;</span></button>
   </div>
-  <button type="button" class="dm-it" role="menuitem" data-go="learn" data-lrn><span class="dm-i" aria-hidden="true">&#127891;</span><span class="dm-t">Learn</span></button>
 </div>
 
 <section id="fpanel" class="sheet fpanel" hidden role="dialog" aria-modal="true" aria-labelledby="h-fpanel">
@@ -440,6 +445,13 @@
   <div class="sp" data-sp="dev" hidden>
     <div class="dev-search"><input id="dev-q" type="search" placeholder="Search developer settings" aria-label="Search developer settings" autocomplete="off"></div>
     <p id="dev-none" class="dev-none" hidden>No settings match.</p>
+    <div class="synccard"><h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-code"/></svg>Audio diagnostics</h3>
+      <details id="ad"><summary>Show audio diagnostics</summary>
+        <p class="help">Why does the voice sound choppy or noisy? Shows which path the narrator takes, the audio engine, the buffer, waits and stalls, and how busy the phone is. Updates every second while open.</p>
+        <pre id="ad-out" class="ad-out" aria-live="off"></pre>
+        <div class="dm-acts"><button id="ad-copy" class="btn small" type="button">Copy report</button><button id="ad-reset" class="btn small ghost" type="button">Reset counters</button></div>
+      </details>
+    </div>
     <div class="synccard">
       <h3><svg class="ic hi" aria-hidden="true"><use href="#i-m-target"/></svg>LibriVox skip (developer)</h3>
       <p class="help">These are on by default. Turn them off here to test or debug the raw audio without any skipping.</p>

@@ -959,8 +959,8 @@
     const r = { url: URL.createObjectURL(blob), env: null, speech: 0, total: 0, heard: (SH.pendingHeard && SH.pendingHeard[id]) || null };
     if (SH.pendingHeard) delete SH.pendingHeard[id];
     try {
-      const AC = window.AudioContext || window.webkitAudioContext, ac = new AC();
-      const buf = await ac.decodeAudioData(await blob.arrayBuffer()); ac.close && ac.close();
+      const AC = window.AudioContext || window.webkitAudioContext, ac = new AC(); let buf;
+      try { buf = await ac.decodeAudioData(await blob.arrayBuffer()); } finally { try { ac.close && ac.close(); } catch (e) { /* ignore */ } }   // closed even when the decode fails: a leaked context keeps the audio device busy
       const d = buf.getChannelData(0), N = Math.max(20, Math.min(160, Math.round(buf.duration * 40))), step = Math.floor(d.length / N) || 1, env = [];
       for (let i = 0; i < N; i++) { let s = 0; const lo = i * step, hi = Math.min(d.length, lo + step); for (let j = lo; j < hi; j++) s += d[j] * d[j]; env.push(Math.sqrt(s / Math.max(1, hi - lo))); }
       const mx = Math.max(...env) || 1, th = mx * 0.14;

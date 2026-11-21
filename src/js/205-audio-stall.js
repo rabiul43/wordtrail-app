@@ -27,6 +27,16 @@
     audio.playbackRate = P.speed;
     audio.play().catch(() => { S.loadingAudio = false; });
   }
+  /* A network error in the middle of streaming (MEDIA_ERR_NETWORK, code 2) used to end playback at once with a toast. On a weak connection it is
+     usually a dropped request, so the same track is loaded again at the same spot (same tries and limit as a stall). true = a retry is planned. */
+  function stallOnError() {
+    const e = audio.error;
+    if (!e || e.code !== 2 || !S.book || audio.paused || stallLocal() || STALL.tries >= STALL_MAX) return false;
+    STALL.tries++; const sec = S.sec, n = STALL.tries;
+    if (!STALL.told) { STALL.told = true; toast('Weak connection. Waiting for the audio…', 4000); }
+    setTimeout(() => { if (S.book && S.sec === sec && !audio.paused && STALL.tries === n) stallRetry(); }, 1200 * n);
+    return true;
+  }
   function stallCheck() {
     STALL.timer = 0;
     if (!stallStarved()) return;                                            // it recovered by itself, or the listener paused
