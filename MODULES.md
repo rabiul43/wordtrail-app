@@ -135,7 +135,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/ambient-mix.js` | 47 | Ambient: apply the mix, volume, master, save the mix, reset on a new book |
 | `sound/ambient-ducking.js` | 85 | Ambient: dip under the narrator's voice |
 | `sound/ambient-events.js` | 132 | Ambient: slow movement, random one-off sounds (birds, creaks, bell, crackle, thunder) |
-| `sound/opening-sound.js` | 320 | Opening sound: mood of a book (genre, title, language), best-fit clip, preload, play on Play with the narrator held back, skip, hand-over to the background music (20 s gap) |
+| `sound/opening-sound.js` | 335 | Opening sound: mood of a book (genre, title, language), best-fit clip, preload, play on Play with the narrator held back, skip, hand-over to the background music (20 s gap) |
 | `sound/story-rules.js` | 74 | Story sounds: which word triggers which sound (`CUE_RULES`). Edit here to add a trigger word |
 | `sound/story-sounds.js` | 177 | Story sounds: how each sound is made (`CUE_SOUND`) |
 | `sound/story-engine.js` | 66 | Story sounds: categories, finding trigger words, playing them on the audio's own clock |

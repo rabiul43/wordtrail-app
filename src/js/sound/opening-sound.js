@@ -6,7 +6,7 @@
      in music.json (same host, same cache as the background music), always the same clip for the same book. The clip is fetched and decoded when the book is
      opened (osArm). If it is not ready at Play (offline, slow) there is no opening and the narrator starts at once: a sound made on the device is never played.
      Sound screen > Opening. */
-  const OSND = { armed: '', tok: 0, nodes: null, map: {}, buf: {}, busy: {}, fail: {}, mood: '', cur: null, hold: null, gated: false, until: 0, musAt: 0 };
+  const OSND = { armed: '', tok: 0, nodes: null, map: {}, buf: {}, busy: {}, fail: {}, mood: '', cur: null, hold: null, gated: false, until: 0, musAt: 0, pend: null, pendId: '', pendDone: true };   // pend: the promise of the clip being got ready for the armed book (pendDone = it has finished, well or not)
   /* ---- the mood of a book: its own genre first, then its title, then its language ----
      Each row: [key, name, English words (regular expression), Bengali word stems (plain text: \b does not work for Bengali script, a stem also finds the word with its endings)].
      To add a genre word: add it to the row of its mood. The first row that matches wins, so the order matters. */
@@ -206,7 +206,16 @@
     if (S.sec !== 0 || t > 15) return;   // resuming in the middle: stay silent
     OSND.armed = String(b.id);
     const m = osMood(b);
-    if (AMB.ctx || ambBuild()) osManifest().then(() => { if (OSND.armed === String(b.id)) osLoad(osClip(m[0], b)); });
+    if (AMB.ctx || ambBuild()) osPrepare(b, m);
+  }
+  function osPrepare(b, m) {   // list, fetch and decode this book's clip; one more try when the first one failed. Play can wait for OSND.pend (osHoldBegin)
+    const id = OSND.pendId = String(b.id); OSND.pendDone = false;
+    const p = OSND.pend = osManifest().then(async () => {
+      if (OSND.pendId !== id) return;
+      let c = osClip(m[0], b); await osLoad(c);
+      if (c && !OSND.buf[c.id] && OSND.pendId === id) { delete OSND.fail[c.id]; await osLoad(c); }   // one retry: a slow first try is not a reason to give up
+    }).catch(() => {}).then(() => { if (OSND.pend === p) OSND.pendDone = true; });
+    return p;
   }
   /* Milliseconds music should still wait for the opening sound (0 = start now). */
   function osLeadWait() {
@@ -260,7 +269,8 @@
     const c = typeof cutFor === 'function' ? cutFor(0) : null, floor = c && c[0] > 0 ? c[0] : 0;
     if (S.sec !== 0 || audio.currentTime > floor + 20) return false;
     const clip = osClip(osMood(S.book)[0], S.book);
-    return !!(clip && OSND.buf[clip.id]);   // not decoded yet (offline, slow): skip the opening
+    if (clip && OSND.buf[clip.id]) return true;
+    return !OSND.pendDone && OSND.pendId === String(S.book.id);   // still being got ready (Play pressed at once after opening): wait for it a few seconds; finished without a clip (offline): skip the opening
   }
   function osHoldEnd(start) {   // the wait is over: start the narrator (start = true) or just drop the wait (a pause, another book)
     const hd = OSND.hold; if (!hd) return;
@@ -271,10 +281,15 @@
   }
   async function osHoldBegin() {
     const b = S.book, id = String(b.id), m = osMood(b), hd = OSND.hold = { id, timer: 0, t: Date.now() };
-    OSND.armed = ''; OSND.until = Date.now() + 2500;   // music holds back
-    toast('Opening first. Tap play to skip.', 2500);
-    hd.timer = setTimeout(() => { if (OSND.hold === hd) { OSND.until = 0; osHoldEnd(true); } }, 3000);   // safety: if anything below hangs (a suspended audio context never resumes), the narrator still starts
+    const c0 = osClip(m[0], b), ready = !!(c0 && OSND.buf[c0.id]), WAIT = 3500;   // WAIT: the longest the narrator waits for a clip that is still coming
+    OSND.armed = ''; OSND.until = Date.now() + (ready ? 2500 : WAIT + 1500);   // music holds back
+    toast(ready ? 'Opening first. Tap play to skip.' : 'Getting the opening ready. Tap play to skip.', ready ? 2500 : WAIT);
+    hd.timer = setTimeout(() => { if (OSND.hold === hd) { OSND.until = 0; osHoldEnd(true); } }, ready ? 3000 : WAIT + 2500);   // safety: if anything below hangs (a suspended audio context never resumes), the narrator still starts
     try {
+      if (!ready && OSND.pend) {   // wait for the clip, but never longer than WAIT
+        let to = 0; await Promise.race([OSND.pend, new Promise(r => { to = setTimeout(r, WAIT); })]); clearTimeout(to);
+        if (OSND.hold !== hd) return;   // skipped meanwhile
+      }
       const ok = await osPlay(m, b);
       if (OSND.hold !== hd) return;   // skipped or stopped meanwhile (osStop already cancelled the music)
       if (!ok) { OSND.until = 0; osHoldEnd(true); return; }   // no opening can play (volume 0, sound blocked): start the narrator at once
