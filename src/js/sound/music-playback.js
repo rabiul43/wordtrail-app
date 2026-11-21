@@ -174,13 +174,17 @@
     try {
       const box = $('#amb-now'); if (!box) return;
       const rows = [];
+      if (OSND.nodes && sndOn()) {   // the opening sound that is playing now: its title and artist, first in the strip
+        const c = OSND.cur, slug = c ? String(c.id).replace(/^[mo]:/, '').split('/').pop().replace(/\.[a-z0-9]+$/i, '') : '';
+        rows.push(['Opening', c ? (c.title || musPrettyTitle(slug)) : 'playing', c ? c.by : '']);
+      }
       if (!sndOn()) rows.push(['Sound', 'off']);
       else if (P.musOn) {
         const p = MUS.playing, c = p && p._clip;
         if (c) {
           const slug = String(c.f).split('/').pop().replace(/\.mp3$/i, '');
           rows.push(['Music', MUS_MOOD_NAME[MUS.mood] || 'Neutral', c.t || MUS_TITLES[slug] || musPrettyTitle(slug), c.by || '']);
-        } else if (!musNarrating()) rows.push(['Music', 'paused']);
+        } else if (!musNarrating()) rows.push(['Music', OSND.nodes && S.book ? 'starts after the opening' : 'paused']);
         else if (osLeadWait() > 0) rows.push(['Music', 'starts after the opening']);
         else if (MUS.live) rows.push(['Music', 'loading']);
         else rows.push(['Music', 'not playing yet']);
@@ -193,7 +197,6 @@
       if (sc) rows.push(['Scene', AMB.lbl]);
       const b1 = $('#snd-now-amb'); if (b1) b1.hidden = !scOff;
       const b2 = $('#amb-scene-off'); if (b2) { b2.hidden = !scOff; const n = $('#amb-scene-off-n'); if (n) n.textContent = scOff ? AMB.lbl : ''; }
-      if (OSND.nodes) rows.push(['Opening', 'recorded clip'].concat(OSND.cur ? [OSND.cur.title, OSND.cur.by] : []));
       box.textContent = ''; box.hidden = !rows.length;
       const bar = $('#snd-nowbar'); if (bar) bar.hidden = !rows.length;   // the pinned strip follows the status text
       const pp = $('#snd-now-pp');

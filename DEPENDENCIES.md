@@ -108,7 +108,7 @@ The app is one closure, so every top-level name is visible to every file. This p
 | `sound/music-moods.js` | 98 | 14 | 5 | 3 |
 | `sound/music-bus.js` | 70 | 14 | 10 | 7 |
 | `sound/music-library.js` | 143 | 13 | 9 | 11 |
-| `sound/music-playback.js` | 278 | 24 | 9 | 28 |
+| `sound/music-playback.js` | 281 | 24 | 9 | 28 |
 | `sound/music-offline.js` | 205 | 17 | 5 | 27 |
 | `sound/music-wiring.js` | 77 | 9 | 2 | 20 |
 | `sound/music-credits.js` | 47 | 7 | 2 | 2 |
