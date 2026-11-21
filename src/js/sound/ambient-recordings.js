@@ -44,7 +44,7 @@
         if (!u.url) throw new Error('missing');
         const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 30000);
         const r = await fetch(u.url, { signal: ctl.signal }); clearTimeout(to);
-        if (!r.ok) throw new Error('http ' + r.status);
+        if (!r.ok) { if (r.status === 404) ambRecGone(); throw new Error('http ' + r.status); }
         if (cache) { try { await cache.put(u.key, r.clone()); sndTouch(u.key); sndCachePrune(); } catch (e) { /* too big or blocked: still play it */ } }
         resp = r;
       }
@@ -66,10 +66,18 @@
       if (c && c.d) set(c.d);
       if (c && Date.now() - c.t < 24 * 3600e3) return;
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-      const r = await fetch(AMB_R2 + 'recordings.json', { signal: ctl.signal }); clearTimeout(to);
+      const r = await fetch(AMB_R2 + 'recordings.json', { signal: ctl.signal, cache: 'no-cache' }); clearTimeout(to);
       if (!r.ok) return;
       const d = await r.json(); set(d); store.set('wt:ambrec', { t: Date.now(), d }); ambRecPaint();
     } catch (e) { /* offline or CORS not set yet */ }
+  }
+  /* A recording answered "not found": it was removed from the library, so the saved list is old. Mark it old and get the new list
+     (at most once in 10 minutes). The sound itself already falls back to the generated one. */
+  function ambRecGone() {
+    if (AMB.recGoneT && Date.now() - AMB.recGoneT < 600e3) return;
+    AMB.recGoneT = Date.now();
+    try { const c = store.get('wt:ambrec', null); if (c && c.d) store.set('wt:ambrec', { t: 0, d: c.d }); } catch (e) { /* nothing saved */ }
+    ambRecManifest();
   }
   function ambRecPaint() {
     $$('#seg-ambsrc button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (P.ambSrc || 'hybrid'))));

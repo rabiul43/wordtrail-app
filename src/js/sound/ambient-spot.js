@@ -35,13 +35,22 @@
       if (c && c.d) AMB_SPOT.idx = c.d;
       if (c && Date.now() - c.t < 24 * 3600e3) { AMB_SPOT.idxBusy = false; return; }
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 10000);
-      const r = await fetch(AMB_R2 + 'ambient-index.json', { signal: ctl.signal }); clearTimeout(to);
+      const r = await fetch(AMB_R2 + 'ambient-index.json', { signal: ctl.signal, cache: 'no-cache' }); clearTimeout(to);
       if (!r.ok) throw new Error('http ' + r.status);
       const all = await r.json(), d = {};
       Object.keys(want).forEach(f => { const e = all[f]; if (e && e.url) d[f] = { url: e.url, license: e.license || '', author: e.author || '' }; });
       AMB_SPOT.idx = d; store.set('wt:ambspot', { t: Date.now(), d });
     } catch (e) { AMB_SPOT.idxFail = Date.now(); }
     AMB_SPOT.idxBusy = false;
+  }
+
+  /* A clip answered "not found": it was removed from the library, so the saved list is old. Mark it old and get the new list
+     (at most once in 10 minutes). The sound itself already falls back to the generated one. */
+  function ambSpotGone() {
+    if (AMB_SPOT.goneT && Date.now() - AMB_SPOT.goneT < 600e3) return;
+    AMB_SPOT.goneT = Date.now();
+    try { const c = store.get('wt:ambspot', null); if (c && c.d) store.set('wt:ambspot', { t: 0, d: c.d }); } catch (e) { /* nothing saved */ }
+    AMB_SPOT.idx = null; ambSpotLoadIdx();
   }
 
   function ambSpotPrep(buf, max) {   // one-shot: no loop blend; level the peak, cut to the longest length with a short fade
@@ -68,7 +77,7 @@
       if (!resp) {
         const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
         const r = await fetch(entry.url, { signal: ctl.signal }); clearTimeout(to);
-        if (!r.ok) throw new Error('http ' + r.status);
+        if (!r.ok) { if (r.status === 404) ambSpotGone(); throw new Error('http ' + r.status); }
         if (cache) { try { await cache.put(entry.url, r.clone()); sndTouch(entry.url); sndCachePrune(); } catch (e) { /* full or blocked */ } }
         resp = r;
       }

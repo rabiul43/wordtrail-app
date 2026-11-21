@@ -26,7 +26,7 @@
       }
       const base = MUS_HOST;
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-      const r = await fetch(base + 'music.json', { signal: ctl.signal }); clearTimeout(to);
+      const r = await fetch(base + 'music.json', { signal: ctl.signal, cache: 'no-cache' }); clearTimeout(to);   // no-cache: ask the server if the list changed, never use a stale browser copy
       if (r.ok) {
         const d = await r.json();
         if (d && d.v === 1 && d.moods) {
@@ -37,6 +37,13 @@
       }
     } catch (e) { /* offline or not yet published: use the saved copy below */ }
     if (!MUS.manifest && cached && cached.d) { MUS.manifest = cached.d; MUS.mfT = cached.t || 0; }   // an old list is better than silence
+  }
+  /* A clip answered "not found": it was removed from the library, so our saved list is old. Get the new list in the background
+     (at most once in 10 minutes). The clip itself is already skipped by musLoadNext. */
+  function musGone() {
+    if (MUS.goneT && Date.now() - MUS.goneT < 600e3) return;
+    MUS.goneT = Date.now();
+    musFetchManifest(true).catch(() => {});
   }
   /* The manifest is missing (first play offline, or the first fetch failed): try again, once at a time. */
   function musManifestRetry() {
@@ -136,7 +143,7 @@
         if (!resp) { resp = await fetch(url); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); if (MUS.have) MUS.have.add(new Request(url).url); } }
         else sndTouch(url);
       } catch (e) { resp = await fetch(url); }
-      if (!resp || !resp.ok) return null;
+      if (!resp || !resp.ok) { if (resp && resp.status === 404) musGone(); return null; }
       return await MUS.ctx.decodeAudioData(await resp.arrayBuffer());
     } catch (e) { return null; }
   }

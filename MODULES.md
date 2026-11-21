@@ -122,7 +122,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/music-state.js` | 49 | Music: the `MUS` state object, local test mode |
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
 | `sound/music-bus.js` | 70 | Music: loudness normalising, volume and audio bus, ducking under the narrator |
-| `sound/music-library.js` | 143 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
+| `sound/music-library.js` | 150 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
 | `sound/music-playback.js` | 281 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
 | `sound/music-offline.js` | 205 | Music: "Download music for offline" |
 | `sound/music-wiring.js` | 77 | Music: engine health, the Music switch, first-time hint, quick controls, `musicInit` |
@@ -131,7 +131,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/ambient-synth.js` | 73 | Ambient: sounds made on the device: noise, reverb, raindrops, rain, rolling thunder, room mix |
 | `sound/ambient-engine.js` | 71 | Ambient: indoor/outdoor detection, `audioCtx` (the ONE AudioContext of the app), `ambBuild` |
 | `sound/ambient-layers.js` | 108 | Ambient: how each sound layer is made (`AMB_LAYER`), layer on/off |
-| `sound/ambient-recordings.js` | 119 | Ambient: real recordings instead of generated sound |
+| `sound/ambient-recordings.js` | 127 | Ambient: real recordings instead of generated sound |
 | `sound/ambient-mix.js` | 47 | Ambient: apply the mix, volume, master, save the mix, reset on a new book |
 | `sound/ambient-ducking.js` | 85 | Ambient: dip under the narrator's voice |
 | `sound/ambient-events.js` | 132 | Ambient: slow movement, random one-off sounds (birds, creaks, bell, crackle, thunder) |
