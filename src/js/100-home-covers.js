@@ -36,31 +36,45 @@
   const coverVariant = title => (covHash(title) >>> 9) % 4;
 
   /* ------ our own copy of every cover (Hugging Face dataset, made by the Kaggle covers notebook) ------
-     covers/index.json      {"v":1,"b":{"<LibriVox id>":"se,ol,lv"}}  which pictures exist for a book; the FIRST one is the program's best pick
-     covers/overrides.json  {"v":1,"b":{"<id>":{"best":"ol","off":["lv"]}}}  my choices from the dashboard: "best" goes first, "off" is removed
+     covers/index.json      {"v":1,"b":{"<LibriVox id>":["ol","se,ol",1342]}}  = [the program's best pick, the pictures that exist, Gutenberg id]. (The older plain form "se,ol,lv", first = best, is still read.)
+     overrides (admin Worker, /public/cover-overrides.json)  {"version":1,"books":{"<id>":{"best":"ol","removed":["lv"]}}}  my choices from the dashboard: "best" goes first, "removed" is never shown. (The older form {"v":1,"b":{"<id>":{"best":..,"off":[..]}}} is still read.)
      covers/<floor(id/1000)>/<id>/<source>.webp   source = se (Standard Ebooks), ol (Open Library), pg (Gutenberg), lv (LibriVox)
      To use another dataset, change COV_REPO (and, if overrides.json lives somewhere else, COV_OVR_URL). */
   const COV_REPO = 'rabiul43/Book_Covers';
   const COV_ROOT = (HF_PROXY || 'https://huggingface.co') + '/datasets/' + COV_REPO + '/resolve/main/covers/';   // the Worker go-between when it is set (same as fetch does for other Hugging Face files)
   const COV_IDX_URL = 'https://huggingface.co/datasets/' + COV_REPO + '/resolve/main/covers/index.json';          // fetch() sends this through the Worker by itself
-  const COV_OVR_URL = 'https://huggingface.co/datasets/' + COV_REPO + '/resolve/main/covers/overrides.json';
+  /* My dashboard choices (Covers tab) are saved by the admin Worker and read back from its public address (set as "admin" in hosts.json; empty = no choices are read). */
+  const COV_ADMIN = '__WT_HOST_ADMIN__';
+  const COV_OVR_URL = COV_ADMIN ? COV_ADMIN + '/public/cover-overrides.json' : '';
   const COV_ORDER = ['se', 'ol', 'pg', 'lv'];
   const COV_WAIT = 5000;                  // a picture of our copy that has not loaded after this long is given up on: the next one is tried
   const COV_IDX_TTL = 12 * 3600e3, COV_OVR_TTL = 20 * 60e3, COV_START_WAIT = 2500;
   const COV = { idx: null, ovr: null, promise: null };
-  async function covFetchJson(url, key, ttl) {
+  /* The dashboard writes {"version":1,"books":{id:{best,removed}}}; the app works with {"v":1,"b":{id:{best,off}}}. */
+  function covNormOvr(j) {
+    if (!j || typeof j !== 'object') return null;
+    if (j.v === 1 && j.b && typeof j.b === 'object') return j;
+    if (j.books && typeof j.books === 'object') {
+      const b = {};
+      for (const id in j.books) { const o = j.books[id] || {}; b[id] = { best: o.best, off: Array.isArray(o.removed) ? o.removed : (Array.isArray(o.off) ? o.off : []) }; }
+      return { v: 1, b };
+    }
+    return null;
+  }
+  async function covFetchJson(url, key, ttl, norm) {
+    if (!url) return null;                  // no address set: this list is simply not used
     let d; try { d = await idb.get(key); } catch (e) { d = undefined; }
     if (d && d.j && Date.now() - (d.fetched || 0) < ttl) return d.j;
     try {
       const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
       const r = await fetch(url, { signal: ctl.signal, cache: 'no-cache' }); clearTimeout(to);
-      if (r.ok) { const j = await r.json(); if (j && j.v === 1 && j.b && typeof j.b === 'object') { idb.set(key, { j, fetched: Date.now() }); return j; } }
+      if (r.ok) { let j = await r.json(); if (norm) j = norm(j); if (j && j.v === 1 && j.b && typeof j.b === 'object') { idb.set(key, { j, fetched: Date.now() }); return j; } }
     } catch (e) { /* offline or not made yet: the saved copy below */ }
     return d && d.j ? d.j : null;           // a saved copy of any age is better than none
   }
   /* Loads both files once (saved copies are used at once; old ones are renewed). Never rejects; no files = our copy is simply not used. */
   function covLoad() {
-    return COV.promise || (COV.promise = Promise.all([covFetchJson(COV_IDX_URL, 'covidx', COV_IDX_TTL), covFetchJson(COV_OVR_URL, 'covovr', COV_OVR_TTL)])
+    return COV.promise || (COV.promise = Promise.all([covFetchJson(COV_IDX_URL, 'covidx', COV_IDX_TTL), covFetchJson(COV_OVR_URL, 'covovr', COV_OVR_TTL, covNormOvr)])
       .then(([i, o]) => { COV.idx = i && i.b; COV.ovr = o && o.b; COV.ready = true; }, () => { COV.ready = true; }));
   }
   setTimeout(() => covLoad(), 300);         // start early, so the first covers do not wait
@@ -69,10 +83,12 @@
     const id = String(b && b.id != null ? b.id : '');
     if (!/^\d{1,9}$/.test(id) || !COV.idx) return [];
     const e = COV.idx[id], o = COV.ovr && COV.ovr[id];
-    if (typeof e !== 'string' && !(o && o.best)) return [];
-    const have = typeof e === 'string' ? e.split(',').filter(x => COV_ORDER.includes(x)) : [];
+    const list = typeof e === 'string' ? e : (Array.isArray(e) ? String(e[1] || '') : null);   // "se,ol": plain form, or [best, "se,ol", gutenbergId]
+    if (list === null && !(o && o.best)) return [];
+    const have = list ? list.split(',').map(x => x.trim()).filter(x => COV_ORDER.includes(x)) : [];
+    const pick = Array.isArray(e) && have.includes(e[0]) ? e[0] : null;                          // the program's own best pick (list form)
     const off = o && Array.isArray(o.off) ? o.off : [];
-    let best = o && COV_ORDER.includes(o.best) && !off.includes(o.best) ? o.best : have.find(x => !off.includes(x));
+    let best = o && COV_ORDER.includes(o.best) && !off.includes(o.best) ? o.best : (pick && !off.includes(pick) ? pick : have.find(x => !off.includes(x)));
     const rest = COV_ORDER.filter(x => x !== best && have.includes(x) && !off.includes(x));
     const dir = COV_ROOT + Math.floor(+id / 1000) + '/' + id + '/';
     return (best ? [best].concat(rest) : rest).map(x => dir + x + '.webp');

@@ -193,7 +193,7 @@
       if (sc) rows.push(['Scene', AMB.lbl]);
       const b1 = $('#snd-now-amb'); if (b1) b1.hidden = !scOff;
       const b2 = $('#amb-scene-off'); if (b2) { b2.hidden = !scOff; const n = $('#amb-scene-off-n'); if (n) n.textContent = scOff ? AMB.lbl : ''; }
-      if (OSND.nodes) { const rec = !!OSND.buf[OSND.mood]; rows.push(['Opening', rec ? 'recorded clip' : 'made on the device'].concat(rec && OSND.cur ? [OSND.cur.title, OSND.cur.by] : [])); }
+      if (OSND.nodes) rows.push(['Opening', 'recorded clip'].concat(OSND.cur ? [OSND.cur.title, OSND.cur.by] : []));
       box.textContent = ''; box.hidden = !rows.length;
       const bar = $('#snd-nowbar'); if (bar) bar.hidden = !rows.length;   // the pinned strip follows the status text
       const pp = $('#snd-now-pp');
@@ -212,7 +212,7 @@
     if (!P.musOn || !sndOn() || !MUS.on || !musNarrating()) return;   // needs the narrator playing and Sound on; ambient is irrelevant
     if (!MUS.manifest) { musManifestRetry(); return; }   // the list never loaded (offline at the first play): try again now
     if (MUS.playing) { musCtxHeal(); return; }   // already sounding: make sure the engine is really running
-    const wait = osLeadWait();   // a recorded or made opening sound is still playing: music comes in near its end
+    const wait = osLeadWait();   // the opening sound is still playing, or has just ended: the music comes in about 20 s after its end
     if (wait > 0) { clearTimeout(MUS.lt); MUS.lt = setTimeout(musicPlay, wait + 50); sndNowPaint(); return; }
     musSceneStep();   // read the scene here first, so the very first clip already fits the story (this may start the music itself)
     if (MUS.playing || MUS.live) return;

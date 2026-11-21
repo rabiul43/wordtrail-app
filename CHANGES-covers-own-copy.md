@@ -15,3 +15,13 @@
 ## Two settings at the top of the new block
 - `COV_REPO = 'rabiul43/Book_Covers'`: change it if the covers go in `wordtrail-packs` instead (then the paths in the notebook get a prefix too).
 - `COV_OVR_URL`: change it if `overrides.json` lives in the admin worker's storage instead of Hugging Face.
+
+
+## Fix after the dashboard (Task 4): the app now reads the REAL files
+The first version of this change assumed file shapes that the notebook and dashboard do not use. Corrected:
+- `covers/index.json` really is `{"v":1,"made":...,"order":[...],"n":..,"total":..,"b":{"<id>":["<best>","se,ol",<gutenberg id>]}}`. The app now reads that list form (best pick, pictures that exist) and still reads the plain `"se,ol"` form. Before this fix, every book was skipped, so the own copy was never used.
+- My choices are NOT on Hugging Face. The dashboard saves `{"version":1,"books":{"<id>":{"best":"ol","removed":["lv"]}}}` in the admin Worker's storage (`covers/overrides.json`), and the app reads it from the Worker's public address `<admin>/public/cover-overrides.json`. `removed` is the same as `off` inside the app.
+- New address in `hosts.json`: `"admin"` (empty = my choices are not read). `build.py` has the matching slot `__WT_HOST_ADMIN__`.
+- `tools/cover_copy_check.js`: 28 checks (was 17), including the real shapes. The new checks fail on the old code.
+- The service worker needed no change.
+- How fast a dashboard change reaches a phone: the Worker address is cached for about 5 minutes, and the app keeps its own copy for 20 minutes (`COV_OVR_TTL`).

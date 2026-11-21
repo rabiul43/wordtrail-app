@@ -2,7 +2,7 @@
    Run: node tools/cover_copy_check.js   (last line must say "0 failed") */
 const fs = require('fs'), vm = require('vm'), path = require('path');
 let src = fs.readFileSync(path.join(__dirname, '..', 'src/js/100-home-covers.js'), 'utf8');
-src = src.replace('const COV_WAIT = 5000;', 'const COV_WAIT = 60;').replace('COV_START_WAIT = 2500', 'COV_START_WAIT = 300');
+src = src.replace('const COV_WAIT = 5000;', 'const COV_WAIT = 60;').replace('COV_START_WAIT = 2500', 'COV_START_WAIT = 300').replace('__WT_HOST_ADMIN__', 'https://admin.example');
 let pass = 0, fail = 0;
 const ok = (c, m) => { c ? pass++ : (fail++, console.log('FAIL ' + m)); if (c) console.log('ok    ' + m); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -23,13 +23,13 @@ function world(opts) {
     fetch: async u => { fetched.push(u); const f = opts.files && opts.files[u.split('/').pop()]; if (!f) return { ok: false }; return { ok: true, json: async () => f }; },
     openLibraryCover: undefined
   });
-  vm.runInContext('(function(){' + src.replace(/^[\s\S]*?\/\* Curated/, '/* Curated') + '\n this.api = { coverFill, covOwn, COV, covLoad }; }).call(this)', ctx);
+  vm.runInContext('(function(){' + (opts.noAdmin ? src.replace("const COV_ADMIN = 'https://admin.example'", "const COV_ADMIN = ''") : src).replace(/^[\s\S]*?\/\* Curated/, '/* Curated') + '\n this.api = { coverFill, covOwn, COV, covLoad }; }).call(this)', ctx);
   return { api: ctx.api, box, fetched, idbm, ctx };
 }
 const IDX = { v: 1, b: { '345': 'ol,lv', '1342': 'se,pg,lv', '7': 'lv' } };
 
 (async () => {
-  let w = world({ files: { 'index.json': IDX, 'overrides.json': { v: 1, b: { '1342': { best: 'pg', off: ['lv'] }, '7': { off: ['lv'] } } } } });
+  let w = world({ files: { 'index.json': IDX, 'cover-overrides.json': { v: 1, b: { '1342': { best: 'pg', off: ['lv'] }, '7': { off: ['lv'] } } } } });
   await w.api.covLoad();
   const own = id => w.api.covOwn({ id });
   ok(own('345').join() === 'https://hf.example/datasets/rabiul43/Book_Covers/resolve/main/covers/0/345/ol.webp,https://hf.example/datasets/rabiul43/Book_Covers/resolve/main/covers/0/345/lv.webp', 'best pick first (ol), then the rest in order');
@@ -39,8 +39,29 @@ const IDX = { v: 1, b: { '345': 'ol,lv', '1342': 'se,pg,lv', '7': 'lv' } };
   w = world({ proxy: '', files: { 'index.json': IDX } }); await w.api.covLoad();
   ok(w.api.covOwn({ id: '345' })[0].startsWith('https://huggingface.co/datasets/'), 'no Worker set: direct Hugging Face address');
 
+  // ---- the REAL file shapes (index.json made by the notebook; overrides written by the dashboard) ----
+  const REAL = { v: 1, made: '2026-11-19T16:32:13Z', order: ['se', 'ol', 'pg', 'lv'], n: 5, total: 5,
+    b: { '23075': ['ol', 'ol', 0], '23076': ['', '', 11254], '22954': ['se', 'se,ol', 47], '22764': ['ol', 'se,ol', 1342], '22911': ['se', 'se,ol', 45502] } };
+  const DASH = { version: 1, updated: 'x', books: { '22954': { best: 'ol', removed: ['se'], removedAt: { se: 1 }, changed: 1 }, '23075': { removed: ['ol'], removedAt: { ol: 1 } }, '22911': { best: 'ol', changed: 1 }, '24000': { best: 'se', changed: 1 } } };
+  const nm = list => list.map(u => u.split('/').pop().replace('.webp', '')).join();
+  w = world({ files: { 'index.json': REAL } }); await w.api.covLoad();
+  ok(nm(w.api.covOwn({ id: '23075' })) === 'ol', 'real index: [best, "ol", gid] gives that one picture');
+  ok(w.api.covOwn({ id: '23076' }).length === 0, 'real index: a book with no pictures (["","",gid]) gives nothing, old sources are used');
+  ok(nm(w.api.covOwn({ id: '22764' })) === 'ol,se', 'real index: the program best pick (ol) is first even though se comes first in the order');
+  ok(nm(w.api.covOwn({ id: '22954' })) === 'se,ol', 'real index: best se first, then ol');
+  w = world({ files: { 'index.json': REAL, 'cover-overrides.json': DASH } }); await w.api.covLoad();
+  ok(w.fetched.includes('https://admin.example/public/cover-overrides.json'), 'choices are read from the admin Worker public address');
+  ok(nm(w.api.covOwn({ id: '22954' })) === 'ol', 'dashboard: best ol, removed se is never listed');
+  ok(w.api.covOwn({ id: '23075' }).length === 0, 'dashboard: the only picture removed gives nothing');
+  ok(nm(w.api.covOwn({ id: '22911' })) === 'ol,se', 'dashboard: best ol put first, se kept after it');
+  ok(nm(w.api.covOwn({ id: '24000' })) === 'se', 'dashboard: a book missing from the index but with a best choice still tries that picture (no crash)');
+  w = world({ noAdmin: true, files: { 'index.json': REAL, 'cover-overrides.json': DASH } }); await w.api.covLoad();
+  ok(w.fetched.every(u => !u.includes('overrides')) && nm(w.api.covOwn({ id: '22954' })) === 'se,ol', 'no admin address set: choices are not read, the program pick is used');
+  w = world({ files: { 'index.json': REAL, 'cover-overrides.json': { oops: 1 } } }); await w.api.covLoad();
+  ok(nm(w.api.covOwn({ id: '22954' })) === 'se,ol', 'a choices file in an unknown form is ignored, nothing breaks');
+
   // covers are saved: a second page start does not fetch again
-  const idb = {}; w = world({ idb, files: { 'index.json': IDX, 'overrides.json': { v: 1, b: {} } } }); await w.api.covLoad();
+  const idb = {}; w = world({ idb, files: { 'index.json': IDX, 'cover-overrides.json': { v: 1, b: {} } } }); await w.api.covLoad();
   const n1 = w.fetched.length; const w2 = world({ idb, files: {} }); await w2.api.covLoad();
   ok(n1 === 2 && w2.fetched.length === 0 && w2.api.covOwn({ id: '345' }).length === 2, 'saved lists are used without asking the network again');
   // offline with no saved copy

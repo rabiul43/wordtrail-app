@@ -33,7 +33,7 @@ A file may use a name from a file ABOVE it at load time; inside a function it ma
 | `070-network-data.js` | 709 | network, local catalog, text-analysis data, reading level, which books are pre-synced, moods.json and similar.json, best version |
 | `080-ui-shell-favourites.js` | 400 | toast, status, views, feature guide, remember the last tab and scroll position, favourites |
 | `090-synced-stats-book-search.js` | 763 | Synced tab, Listening dashboard, Reading analytics, Offline search inside books |
-| `100-home-covers.js` | 284 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
+| `100-home-covers.js` | 300 | home constants (featured IDs, genres, cache TTLs), cover art, Standard Ebooks covers, per-book accent colour, cover style |
 | `101-home-tiles.js` | 163 | tiles, "Show more" tile, skeleton tiles, pull to refresh, fill a row, stale-while-revalidate helper |
 | `102-home-sections.js` | 215 | one book per row per screen, Featured, Recently added, genre chips and results |
 | `103-browse-filters.js` | 258 | browse filters (length, mood, language, narrator, level, sort, minimum rating), filter panel. Declares `LF` |
@@ -135,7 +135,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/ambient-mix.js` | 47 | Ambient: apply the mix, volume, master, save the mix, reset on a new book |
 | `sound/ambient-ducking.js` | 85 | Ambient: dip under the narrator's voice |
 | `sound/ambient-events.js` | 132 | Ambient: slow movement, random one-off sounds (birds, creaks, bell, crackle, thunder) |
-| `sound/opening-sound.js` | 315 | Opening (intro chime): mood of a book, clips, synth fallback, play on start |
+| `sound/opening-sound.js` | 320 | Opening sound: mood of a book (genre, title, language), best-fit clip, preload, play on Play with the narrator held back, skip, hand-over to the background music (20 s gap) |
 | `sound/story-rules.js` | 74 | Story sounds: which word triggers which sound (`CUE_RULES`). Edit here to add a trigger word |
 | `sound/story-sounds.js` | 177 | Story sounds: how each sound is made (`CUE_SOUND`) |
 | `sound/story-engine.js` | 66 | Story sounds: categories, finding trigger words, playing them on the audio's own clock |

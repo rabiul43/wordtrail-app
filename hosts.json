@@ -4,5 +4,6 @@
   "hf_proxy": "https://wordtrail-hf.test-rabiulclaud-1.workers.dev",
   "stats": "https://wordtrail-stats.test-rabiulclaud-1.workers.dev",
   "scene": "https://wordtrail-scene.test-rabiulclaud-1.workers.dev",
-  "music": "https://wordtrail-music.pages.dev/"
+  "music": "https://wordtrail-music.pages.dev/",
+  "admin": "https://wordtrail-admin.test-rabiulclaud-1.workers.dev"
 }
