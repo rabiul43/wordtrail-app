@@ -105,6 +105,7 @@
     if (S.rb) { clearTimeout(S.rb.tid); S.rb = null; }
     el.page.textContent = ''; el.page.classList.remove('cv'); S.spans.clear(); S.curId = -1;
     S.wSp = null; S.wEls = null; S.wTimes = null; S.wId = -1; S.wIdx = -1;
+    loSync(i);   // the listen-only look (155) is on only while this track has no text
     if (S.model && S.textSrc && S.textSrc.from === 'archive.org') el.page.append(srcNoteNode());   // the text came from archive.org: say so, with a way to switch
     setTimeout(() => enqueueAlign(S.sec, true), 0);
     setTimeout(() => backfillSkip(i), 0);
@@ -121,7 +122,8 @@
         updateHeader(); return;
       }
       if (TM.fail) { el.page.append(noteNode("Couldn't reach timing. Try again", [['Try again', retryTiming], ['Choose text', () => openSheet('sheet-text')]], 'The shared timing could not be loaded. Check your connection.')); updateHeader(); return; }
-      el.page.append(noteNode('No text is lined up with this track.', [['Choose text', () => openSheet('sheet-text')]]));
+      loSync(i);
+      el.page.append(loActive(i) ? loNode() : noteNode('No text is lined up with this track.', [['Choose text', () => openSheet('sheet-text')]]));
       updateHeader(); return;
     }
     if (S.textSrc && S.textSrc.asr) el.page.append(asrBanner());   // the text was made from speech recognition

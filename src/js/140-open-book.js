@@ -7,11 +7,12 @@
     const pc = $('#pcover');
     if (pc && pc._wtId !== S.book.id) { pc._wtId = S.book.id; pc.textContent = ''; pc.append(coverBox(S.book, 'pcover-bg'), h('div', { class: 'pcover-poster' }, coverBox(S.book, 'pcover-art'))); }
     const t = S.secs[S.sec];
-    el.sub.textContent = 'Track ' + (S.sec + 1) + ' of ' + S.secs.length + (S.model && S.plan[S.sec] && !S.plan[S.sec].ids.length && !trkLoading(S.sec) ? ' · no text' : '') + (S.bgTrack === S.sec ? ' · syncing' : '') + dlNote() + (S.syncWatch === S.book.id && S.syncText ? ' · ' + S.syncText : '') + ' · ' + S.book.authors;
+    el.sub.textContent = 'Track ' + (S.sec + 1) + ' of ' + S.secs.length + (S.model && S.plan[S.sec] && !S.plan[S.sec].ids.length && !trkLoading(S.sec) ? (loActive() ? ' · audio only' : ' · no text') : '') + (S.bgTrack === S.sec ? ' · syncing' : '') + dlNote() + (S.syncWatch === S.book.id && S.syncText ? ' · ' + S.syncText : '') + ' · ' + S.book.authors;
     updateSyncUI(); verChip(); paintBookProg();
     if (S._miniBook !== S.book.id) { S._miniBook = S.book.id; setMini(false); } // each book opens with the full controls
     { const nt = $('#b-nexttrack'); if (nt) nt.disabled = S.sec >= S.secs.length - 1; }
     document.title = t ? t.title + ' · ' + S.book.title + ' · Wordtrail' : 'Wordtrail';
+    loSync();
   }
   function prefetchText(b) {
     const saved = store.get('wt:book:' + b.id, null) || {};

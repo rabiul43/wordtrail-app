@@ -1,0 +1,35 @@
+/* Listen-only screen (src/js/155-listen-only.js): a track with no text. Colours come from the theme tokens, so every theme works.
+   The round cover, ring and wave are phones and tablets only (< 900px); on desktop the cover stays in its side panel and only the
+   quiet note and Up next card change. Motion runs only while playing, never under reduced motion, Calm mode or light effects. */
+.lo-note { display: grid; gap: .9rem; justify-items: center; max-width: 34rem; margin: 0 auto; padding: .5rem 1rem 1.25rem; }
+.lo-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .1rem .5rem; color: var(--muted); font-size: .9rem; line-height: 1.4; text-align: center; }
+.lo-add, .lo-all { min-height: 2.75rem; padding: 0 .75rem; font-size: .9rem; background: none; border: 0; border-radius: var(--r-sm); color: var(--accent); font-family: inherit; font-weight: 600; cursor: pointer; }
+.lo-add { text-decoration: underline; text-underline-offset: 3px; }
+.lo-next { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .1rem .75rem; padding: .7rem .5rem .9rem 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); }
+.lo-next-t { display: grid; min-width: 0; }
+.lo-next-t small { color: var(--muted); font-size: .75rem; }
+.lo-next-t b { font-weight: 500; font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lo-strip { grid-column: 1 / -1; display: flex; gap: 2px; padding-right: .5rem; margin-top: .25rem; }
+.lo-strip i { flex: 1; height: 6px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.lo-strip i.done { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.lo-strip i.cur { background: var(--accent); }
+.lo-wave { display: none; }
+@keyframes lo-spin { to { transform: rotate(360deg); } }
+@keyframes lo-bar { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.player.lo #b-read { display: none; }
+@media (max-width: 899px) {
+  .player.lo .pcover { --lo-d: min(62vw, 15rem); height: calc(var(--lo-d) + 2.4rem); margin-bottom: 0; overflow: visible; background: none; }
+  .player.lo .pcover-bg, .player.lo .pcover::after { display: none; }
+  .player.lo .pcover::before { content: ""; position: absolute; z-index: 2; left: 50%; top: 50%; width: calc(var(--lo-d) + 1.1rem); height: calc(var(--lo-d) + 1.1rem); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+    background: conic-gradient(var(--accent) calc(var(--lo-p, 0) * 1%), color-mix(in srgb, var(--ink) 14%, transparent) 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); }
+  .player.lo .pcover-poster { width: var(--lo-d); height: var(--lo-d); aspect-ratio: 1; max-width: none; border-radius: 50%; overflow: hidden; animation: none; }
+  .player.lo .pcover-poster .pcover-art img { object-fit: cover; object-position: center; }
+  .player.lo.lo-play .pcover-poster { animation: lo-spin 28s linear infinite; }
+  .player.lo .lo-wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 26px; margin-top: .4rem; }
+  .player.lo .lo-wave i { width: 3px; border-radius: 2px; background: var(--accent); transform: scaleY(.55); animation: lo-bar 1.3s ease-in-out infinite; animation-play-state: paused; }
+  .player.lo.lo-play .lo-wave i { animation-play-state: running; }
+  .player.lo .ptitle { margin-top: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) { .player.lo.lo-play .pcover-poster, .player.lo .lo-wave i { animation: none !important; } }
+[data-calm] .player.lo.lo-play .pcover-poster, [data-calm] .player.lo .lo-wave i, html[data-lite] .player.lo.lo-play .pcover-poster, html[data-lite] .player.lo .lo-wave i { animation: none !important; }

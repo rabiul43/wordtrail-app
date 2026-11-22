@@ -3,6 +3,12 @@
   "dir": "ltr",
   "order": 6,
   "dict": {
+    "Listen-only screen": "শুধু শোনার স্ক্রিন",
+    "A track with no text shows a round cover and the next track instead of a warning.": "যে ট্র্যাকের লেখা নেই, সেখানে সতর্কতার বদলে গোল কভার আর পরের ট্র্যাক দেখায়।",
+    "No text for this track. Just listen.": "এই ট্র্যাকের লেখা নেই। শুধু শুনুন।",
+    "Add text": "লেখা যোগ করুন",
+    "Up next": "এরপর",
+    "Tracks without text": "লেখা ছাড়া ট্র্যাক",
     "Fill the gaps": "শূন্যস্থান পূরণ করুন",
     "Fill in the missing words": "হারানো শব্দগুলো লিখুন",
     "Hint: letters": "ইঙ্গিত: অক্ষর",
