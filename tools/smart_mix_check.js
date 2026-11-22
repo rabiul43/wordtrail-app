@@ -13,7 +13,7 @@ const src = fs.readFileSync(path.join(__dirname, '..', 'src/js/sound/smart-mix.j
 /* ---- the pretend app ---- */
 const ls = {};
 const localStorage = { get length() { return Object.keys(ls).length; }, key: i => Object.keys(ls)[i] || null, getItem: k => (k in ls ? ls[k] : null), setItem: (k, v) => { ls[k] = String(v); }, removeItem: k => { delete ls[k]; } };
-const store = { get: (k, d) => { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }, set: (k, v) => localStorage.setItem(k, JSON.stringify(v)) };
+const store = { get: (k, d) => { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }, set: (k, v) => localStorage.setItem(k, JSON.stringify(v)), flush: () => {}, del: k => localStorage.removeItem(k) };   // stand-in: writes through, so flush has nothing to do
 const P = { smartMix: true, musVol: 40, ambVol: 70 };
 const S = { book: { id: 'b1' }, loadingAudio: false };
 const nodes = [];

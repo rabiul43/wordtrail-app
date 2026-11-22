@@ -100,7 +100,7 @@
      download cut short by closing the page or losing the connection can carry on by itself (dlResumePending). */
   const DQ_KEY = 'wt:dlq';
   const dqSet = b => { try { store.set(DQ_KEY, { id: String(b.id), title: b.title || '', ts: Date.now() }); } catch (e) { /* ignore */ } };
-  const dqClear = () => { try { localStorage.removeItem(DQ_KEY); } catch (e) { /* ignore */ } };
+  const dqClear = () => { try { store.del(DQ_KEY); } catch (e) { /* ignore */ } };
   const dqGet = () => { try { const v = store.get(DQ_KEY, null); return v && v.id ? v : null; } catch (e) { return null; } };
   async function dlStart(book, only) {   // only: a list of track numbers to save instead of the whole book
     const b = book || S.book;

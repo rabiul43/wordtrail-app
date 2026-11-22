@@ -334,7 +334,7 @@ section > h2 { font-size: .78rem; text-transform: uppercase; letter-spacing: .1e
   .tile:active, .card:active, .genre-chip:active, .tab:active, .tile-more:active, .acct-link:active, .heart:active { transform: none; }
   .heart.pop svg { animation: none; }
 }
-body:has(#tabbar:not([hidden])) .toast { bottom: calc(5rem + env(safe-area-inset-bottom)); }
+html[data-ui~="tabbar"]:not(#_) .toast { bottom: calc(5rem + env(safe-area-inset-bottom)); }
 .state { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; padding: 1.6rem 1rem; background: var(--surface); border-radius: 18px; }
 .state-ic { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); margin-bottom: .2rem; }
 .state.error .state-ic, .state.offline .state-ic { background: var(--surface-2); color: var(--danger); }
@@ -375,7 +375,7 @@ body:has(#tabbar:not([hidden])) .toast { bottom: calc(5rem + env(safe-area-inset
 .mini-scene { flex: none; max-width: 7.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: .2rem .6rem; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); font-size: .68rem; font-weight: 600; line-height: 1.5; cursor: pointer; }
 .mini-scene:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
 .mini-scene[hidden] { display: none; }
-body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(9.5rem + env(safe-area-inset-bottom)); }
+html[data-ui~="tabbar"]:not(#_) body.has-mini .toast { bottom: calc(9.5rem + env(safe-area-inset-bottom)); }
 @media (prefers-reduced-motion: reduce) { .mini-play:active { transform: none; } }
 
 /* ---------- Phase 13: thumb-safe hearts + reduced motion everywhere ---------- */
@@ -403,7 +403,7 @@ body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(9.5rem + env(safe
 #sec-genre { margin-top: -.3rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: .5rem; }
 .genre-row { scroll-padding-left: 1.1rem; display: flex; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overflow-y: hidden; gap: .4rem; scroll-snap-type: x proximity; margin: 0 -1.1rem; padding: .1rem 1.1rem .15rem;
   -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent); }
-body.genre-on #sec-picks, body:has(#filter-results:not([hidden])) #sec-picks { display: none; }
+body.genre-on #sec-picks, html[data-ui~="filter"]:not(#_) #sec-picks { display: none; }
 
 
 /* Account: activity tiles, and the Data and privacy section */

@@ -96,7 +96,7 @@
   .tab > span:not(.tab-ic) {
     position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
-  html[data-nav="open"] body:not(:has(#player:not([hidden]))) .tab > span:not(.tab-ic) {
+  html[data-nav="open"]:not([data-ui~="player"]):not(#_) body .tab > span:not(.tab-ic) {
     position: static; width: auto; height: auto; overflow: visible; clip-path: none;
   }
   .tab { min-height: 3rem; }

@@ -170,6 +170,7 @@
   }
   function exportBookmarks() {
     const out = [];
+    store.flush();
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i); if (!k || k.indexOf('wt:bm:') !== 0) continue;
       const r = store.get(k, null); if (!r) continue;

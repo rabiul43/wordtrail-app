@@ -64,9 +64,42 @@
       return f0(typeof input === 'string' ? px(input) : input, init);
     }; }
   let storeHook = null; // set by 295-account-sync.js: called with the key after every saved item
+  /* Write queue (Task 8). store.set puts the value in memory at once (as the JSON text, so the saved copy is a snapshot,
+     exactly as before) and one timer writes everything that is waiting to localStorage in one go: the LATEST value per key
+     wins, and storeHook runs once per key when it is really saved. store.get answers from the queue first, so it always
+     sees the newest value. The queue is also written (store.flush()):
+       - when the page is hidden or closed (visibilitychange / pagehide, listener at the end of 999, so it runs after every
+         other handler that saves something there),
+       - before any code that reads localStorage directly (backup, account sync, key scans) and before a restore starts,
+       - at once for values that must survive a sudden close (store.now, used for wt:pauseT).
+     While a restore is running (window.__wtRestoring) nothing is queued and nothing is written, as before. */
+  const STORE_WAIT = 600;   // ms: the longest a changed value waits before it is written (the timer is not pushed back by newer sets)
+  const storeQ = new Map(); // key -> JSON text waiting to be written
+  let storeT = 0;
   const store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-    set(k, v) { if (window.__wtRestoring) return; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return; /* storage unavailable */ } if (storeHook) storeHook(k); }
+    get(k, d) {
+      try {
+        const v = storeQ.has(k) ? storeQ.get(k) : localStorage.getItem(k);
+        return v ? JSON.parse(v) : d;
+      } catch (e) { return d; }
+    },
+    set(k, v) {
+      if (window.__wtRestoring) return;
+      let s; try { s = String(JSON.stringify(v)); } catch (e) { return; /* cannot be saved */ }
+      storeQ.set(k, s);
+      if (!storeT) storeT = setTimeout(store.flush, STORE_WAIT);
+    },
+    del(k) { storeQ.delete(k); try { localStorage.removeItem(k); } catch (e) { /* storage unavailable */ } },   // removes the key, also a value still waiting in the queue
+    now(k, v) { store.set(k, v); store.flush(); },   // a value that must be saved at once (e.g. just before the page closes)
+    flush() {
+      if (storeT) { clearTimeout(storeT); storeT = 0; }
+      if (!storeQ.size) return;
+      const list = [...storeQ]; storeQ.clear();
+      if (window.__wtRestoring) return;   // a restore is writing the real values: do not put old ones over them
+      const done = [];
+      list.forEach(([k, s]) => { try { localStorage.setItem(k, s); done.push(k); } catch (e) { /* storage unavailable or full: skip this key */ } });
+      if (storeHook) done.forEach(k => { try { storeHook(k); } catch (e) { /* never break saving */ } });
+    }
   };
   const idb = (() => {
     let dbp = null;

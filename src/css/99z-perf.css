@@ -1,0 +1,54 @@
+/* ---------- Smoothness (phase 2) ---------- */
+
+/* 1. The player's backdrop is a tiny canvas now (softBackdrop in 100-home-covers.js): no CSS blur is painted. The picture stays as a fallback. */
+.pcover-bg canvas.bg-soft { position: absolute; inset: -14%; width: 128%; height: 128%; max-width: none; opacity: 0; transition: opacity .5s ease; transform: translateZ(0); image-rendering: auto; }
+.pcover-bg canvas.bg-soft.loaded { opacity: .72; }
+.pcover-bg.bg-soft-on > img { display: none; }
+@media (prefers-reduced-motion: reduce) { .pcover-bg canvas.bg-soft { transition: none; } }
+
+/* 2. Phones: the tab bar and the sticky bars are nearly solid already (78-95% fill), so the live blur behind them is dropped and the fill is
+   made a little firmer. The glass look stays on tablets and computers (700px and up). */
+@media (max-width: 699px) {
+  .tabbar, .searchbar.stuck, .appbar.stuck { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--bg) 96%, transparent); }
+}
+
+/* 3. Pulses that only change opacity or scale run on the graphics card; a moving box-shadow is repainted on every frame. */
+.dlmark[data-s="run"] { animation: none; }
+.dlmark[data-s="run"]::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 3px rgba(233, 184, 79, .35); opacity: 0; animation: wtRingPulse 1.6s ease-in-out infinite; pointer-events: none; }
+@keyframes wtRingPulse { 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .dlmark[data-s="run"]::after { animation: none; opacity: 0; } }
+.player.opening .pcover-poster { animation: wtopBreathe 2.4s ease-in-out infinite; box-shadow: 0 12px 44px color-mix(in srgb, var(--accent) 26%, transparent); }
+@keyframes wtopBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.018); } }
+@media (prefers-reduced-motion: reduce) { .player.opening .pcover-poster { animation: none; } }
+html[data-lite] .player.opening .pcover-poster { animation: none; }
+
+/* 4. Nothing moves while the page is hidden (another tab, the screen off): 080 sets <html data-hidden>, which pauses every running animation
+   (skeleton shimmer, spinners, pulses). They carry on from the same point when the page is shown again. */
+html[data-hidden] *, html[data-hidden] *::before, html[data-hidden] *::after { animation-play-state: paused !important; }
+
+/* 5. Touch: taps on buttons, links and cards never wait for a possible double-tap zoom, and a double tap does not zoom the page.
+   (The reader and the sliders set their own touch-action on their own element, which is not changed here.) */
+button, a[href], summary, label, [role="button"], [role="tab"], .tile, .card, .chip, .tab, .genre-chip { touch-action: manipulation; }
+/* menus and sheets: a swipe that reaches the end of their list does not drag the page behind them */
+.dmenu, .sheet, .cf-back { overscroll-behavior: contain; }
+
+/* 6. Home rows far below the screen are not drawn until they are near (content-visibility on the row itself: the row is the scroller and
+   already clips its own box; on the whole section it cut off the right edge of rows that run to the screen edge). The first time, the
+   height is a guess (19rem, the measured height of a row of covers); once a row has been shown the browser remembers its real height
+   ("auto"), so the page does not jump. Phones only (on wide screens the row is a grid and its cover shadows must not be clipped).
+   Not used on the lists of My Library, Synced and Search: those are already limited by vlist (031). */
+@media (max-width: 699px) {
+  .home-section .hrow:not(:empty) { content-visibility: auto; contain-intrinsic-size: auto 19rem; }
+}
+
+/* 7. Touch feel (Task 10). The motion system in 70-collections-detail-motion.css already gives .btn, .chip, .tile, .card, .tab, .ib, .play and
+   the other listed controls a press scale (with reduced motion and html[data-lite] switched off). This only fills the gap: any other button
+   dips in opacity while it is pressed, at once, on touch screens only. Opacity needs no layout and no repaint of its neighbours, so it is the
+   same for lite mode; nothing scales, so it cannot fight a `transform` that an element sets for itself. Sliders, drag handles and disabled
+   buttons are left alone. */
+@media (hover: none) and (pointer: coarse) {
+  :is(button, [role="button"], [role="tab"]):not(.btn, .chip, .fchip, .genre-chip, .tile, .card, .synced-row, .mrow, .acct-link, .tile-more, .tab, .col-card, .col-hero, .col-tile, .botd-hero, .det-btn, .resume, .ib, .heart, .mini-play, .play, .nr-wave, .tl-h, .ps-thumb, :disabled, [aria-disabled="true"]):active { opacity: .72; }
+}
+
+/* 8. Scrolling lists inside a sheet or a card (not only the sheet itself): reaching the end of one never drags the page or the sheet behind it. */
+.trpop, .rq.sug, .wf__res, .ec-card, .ec-lib-body, .lt-fb, .ws-paper, .wr-ta, .livetr, .ow-card, .ad-out, .sp-fs-card, .sheet.ws .ws-body, .reader, #reader { overscroll-behavior: contain; }

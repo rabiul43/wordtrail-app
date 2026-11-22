@@ -19,7 +19,7 @@
 .tod-alt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* the time-of-day card takes the Book of the day's place while it is showing */
 #sec-tod:not([hidden]) ~ #sec-botd { display: none; }
-body.genre-on #sec-tod, body:has(#filter-results:not([hidden])) #sec-tod { display: none; }
+body.genre-on #sec-tod, html[data-ui~="filter"]:not(#_) #sec-tod { display: none; }
 /* with listening history, Continue listening is the hero: no Book of the day */
 #recents:not([hidden]) ~ #sec-botd { display: none; }
 /* scope chips only matter while searching. .sf-keep (set in rsPaint) keeps the row up while a scope other than All is chosen, so it does not depend on :has() re-evaluating aria-pressed */
@@ -502,8 +502,8 @@ html[data-offbar] .tabbar { bottom: var(--offbar-h, 0px); padding-bottom: .35rem
 html[data-offbar] .home { padding-bottom: calc(var(--tabbar-h, 4.2rem) + var(--mini-h, 0px) + var(--offbar-h, 0px) + 1.5rem); }
 html[data-offbar] .mini { bottom: calc(var(--tabbar-h, 4.2rem) + var(--offbar-h, 0px) + .4rem); }
 html[data-offbar] .toast { bottom: calc(var(--dock-h, 0px) + var(--offbar-h, 0px) + .8rem + env(safe-area-inset-bottom)); }
-html[data-offbar] body:has(#tabbar:not([hidden])) .toast { bottom: calc(var(--tabbar-h, 4.2rem) + var(--offbar-h, 0px) + .5rem); }
-html[data-offbar] body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(9.5rem + var(--offbar-h, 0px) + env(safe-area-inset-bottom)); }
+html[data-offbar][data-ui~="tabbar"]:not(#_) .toast { bottom: calc(var(--tabbar-h, 4.2rem) + var(--offbar-h, 0px) + .5rem); }
+html[data-offbar][data-ui~="tabbar"]:not(#_) body.has-mini .toast { bottom: calc(9.5rem + var(--offbar-h, 0px) + env(safe-area-inset-bottom)); }
 html[data-offbar] .trpop { bottom: calc(var(--dock-h, 0px) + var(--offbar-h, 0px) + .8rem + env(safe-area-inset-bottom)); }
 @media (min-width: 46rem) { .offbar { left: 50%; right: auto; width: min(100%, 46rem); transform: translate(-50%, 100%); border-radius: var(--r-card) var(--r-card) 0 0; } .offbar.show { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .offbar { transition: none; } }

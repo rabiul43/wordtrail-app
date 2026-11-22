@@ -72,17 +72,17 @@
 
 /* Learn screen only, on phones: the title is drawn by the screen itself, so the shared header bar steps aside; the bottom bar lights the active tab as a pill */
 @media (max-width: 699.98px) {
-  html:has(#shelf[data-mode="learn"]:not([hidden])) #appbar { display: none; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) #shelf > .tab-head { display: none; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tabbar { padding-top: .35rem; padding-bottom: max(1.45rem, env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--line); }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab { min-height: 0; gap: 0; padding-top: 0; padding-bottom: 0; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab::before { display: none; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab .tab-ic { width: 3.75rem; height: 2.2rem; margin-bottom: -.2rem; display: grid; place-items: center; background: transparent; border-radius: 999px; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] { color: var(--accent); }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic { margin-top: .5rem; background: var(--accent-soft); }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic + span { margin-top: .2rem; }
-  html:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] svg { transform: none; animation: none; fill: none; }
+  html[data-ui~="learn"]:not(#_)[data-ui] #appbar { display: none; }
+  html[data-ui~="learn"]:not(#_)[data-ui] #shelf > .tab-head { display: none; }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tabbar { padding-top: .35rem; padding-bottom: max(1.45rem, env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--line); }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab { min-height: 0; gap: 0; padding-top: 0; padding-bottom: 0; }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab::before { display: none; }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab .tab-ic { width: 3.75rem; height: 2.2rem; margin-bottom: -.2rem; display: grid; place-items: center; background: transparent; border-radius: 999px; }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab[aria-current="page"] { color: var(--accent); }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab[aria-current="page"] .tab-ic { margin-top: .5rem; background: var(--accent-soft); }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab[aria-current="page"] .tab-ic + span { margin-top: .2rem; }
+  html[data-ui~="learn"]:not(#_)[data-ui] .tab[aria-current="page"] svg { transform: none; animation: none; fill: none; }
 }
-:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) .tabbar { background: #0F0F11; border-top-color: #26262A; }
-:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) .tab[aria-current="page"] .tab-ic { background: #292418; }
-:root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])), :root[data-theme="black"]:has(#shelf[data-mode="learn"]:not([hidden])) body { background: #0A0A0B; }
+:root[data-theme="black"][data-ui~="learn"]:not(#_)[data-ui] .tabbar { background: #0F0F11; border-top-color: #26262A; }
+:root[data-theme="black"][data-ui~="learn"]:not(#_)[data-ui] .tab[aria-current="page"] .tab-ic { background: #292418; }
+:root[data-theme="black"][data-ui~="learn"]:not(#_)[data-ui], :root[data-theme="black"][data-ui~="learn"]:not(#_)[data-ui] body { background: #0A0A0B; }

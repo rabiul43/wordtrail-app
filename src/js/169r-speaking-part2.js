@@ -135,7 +135,7 @@
     /* ----- the clock: always worked out from the start and end times, never counted ----- */
     function paintTime(sec, total) {
       const t = SPC.fmt(sec); if (L.tEl && L.tEl.textContent !== t) L.tEl.textContent = t;
-      if (L.arc) L.arc.setAttribute('stroke-dashoffset', String(CIRC * (1 - Math.max(0, Math.min(1, sec / total)))));
+      if (L.arc) { const d = String(CIRC * (1 - Math.max(0, Math.min(1, sec / total)))); if (L.arcD !== d || L.arcE !== L.arc) { L.arcD = d; L.arcE = L.arc; L.arc.setAttribute('stroke-dashoffset', d); } }
     }
     function say(sec) {   // a short spoken note at a few moments only (not every second)
       const th = L.mode === 'prep' ? (sec <= 0 ? 0 : -1) : L.mode === 'speak' ? (sec <= 0 ? 0 : sec <= 10 ? 10 : sec <= 60 ? 60 : -1) : -1;

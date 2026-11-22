@@ -27,11 +27,11 @@ html[data-player-style="glass"][data-theme="light"], html[data-player-style="gla
 }
 
 /* ---- backdrop: dim + blur the reader, plus two glow orbs (only while one of the two sheets is open) ---- */
-html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop { background: var(--pg-dim); -webkit-backdrop-filter: blur(14px) saturate(1.15); backdrop-filter: blur(14px) saturate(1.15); overflow: hidden; }
-html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::before,
-html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; width: min(120vw, 620px); height: min(120vw, 620px); }
-html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::before { left: -30%; top: -8%; background: radial-gradient(circle, rgba(109, 91, 255, var(--pg-orb1)) 0, rgba(109, 91, 255, 0) 66%); }
-html[data-player-style="glass"] body:has(.ps-sheet:not([hidden])) #backdrop::after { right: -34%; bottom: -10%; background: radial-gradient(circle, rgba(47, 212, 192, var(--pg-orb2)) 0, rgba(47, 212, 192, 0) 66%); }
+html[data-player-style="glass"][data-ui~="pssheet"][data-ui] #backdrop { background: var(--pg-dim); -webkit-backdrop-filter: blur(14px) saturate(1.15); backdrop-filter: blur(14px) saturate(1.15); overflow: hidden; }
+html[data-player-style="glass"][data-ui~="pssheet"][data-ui] #backdrop::before,
+html[data-player-style="glass"][data-ui~="pssheet"][data-ui] #backdrop::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; width: min(120vw, 620px); height: min(120vw, 620px); }
+html[data-player-style="glass"][data-ui~="pssheet"][data-ui] #backdrop::before { left: -30%; top: -8%; background: radial-gradient(circle, rgba(109, 91, 255, var(--pg-orb1)) 0, rgba(109, 91, 255, 0) 66%); }
+html[data-player-style="glass"][data-ui~="pssheet"][data-ui] #backdrop::after { right: -34%; bottom: -10%; background: radial-gradient(circle, rgba(47, 212, 192, var(--pg-orb2)) 0, rgba(47, 212, 192, 0) 66%); }
 
 /* ---- floating glass sheet ---- */
 html[data-player-style="glass"] .ps-sheet { bottom: max(10px, env(safe-area-inset-bottom, 0px)); width: min(calc(100% - 20px), 42rem); border-radius: 36px; background: var(--pg-bg); -webkit-backdrop-filter: blur(28px) saturate(1.4); backdrop-filter: blur(28px) saturate(1.4); border: 1px solid var(--pg-bd); box-shadow: var(--pg-shadow); color: var(--pg-ink); font-family: var(--font-ui); }

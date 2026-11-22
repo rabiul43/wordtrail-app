@@ -4,6 +4,7 @@
     // Lists cached before cover art was requested have no covers: drop them once so they reload with art.
     try {
       if (store.get('wt:covfix', 0) !== 2) {
+        store.flush();
         Object.keys(localStorage).filter(k => /^wt:(genre:|home:|q:|seeall:)/.test(k)).forEach(k => localStorage.removeItem(k));
         store.set('wt:covfix', 2);
       }

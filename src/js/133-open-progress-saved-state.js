@@ -11,15 +11,22 @@
     const st = STEPS[OP.key] || STEPS.list, pct = Math.round(OP.f * 100) + '%';
     const sec = Math.floor((Date.now() - OP.t0) / 1000);
     const extra = OP.detail || (OP.timed && sec >= 3 ? sec + 's' : '');
-    if (OP.home) { progress(true, OP.f, pct); setStatus('Opening "' + OP.title + '": ' + st[1].toLowerCase() + '…' + (extra ? ' (' + extra + ')' : '')); }
-    if (OP.ui) OP.ui.lbl.textContent = sec >= 6 || OP.detail ? (extra || '') : '';   // one calm line; details only when it is slow
+    if (OP.home) {
+      progress(true, OP.f, pct);
+      const msg = 'Opening "' + OP.title + '": ' + st[1].toLowerCase() + '…' + (extra ? ' (' + extra + ')' : '');
+      if (msg !== OP.lastMsg || !OP.lastMsgOn) { OP.lastMsg = msg; setStatus(msg); }   // the same line is not drawn again
+      OP.lastMsgOn = true;
+    } else OP.lastMsgOn = false;
+    if (OP.ui) { const lt = sec >= 6 || OP.detail ? (extra || '') : ''; if (OP.ui.lbl.textContent !== lt) OP.ui.lbl.textContent = lt; }   // one calm line; details only when it is slow
     opPaintBtn(pct, Math.round(OP.f * 100));
   }
   /* Opening the book: the text is not ready yet, so Play waits. The play buttons turn into the progress ring (see 99l-opening.css),
      a press is remembered and starts the narration the moment the text is ready (or when it fails, so listening is never blocked). */
   const opGate = () => !!(OP.active && !OP.home && S.book && !S.model);
+  let opBtnKey = '';   // the last state drawn on the play buttons: the same state needs no new work
   function opPaintBtn(pct, n) {
-    const on = opGate();
+    const on = opGate(), key = (on ? 1 : 0) + '|' + (on && S.playWhenReady ? 1 : 0) + '|' + n + '|' + pct;
+    if (key === opBtnKey) return; opBtnKey = key;
     $$('#b-play, #mini-play, #nr-play').forEach(b => {
       b.classList.toggle('opening', on);
       b.classList.toggle('queued', on && !!S.playWhenReady);   // the press was heard: it starts when the text is ready (Wide play bar says so)
@@ -36,7 +43,7 @@
     if (S.playWhenReady) { S.playWhenReady = false; if (S.book && audio.paused) audio.play().catch(onPlayFail); }
   }
   function startOpen(title, home) {
-    clearInterval(OP.timer);
+    clearInterval(OP.timer); opBtnKey = ''; OP.lastMsgOn = false; if (ostEl) ostEl.pn = -1;   // a new opening always draws its first state
     Object.assign(OP, { active: true, home: !!home, f: 0, key: 'list', t0: Date.now(), title: title || '', detail: '', timed: true, ui: null });
     OP.timer = setInterval(paintOpen, 500);
     paintOpen();
@@ -109,6 +116,7 @@
   }
   function ostProg(n) {
     if (!ostEl || !OP.active) return;   // after the book is open the screen only fades out; it keeps its last progress
+    if (ostEl.pn === n) return; ostEl.pn = n;
     ostEl.root.style.setProperty('--op', String(n));
     const k = Math.round(n * ostEl.bars.length / 100);
     ostEl.bars.forEach((x, i) => x.classList.toggle('on', i < k));

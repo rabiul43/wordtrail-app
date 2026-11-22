@@ -101,6 +101,7 @@ PARTS = [
     ('file', 'src/css/99q-ielts-books.css'),
     ('file', 'src/css/99r-skip-ready.css'),
     ('file', 'src/css/99s-learn-screen.css'),
+    ('file', 'src/css/99z-perf.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),

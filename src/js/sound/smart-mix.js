@@ -171,14 +171,15 @@ const SMX_REF = { mus: 0.40, amb: 0.70 };   // the reference slider positions (t
   function smxIndexTouch(id) {
     let idx = store.get(SMX_IDX, null); if (!Array.isArray(idx)) idx = [];
     idx = idx.filter(x => x !== id); idx.push(id);
-    while (idx.length > SMX_KEEP) { const old = idx.shift(); try { localStorage.removeItem(SMX_NOTE + old); } catch (e) { /* storage unavailable */ } }
+    while (idx.length > SMX_KEEP) { const old = idx.shift(); try { store.del(SMX_NOTE + old); } catch (e) { /* storage unavailable */ } }
     store.set(SMX_IDX, idx);
   }
   function smxIndexInit() {
     if (Array.isArray(store.get(SMX_IDX, null))) return;
     const ids = [];
+    store.flush();
     try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(SMX_NOTE) && k !== SMX_NOTE + 'global') ids.push(k.slice(SMX_NOTE.length)); } } catch (e) { return; }
-    let idx = ids; while (idx.length > SMX_KEEP) { const old = idx.shift(); try { localStorage.removeItem(SMX_NOTE + old); } catch (e) { /* storage unavailable */ } }
+    let idx = ids; while (idx.length > SMX_KEEP) { const old = idx.shift(); try { store.del(SMX_NOTE + old); } catch (e) { /* storage unavailable */ } }
     store.set(SMX_IDX, idx);
   }
   function smxSave() {

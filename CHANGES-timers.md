@@ -1,0 +1,5 @@
+# Timers (performance Task 9)
+
+- `src/js/260-audio-effects.js`: silence skipping ticks every 120 ms (was 70), the loudness evener every 250 ms (was 100). Both still run only while the audio plays and their switch is on. They now count real elapsed time (`performance.now`, capped), not a fixed step, so a late tick cannot stretch the 220 ms silence rule or the 20 s save rule. `LEV.ring` 50 -> 20 and `LEV.need` 20 -> 8 keep the same 5 s window and 2 s warm-up. I used setInterval, not requestAnimationFrame, on purpose: rAF stops when the screen is off, and listening with the screen off must keep levelling.
+- Pollers that only draw when the value changed: `progress()` (120, search bar, 250 ms), `paintOpen` status line and label (133, 500 ms), `opPaintBtn` and `ostProg` (133), the speaking-timer arc (169r). Caches are reset when a new opening starts. The exam timers (169q, 169s), the sleep badge (200) and the follow-watch (300) already skipped unchanged values.
+- New test: `node tools/audio_timers_check.js`.

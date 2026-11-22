@@ -83,3 +83,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @property --accent-ink { syntax: '<color>'; inherits: true; initial-value: #1A1405; }
 html.acc-fade { transition: --accent .45s ease, --accent-soft .45s ease, --accent-ink .45s ease; }
 @media (prefers-reduced-motion: reduce) { html.acc-fade { transition: none; } }
+
+/* Screen enter animation (screenEnter in 080-ui-shell-favourites.js). Opacity and transform only, so it runs on the compositor. */
+@keyframes wtEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.wt-enter { animation: wtEnter .18s cubic-bezier(.2, .7, .2, 1) backwards; }
+/* the book page has fixed bars inside it: a moving parent would drag them for a moment, so it only fades */
+#detail.wt-enter { animation-name: wtEnterFade; }
+@keyframes wtEnterFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .wt-enter { animation: none; } }
+html[data-lite] .wt-enter { animation: none; }

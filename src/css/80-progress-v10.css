@@ -122,7 +122,7 @@
 .slp-go { width: 100%; margin-top: .2rem; padding: .7rem 1rem; font-size: 1rem; }
 /* better behaviour: shorter panel, light backdrop so the cover and text stay visible, drag the top down to close */
 #sheet-quick { max-height: 62%; }
-body:has(#sheet-quick:not([hidden])) #backdrop { background: rgba(0, 0, 0, .12); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-ui~="sheetq"]:not(#_) #backdrop { background: rgba(0, 0, 0, .12); -webkit-backdrop-filter: none; backdrop-filter: none; }
 #sheet-quick header { touch-action: none; }
 /* calmer look */
 #sheet-quick .body { gap: .8rem; padding-top: .8rem; }

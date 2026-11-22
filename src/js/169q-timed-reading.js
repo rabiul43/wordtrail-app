@@ -154,7 +154,7 @@
       r.mins = TRC.minutes(r.mins); r.rd = r.rd > 0 ? r.rd : 0; r.wpm = r.wpm > 0 ? r.wpm : 0; r.words = r.words > 0 ? r.words : 0; return r;
     }
     const saveRun = r => { try { store.set(RUN, r); } catch (e) { /* storage unavailable: the timer still runs on this screen */ } };
-    const clearRun = () => { try { localStorage.removeItem(RUN); } catch (e) { /* nothing to remove */ } };
+    const clearRun = () => { try { store.del(RUN); } catch (e) { /* nothing to remove */ } };
     const history = () => { let v = null; try { v = store.get(SPD, null); } catch (e) { v = null; } return TRC.merge(v && Array.isArray(v.runs) ? v.runs : [], []); };
     const addHist = e => { try { store.set(SPD, { v: 1, runs: TRC.merge(history(), [e]) }); } catch (x) { /* storage full: the speed is shown but not kept */ } };
     const savedMins = () => { let v = null; try { v = store.get(MINK, null); } catch (e) { v = null; } return TRC.minutes(v == null ? TRC.DEF_MIN : v); };
