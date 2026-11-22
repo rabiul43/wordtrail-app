@@ -56,7 +56,6 @@
   const FLT_PAGE = 30;
   function fltNarrators() {
     const m = new Map();
-    store.flush();
     try { Object.keys(localStorage).forEach(k => { if (k.indexOf('wt:rdr:') === 0) { const n = store.get(k, ''); if (n && typeof n === 'string') { if (!m.has(n)) m.set(n, new Set()); m.get(n).add(k.slice(7)); } } }); } catch (e) { /* storage unavailable */ }
     return m;
   }

@@ -705,7 +705,7 @@
     if (!(t > 0) || !b) return t;
     let r = null; try { r = store.get('wt:pauseT', null); } catch (e) { r = null; }
     if (!r || !r.t || String(r.id) !== String(b.id)) return t;
-    try { store.now('wt:pauseT', { id: r.id, t: 0 }); } catch (e) { /* storage unavailable */ }   // used once, so a second refresh does not rewind again
+    try { store.set('wt:pauseT', { id: r.id, t: 0 }); } catch (e) { /* storage unavailable */ }   // used once, so a second refresh does not rewind again
     if (P.smartRewind === false) return t;
     const back = skipBackFor(Date.now() - r.t);
     const c = cutFor(S.sec), floor = c && c[0] > 0 ? c[0] : 0;
@@ -721,7 +721,7 @@
     if (audio.currentTime > floor && t >= 0) audio.currentTime = Math.max(floor, t);
   }
   audio.addEventListener('play', () => { hbSync(); setPlayIcon(true); smartSkipBack(); stopLoop(); loop(); if (vctx && vctx.state !== 'running') vctx.resume().catch(() => {}); });
-  window.addEventListener('pagehide', () => { if (S.book && !audio.paused && !audio.ended) store.now('wt:pauseT', { id: S.book.id, t: Date.now() }); });
+  window.addEventListener('pagehide', () => { if (S.book && !audio.paused && !audio.ended) store.set('wt:pauseT', { id: S.book.id, t: Date.now() }); });
   audio.addEventListener('playing', () => { vizTryBuild(); if (S.resnap && !S.loadingAudio && !audio.seeking) { S.resnap = false; resnap(); } });
   audio.addEventListener('pause', () => { setPlayIcon(false); hbSync(); S.pausedAt = (S.book && !S.loadingAudio && !audio.ended && !audio.seeking && audio.currentTime > 0) ? Date.now() : 0; if (S.pausedAt) store.set('wt:pauseT', { id: S.book.id, t: S.pausedAt }); stopLoop(); updateSeekUI(audio.currentTime); persist(); vizIdle(); });
   /* Re-snap the highlight to the audio's real position. A seek is only really done once the browser

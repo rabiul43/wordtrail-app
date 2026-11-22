@@ -128,10 +128,10 @@
 
     /* ----- data and cache ----- */
     function hash(s) { let x = 2166136261; for (let i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36) + ':' + s.length; }
-    const raw = k => { try { store.flush(); return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    const raw = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
     function listen() { let n = 0, s = 0; try { Object.keys(ST.days).forEach(k => { n++; s += num(ST.days[k].s); }); } catch (e) { /* stats not ready */ } return { n, s }; }
     function lpAll() {   // { book id: { track: 0..1 } } and the raw text of all of them (for the cache check)
-      const lp = {}; let txt = ''; store.flush();
+      const lp = {}; let txt = '';
       try { Object.keys(localStorage).forEach(k => { if (k.indexOf('wt:lp:') === 0) { const t = localStorage.getItem(k) || ''; txt += k + t; try { lp[k.slice(6)] = JSON.parse(t); } catch (e) { /* skip */ } } }); } catch (e) { /* storage unavailable */ }
       return { lp, txt };
     }

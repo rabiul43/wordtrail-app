@@ -453,7 +453,6 @@
     const put = r => { if (r && r.id != null && r.title) { const k = String(r.id), o = meta.get(k) || {}; meta.set(k, { id: k, title: o.title || r.title, authors: o.authors || r.authors || '', cover: o.cover || r.cover || '', ia: o.ia || r.ia || '', ts: Math.max(o.ts || 0, r.ts || 0) }); } };
     P.recents.forEach(put); (store.get('wt:listens', []) || []).forEach(put); getFavs().forEach(put); (ST.done || []).forEach(put); if (S.book) put(S.book);
     const ids = [];
-    store.flush();
     try { Object.keys(localStorage).forEach(k => { if (k.indexOf('wt:book:') === 0) ids.push(k.slice(8)); }); } catch (e) { /* storage unavailable */ }
     const out = [];
     for (const id of ids) {
@@ -656,59 +655,10 @@
     return !!(reduceMotion || (n.deviceMemory && n.deviceMemory <= 2) || (n.hardwareConcurrency && n.hardwareConcurrency <= 4));
   }
   function applyLite() {
-    const on = P.liteForce === true || (P.liteGfx !== false && (liteWeak() || liteAuto()));
+    const on = P.liteForce === true || (P.liteGfx !== false && liteWeak());
     document.documentElement.toggleAttribute('data-lite', on);
   }
-  /* Lighter graphics from real speed: a phone that reports plenty of cores can still be slow. Two measurements, both with requestAnimationFrame:
-     (1) the first 3 s after the page has loaded, (2) the frames drawn while the page is scrolled (first 30 of them, gives up after 12 s).
-     Lighter graphics turn on when the AVERAGE frame is slower than 24 ms (under about 42 frames a second), or, while scrolling, when more
-     than 3 in 10 frames took over 34 ms. It only ever turns ON (never back off by itself, so it cannot flip), is decided once per page
-     visit, and is kept on this device for 14 days (localStorage only: it is about the device, so it is never synced).
-     Settings > Lighter graphics off ("never") and "always on" are respected. A frame gap over 250 ms (tab left, screen off) is not counted. */
-  function liteAuto() { try { const t = +localStorage.getItem('wt:liteAuto'); return t > 0 && Date.now() - t < 14 * 864e5; } catch (e) { return false; } }
-  function liteProbe() {
-    if (P.liteForce === true || P.liteGfx === false || reduceMotion || document.documentElement.hasAttribute('data-lite') || !window.requestAnimationFrame) return;
-    let done = false, sRaf = 0, cRaf = 0;
-    const lite = () => document.documentElement.hasAttribute('data-lite');
-    const decide = () => {
-      if (done) return; done = true;
-      cancelAnimationFrame(sRaf); cancelAnimationFrame(cRaf); window.removeEventListener('scroll', onScroll);
-      try { localStorage.setItem('wt:liteAuto', String(Date.now())); } catch (e) { /* storage unavailable */ }
-      applyLite();
-    };
-    /* (1) the first 3 s after load */
-    let s0 = 0, sLast = 0, sSum = 0, sN = 0;
-    const sFrame = now => {
-      if (done || lite()) return;
-      if (document.hidden) sLast = 0;
-      else {
-        if (!s0) s0 = now;
-        if (sLast) { const d = now - sLast; if (d < 250) { sSum += d; sN++; } }
-        sLast = now;
-        if (now - s0 > 3000) { if (sN >= 20 && sSum / sN > 24) decide(); return; }
-      }
-      sRaf = requestAnimationFrame(sFrame);
-    };
-    const startSample = () => { sRaf = requestAnimationFrame(sFrame); };
-    if (document.readyState === 'complete') startSample(); else window.addEventListener('load', startSample, { once: true });
-    /* (2) frames drawn while scrolling */
-    let t0 = 0, last = 0, sc = 0, n = 0, slow = 0, sum = 0;
-    const onScroll = () => { sc = performance.now(); if (!t0) { t0 = sc; cRaf = requestAnimationFrame(frame); } };
-    const frame = now => {
-      if (done || lite()) return;
-      if (document.hidden) { last = 0; }                            // the tab was left: skip, do not count that gap
-      else {
-        if (last && now - sc < 120) { const d = now - last; if (d < 250) { n++; sum += d; if (d > 34) slow++; } }   // only frames drawn while scrolling
-        last = now;
-        if (n >= 30) { if (slow / n > 0.3 || sum / n > 24) decide(); else { cancelAnimationFrame(cRaf); window.removeEventListener('scroll', onScroll); } return; }
-        if (now - t0 > 12000) { cancelAnimationFrame(cRaf); window.removeEventListener('scroll', onScroll); return; }
-      }
-      cRaf = requestAnimationFrame(frame);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
   applyLite(); // auto-apply on load: weak devices get lite mode before the settings panel is ever opened
-  liteProbe();
   function applyQuick() {   // the Controls sheet is the only player menu, so the old bottom chips (Text only, More) stay hidden
     document.documentElement.setAttribute('data-quick', '');
   }

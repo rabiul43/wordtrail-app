@@ -14,12 +14,13 @@
   const AMB_PRESETS = [
     ['subtle', 'Quiet', 'Quiet scenes and soft music that follow the story. No story sounds and no opening sound.', { ambInt: 35, ambVol: 50, ambCues: false, ambTrans: false, ambAuto: true, ambDuck: true, ambSmart: true, musOn: true, musVol: 20, musDuck: true, openOn: false, openVol: 40 }],
     ['cinematic', 'Cinematic', 'Full scenes that follow the story, with story sounds, music and an opening sound.', { ambInt: 100, ambVol: 80, ambCues: true, ambTrans: true, ambAuto: true, ambDuck: true, ambSmart: true, musOn: true, musVol: 35, musDuck: true, openOn: true, openVol: 60 }],
-    ['sleep', 'Sleep', 'Soft steady rain and brown noise. Scenes, story sounds, music and the opening sound are off, so nothing surprises you.', { ambInt: 30, ambVol: 40, ambCues: false, ambTrans: false, ambAuto: false, ambDuck: true, ambTod: true, musOn: false, openOn: false, scene: 'sleep' }]
+    ['sleep', 'Sleep', 'Soft steady rain and brown noise. Scenes, story sounds, music and the opening sound are off, so nothing surprises you.', { ambInt: 30, ambVol: 40, ambCues: false, ambTrans: false, ambAuto: false, ambDuck: true, ambTod: true, musOn: false, openOn: false, scene: 'sleep' }],
+    ['study', 'Study', 'Music, story sounds, opening sound and ambient scenes are all off. Good for learning exercises.', { ambOn: false, ambInt: 100, ambVol: 70, ambCues: false, ambTrans: false, ambAuto: false, ambDuck: true, ambSmart: false, musOn: false, openOn: false }]
   ];
   /* The preset row is Off, the three above, and Custom. Off is the master switch (settings are kept); Custom is what shows once
      anything has been moved by hand. */
   const AMB_OFF_PRESET = ['off', 'Off', 'Everything is silent. Your settings are kept; turn Sound back on to hear them again.'];
-  const AMB_PRESET_KEYS = ['ambInt', 'ambVol', 'ambCues', 'ambTrans', 'ambAuto', 'ambDuck', 'ambSmart', 'ambTod', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol'];
+  const AMB_PRESET_KEYS = ['ambOn', 'ambInt', 'ambVol', 'ambCues', 'ambTrans', 'ambAuto', 'ambDuck', 'ambSmart', 'ambTod', 'musOn', 'musVol', 'musDuck', 'musDip', 'openOn', 'openVol'];
   function ambBuildPresets() {
     const box = $('#amb-presets'); box.textContent = '';
     [AMB_OFF_PRESET].concat(AMB_PRESETS, [['custom', 'Custom']]).forEach(([k, n]) => box.append(h('button', { class: 'chip', type: 'button', 'data-k': k, 'aria-pressed': 'false' }, n)));
@@ -50,7 +51,8 @@
     AMB.undo = { v: Object.fromEntries(keys.map(x => [x, P[x]])), amb: P.amb, on: P.ambOn, snd: P.sndOn };
     keys.forEach(x => { P[x] = set[x]; });
     if (set.scene) { const sc = AMB_SCENES.find(x => x.k === set.scene); P.amb = ambFull(sc ? sc.L : { rain: 45, brown: 25 }); }
-    P.ambOn = true; P.sndOn = true; AMB.auto = null; AMB.autoId = null; AMB.preset = k;
+    if (!('ambOn' in set)) P.ambOn = true;   // most presets turn ambient on; Study preset sets it via keys
+    P.sndOn = true; AMB.auto = null; AMB.autoId = null; AMB.preset = k;
     if (set.scene) ambSaveMix(); else savePrefs();
     ambRefresh(); ambApply(0.9); sndApplyAll(); ambMatchScene(); ambPresetPaint(); gsSave();
   }

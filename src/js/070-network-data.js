@@ -130,7 +130,6 @@
     return out.slice(0, lim).map(({ _t, _a, _l, _g, ...b }) => b);
   }
   function catPurge() {
-    store.flush();
     try { Object.keys(localStorage).filter(k => /^wt:(genre:|home:|q:|seeall:)/.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) {}
   }
   setTimeout(catLoad, 0); // start downloading the catalog straight away

@@ -1,33 +1,16 @@
   /* ---------- music-wiring.js ----------
      Music: keeping the engine healthy, the Music switch, the first-time hint, quick controls and musicInit. */
   /* ---------- Screen lock, calls and other apps ----------
-     When the screen locks, a call comes in or another app takes the sound, the shared AudioContext can go to 'suspended' or
-     (Safari) 'interrupted' while the narrator is still wanted. musCtxHeal wakes it again, but only while music is wanted:
-     music on, Sound on, the narrator really playing and a clip sounding or loading. With the narrator paused it does nothing,
-     so it never starts music or keeps the engine awake for nothing. It runs on the context's own state change, when the page
-     is shown again, when the narrator reports it is playing, and on play. If the browser refuses (it wants a tap first),
-     ONE tap or key listener waits and tries again; it removes itself on the first use. */
+     The wake-up of the shared AudioContext is ctxHeal (sound-screen.js): it serves ambient, music and the narrator's sound graph,
+     and runs on the context's state change, when the page is shown, on pageshow and on the narrator's 'playing'. musCtxHeal is
+     the music's own entry: it asks for a wake-up only while music is wanted (music on, Sound on, the narrator really heard and a
+     clip sounding or loading), so with the narrator paused it does nothing and never keeps the engine awake for nothing. */
   function musWanted() { return !!(P.musOn === true && sndOn() && MUS.on && MUS.ctx && S.book && musNarrating() && (MUS.live || MUS.playing)); }
   function musCtxHeal() {
     try {
       if (!musWanted()) return;
-      const ctx = MUS.ctx, st = ctx.state;
-      if (st === 'running' || st === 'closed') return;
-      const p = ctx.resume();   // 'suspended', or Safari's 'interrupted'
-      if (p && p.then) p.then(() => { if (ctx.state !== 'running' && musWanted()) musGestureArm(); }, () => { if (musWanted()) musGestureArm(); });
+      ctxHeal();
     } catch (e) { /* a help only: never break playback */ }
-  }
-  function musGestureArm() {
-    if (MUS.gest) return;
-    MUS.gest = true;
-    const evs = ['pointerdown', 'touchend', 'keydown'];
-    const go = () => { MUS.gest = false; evs.forEach(ev => document.removeEventListener(ev, go, true)); musCtxHeal(); };
-    evs.forEach(ev => document.addEventListener(ev, go, true));
-  }
-  function musHealInit() {
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) musCtxHeal(); });
-    window.addEventListener('pageshow', musCtxHeal);
-    audio.addEventListener('playing', musCtxHeal);
   }
 
   /* ---------- Quick controls tile, dip choice and the one-time hint ---------- */
@@ -70,7 +53,6 @@
   /* Called once at startup to pre-fetch the manifest in the background. */
   async function musicInit() {
     try { musOffInit(); } catch (e) { console.warn('offline music', e); }
-    try { musHealInit(); } catch (e) { console.warn('music wake-up', e); }
     try { musQuickInit(); } catch (e) { console.warn('music tile', e); }
     if (!MUS.manifest) musFetchManifest();   // fire and forget; the bus is built on the first play
   }

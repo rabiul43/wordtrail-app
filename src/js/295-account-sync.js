@@ -87,7 +87,7 @@
     const i = acInfo(); if (!i) return false;
     return AC_CATS.some(c => i.cats && i.cats[c[0]] === false ? false : c[2](k));
   }
-  const acLocalKeys = () => { store.flush(); const out = []; try { Object.keys(localStorage).forEach(k => { if (acWanted(k)) out.push(k); }); } catch (e) { /* storage unavailable */ } return out; };
+  const acLocalKeys = () => { const out = []; try { Object.keys(localStorage).forEach(k => { if (acWanted(k)) out.push(k); }); } catch (e) { /* storage unavailable */ } return out; };
 
   /* called by store.set for every saved item */
   function acMark(k) {
@@ -307,7 +307,6 @@
      against a fresh copy of the cloud, so it passes guard = false.) The local copy is left as it is; the next sync
      pulls the merged one. */
   async function acPushKeys(keys, guard) {
-    store.flush();   // values still waiting in the write queue (030) must be in localStorage before they are read here
     const meta = acMeta(), big = acBig(), col = acCol(), list = [...keys], lastT = (acInfo() || {}).lastT || 0, bigs = [];
     let skipped = 0, bigChanged = false;
     for (let i = 0; i < list.length; i += 250) {
@@ -364,7 +363,6 @@
   const acPlaying = () => { try { return (!audio.paused && !audio.ended) || !!(S && S.loadingAudio); } catch (e) { return false; } };
   function acFlushSoon() { clearTimeout(acFlushT); acFlushT = acPending ? setTimeout(acFlush, 6000) : 0; }
   function acFlush() {
-    store.flush();
     clearTimeout(acFlushT); acFlushT = 0;
     if (!acPending || acPlaying()) return;
     if (acPending.quiet && document.visibilityState !== 'hidden') return;   // a background sync never reloads the screen in front of the person: it waits until the app is hidden (the next flush call)
@@ -372,7 +370,7 @@
     const p = acPending; acPending = null;
     const meta = acMeta(), keys = Object.keys(p.items).filter(k => (meta[k] || 0) <= p.at);
     if (!keys.length) return;
-    store.flush(); window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
+    window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
     keys.forEach(k => { const it = p.items[k]; try { localStorage.setItem(k, it.v); meta[k] = it.t; if (it.up) acDirty.add(k); } catch (e) { /* storage full: skip */ } });
     acSaveMeta(meta); acDirtySave();
     if (!p.quiet) toast('Synced from your account. Reloading…', 2500);
@@ -389,7 +387,6 @@
      also picks up items written by an older copy of the app that does not set u. */
   const AC_FULL_EVERY = 7 * 864e5, AC_OVERLAP = 120000;
   async function acSync(manual, full) {
-    store.flush();
     if (!acUser || !acDb || acBusy) return;
     acBusy = true; acErr = ''; acMsg = 'Syncing…'; renderAcctSync();
     let reload = false;
@@ -448,7 +445,7 @@
       if (deferred) {
         acPending = { at: syncT, items, quiet }; // the newest pull replaces an older one: it was worked out from the same unchanged local state
       } else if (pulled.length) {
-        store.flush(); window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
+        window.__wtRestoring = true; // pause saving so the old in-memory state cannot overwrite what is applied
         pulled.forEach(k => { try { localStorage.setItem(k, items[k].v); meta[k] = items[k].t; if (items[k].up) up.add(k); } catch (e) { /* storage full: skip */ } });
         reload = true;
       }

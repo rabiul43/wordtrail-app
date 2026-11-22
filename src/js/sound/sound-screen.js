@@ -22,26 +22,90 @@
     s.setAttribute('class', 'ic'); s.setAttribute('aria-hidden', 'true'); u.setAttribute('href', '#i-play'); s.append(u); return s;
   }
   function ambPlaying() {   // the book is really being heard: not just asked to play. Loading, stalled, failed or finished audio is not playing.
+    if (SND.focus > 0) return false;   // focus mode: a trainer is playing clips; treat as silent
     if (!S.book || audio.paused || audio.ended || audio.error) return false;
     if (audio.seeking) return AMB.on;   // a seek is a short gap: keep the sound as it is
-    return !S.loadingAudio && audio.readyState > 2;
+    return sndHeard();   // data there, or short for under 2 s (music-bus.js): one small buffering dip does not stop the sound
+  }
+  /* ---------- Waking the shared audio engine ----------
+     Screen lock, a call or another app can leave the ONE shared AudioContext 'suspended' (Safari: 'interrupted') while the narrator
+     carries on. ctxHeal wakes it again, but only while sound is wanted (ctxWantedFor): Sound on, the narrator really heard, and
+     ambient or music wanted, or the narrator running through the graph. It does not depend on music. It runs on the context's own
+     state change (one listener, added in audioCtx), when the page is shown again, on pageshow and when the narrator reports it is
+     playing. If the browser refuses (it wants a tap first), ONE tap or key listener waits, tries again and removes itself.
+     ctxHeal never starts a sound; it only resumes the engine. */
+  function ctxWantedFor(s) { return !!(s && s.sound && s.playing && (s.amb || s.mus || s.narr)); }   // pure: the "sound is wanted" rule
+  function sndCtxState() {   // what the rule looks at, read from the app
+    const on = sndOn();
+    let amb = false;
+    if (on) {   // the same wish as ambSync: the bed (ambient on, something to play) or the effects (cues on)
+      let bed = P.ambOn === true;
+      if (bed && P.ambAuto === false) { const L = ambLive(); bed = AMB_SOUNDS.some(([k]) => L[k] > 0); }   // scenes off and every level at 0: nothing to play
+      amb = bed || (P.ambCues !== false && P.calm !== true);
+    }
+    return { sound: on, playing: ambPlaying(), amb, mus: musWanted(), narr: !!(AMB.narr && AMB.narr()) };
+  }
+  function ctxGestureArm() {   // one tap/key listener; the first use tries again and removes it
+    if (CTXH.gest) return;
+    CTXH.gest = true;
+    const evs = ['pointerdown', 'touchend', 'keydown'];
+    const go = () => { CTXH.gest = false; evs.forEach(ev => document.removeEventListener(ev, go, true)); ctxHeal(); };
+    evs.forEach(ev => document.addEventListener(ev, go, true));
+  }
+  function ctxHeal() {
+    try {
+      const ctx = AMB.ctx; if (!ctx) return;
+      const st = ctx.state; if (st === 'running' || st === 'closed') return;
+      if (!ctxWantedFor(sndCtxState())) return;
+      const now = performance.now();
+      if (now - CTXH.at < 400) { if (!CTXH.t) CTXH.t = setTimeout(() => { CTXH.t = 0; ctxHeal(); }, 450); return; }   // a state that flips back at once must not loop: one retry a moment later
+      CTXH.at = now;
+      audioSuspendCancel();   // sound is wanted: no old suspend timer may stop it again
+      const p = ctx.resume();   // 'suspended', or Safari's 'interrupted'
+      const again = () => { try { if (ctx.state !== 'running' && ctxWantedFor(sndCtxState())) ctxGestureArm(); } catch (e) { /* a help only */ } };
+      if (p && p.then) p.then(again, again);
+    } catch (e) { /* a help only: never break playback */ }
+  }
+  function ctxHealInit() {
+    CTXH.fn = ctxHeal;   // audioCtx's one statechange listener calls this
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) ctxHeal(); });
+    window.addEventListener('pageshow', ctxHeal);
+    audio.addEventListener('playing', ctxHeal);
   }
   function ambSync() {
     ambBookCheck();
     const L = ambLive(), any = AMB_SOUNDS.some(([k]) => L[k] > 0);
-    const want = sndOn() && (any || AMB.aud || P.ambAuto !== false || (P.ambCues !== false && P.calm !== true)) && (AMB.preview || AMB.aud || (P.ambOn === true && ambPlaying()));   // opening the screen plays nothing: sound comes only from a tap on a scene or a sound name (preview / audition), or from the book itself
-    clearTimeout(AMB.timer);
+    const playing = AMB.preview || AMB.aud || ambPlaying();
+    // wantBed: the ambient layer bed (rain, wind, …) needs ambient on AND something playing
+    const wantBed = sndOn() && (any || AMB.aud || P.ambAuto !== false) && (AMB.preview || AMB.aud || (P.ambOn === true && ambPlaying()));
+    // wantCue: the story/transition effects bus only needs Sound on + cues enabled + something actually playing;
+    //          P.ambOn is NOT required — effects work with the ambient bed silent
+    const wantCue = sndOn() && P.ambCues !== false && P.calm !== true && playing;
+    const want = wantBed || wantCue;   // engine starts if either bus needs it; opening the screen plays nothing without a preview/audition tap
+    audioSuspendCancel('timer');
     if (want) {
       if (!ambBuild()) return;
-      AMB.ctx.resume().catch(() => {}); ambTod(true); ambApply();
-      AMB.slow = false; AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, 0.8);
-      AMB.on = true; if (!AMB.clinkIv) AMB.clinkIv = setInterval(ambClink, 4500);
+      audioSuspendCancel();   // sound is wanted again: neither the ambient nor the music suspend timer may stop it
+      AMB.ctx.resume().catch(() => {});
+      // bed: fade in only when ambient layers are wanted; hold at 0 when effects-only
+      if (wantBed) {
+        ambTod(true); ambApply();
+        AMB.slow = false; AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, 0.8);
+      } else if (!AMB.on) {
+        // first time we're starting for effects only: make sure the bed is silent
+        AMB.master.gain.setTargetAtTime(0, AMB.ctx.currentTime, 0.3);
+      }
+      AMB.on = true; AMB.cueOn = true;
+      if (!AMB.clinkIv) AMB.clinkIv = setInterval(ambClink, 4500);
       if (!AMB.duckIv) AMB.duckIv = setInterval(ambDuckTick, 60);
       if (!AMB.evIv) { AMB.evIv = setInterval(ambEvents, 400); AMB.nextThunder = Date.now() + 4000 + Math.random() * 8000; }
     } else if (AMB.built && AMB.on) {
       const tc = AMB.slow ? 3 : 0.6; AMB.slow = false;   // a sleep timer fades the sounds out slowly, after the voice is gone
       AMB.master.gain.setTargetAtTime(0, AMB.ctx.currentTime, tc);
-      AMB.on = false; clearInterval(AMB.duckIv); AMB.duckIv = 0; AMB.duckS = ''; ambDuckSet('o'); clearInterval(AMB.clinkIv); AMB.clinkIv = 0; clearInterval(AMB.evIv); AMB.evIv = 0;
+      AMB.on = false; AMB.cueOn = false;
+      clearInterval(AMB.duckIv); AMB.duckIv = 0; AMB.duckS = ''; ambDuckSet('o');
+      clearInterval(AMB.clinkIv); AMB.clinkIv = 0;
+      clearInterval(AMB.evIv); AMB.evIv = 0;
       audioSuspendSoon(tc * 3500 + 500, 'timer');   // stop the engine when silent (and no music is playing), to save battery
     }
   }
@@ -106,9 +170,12 @@
     ['input', 'change'].forEach(ev => $('#sheet-amb').addEventListener(ev, ambPresetClear));   // a slider or switch moved by hand ends the preset
     $('#amb-scenes').addEventListener('click', ambPresetClear); $('#amb-sug-go').addEventListener('click', ambPresetClear);
     document.addEventListener('visibilitychange', () => { if (document.hidden && AMB.preview) { AMB.preview = false; ambSync(); } });   // a mixer left open with the screen off stops playing
-    ['play', 'playing', 'pause', 'ended', 'waiting', 'stalled', 'error', 'emptied', 'abort', 'canplay', 'loadstart', 'loadedmetadata', 'seeked'].forEach(ev => audio.addEventListener(ev, ambSync));   // the sound follows what is really heard: it waits for the audio to start, and stops if it stalls or fails
+    try { ctxHealInit(); } catch (e) { console.warn('audio wake-up', e); }
+    ['pause', 'ended', 'error', 'loadstart', 'emptied', 'abort'].forEach(ev => audio.addEventListener(ev, sndHeardReset));   // a real stop: no grace after it (registered before ambSync, so it runs first)
+    ['timeupdate', 'playing', 'canplay'].forEach(ev => audio.addEventListener(ev, () => { if (!audio.paused && !S.loadingAudio && audio.readyState > 2) SNDHOLD.at = performance.now(); }));   // the voice is really moving: the grace counts from here
+    ['play', 'playing', 'pause', 'ended', 'waiting', 'stalled', 'error', 'emptied', 'abort', 'canplay', 'loadstart', 'loadedmetadata', 'seeked', 'wt-sndhold'].forEach(ev => audio.addEventListener(ev, ambSync));   // the sound follows what is really heard: it waits for the audio to start, and stops if it stalls or fails
     audio.addEventListener('play',  () => { musicAttach(); musicPlay(); });   // musicPlay waits (musNarrating) until the recording is really playing
-    ['playing', 'canplay', 'seeked', 'waiting', 'stalled', 'loadstart', 'emptied', 'abort', 'error'].forEach(ev => audio.addEventListener(ev, () => {   // music follows what is heard: it starts when the voice does and stops while a recording loads or stalls
+    ['playing', 'canplay', 'seeked', 'waiting', 'stalled', 'loadstart', 'emptied', 'abort', 'error', 'wt-sndhold'].forEach(ev => audio.addEventListener(ev, () => {   // music follows what is heard: it starts when the voice does and stops while a recording loads or stalls
       if (musNarrating()) { musicAttach(); musicPlay(); } else if (MUS.live || MUS.playing) musicPause();
     }));
     audio.addEventListener('pause', () => musicPause());

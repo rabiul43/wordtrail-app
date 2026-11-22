@@ -81,7 +81,7 @@ const page = `<!doctype html><html data-theme="dark"><head><meta charset="utf-8"
 const h = (tag, attrs, ...kids) => { const e = document.createElement(tag); Object.keys(attrs || {}).forEach(k => { const v = attrs[k]; if (v == null || v === false) return; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); }); kids.flat().forEach(c => { if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c))); }); return e; };
 window.__toasts = [];
 const toast = m => window.__toasts.push(m), histSoon = () => {}, LB = { ctx: () => null }, P = {};
-const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { localStorage.setItem(k, JSON.stringify(v)); }, del(k) { localStorage.removeItem(k); }, flush() {} };
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { localStorage.setItem(k, JSON.stringify(v)); } };
 const LearnHub = { register(t) { window.__tile = t; }, refresh() {} };
 </script>
 <script>${read('src/js/010-core.js')}</script>

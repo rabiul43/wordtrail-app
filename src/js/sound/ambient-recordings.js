@@ -34,7 +34,7 @@
     AMB.live[k] = { nodes: [s], lfos: [], off: 0, rec: true }; sndNowPaint();
   }
   async function ambRecLoad(k) {
-    if (!AMB.ctx || AMB.rec[k] || AMB.recBusy[k] || Date.now() - (AMB.recFail[k] || 0) < 60000) return;
+    if (!AMB.ctx || AMB.rec[k] || AMB.recBusy[k] || Date.now() - (AMB.recFail[k] || 0) < 15000) return;
     const u = ambRecSrc(k); if (!u) return;
     AMB.recBusy[k] = true; ambRecPaint();
     try {
@@ -53,12 +53,38 @@
     } catch (e) { AMB.recFail[k] = Date.now(); }
     AMB.recBusy[k] = false; ambRecPaint(); ambSrcRefresh(k);
   }
+  /* Download ahead: save a recording on the device before a scene needs it (download only, no decoding), one file at a time and only
+     while the book is playing, so it never crowds the book's own audio. ambRecLoad then finds it saved and only has to decode it. */
+  const AMB_WARM = { q: [], busy: false, fail: {} };
+  function ambRecWarm(k) {
+    if (AMB.rec[k] || AMB.recBusy[k] || P.ambSrc === 'gen' || !AMB_REC_KEYS.has(k) || AMB_WARM.q.indexOf(k) >= 0 || Date.now() - (AMB_WARM.fail[k] || 0) < 120000) return;
+    try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) { /* no data-saver info: go on */ }
+    AMB_WARM.q.push(k); if (!AMB_WARM.busy) ambRecWarmRun();
+  }
+  async function ambRecWarmRun() {
+    AMB_WARM.busy = true;
+    while (AMB_WARM.q.length) {
+      const k = AMB_WARM.q.shift(), u = ambRecSrc(k);
+      if (!u || !u.url || u.own || AMB.rec[k] || AMB.recBusy[k]) continue;
+      try {
+        const cache = await caches.open('wt-amb-rec');
+        if (await cache.match(u.key)) continue;   // already saved
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 90000);
+        try {
+          const r = await fetch(u.url, { signal: ctl.signal });
+          if (!r.ok) throw new Error('http ' + r.status);
+          await cache.put(u.key, r); sndTouch(u.key); sndCachePrune();
+        } finally { clearTimeout(to); }
+      } catch (e) { AMB_WARM.fail[k] = Date.now(); }
+    }
+    AMB_WARM.busy = false;
+  }
   function ambSrcRefresh(k) {   // the source or a recording changed: rebuild the steady sounds so they use the right one
     if (!AMB.built) return;
     Object.keys(AMB.live).forEach(x => { if (AMB_REC_KEYS.has(x) && (!k || x === k)) ambLayerOff(x); });
     ambApply(0.6); sndNowPaint();
   }
-  const AMB_R2 = 'https://pub-94b7e1b846f843dfbe430f5b3caf7680.r2.dev/';
+  const AMB_R2 = '__WT_HOST_SOUNDS__';   // filled by build.py from hosts.json "sounds" key; never type a web address here
   async function ambRecManifest() {
     const set = (d) => { if (!d || typeof d !== 'object') return; AMB.recMap = {}; Object.keys(d).forEach(k => { const m = d[k]; if (AMB_REC_KEYS.has(k) && m && m.file) { try { AMB.recMap[k] = { url: new URL(m.file, AMB_R2).href, by: m.by || '', license: m.license || '' }; } catch (e) { /* bad address */ } } }); };
     try {

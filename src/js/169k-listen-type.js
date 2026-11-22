@@ -426,6 +426,7 @@
       st.on = true; st.set = set; st.i = 0; st.res = []; st.playing = false; st.graded = new Set();
       st.dif = {}; st.word = '';
       try { set.forEach(i => { st.dif[i] = dif(i); }); if (target != null) st.word = LVX.word('type', set.map(i => st.dif[i])); } catch (e) { st.dif = {}; st.word = ''; }   // level: never stops a session
+      try { sndFocusOn(); } catch (e) { /* sound is a bonus */ }
       stopAudio();
       openSheet('sheet-lt');
       if (window.visualViewport) { window.visualViewport.addEventListener('resize', vv); window.visualViewport.addEventListener('scroll', vv); vv(); }
@@ -435,6 +436,7 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
+      try { sndFocusOff(); } catch (e) { /* sound is a bonus */ }
       halt(); stopAudio();
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vv); window.visualViewport.removeEventListener('scroll', vv); }
       const sh = q('sheet-lt'); sh.style.height = ''; sh.style.top = '';

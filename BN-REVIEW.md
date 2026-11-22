@@ -3,6 +3,19 @@
 All Bengali added in `src/js/200-player-controls.js` (block "Bengali (bn): expanded coverage") was written without a native reviewer.
 The list below is ordered by how unsure the wording is. Each row: English | current Bengali | the question to settle.
 
+## Added in Phase 1, Item 2 (story effects without ambient)
+
+| English | Current Bengali | Question |
+|---------|----------------|----------|
+| A short sound at a word like thunder, a knock or a bell. Works with or without Ambient sound. | বজ্রপাত, টোকা বা ঘণ্টার মতো শব্দে একটি সংক্ষিপ্ত শব্দ। পরিবেশের শব্দ ছাড়াও কাজ করে। | Is "পরিবেশের শব্দ ছাড়াও কাজ করে" natural for "Works with or without Ambient sound"? |
+| A door or footsteps when the story moves somewhere new. Works with or without Ambient sound. Needs "Follow the story". Off in Calm mode. | গল্প নতুন কোথাও গেলে দরজা বা পায়ের শব্দ। পরিবেশের শব্দ ছাড়াও কাজ করে। "গল্প অনুসরণ" দরকার। শান্ত মোডে বন্ধ। | Confirm "গল্প অনুসরণ" matches the Bengali label for "Follow the story" elsewhere in the app. |
+
+## Added in Phase 1 (focus mode / Study preset)
+
+| English | Current Bengali | Question |
+|---------|----------------|----------|
+| Music, story sounds, opening sound and ambient scenes are all off. Good for learning exercises. | সংগীত, গল্পের শব্দ, শুরুর শব্দ ও পরিবেশের দৃশ্য সব বন্ধ। শেখার অনুশীলনের জন্য ভালো। | Is "শেখার অনুশীলন" the natural phrase for "learning exercises"? "পড়াশোনার অনুশীলন" may be more idiomatic. |
+
 ## 1. Word choice is a real decision (check these first)
 
 | English | Current | Question |

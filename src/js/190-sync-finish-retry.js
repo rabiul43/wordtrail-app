@@ -585,7 +585,6 @@
   async function exportBookList() {
     try { if (!PKI.ready) await PKI.load(); } catch (e) { /* index not reachable: device books only */ }
     const rows = new Map();
-    store.flush();
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);

@@ -5,5 +5,6 @@
   "stats": "https://wordtrail-stats.test-rabiulclaud-1.workers.dev",
   "scene": "https://wordtrail-scene.test-rabiulclaud-1.workers.dev",
   "music": "https://wordtrail-music.pages.dev/",
-  "admin": "https://wordtrail-admin.test-rabiulclaud-1.workers.dev"
+  "admin": "https://wordtrail-admin.test-rabiulclaud-1.workers.dev",
+  "sounds": "https://pub-94b7e1b846f843dfbe430f5b3caf7680.r2.dev/"
 }

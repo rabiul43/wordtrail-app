@@ -101,7 +101,6 @@ PARTS = [
     ('file', 'src/css/99q-ielts-books.css'),
     ('file', 'src/css/99r-skip-ready.css'),
     ('file', 'src/css/99s-learn-screen.css'),
-    ('file', 'src/css/99z-perf.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),
@@ -378,6 +377,7 @@ HOST_SLOTS = {
     "scene":    (b"__WT_HOST_SCENE__",    True,  False),
     "music":    (b"__WT_HOST_MUSIC__",    False, True),
     "admin":    (b"__WT_HOST_ADMIN__",    True,  False),   # the admin Worker: the app reads my cover choices from its public address
+    "sounds":   (b"__WT_HOST_SOUNDS__",   False, True),   # R2 bucket for real ambient recordings (recordings.json + audio files)
 }
 
 def load_hosts():
@@ -426,24 +426,34 @@ def csp_covers(sources, origin):
 
 def apply_hosts_headers(text, hosts):
     """dist/_headers: the proxy's address goes into script-src (the app loads a script from it), and every configured address
-    is made sure to be allowed in connect-src. With today's addresses the wildcards there already cover them, so nothing is added;
+    is made sure to be allowed in connect-src. The sounds host (R2 bucket) also needs media-src so the browser can load
+    audio files directly. With today's addresses the wildcards there already cover them, so nothing is added;
     after a move to a new domain the new address is added for you."""
     text = text.replace("__WT_HOST_PROXY__", host_origin(hosts["proxy"]))
-    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin") if hosts[k]]
+    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "sounds") if hosts[k]]
+    sounds_origin = host_origin(hosts["sounds"]) if hosts.get("sounds") else None
     lines = text.split("\n")
     for i, line in enumerate(lines):
         if not line.lstrip().startswith("Content-Security-Policy-Report-Only:"):
             continue
+        # connect-src: all configured hosts must be allowed
         m = re.search(r"connect-src([^;]*)", line)
-        if not m:
-            continue
-        have = m.group(1).split()
-        missing = []
-        for o in origins:
-            if not csp_covers(have + missing, o):
-                missing.append(o)
-        if missing:
-            lines[i] = line[:m.end()].rstrip() + " " + " ".join(missing) + line[m.end():]
+        if m:
+            have = m.group(1).split()
+            missing = []
+            for o in origins:
+                if not csp_covers(have + missing, o):
+                    missing.append(o)
+            if missing:
+                line = line[:m.end()].rstrip() + " " + " ".join(missing) + line[m.end():]
+        # media-src: the sounds host serves audio files the browser fetches directly
+        if sounds_origin:
+            ms = re.search(r"media-src([^;]*)", line)
+            if ms:
+                have_ms = ms.group(1).split()
+                if not csp_covers(have_ms, sounds_origin):
+                    line = line[:ms.end()].rstrip() + " " + sounds_origin + line[ms.end():]
+        lines[i] = line
     return "\n".join(lines)
 
 def check_no_placeholders(dist):
@@ -500,7 +510,7 @@ if __name__ == "__main__":
         with open(hp, "w", encoding="utf-8", newline="") as f:
             f.write(apply_hosts_headers(ht, hosts))
     check_no_placeholders(dist)
-    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin")))
+    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "sounds")))
     # self-hosted fonts (only when tools/fetch_fonts.py has been run); a stale dist/fonts from an older build is replaced
     fonts_out = os.path.join(dist, "fonts")
     shutil.rmtree(fonts_out, ignore_errors=True)

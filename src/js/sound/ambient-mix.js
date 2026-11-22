@@ -18,6 +18,9 @@
     if (AMB.sR && !AMB.spaceApplied) { const m = ambRoomMix(L); AMB.sR.gain.setTargetAtTime(m[0], t, 1.2); AMB.sH.gain.setTargetAtTime(m[1], t, 1.2); }   // spatial scene overrides the mix-based send while text context is active
     ambMoodApply(tc);
   }
+  /* Download ahead (used by the scene look ahead in 233): is it a good time, and which recordings does this mix want. */
+  const ambWarmReady = () => P.ambSrc !== 'gen' && AMB.on && !!(AMB.preview || AMB.aud || ambPlaying());
+  function ambWarmKeys(L) { for (const k in L) if (L[k] >= 15 && AMB_REC_KEYS.has(k)) ambRecWarm(k); }
   const ambVol = () => (P.ambVol == null ? 70 : P.ambVol) / 100;
   const ambGain = () => ambVol() * sndMul() * sndBalAmb();   // what the engine really plays at: the ambient volume times the Sound master (0 when Sound is off) times the automatic balance (sound-core.js)
   function ambMaster(tc) { if (AMB.built && AMB.on) AMB.master.gain.setTargetAtTime(ambGain(), AMB.ctx.currentTime, tc == null ? 0.1 : tc); }

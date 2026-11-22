@@ -37,10 +37,10 @@ const WORDS = [{ ts: 1700000000000, w: 'forlorn', lv: 'C1', ex: 'She sat alone i
   }
   const lib = async pg => { await pg.evaluate(() => document.querySelector('#tabbar .tab[data-tab="shelf"]').click()); await pg.waitForTimeout(500); };
   const card = pg => pg.evaluate(() => { const e = document.getElementById('gl-ask'); return !!e && !e.hidden && getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().height > 0; });
-  const goal = async pg => { await pg.waitForTimeout(700); /* the app's write queue (030) saves within 600 ms */ return pg.evaluate(() => JSON.parse(localStorage.getItem('wt:prefs') || '{}').goal); };
+  const goal = pg => pg.evaluate(() => JSON.parse(localStorage.getItem('wt:prefs') || '{}').goal);
   const learnAttr = pg => pg.evaluate(() => document.documentElement.hasAttribute('data-learn'));
   const learnTab = pg => pg.evaluate(() => !document.querySelector('#tabbar .tab[data-tab="learn"]').hidden);
-  const words = async pg => { await pg.waitForTimeout(700); return pg.evaluate(() => JSON.parse(localStorage.getItem('wt:words') || '[]')); };
+  const words = pg => pg.evaluate(() => JSON.parse(localStorage.getItem('wt:words') || '[]'));
   const keeps = (before, now) => before.every(o => { const n = now.find(x => x.w === o.w); return n && Object.keys(o).every(k => JSON.stringify(n[k]) === JSON.stringify(o[k])); });
   const flip = (pg, id, v) => pg.evaluate(([i, val]) => { const c = document.getElementById(i); c.checked = val; c.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]);
   const setv = (pg, id, v) => pg.evaluate(([i, val]) => { const c = document.getElementById(i); c.value = val; c.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]);
@@ -100,7 +100,7 @@ const WORDS = [{ ts: 1700000000000, w: 'forlorn', lv: 'C1', ex: 'She sat alone i
   ok(await pg.evaluate(() => { const o = document.getElementById('ob-overlay'); return !!o && !o.hidden; }), 'new user: onboarding shows, goal card first');
   await pg.evaluate(() => document.getElementById('ob-skip-now').click()); await pg.waitForTimeout(600);
   g1 = await goal(pg); ok(g1 && g1.ask === 'done' && g1.v === undefined, 'first run, Skip for now: no goal chosen, question marked done');
-  await pg.waitForTimeout(700); ok(await pg.evaluate(() => localStorage.getItem('wt:onboarded') === '1'), 'onboarding is marked done');
+  ok(await pg.evaluate(() => localStorage.getItem('wt:onboarded') === '1'), 'onboarding is marked done');
   await lib(pg); ok(!(await card(pg)) && !(await learnAttr(pg)), 'after skipping: no card in My Library, Standard');
   pg = await open({});
   await pg.evaluate(() => { document.getElementById('ob-goal-learn').click(); document.getElementById('ob-next-g').click(); }); await pg.waitForTimeout(300);

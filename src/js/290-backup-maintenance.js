@@ -80,7 +80,6 @@
   async function bkMake() {
     try { persist(); stSave(); } catch (e) { /* nothing open yet */ } // include the newest position and stats
     await new Promise(r => setTimeout(r, 300));
-    store.flush();   // the write queue (030) first, so the backup has the newest values
     const ls = {};
     try {
       Object.keys(localStorage).forEach(k => {
@@ -112,7 +111,7 @@
     const ok = bkCheck(d), keys = Object.keys(ok.ls), n = keys.length + Object.keys(ok.idb).length;
     if (!n) { toast('That backup has nothing this app can restore.', 4500); return; }
     if (!await askConfirm({ title: 'Restore this backup?', item: 'Backup of ' + (String(d.created || '').slice(0, 10) || 'unknown date'), meta: n + ' items', text: (ok.skipped ? ok.skipped + ' damaged items will be skipped. ' : '') + 'Matching data on this device will be replaced.', ok: 'Restore', tone: 'calm' })) return;
-    store.flush(); window.__wtRestoring = true;
+    window.__wtRestoring = true;
     const before = {};   // what was here, so a failed restore can be undone
     try {
       keys.forEach(k => { before[k] = localStorage.getItem(k); });

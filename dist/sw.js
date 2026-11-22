@@ -23,7 +23,7 @@
  */
 'use strict';
 
-const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', CATALOG = 'wt-catalog-v1', COVERS = 'wt-covers-v1', LEARN = 'wt-learn-v1', NET_WAIT = 3000;   // (no longer used by the page open: the saved page is served at once)
+const SHELL = 'wt-shell-v1', FONTS = 'wt-fonts-v1', LANG = 'wt-lang-v1', CATALOG = 'wt-catalog-v1', COVERS = 'wt-covers-v1', LEARN = 'wt-learn-v1', NET_WAIT = 3000;
 const CAT_WAIT = 6000;                 // catalogue: after this long the saved copy is used (the app itself gives up at 8 s)
 const COVER_MAX = 1000, COVER_FRESH = 14 * 864e5, COVER_BIG = 1.5e6; // covers kept, age before a quiet refresh, largest file kept
 let coverPuts = 0;
@@ -114,10 +114,11 @@ async function shell(event) {
     return full(v);
   })();
   event.waitUntil(net.catch(() => {}));
-  /* The saved page opens at once. Waiting up to NET_WAIT for the network used to leave a blank screen on a slow connection. The check
-     above (version.json, then the page if it changed) carries on in the background, and the open page gets 'wt-update' (Reload). */
-  usedCached = true;
-  return cached.clone();
+  /* Network first: the newest page opens whenever the network answers within NET_WAIT. If it is slow or offline, the saved
+     page opens at once and the newest one keeps downloading (then the app offers "Reload"). */
+  const slow = new Promise(res => setTimeout(() => { usedCached = true; res(cached.clone()); }, NET_WAIT));
+  const fast = net.catch(() => { usedCached = true; return cached.clone(); });
+  return Promise.race([fast, slow]);
 }
 
 // Our own fonts (fonts/<name>-<hash>.woff2): a saved file is final, so it is served without asking the network again.

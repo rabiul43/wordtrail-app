@@ -64,49 +64,12 @@
   /* Refresh keeps you in the book: the open book is remembered while the player is showing and forgotten when you go back home. */
   const RESUME_OPEN = (() => { try { return store.get('wt:open', null); } catch (e) { return null; } })();
   function rememberOpen(b) { try { store.set('wt:open', b ? { id: b.id, title: b.title, authors: b.authors || '', cover: b.cover || '', ia: b.ia || '' } : null); } catch (e) { /* storage unavailable */ } }
-  /* <html data-ui="..."> mirrors which of these are showing: tabbar, filter (filter results), toast, sheetq (quick sheet), nr (focus page),
-     player, playerro (read-only player), playerrw (player, not read-only), mini, pssheet (a player sheet), learn (Learn mode on My Library).
-     The CSS uses it in place of body:has(#x:not([hidden])), which made the browser re-check the whole page after every change. */
-  function uiMirror() {
-    const g = id => document.getElementById(id), on = n => !!n && !n.hidden, pl = g('player'), plOn = on(pl), ro = plOn && pl.classList.contains('ro'), sh = g('shelf');
-    const t = [];
-    if (on(g('tabbar'))) t.push('tabbar');
-    if (on(g('filter-results'))) t.push('filter');
-    if (on(g('toast'))) t.push('toast');
-    if (on(g('sheet-quick'))) t.push('sheetq');
-    if (on(g('nr'))) t.push('nr');
-    if (plOn) t.push('player', ro ? 'playerro' : 'playerrw');
-    if (on(g('mini'))) t.push('mini');
-    if (document.querySelector('.ps-sheet:not([hidden])')) t.push('pssheet');
-    if (on(sh) && sh.getAttribute('data-mode') === 'learn') t.push('learn');
-    const v = t.join(' '), r = document.documentElement;
-    if (r.getAttribute('data-ui') !== v) r.setAttribute('data-ui', v);
-  }
-  uiMirror();
-  try {
-    const mo = new MutationObserver(uiMirror), opt = { attributes: true, attributeFilter: ['hidden', 'class', 'data-mode'] };
-    ['tabbar', 'filter-results', 'toast', 'sheet-quick', 'nr', 'player', 'mini', 'shelf'].forEach(id => { const n = document.getElementById(id); if (n) mo.observe(n, opt); });
-    $$('.ps-sheet').forEach(n => mo.observe(n, opt));
-  } catch (e) { /* no observer: the first state stays */ }
-  /* A screen that has just appeared fades and slides in for about 0.18 s (CSS: .wt-enter, in 10-base-layout.css). Only opacity and
-     transform move. Nothing is animated while the app starts, in lighter graphics mode, or with reduced motion; the player has its own
-     opening animation, so it is left out. A screen that was already showing is not touched. */
-  function screenEnter(before) {
-    if (reduceMotion || document.documentElement.hasAttribute('data-lite') || document.hidden) return;
-    [el.home, $('#sp'), $('#seeall'), $('#collections'), $('#shelf'), $('#account'), $('#detail')].forEach((n, i) => {
-      if (!n || n.hidden || before[i]) return;
-      n.classList.remove('wt-enter'); void n.offsetWidth;   // restart if it is still playing from a quick double tap
-      n.classList.add('wt-enter');
-      n.addEventListener('animationend', function done(e) { if (e.target !== n) return; n.classList.remove('wt-enter'); n.removeEventListener('animationend', done); });
-    });
-  }
   function showView(v) {
     if (v === 'home' && !BOOTING) rememberOpen(null);
     if (v !== 'player' && el.player.classList.contains('ro')) setReadOnly(false);
     const home = v === 'home';
     if (v === 'player' && el.player.hidden) { backTo = pendingBack || { tab: curTab, see: seeOpen }; pendingBack = null; }
     const det = home && !!(DET.book || DET.author);
-    const enterBefore = BOOTING ? null : [el.home, $('#sp'), $('#seeall'), $('#collections'), $('#shelf'), $('#account'), $('#detail')].map(n => !!n && !n.hidden);
     el.home.hidden = !(home && curTab === 'library' && !seeOpen && !det && !spOpen);
     $('#sp').hidden = !(home && spOpen && !seeOpen && !det);   // the Search page (121)
     { const fs = $('#sp-fs'); if (fs && $('#sp').hidden) fs.hidden = true; }
@@ -120,7 +83,6 @@
     appBarShow(home && el.home.hidden && !spOpen && !(det && abPhone.matches));   // every Home-area screen except the Library, the Search page and (phones) book/author pages: they have their own header row
     el.player.hidden = v !== 'player';
     if (home) window.scrollTo(0, 0);
-    if (enterBefore) screenEnter(enterBefore);
     wakeSync();
     miniUpdate(home);
     if (v === 'player') paintPlayerHeart();
@@ -348,8 +310,6 @@
   }
   function uiInit() {
     window.addEventListener('scroll', () => { clearTimeout(uiT); uiT = setTimeout(uiSave, 250); }, { passive: true });
-    /* While the page is hidden, <html data-hidden> pauses every running animation (99z-perf.css). Set and cleared only here. */
-    const hid = () => document.documentElement.toggleAttribute('data-hidden', document.hidden); document.addEventListener('visibilitychange', hid); hid();
     document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTimeout(uiT); uiSave(); } });
     window.addEventListener('pagehide', () => { clearTimeout(uiT); uiSave(); });
     const s = store.get(UI_KEY, null);

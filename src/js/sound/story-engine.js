@@ -7,7 +7,7 @@
   const CUE_NAMES = { thunder: 'Thunder', knock: 'Knocking', creak: 'Creaking', slam: 'Door slam', steps: 'Footsteps', bell: 'Bell', clock: 'Ticking clock', wind: 'Gust of wind', waves: 'Waves', splash: 'Splash', fire: 'Crackling fire', birds: 'Birdsong', owl: 'Owl', horse: 'Galloping horse', rain: 'Rain', storm: 'Storm', sea: 'Sea', water: 'Brook or river', crickets: 'Crickets', frogs: 'Frogs', wolf: 'Wolf howl', bee: 'Buzzing bee', dooropen: 'Door opening', doorshut: 'Door closing', glass: 'Breaking glass', match: 'Striking a match', paper: 'Rustling paper', coins: 'Coins', lock: 'Key and lock', tea: 'Teacups', rooster: 'Rooster', wheels: 'Carriage wheels', train: 'Train', ship: 'Ship and foghorn', crowd: 'Crowd murmur', run: 'Running', clap: 'Applause', laugh: 'Laugh', sigh: 'Sigh', gasp: 'Gasp', heart: 'Heartbeat' };
   function ambStory(id) {   // called when the reader moves to a sentence: find trigger words, play each one as its word is spoken
     try {
-      if (!AMB.on || !AMB.cue || P.ambCues === false || P.calm === true || audio.paused || audio.seeking || !S.model || id == null || id < 0) return;
+      if (!AMB.cueOn || !AMB.cue || P.ambCues === false || P.calm === true || audio.paused || audio.seeking || !S.model || id == null || id < 0) return;
       const s = S.model.sents[id]; if (!s || s.h) return;
       const text = s.t, re = /[a-z0-9]+(?:['\u2019][a-z]+)?/gi, hits = [], seen = new Set();   // hits: [sound, word index, count]
       const cust = Array.isArray(P.ambCueCustom) ? P.ambCueCustom : [];
@@ -56,7 +56,7 @@
     (AMB.cueG || []).forEach(g => { try { g.gain.setTargetAtTime(0, AMB.ctx.currentTime, 0.05); } catch (e) {} }); AMB.cueG = [];   // a counted run of strokes stops when the book pauses or jumps
   }
   function ambCueFire(k, id, n) {
-    if (!AMB.on || !AMB.cue || P.ambCues === false || cueCatOff(k) || audio.paused || audio.seeking || Math.abs((S.curId == null ? -9 : S.curId) - id) > 1) return;   // paused, jumped away or moved on: skip
+    if (!AMB.cueOn || !AMB.cue || P.ambCues === false || cueCatOff(k) || audio.paused || audio.seeking || Math.abs((S.curId == null ? -9 : S.curId) - id) > 1) return;   // paused, jumped away or moved on: skip
     const ms = Date.now(), nx = AMB.cueNx || (AMB.cueNx = {}), log = AMB.cueLog || (AMB.cueLog = []);
     while (log.length && ms - log[0] > 60000) log.shift();
     if (ms < (nx[k] || 0) || ms < (AMB.cueGap || 0) || log.length >= 6) return;

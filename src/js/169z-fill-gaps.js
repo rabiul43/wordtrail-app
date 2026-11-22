@@ -321,6 +321,7 @@
       st.snap = { bookId: String(S.book.id), sec: S.sec, time: nowT(), playing: !audio.paused && !audio.ended };
       st.on = true; st.plan = plan; st.i = 0; st.res = []; st.playing = false; st.graded = new Set(); st.dif = {}; st.word = '';
       try { plan.forEach(x => { st.dif[x.i] = dif(x.i); }); if (target != null) st.word = LVX.word('gap', plan.map(x => st.dif[x.i])); } catch (e) { st.dif = {}; st.word = ''; }   // level: never stops a session
+      try { sndFocusOn(); } catch (e) { /* sound is a bonus */ }
       stopAudio();
       openSheet('sheet-fg');
       if (window.visualViewport) { window.visualViewport.addEventListener('resize', vv); window.visualViewport.addEventListener('scroll', vv); vv(); }
@@ -330,6 +331,7 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
+      try { sndFocusOff(); } catch (e) { /* sound is a bonus */ }
       halt(); stopAudio();
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vv); window.visualViewport.removeEventListener('scroll', vv); }
       const sh = q('sheet-fg'); sh.style.height = ''; sh.style.top = '';

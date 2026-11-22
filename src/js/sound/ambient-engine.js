@@ -38,12 +38,19 @@
     /* latencyHint 'playback': bigger audio buffers, so the shared graph (narrator enhancer, ambient, music) does not under-run on a weak or busy phone
        (an under-run is the stuttering, crackling "bad phone line" sound). Nothing here is played live from a key press, so the extra few tens of ms do not matter. */
     try { AMB.ctx = new AC({ latencyHint: 'playback' }); } catch (e) { try { AMB.ctx = new AC(); } catch (e2) { return null; } }
+    try { AMB.ctx.addEventListener('statechange', () => { try { if (CTXH.fn) CTXH.fn(); } catch (e) { /* a help only */ } }); } catch (e) { /* the other wake-up triggers still work */ }   // ONE listener for the one context; the wake-up itself is ctxHeal (sound-screen.js)
     return AMB.ctx;
   }
   ctxHook.get = audioCtx;   // the player's sound wave (150) takes the same context through this
+  const CTXH = { fn: null, gest: false, at: 0, t: 0 };   // the wake-up of the shared context: fn = ctxHeal (set in sound-screen.js), gest = a tap listener is waiting, at/t = the last try and its one delayed retry
+  const AUD_SUSP = { timer: 0, sTimer: 0 };   // the two suspend timers: 'timer' (ambient, ambSync) and 'sTimer' (music, musStop); one store, so whoever starts a sound can cancel both
+  function audioSuspendCancel(key) {   // no key: cancel both (sound is wanted again)
+    if (key) { clearTimeout(AUD_SUSP[key]); AUD_SUSP[key] = 0; return; }
+    clearTimeout(AUD_SUSP.timer); clearTimeout(AUD_SUSP.sTimer); AUD_SUSP.timer = 0; AUD_SUSP.sTimer = 0;
+  }
   function audioSuspendSoon(ms, key) {   // stop the engine to save battery, but only when ambient is silent, music is not playing AND the narrator is not running through it; ambient and music each keep their own timer
-    clearTimeout(AMB[key]);
-    AMB[key] = setTimeout(() => { if (AMB.ctx && !AMB.on && !musicActive() && !(AMB.narr && AMB.narr())) AMB.ctx.suspend().catch(() => {}); }, ms);
+    audioSuspendCancel(key);
+    AUD_SUSP[key] = setTimeout(() => { AUD_SUSP[key] = 0; if (AMB.ctx && !AMB.on && !musicActive() && !(AMB.narr && AMB.narr())) AMB.ctx.suspend().catch(() => {}); }, ms);
   }
   function ambBuild() {   // the ambient engine; each sound's layer is built only while its level is above zero (ambLayerOn)
     if (AMB.built) return true;

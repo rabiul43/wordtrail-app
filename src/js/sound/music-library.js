@@ -132,19 +132,19 @@
 
   /* Fetch a clip, cache it in the Cache API, decode it. Returns AudioBuffer or null. */
   async function musFetch(f) {
-    const url = musClipUrl(f);
+    const url = musClipUrl(f), ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 60000), sg = { signal: ctl.signal };   // a stuck download is given up after 60 s, so the next clip can be tried
     try {
       let resp;
       if (MUS.base) {
-        resp = await fetch(url, { cache: 'no-store' });   // local test mode: never cache
+        resp = await fetch(url, { cache: 'no-store', signal: ctl.signal });   // local test mode: never cache
       } else try {
         const c = await caches.open('wt-music');
         resp = await c.match(url);
-        if (!resp) { resp = await fetch(url); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); if (MUS.have) MUS.have.add(new Request(url).url); } }
+        if (!resp) { resp = await fetch(url, sg); if (resp.ok) { await c.put(url, resp.clone()); sndTouch(url); sndCachePrune(); if (MUS.have) MUS.have.add(new Request(url).url); } }
         else sndTouch(url);
-      } catch (e) { resp = await fetch(url); }
+      } catch (e) { if (ctl.signal.aborted) return null; resp = await fetch(url, sg); }
       if (!resp || !resp.ok) { if (resp && resp.status === 404) musGone(); return null; }
       return await MUS.ctx.decodeAudioData(await resp.arrayBuffer());
-    } catch (e) { return null; }
+    } catch (e) { return null; } finally { clearTimeout(to); }
   }
 

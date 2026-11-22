@@ -230,6 +230,7 @@
       st.snap = { bookId: String(S.book.id), sec: S.sec, time: nowT(), playing: !audio.paused && !audio.ended };
       st.on = true; st.set = set; st.i = 0; st.res = []; st.playing = false;
       st.sp = st.from = st.nxt = SLC.startStep(load());
+      try { sndFocusOn(); } catch (e) { /* sound is a bonus */ }
       stopAudio();
       openSheet('sheet-sl');
       if (window.visualViewport) { window.visualViewport.addEventListener('resize', vv); window.visualViewport.addEventListener('scroll', vv); vv(); }
@@ -239,6 +240,7 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
+      try { sndFocusOff(); } catch (e) { /* sound is a bonus */ }
       halt(); stopAudio();
       if (window.visualViewport) { window.visualViewport.removeEventListener('resize', vv); window.visualViewport.removeEventListener('scroll', vv); }
       const sh = q('sheet-sl'); sh.style.height = ''; sh.style.top = '';

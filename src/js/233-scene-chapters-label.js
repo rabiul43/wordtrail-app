@@ -93,6 +93,17 @@
       .catch(() => { AI.off = Date.now() + AI_PAUSE; })   // no internet, allowance used up or a slow reply: rules only for a while
       .finally(() => { clearTimeout(tm); AI.busy = false; });
   }
+  function ambWarmAhead(ix, pi, A) {   // the scores of the next paragraphs (the worker in 234 has them ready) say which recordings a scene change will want: save those first
+    try {
+      if (P.ambAuto === false || A.warmPi === pi || !ambWarmReady()) return;
+      A.warmPi = pi;
+      const top = o => { let b = '', v = 3; for (const k in o) if (o[k] > v) { b = k; v = o[k]; } return b; };
+      for (let j = pi + 1; j <= pi + 6 && ix.pa[j] && ix.pa[j].sc; j++) {
+        const R = ambSceneRead(ix, j);
+        ambWarmKeys(ambSceneMix({ place: top(R.p), wx: top(R.w), time: A.time || '', mood: '', wi: 1 }, 1));
+      }
+    } catch (e) { /* a look ahead must never break reading */ }
+  }
   function ambAutoStep() {   // called when the reader moves to a new sentence; does the work only when the paragraph changes
     AMB.autoId = S.curId; AMB.autoSec = S.sec;
     try {
@@ -106,6 +117,7 @@
       if (pi == null || (A.model === m && A.pi === pi && !A.refix && !look)) return;
       A.refix = false; if (look) A.look = pi;
       let jump = A.model !== m || Math.abs(pi - A.pi) > 1; const skipped = jump; A.model = m; A.pi = pi;   // skipped: the reader jumped (seek, new book), so no transition sound
+      ambWarmAhead(ix, pi, A);   // download the recordings the next paragraphs will probably need (once per paragraph)
       const R = ambGenreApply(ambSceneRead(ix, pi), S.book); ambFixWords(m, ix, pi, R); if (ambChapBoost(ix, id, pi, R, look)) jump = true;   // a new chapter may start in a new place
       if (!look) ambAiApply(R, pi);   // (the saved answer of the free AI, if the reader turned it on)
       const mm = A.memo, n = R.t.night || 0, d = R.t.day || 0, t0 = A.time;

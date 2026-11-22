@@ -21,19 +21,15 @@
     $$('#sp-presets .chip[data-v]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === P.speed)));
     $('#sp-each').checked = P.speedEach !== false; $('#sp-lev').checked = !!P.level; $('#sp-sil').checked = !!P.silence; $('#sp-voice').checked = P.enh === 'voice';
   }
-  /* Both timers below run only while the audio plays AND their feature is on. They measure real elapsed time (not a fixed step),
-     so the rate can be low: silence skipping looks every 120 ms (it needs 220 ms of quiet), the loudness evener every 250 ms. */
-  const SIL_MS = 120;
-  let silT = 0, silQuiet = 0, silOn = false, silBuf = null, silLast = 0;
+  let silT = 0, silQuiet = 0, silOn = false, silBuf = null;
   function silTick() {
-    const tn = performance.now(), dt = Math.min(400, Math.max(0, tn - (silLast || tn))); silLast = tn;
     if (!vgraph || audio.paused || (!P.silence && P.enh !== 'voice')) { if (silOn) { silOn = false; audio.playbackRate = P.speed; } silQuiet = 0; return; }
     if (!silBuf) silBuf = new Uint8Array(vgraph.fftSize);
     vgraph.getByteTimeDomainData(silBuf);
     let m = 0; for (let i = 0; i < silBuf.length; i++) { const d = Math.abs(silBuf[i] - 128); if (d > m) m = d; }
     const quiet = m < 6;
     if (P.silence) {
-      if (quiet) { silQuiet += dt; if (silQuiet >= 220 && !silOn) { silOn = true; audio.playbackRate = Math.min(16, Math.max(P.speed * 2.5, 2.5)); } }
+      if (quiet) { silQuiet += 70; if (silQuiet >= 220 && !silOn) { silOn = true; audio.playbackRate = Math.min(16, Math.max(P.speed * 2.5, 2.5)); } }
       else { silQuiet = 0; if (silOn) { silOn = false; audio.playbackRate = P.speed; } }
     } else if (silOn) { silOn = false; audio.playbackRate = P.speed; }
     if (enh && P.enh === 'voice' && !quiet) {          // active leveling: lift soft passages, ease loud ones
@@ -41,9 +37,9 @@
       enh.gain.gain.setTargetAtTime(g, vctx.currentTime, 0.25);
     }
   }
-  function silSync() { // the timer only runs while the audio is playing: when paused there is nothing to measure
+  function silSync() { // the 70 ms timer only runs while the audio is playing: when paused there is nothing to measure
     const need = (!!P.silence || P.enh === 'voice') && !audio.paused;
-    if (need && !silT) { silLast = performance.now(); silT = setInterval(silTick, SIL_MS); }
+    if (need && !silT) silT = setInterval(silTick, 70);
     if (!need && silT) { clearInterval(silT); silT = 0; silQuiet = 0; if (silOn) { silOn = false; audio.playbackRate = P.speed; } }
   }
   function silSet(on) {
@@ -59,8 +55,8 @@
      not pull it down) and trims a gain stage in front of the enhancer so every track lands near the same level.
      The level learned for each track is saved per book, so a track starts at the right volume next time.
      Gain is limited to -9 dB .. +6 dB. */
-  const LEV = { target: -24, min: -9, max: 6, ring: 20, need: 8, ms: 250 };   // ring = about 5 s of frames, need = about 2 s
-  let levT = 0, levLast = 0, levRing = [], levSec = -1, levLv = null, levMs = 0, levSaved = 0, levMem = null, levBook = null, levData = null;
+  const LEV = { target: -24, min: -9, max: 6, ring: 50, need: 20 };
+  let levT = 0, levRing = [], levSec = -1, levLv = null, levMs = 0, levSaved = 0, levMem = null, levBook = null, levData = null;
   function levMemory() {
     const id = S.book && S.book.id;
     if (id == null) return null;
@@ -86,7 +82,6 @@
     return 20 * Math.log10(Math.sqrt(sum / n) + 1e-9);
   }
   function levTick() {
-    const tn = performance.now(), dt = Math.min(1000, Math.max(0, tn - (levLast || tn))); levLast = tn;
     if (!P.level || !enh || !enh.lev || !vgraph || !S.book) return;
     if (audio.paused || audio.seeking || S.loadingAudio) return;
     const mem = levMemory();
@@ -96,7 +91,7 @@
       levGain(levLv == null ? 0 : LEV.target - levLv, true);
     }
     levRing.push(levFrameDb()); if (levRing.length > LEV.ring) levRing.shift();
-    levMs += dt;
+    levMs += 100;
     if (levRing.length < LEV.need) return;
     const L = levRing.slice().sort((a, b) => a - b)[Math.floor(levRing.length * 0.8)];
     if (L < -60) return;                                     // silence: nothing to measure
@@ -104,8 +99,8 @@
     levGain(LEV.target - levLv, false);
     if (mem && levMs >= 20000 && Date.now() - levSaved > 15000) { mem[S.sec] = Math.round(levLv * 10) / 10; store.set('wt:lev:' + S.book.id, mem); levSaved = Date.now(); }
   }
-  function levSync() { // the timer only runs while playing; a pause stops the timer but keeps what was learned
-    if (P.level && !audio.paused && !levT) { levLast = performance.now(); levT = setInterval(levTick, LEV.ms); }
+  function levSync() { // the 100 ms timer only runs while playing; a pause stops the timer but keeps what was learned
+    if (P.level && !audio.paused && !levT) levT = setInterval(levTick, 100);
     if (P.level && audio.paused && levT) { clearInterval(levT); levT = 0; }
     if (!P.level && levT) { clearInterval(levT); levT = 0; levSec = -1; levLv = null; levGain(0, false); }
   }

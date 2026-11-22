@@ -115,7 +115,8 @@
     const gen = ++MUS.gen;
     MUS.queue = musQueue(mood);
     MUS.qi    = 0;
-    clearTimeout(MUS.xTimer); clearTimeout(MUS.sTimer); clearTimeout(MUS.rt); clearTimeout(MUS.lt);
+    clearTimeout(MUS.xTimer); clearTimeout(MUS.rt); clearTimeout(MUS.lt);
+    audioSuspendCancel();   // sound is wanted again: cancel both suspend timers (music's own and ambient's), so an old one cannot stop it
     MUS.live = true;   // keeps the shared context from being suspended while this loads and plays
     musDuckStart();    // the narrator duck runs whenever music is live, with ambient on or off
     if (MUS.ctx.state !== 'running') MUS.ctx.resume().catch(() => {});
@@ -263,7 +264,6 @@
     cb.type = 'peaking'; cb.frequency.value = 800;  cb.Q.value = 0.9; cb.gain.value = 0;
     master.connect(ca); ca.connect(cb); cb.connect(duck); duck.connect(ctx.destination);
     MUS.ctx = ctx; MUS.master = master; MUS.duck = duck; MUS.ca = ca; MUS.cb = cb; MUS.on = true;
-    try { if (ctx.addEventListener) ctx.addEventListener('statechange', musCtxHeal); else ctx.onstatechange = musCtxHeal; } catch (e) { /* the other triggers still work */ }
     if (!MUS.manifest) musManifestRetry();
   }
 

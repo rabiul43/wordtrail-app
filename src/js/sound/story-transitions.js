@@ -36,7 +36,7 @@
   };
   function ambTrans(from, to, id, look, skipped) {   // called by the scene detector the moment the place changes
     try {
-      if (skipped || !from || !to || from === to || !AMB.on || !AMB.cue || P.ambTrans === false || P.calm === true || !ambPlaying()) return;
+      if (skipped || !from || !to || from === to || !AMB.cueOn || !AMB.cue || P.ambTrans === false || P.calm === true || !ambPlaying()) return;
       const kind = ambTransKind(from, to); if (!kind) return;
       const ms = Date.now(); if (ms < (AMB.transNx || 0)) return;
       AMB.transNx = ms + 15000; clearTimeout(AMB.transH);
@@ -54,7 +54,7 @@
   }
   function ambTransFire(e) {
     try {
-      if (!AMB.on || !AMB.cue || P.ambTrans === false || P.calm === true || audio.paused || audio.seeking || Math.abs((S.curId == null ? -9 : S.curId) - e.id) > 1) return;
+      if (!AMB.cueOn || !AMB.cue || P.ambTrans === false || P.calm === true || audio.paused || audio.seeking || Math.abs((S.curId == null ? -9 : S.curId) - e.id) > 1) return;
       const ctx = AMB.ctx, dst = ctx.createGain(), pl = SC_PLACES[e.to];
       dst.gain.value = 0.8; dst.connect(AMB.cue); (AMB.cueG = (AMB.cueG || []).slice(-3)).push(dst);   // fades out if the book pauses
       ctx.resume().catch(() => {}); AMB.pj = 0.95 + Math.random() * 0.1;

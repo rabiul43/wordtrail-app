@@ -177,6 +177,7 @@
       if (k < 0) { toast('Open a book that has its text lined up with the audio first.', 4000); return false; }
       st.snap = { bookId: String(S.book.id), sec: S.sec, time: nowT(), playing: !audio.paused && !audio.ended };
       st.on = true; st.k = k; st.slow = false; st.fail = false; st.n = st.u = '';
+      try { sndFocusOn(); } catch (e) { /* sound is a bonus */ }
       stopAudio();
       openSheet('sheet-echo');
       listen();
@@ -185,6 +186,7 @@
     }
     function finish() {   // however the screen was closed
       if (!st.on) return; st.on = false;
+      try { sndFocusOff(); } catch (e) { /* sound is a bonus */ }
       if (st.cnt >= 3) { try { IE.log('s'); } catch (e) { /* IELTS practice log (169o) not loaded */ } }
       st.cnt = 0;
       halt(); stopAudio(); hook('close');

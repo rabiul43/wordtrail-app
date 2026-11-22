@@ -21,13 +21,37 @@
      running for the music even when ambient is silent. */
   const musicActive = () => !!(MUS.on && MUS.live);
 
+  /* Grace for short buffering dips. A readyState of 2 or less (no data for the next moment) that lasts under SND_HOLD_MS still counts as
+     "heard", so one small dip does not fade the ambient out, stop the music and suspend the engine, only to start it all again a second later.
+     SNDHOLD.at is the last time the narrator was heard fine; it is set by every good reading and by the audio's own progress
+     (sound-screen.js), and cleared by every real stop (pause, ended, error, a new recording loading). Loading a recording is never held. */
+  const SND_HOLD_MS = 2000;
+  const SNDHOLD = { at: 0, t: 0 };   // at: last good reading (performance.now); t: the one timer that re-checks when the grace runs out
+  function sndHeardCalc(ready, loading, last, now, ms) {   // pure: { ok, at } for readyState, "a recording is loading", the last good time, now and the grace in ms
+    if (loading) return { ok: false, at: last };
+    if (ready > 2) return { ok: true, at: now };
+    const d = now - last;
+    return { ok: last > 0 && d >= 0 && d < ms, at: last };
+  }
+  function sndHeard() {   // the narrator's data is there, or ran short only a moment ago
+    const now = performance.now(), r = sndHeardCalc(audio.readyState, !!S.loadingAudio, SNDHOLD.at, now, SND_HOLD_MS);
+    SNDHOLD.at = r.at;
+    if (r.ok && audio.readyState > 2 && SNDHOLD.t) { clearTimeout(SNDHOLD.t); SNDHOLD.t = 0; }   // the data is back: no re-check needed
+    if (r.ok && audio.readyState <= 2 && !SNDHOLD.t) {   // held by the grace: look again when it ends, so a real stall still stops the sound
+      SNDHOLD.t = setTimeout(() => { SNDHOLD.t = 0; try { audio.dispatchEvent(new Event('wt-sndhold')); } catch (e) { /* the next audio event looks again */ } }, Math.max(100, SND_HOLD_MS - (now - SNDHOLD.at)) + 60);
+    }
+    return r.ok;
+  }
+  function sndHeardReset() { SNDHOLD.at = 0; clearTimeout(SNDHOLD.t); SNDHOLD.t = 0; }   // a real stop: no grace after it
+
   /* The book's narrator is really being HEARD (not just asked to play): not paused, finished, failed, loading a recording or stalled
-     for lack of data. Same rule as ambPlaying() for the background sounds, so music never plays over a silent, loading book.
-     A short seek keeps the music as it is. Independent of ambient. */
+     for lack of data (for longer than the grace above). Same rule as ambPlaying() for the background sounds, so music never plays over
+     a silent, loading book. A short seek keeps the music as it is. Independent of ambient. */
   const musNarrating = () => {
+    if (SND.focus > 0) return false;   // focus mode: a trainer is playing clips; treat narrator as silent
     if (!S.book || audio.paused || audio.ended || audio.error) return false;
     if (audio.seeking) return !!(MUS.live || MUS.playing);
-    return !S.loadingAudio && audio.readyState > 2;
+    return sndHeard();
   };
 
   /* ---------- Ducking under the narrator ----------

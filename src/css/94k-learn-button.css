@@ -15,7 +15,7 @@
 .lrn-fab:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
 .lrn-ic { font-size: 1.1rem; line-height: 1; }
 /* hidden in reading-only mode, in Focus mode (slim dock) and on the Focus page */
-.player.ro .lrn-fab, .dock.slim ~ .lrn-fab, html[data-ui~="nr"]:not(#_) .lrn-fab { display: none; }
+.player.ro .lrn-fab, .dock.slim ~ .lrn-fab, body:has(#nr:not([hidden])) .lrn-fab { display: none; }
 :root[data-calm] .lrn-fab { transition: none; }
 @media (prefers-reduced-motion: reduce) { .lrn-fab { transition: none; } }
 @media (min-width: 1100px) { .lrn-fab { right: 2rem; } }

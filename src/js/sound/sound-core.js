@@ -1,6 +1,40 @@
   /* ---------- sound-core.js ----------
      Sound screen: the master switch and master volume (sndOn, sndMul, sndPaint, sndApplyAll). */
   /* ---------- the Sound screen: master switch, master volume and the glue between its controls ---------- */
+  /* ---------- Focus mode ----------
+     Learning trainers (Echo, Listen & type, Fill gaps, Speed ladder, Sound drill) play audio clips through the
+     shared <audio> element. Without focus mode the ambient/music/story/opening engines play under those clips.
+     SND.focus is a count so nested screens work: each start() increments, each close decrements. While > 0:
+       - ambPlaying() returns false → ambSync() fades the ambient bed out (slow tc)
+       - musNarrating() returns false → musicPause() is called
+       - story sounds and transition sounds do not fire (they check AMB.on)
+       - the opening sound's arm is cleared so it does not start
+     On focus off (count back to 0) the engines resume exactly as a normal play does. */
+  const SND = { focus: 0 };
+  function sndFocusOn() {
+    try {
+      SND.focus++;
+      if (SND.focus !== 1) return;   // already in focus: nothing more to do
+      // Fade out ambient slowly (same tc as the sleep timer) and pause music
+      if (typeof AMB !== 'undefined' && AMB.built && AMB.on) {
+        AMB.slow = true;   // signals ambSync to use the slow tc
+      }
+      try { ambSync(); } catch (e) { /* sound is a bonus */ }
+      try { musicPause(); } catch (e) { /* sound is a bonus */ }
+      // Clear any pending opening so it does not arm while a clip plays
+      try { if (typeof OSND !== 'undefined') OSND.armed = ''; } catch (e) { /* optional */ }
+    } catch (e) { /* focus is cosmetic: never stop reading */ }
+  }
+  function sndFocusOff() {
+    try {
+      if (SND.focus <= 0) { SND.focus = 0; return; }
+      SND.focus--;
+      if (SND.focus > 0) return;   // still inside a nested focus screen
+      // Resume exactly like a normal play event (ambPlaying / musNarrating now return real values)
+      try { ambSync(); } catch (e) { /* sound is a bonus */ }
+      try { musicPlay(); } catch (e) { /* optional: music may not be built yet */ }
+    } catch (e) { /* focus is cosmetic: never stop reading */ }
+  }
   /* ---------- idle timers ----------
      The smart mix (250 ms), the sound balance (500 ms) and the scene label (1 s) used to tick all day, even with nothing playing.
      idleTimer() registers one; it runs only while audio plays and the page is visible, or while its own "also" check says someone

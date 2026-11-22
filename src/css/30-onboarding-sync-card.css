@@ -118,9 +118,9 @@
 .about p, .state p, .acct-row, .tab-head p { font-size: var(--small); }
 
 /* bottom stack: one thing at a time. A toast takes the mini-player's slot, just above the tab bar. */
-html[data-ui~="toast"][data-ui] .mini { visibility: hidden; }
-html[data-ui~="tabbar"]:not(#_) .toast,
-html[data-ui~="tabbar"]:not(#_) body.has-mini .toast { bottom: calc(var(--tabbar-h, 4.2rem) + .5rem); }
+body:has(.toast:not([hidden])) .mini { visibility: hidden; }
+body:has(#tabbar:not([hidden])) .toast,
+body.has-mini:has(#tabbar:not([hidden])) .toast { bottom: calc(var(--tabbar-h, 4.2rem) + .5rem); }
 
 /* ---------- Phase 19: sync card that is easy to read ---------- */
 .syncstat > * { margin: 0; }

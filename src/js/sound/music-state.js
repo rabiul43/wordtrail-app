@@ -15,7 +15,6 @@
     duckIv: 0,      // setInterval handle of musDuckTick (runs only while music is live, ambient on or off)
     duckS: '',      // last duck state applied: s speaking, p pause, u unknown, o off
     live: false,    // music is wanted/playing (a clip is loading or sounding): the context must not be suspended
-    sTimer: 0,      // setTimeout handle: suspend the context a moment after music stops (if ambient is silent too)
     manifest: null, // parsed music.json
     mood: '',       // current mood key
     queue: [],      // shuffled clip list for current mood
@@ -40,7 +39,6 @@
     slow: false,    // the pause comes from the sleep timer: fade the music out slowly, like the ambient sounds (set in 200 and 150)
     rs: null,       // where a pause left the music: { clip, pos, mood, book, t }, used by the next play to carry on (musResumeSave / musResumeTake)
     tail: null,     // the nodes of the last stop, still fading: cut short if the same clip carries on
-    gest: false,    // one tap/key listener is waiting to wake the audio engine (musGestureArm)
   };
 
   /* Local test mode: when the app runs on localhost (tools/dev_server.py), music.json and

@@ -254,28 +254,11 @@
   /* Draws a cover into its box (and redraws it when the style changes): the tinted placeholder first (first letter .gc-i, title .gc-t,
      author .gc-a; the Modern style adds .mc and a pattern), then the real picture on top once it has loaded. A picture that fails
      tries the next source, then Open Library. The download mark (dlMarkPaint in 120) is kept. */
-  let covHi = 4;   // how many of the first tile covers get high priority
-  /* The player's blurred backdrop: a CSS blur of a screen-sized picture is costly to paint on weak phones. Instead the picture is drawn once
-     into a tiny canvas (small size and the smoothing of the scaled-up canvas give the same soft look) and the picture itself is hidden.
-     If drawing is not possible, the picture stays and the old CSS blur (50-new-reader-tabbar-settings.css) is used. */
-  function softBackdrop(box, img) {
-    try {
-      const w = 24, hh = 36, c = document.createElement('canvas'); c.width = w; c.height = hh; c.className = 'bg-soft';
-      const x = c.getContext('2d'); if (!x) return;
-      try { x.filter = 'saturate(1.25) blur(1px)'; } catch (e) { /* older browser: no filter, the small size alone is soft enough */ }
-      const iw = img.naturalWidth, ih = img.naturalHeight; if (!iw || !ih) return;
-      const sc = Math.max(w / iw, hh / ih), dw = iw * sc, dh = ih * sc;   // cover, like object-fit: cover
-      x.drawImage(img, (w - dw) / 2, (hh - dh) / 2, dw, dh);
-      box.querySelectorAll('canvas.bg-soft').forEach(n => n.remove());
-      box.classList.add('bg-soft-on'); box.insertBefore(c, img);
-      requestAnimationFrame(() => c.classList.add('loaded'));
-    } catch (e) { /* keep the picture and its CSS blur */ }
-  }
   function coverFill(box, b) {
     const tok = box._cvT = (box._cvT || 0) + 1, mark = box._wtMk;
     box.textContent = '';
     box.style.setProperty('--ch', String(coverHue(b.title)));
-    box.classList.remove('mc', 'mc-0', 'mc-1', 'mc-2', 'mc-3', 'bg-soft-on');
+    box.classList.remove('mc', 'mc-0', 'mc-1', 'mc-2', 'mc-3');
     if (covStyle() === 'modern') box.classList.add('mc', 'mc-' + coverVariant(b.title));
     const title = String(b.title || '').trim(), au = String(b.authors || '').split(',')[0].trim();
     const ini = (title.replace(/^(the|a|an)\s+/i, '').charAt(0) || '?').toUpperCase();
@@ -284,7 +267,6 @@
        sources (LibriVox art, Internet Archive, then Open Library), and the tinted box above stays if all fail. */
     let own = [], old = coverSources(b), i = 0, j = 0, olTried = false, tm = 0, started = false;
     const img = h('img', { alt: '', loading: 'lazy', decoding: 'async' });
-    if (box._cls === 'tile-cover' && covHi > 0) { covHi--; img.loading = 'eager'; img.setAttribute('fetchpriority', 'high'); }   // the first few covers on Home load first
     const arm = ms => { clearTimeout(tm); tm = ms ? setTimeout(() => { if (tok === box._cvT && !img.classList.contains('loaded')) next(); }, ms) : 0; };
     const next = () => {
       if (tok !== box._cvT) { clearTimeout(tm); return; }
@@ -298,7 +280,7 @@
       pr.then(u => { if (tok !== box._cvT) return; if (u) img.src = u; else img.remove(); }, () => img.remove());
     };
     const start = () => { if (started || tok !== box._cvT) return; started = true; try { own = covOwn(b); } catch (e) { own = []; } next(); };
-    img.addEventListener('load', () => { clearTimeout(tm); if (tok === box._cvT) { img.classList.add('loaded'); if (box._cls === 'pcover-bg') softBackdrop(box, img); } });
+    img.addEventListener('load', () => { clearTimeout(tm); if (tok === box._cvT) img.classList.add('loaded'); });
     img.addEventListener('error', next);
     box.append(img);
     if (mark) box.append(mark);

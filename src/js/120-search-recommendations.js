@@ -98,13 +98,10 @@
   }
   let searchCtl = null, typeTimer = 0, progTimer = 0;
   const QIDX = 'wt:qidx', QTTL = 72 * 3600e3;
-  let progLast = '';   // what the bar shows now: the 250 ms and 500 ms pollers only touch the page when it changed
   function progress(on, frac, label) {
-    const w = Math.round(Math.max(0, Math.min(1, frac || 0)) * 100) + '%', t = label || '', k = (on ? 1 : 0) + '|' + w + '|' + t;
-    if (k === progLast) return; progLast = k;
     el.prog.hidden = !on;
-    el.prog.firstElementChild.firstElementChild.style.width = w;
-    el.progT.textContent = t;
+    el.prog.firstElementChild.firstElementChild.style.width = Math.round(Math.max(0, Math.min(1, frac || 0)) * 100) + '%';
+    el.progT.textContent = label || '';
   }
   function showSkeletons() {
     el.resultList.textContent = '';
@@ -190,7 +187,7 @@
     store.set(key, { t: Date.now(), books });
     const idx = store.get(QIDX, []).filter(k => k !== key);
     idx.unshift(key);
-    while (idx.length > 25) { try { store.del(idx.pop()); } catch (e) { /* ignore */ } }
+    while (idx.length > 25) { try { localStorage.removeItem(idx.pop()); } catch (e) { /* ignore */ } }
     store.set(QIDX, idx);
   }
   /* ---------- Search by meaning: semantic.json (built by wt_semantic.py) has a vector per book and a table of word vectors ---------- */
