@@ -13,7 +13,7 @@
   var n=0,t=0,h=document.getElementById('h-settings');
   h.addEventListener('click',function(){
     var now=Date.now(); n=(now-t>2000)?1:n+1; t=now;
-    if(n>=7){ n=0; unlock(true); window.wtSettingsTab('dev'); }
+    if(n>=7){ n=0; unlock(true); show('dev'); }
   });
   var dq=document.getElementById('dev-q'), dn=document.getElementById('dev-none'), dp=sh.querySelector('.sp[data-sp="dev"]');
   function filt(){
@@ -33,10 +33,5 @@
   }
   dq.addEventListener('input',filt);
   window.wtDevOn=function(){ return !dev.hidden; };
-  window.wtSettingsTab=function(name,force){
-    if(name==='dev'&&force) unlock(true);
-    /* New Settings layout: the old tab names map to the new pages (291-settings-pages.js) */
-    if(window.wtNpOn&&window.wtNpOn()){ window.wtNpGo({reading:'reading',audio:'listening',sync:'advanced',storage:'storage',dev:'advanced'}[name]||name); return; }
-    show(name);
-  };
+  window.wtSettingsTab=function(name,force){ if(name==='dev'&&force) unlock(true); show(name); };
 })();

@@ -169,8 +169,8 @@
   /* ---------- Now playing ----------
      One short block at the top of the sound sheet (#amb-now): the music (mood, track, artist), the scene, and the
      opening sound. Each piece is its own element so the translator can match fixed words one by one. */
-  /* Ambient names in this strip open the dashboard on the exact clip that is playing. Owner only: off until the app is opened once
-     with ?dash=1 (?dash=0 turns it off). The address comes from hosts.json "admin"; empty = no links. */
+  /* Ambient names in this strip open the dashboard on the exact clip that is playing. Owner only: off until you tap the word "Ambient" in the strip
+     5 times quickly (tap 5 times again to turn it off). ?dash=1 / ?dash=0 in the address does the same. The address comes from hosts.json "admin"; empty = no links. */
   try { const dm = /[?&]dash=([01])/.exec(location.search); if (dm) localStorage.setItem('wt:dashlinks', dm[1]); } catch (e) { /* no storage */ }
   function ambDashHref(k) {
     try {
@@ -185,6 +185,15 @@
     musWarnPaint();
     try {
       const box = $('#amb-now'); if (!box) return;
+      if (!box._dashTap) {   // 5 quick taps on the word "Ambient" switch the dashboard links on or off (owner only)
+        box._dashTap = true; let taps = 0, last = 0;
+        box.addEventListener('click', ev => {
+          if (!(ev.target.closest && ev.target.closest('[data-k="Ambient"]'))) return;
+          const now = Date.now(); taps = now - last > 2500 ? 1 : taps + 1; last = now;
+          if (taps < 5) return; taps = 0;
+          try { const on = localStorage.getItem('wt:dashlinks') !== '1'; localStorage.setItem('wt:dashlinks', on ? '1' : '0'); toast(on ? 'Dashboard links ON' : 'Dashboard links OFF'); sndNowPaint(); } catch (e) { /* no storage */ }
+        });
+      }
       const rows = [];
       if (OSND.nodes && sndOn()) {   // the opening sound that is playing now: its title and artist, first in the strip
         const c = OSND.cur, slug = c ? String(c.id).replace(/^[mo]:/, '').split('/').pop().replace(/\.[a-z0-9]+$/i, '') : '';
@@ -214,7 +223,7 @@
       const pp = $('#snd-now-pp');
       if (pp) { const pl = !!S.book && !audio.paused && !audio.ended; pp.hidden = !S.book; pp.classList.toggle('playing', pl); pp.setAttribute('aria-label', pl ? 'Pause' : 'Play'); }
       rows.forEach(r => {
-        const row = h('div', {}, h('span', { class: 'k', text: r[0] }), ' ');
+        const row = h('div', {}, h('span', { class: 'k', text: r[0], 'data-k': r[0] }), ' ');
         r.slice(1).filter(Boolean).forEach((t, i) => {
           if (i) row.append(' \u00b7 ');
           if (r.live && i === 0) r.live.forEach((k, n) => {   // each ambient name links to its clip in the dashboard (owner only)

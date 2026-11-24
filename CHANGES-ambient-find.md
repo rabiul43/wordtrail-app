@@ -16,13 +16,13 @@ Dashboard (`index.html`, Ambient tab)
 App
 4. `src/js/sound/music-playback.js`: in the sound sheet strip, each ambient name (Wind, Rain, Fire) is a link to the dashboard.
    `src/css/80-progress-v10.css`: a dotted underline for those links.
-   Owner only: the links stay hidden until the app is opened once with `?dash=1` (`?dash=0` hides them again). Normal readers
+   Owner only: the links stay hidden until you tap the word "Ambient" in the strip 5 times quickly (a message says "Dashboard links ON"; 5 taps again turns them off). `?dash=1` / `?dash=0` in the address still works too. Normal readers
    never see them. The address comes from `hosts.json` "admin" (same as the cover choices); empty = no links.
 
 ## How to apply
 - Replace the dashboard `index.html` (and `admin/index.html` if that is the copy you deploy) and redeploy the admin Worker.
 - Copy the two `src/` files over the repo ones, run `python build.py`, deploy.
-- Open the app once at `https://<your app>/?dash=1`.
+- In the app, open the Sound sheet and tap the word "Ambient" 5 times quickly.
 
 ## Not tested / assumptions
 - The link finds the clip by the file address, then by the file name. This works only if the file names in `recordings.json`
