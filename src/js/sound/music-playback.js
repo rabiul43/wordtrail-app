@@ -169,6 +169,17 @@
   /* ---------- Now playing ----------
      One short block at the top of the sound sheet (#amb-now): the music (mood, track, artist), the scene, and the
      opening sound. Each piece is its own element so the translator can match fixed words one by one. */
+  /* Ambient names in this strip open the dashboard on the exact clip that is playing. Owner only: off until the app is opened once
+     with ?dash=1 (?dash=0 turns it off). The address comes from hosts.json "admin"; empty = no links. */
+  try { const dm = /[?&]dash=([01])/.exec(location.search); if (dm) localStorage.setItem('wt:dashlinks', dm[1]); } catch (e) { /* no storage */ }
+  function ambDashHref(k) {
+    try {
+      if (!COV_ADMIN || localStorage.getItem('wt:dashlinks') !== '1') return '';
+      const m = AMB.recMap && AMB.recMap[k]; if (!m || !m.url) return '';
+      const q = new URLSearchParams({ amb: k, f: String(m.url).split('?')[0].split('/').pop(), u: m.url, by: m.by || '' });
+      return COV_ADMIN.replace(/\/+$/, '') + '/#' + q.toString();
+    } catch (e) { return ''; }
+  }
   const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
   function sndNowPaint() {
     musWarnPaint();
@@ -192,7 +203,7 @@
       }
       if (sndOn() && P.ambOn === true && AMB.on) {   // Ambient: only real recordings that are playing now (not generated, not the reader's own test file); credit comes from AMB.recMap
         const live = Object.keys(AMB.live || {}).filter(k => AMB.live[k] && AMB.live[k].rec && AMB.recMap && AMB.recMap[k] && !(P.ambRecUser || {})[k]);
-        if (live.length) rows.push(['Ambient', live.map(k => AMB_REC_NAMES[k] || k).join(', '), Array.from(new Set(live.map(k => AMB.recMap[k].by).filter(Boolean))).join(', ')]);
+        if (live.length) { const ar = ['Ambient', live.map(k => AMB_REC_NAMES[k] || k).join(', '), Array.from(new Set(live.map(k => AMB.recMap[k].by).filter(Boolean))).join(', ')]; ar.live = live; rows.push(ar); }
       }
       const sc = sndOn() && !!AMB.lbl && !!S.book && AMB.lblBook === String(S.book.id), scOff = sc && P.ambOn !== true;   // the scene shows whenever Sound is on and a scene is known; with Background sounds off it comes with a "Turn on sounds" button
       if (sc) rows.push(['Scene', AMB.lbl]);
@@ -204,7 +215,15 @@
       if (pp) { const pl = !!S.book && !audio.paused && !audio.ended; pp.hidden = !S.book; pp.classList.toggle('playing', pl); pp.setAttribute('aria-label', pl ? 'Pause' : 'Play'); }
       rows.forEach(r => {
         const row = h('div', {}, h('span', { class: 'k', text: r[0] }), ' ');
-        r.slice(1).filter(Boolean).forEach((t, i) => { if (i) row.append(' \u00b7 '); row.append(h('span', { text: t })); });
+        r.slice(1).filter(Boolean).forEach((t, i) => {
+          if (i) row.append(' \u00b7 ');
+          if (r.live && i === 0) r.live.forEach((k, n) => {   // each ambient name links to its clip in the dashboard (owner only)
+            if (n) row.append(', ');
+            const u = ambDashHref(k), nm = AMB_REC_NAMES[k] || k;
+            row.append(u ? h('a', { class: 'amb-find', href: u, target: '_blank', rel: 'noopener', title: 'Find this clip in the dashboard', text: nm }) : h('span', { text: nm }));
+          });
+          else row.append(h('span', { text: t }));
+        });
         box.append(row);
       });
     } catch (e) { /* a status line must never break playback */ }
