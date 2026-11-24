@@ -12,6 +12,7 @@
     applyTidy();
     applyDet();
     applyLib();
+    npApply();
     applyQuick();
     setSpeed(P.speed, true);
     speedInit();
@@ -449,6 +450,7 @@
     $('#in-detnew').addEventListener('change', e => { P.detNew = e.target.checked; savePrefs(); applyDet(); });
     $('#in-today').addEventListener('change', e => { P.todayCard = e.target.checked; savePrefs(); try { TDH.paint(); homeGoal(); } catch (x) { /* Home not ready */ } });
     $('#in-libnew').addEventListener('change', e => { P.libTiles = e.target.checked; savePrefs(); applyLib(); if (curTab === 'shelf' && shelfHub) applyShelfMode(); });
+    $('#in-setnew').addEventListener('change', e => { P.setNew = e.target.checked; savePrefs(); npApply(); });
     try { matchMedia('(min-width: 700px)').addEventListener('change', applyDet); matchMedia('(min-width: 700px)').addEventListener('change', applyLib); } catch (e) { /* old browser: applies on the next start */ }
     $('#in-tidy').addEventListener('change', e => { P.tidyPlayer = e.target.checked; savePrefs(); applyTidy(); paintBookProg(); });
     $('#in-load').addEventListener('change', e => { P.fastLoad = e.target.checked; savePrefs(); });

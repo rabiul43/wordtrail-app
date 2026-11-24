@@ -131,7 +131,7 @@
 
     /* ----- Home: the exam card or the ask card ----- */
     const fmtDate = s => { const p = GLC.parse(s); return p ? new Date(p.y, p.m - 1, p.d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : ''; };
-    function openSettingsAt() { closeSheets(); openSheet('sheet-settings'); setTimeout(() => { const n = $('#in-learnmode'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
+    function openSettingsAt() { closeSheets(); if (npOn()) SMH.from = true; openSheet('sheet-settings'); setTimeout(() => { const n = $('#in-learnmode'); npReveal(n); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'center' }); }, 120); }
     function examCard(g, now) {
       const st = GLC.examState(g, now), ex = g.exam;
       const btn = (cls, text, fn) => h('button', { type: 'button', class: 'gl-btn ' + cls, onclick: fn }, text);

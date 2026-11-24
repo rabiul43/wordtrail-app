@@ -196,6 +196,7 @@
     if (c) r.setAttribute('lang', c); else r.removeAttribute('lang');
   }
   function openSheet(id) {
+    if (id === 'sheet-settings' && npOn() && !SMH.from) { SMH.q = ''; id = 'sheet-sethome'; }   // New Settings layout: every way in starts at the page list (291)
     if (id !== 'sheet-shadow') shCleanup();
     if (id !== 'sheet-clipedit') clEdCleanup();
     $$('.sheet').forEach(s => { s.hidden = true; });

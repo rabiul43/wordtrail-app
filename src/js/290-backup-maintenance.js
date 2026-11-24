@@ -271,7 +271,8 @@
   const smH3 = (tab, text) => { const h3 = $$('#sheet-settings .sp[data-sp="' + tab + '"] h3').find(x => smNorm(x.textContent).toLowerCase().startsWith(text.toLowerCase())); return h3 ? (h3.closest('.row') || h3.parentElement) : null; };
   function smOpenTab(tab, find) {
     SMH.from = true; openSheet('sheet-settings'); window.wtSettingsTab(tab);
-    smMark(typeof find === 'function' ? find() : null);
+    const el = typeof find === 'function' ? find() : null; npReveal(el);   // New Settings layout: switch to the page that holds it
+    smMark(el);
   }
   /* [section, key, icon, name, description, value, search words, action, 'dev' when it needs Developer unlocked] */
   const smRows = () => [
@@ -302,6 +303,7 @@
     h('span', { class: 'mr-main' }, h('span', { class: 'mr-t' }, name), h('span', { class: 'mr-d' }, desc)),
     val ? h('span', { class: 'sh-val' }, val) : null, pill ? h('span', { class: 'sh-pill' }, pill) : null);
   function smHomePaint() {
+    if (npOn()) { npHomePaint(); return; }   // New Settings layout (291-settings-pages.js)
     const box = $('#sh-home'); box.textContent = '';
     [['basics', 'Basics'], ['advanced', 'Advanced'], ['help', 'Help']].forEach(([sec, title]) => {
       const rows = smRows().filter(r => r[0] === sec && smShow(r));
@@ -311,7 +313,7 @@
   /* everything that can be found: the rows above, each label and heading in the tabbed Settings, and the book tools */
   function smIndex() {
     const out = [], seen = new Set(), dev = smDev();
-    smRows().filter(smShow).forEach(r => { seen.add(r[3].toLowerCase()); out.push({ name: r[3], desc: smSecName[r[0]] + ' \u00b7 ' + r[4], hay: (r[3] + ' ' + r[4] + ' ' + r[6]).toLowerCase(), icon: r[2], go: r[7] }); });
+    smRows().filter(r => smShow(r) && !(npOn() && r[1] === 'all')).forEach(r => { seen.add(r[3].toLowerCase()); out.push({ name: r[3], desc: smSecName[r[0]] + ' \u00b7 ' + r[4], hay: (r[3] + ' ' + r[4] + ' ' + r[6]).toLowerCase(), icon: r[2], go: r[7] }); });
     const tabs = {}; $$('#sp-tabs button').forEach(b => { tabs[b.dataset.sp] = smNorm(b.textContent); });
     $$('#sheet-settings .sp').forEach(p => {
       const tab = p.dataset.sp; if (tab === 'dev' && !dev) return;
@@ -324,8 +326,8 @@
       $$('h3', p).forEach(x => { if (!x.closest('label')) items.push([x, smNorm(x.textContent), '']); });
       items.forEach(([n, name, d]) => {
         name = name.slice(0, 90); const key = name.toLowerCase(); if (!name || seen.has(key)) return; seen.add(key);
-        const blk = n.closest('.row') || n.parentElement;
-        out.push({ name, desc: 'All settings \u203a ' + tabs[tab] + (d ? ' \u00b7 ' + d.slice(0, 80) : ''), hay: (name + ' ' + d + ' ' + tabs[tab]).toLowerCase(), icon: 'i-m-sliders', go: () => smOpenTab(tab, () => blk) });
+        const blk = n.closest('.row') || n.parentElement, where = npName(blk) || tabs[tab];
+        out.push({ name, desc: (npOn() ? 'Settings' : 'All settings') + ' \u203a ' + where + (d ? ' \u00b7 ' + d.slice(0, 80) : ''), hay: (name + ' ' + d + ' ' + where).toLowerCase(), icon: 'i-m-sliders', go: () => smOpenTab(tab, () => blk) });
       });
     });
     const more = { 'b-hl': 'quote card share picture', 'b-next': 'next up more like this recommend', 'b-chars': 'characters people names', 'b-clips': 'audio clips record' };
@@ -384,6 +386,7 @@
     pstyleSegSync();
     ostSegSync();
     homeCustPaint();
+    { const e = $('#in-setnew'); if (e) e.checked = npOn(); }
     dmRender();
     devStartup();
     $('#in-mdays').value = MAINT().days; $('#in-mlive').checked = !!MAINT().live;
