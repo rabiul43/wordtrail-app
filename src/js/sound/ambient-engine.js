@@ -52,6 +52,18 @@
     audioSuspendCancel(key);
     AUD_SUSP[key] = setTimeout(() => { AUD_SUSP[key] = 0; if (AMB.ctx && !AMB.on && !musicActive() && !(AMB.narr && AMB.narr())) AMB.ctx.suspend().catch(() => {}); }, ms);
   }
+  /* Safety limiter for the ambient bus. A burst (thunder, a crackle, a crowd laugh) must not get past a ceiling, however the sliders are set. It is a soft clipper made
+     with a waveshaper: the curve is the straight line up to the knee, so normal levels pass through untouched (a compressor node cannot promise that: browsers add make-up
+     gain to it), then it bends smoothly (no corner) and never goes above the ceiling. Sits after the mood stage, so the duck, the carves and the reverb are already in. */
+  const AMB_LIM = { knee: 0.5, ceil: 0.9 };   // linear levels on the bus: the knee is -6 dBFS, the ceiling -0.9 dBFS
+  function ambLimCurve(n, knee, ceil) {   // n points (odd) for x from -1 to 1; the same on both sides of zero
+    const c = new Float32Array(n), room = ceil - knee;
+    for (let i = 0; i < n; i++) {
+      const x = (2 * i) / (n - 1) - 1, a = Math.abs(x);
+      c[i] = (x < 0 ? -1 : 1) * (a <= knee ? a : knee + room * Math.tanh((a - knee) / room));
+    }
+    return c;
+  }
   function ambBuild() {   // the ambient engine; each sound's layer is built only while its level is above zero (ambLayerOn)
     if (AMB.built) return true;
     const ctx = audioCtx(); if (!ctx) return false;
@@ -65,7 +77,10 @@
     const wf = ctx.createBiquadFilter(); wf.type = 'lowpass'; wf.frequency.value = 20000; wf.Q.value = 0.5; cb.connect(wf); AMB.wf = wf;
     const mhp = ctx.createBiquadFilter(), mlp = ctx.createBiquadFilter(), mg = ctx.createGain();   // the mood stage: neutral (20 Hz, 20 kHz, gain 1) until the story has a mood
     mhp.type = 'highpass'; mhp.frequency.value = 20; mhp.Q.value = 0.6; mlp.type = 'lowpass'; mlp.frequency.value = 20000; mlp.Q.value = 0.6; mg.gain.value = 1;
-    wf.connect(mhp); mhp.connect(mlp); mlp.connect(mg); mg.connect(warm); AMB.mhp = mhp; AMB.mlp = mlp; AMB.mg = mg;
+    wf.connect(mhp); mhp.connect(mlp); mlp.connect(mg); AMB.mhp = mhp; AMB.mlp = mlp; AMB.mg = mg;
+    try {   // the safety limiter (see AMB_LIM); no oversampling, so below the knee the signal is exactly as it was
+      const lim = ctx.createWaveShaper(); lim.curve = ambLimCurve(2049, AMB_LIM.knee, AMB_LIM.ceil); lim.oversample = 'none'; mg.connect(lim); lim.connect(warm); AMB.lim = lim;
+    } catch (e) { mg.connect(warm); /* no limiter here: the bus goes straight on */ }
     const cue = ctx.createGain(); cue.gain.value = 1; cue.connect(warm); AMB.cue = cue;
     try {   // light reverb: a small room for indoor sounds, a wide one for the rest; ambApply sets how much of each from the mix
       const rRoom = ctx.createConvolver(), rHall = ctx.createConvolver(), sR = ctx.createGain(), sH = ctx.createGain(), cs = ctx.createGain();

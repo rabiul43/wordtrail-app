@@ -41,7 +41,7 @@
       }
     } catch (e) {}
   }
-  function ambDuckVec(st) {   // [voice-band gain, cut at 3 kHz, cut at 800 Hz] for a state, and how fast to move there
+  function ambDuckBase(st) {   // [voice-band gain, cut at 3 kHz, cut at 800 Hz] for a state, and how fast to move there (today's values: the baseline for a sound with an average speech-band share)
     const v = { s: [0.68, -10, -4], p: [1, 0, 0], u: [0.8, -5, -2], o: [1, 0, 0] }[st] || [1, 0, 0];
     let tc = st === 's' ? 0.08 : (st === 'p' ? 0.35 : 0.4);
     if (P.ambSmart === false || (st !== 's' && st !== 'p')) return { v, tc };
@@ -55,6 +55,40 @@
       tc = sc.hold ? 0.5 : 0.9;
     }
     return { v, tc };
+  }
+  /* Spectral ducking: a sound that has a lot of energy in the speech band (300-4000 Hz: rain, cafe, crowd) hides the voice, so it is dipped and carved
+     more; a bass-heavy one (drone, engine) hides little, so it is dipped less. What is playing is weighted by its live level (the gain of its own node), and each
+     sound counts with its speech-band share: a recording by the share measured for it (sh in recordings.json), a generated sound by the share worked out for its layer
+     (AMB_REC_REF). A mix with the average share (0.5) gets exactly today's dip; share 0 gets 0.6 of it, share 1 gets 1.4 of it. */
+  const AMB_DUCK_AVG = 0.5, AMB_DUCK_SLOPE = 0.8;
+  function ambDuckShare(parts) {   // parts = [[amplitude, speech-band dB, whole dB], ...]: the share of the playing power that sits in the speech band, or null when nothing plays
+    let sb = 0, all = 0;
+    for (const p of parts) { const a2 = p[0] * p[0]; if (!(a2 > 0)) continue; sb += a2 * Math.pow(10, p[1] / 10); all += a2 * Math.pow(10, p[2] / 10); }
+    return all > 0 && isFinite(sb / all) ? Math.min(1, sb / all) : null;
+  }
+  function ambDuckFactor(share) {   // how much of today's dip to use: 1 for the average share (or when unknown); in steps of 0.02 so a fade does not retarget the dip every tick
+    if (typeof share !== 'number' || !isFinite(share)) return 1;
+    return Math.round(Math.max(0.6, Math.min(1.4, 1 + AMB_DUCK_SLOPE * (share - AMB_DUCK_AVG))) * 50) / 50;
+  }
+  function ambDuckParts() {   // what is playing now: the live gain of each looping sound with its levels
+    const parts = [];
+    for (const k in AMB_REC_REF) {
+      const g = AMB.g[k], live = AMB.live[k], a = g && g.gain ? g.gain.value : 0; if (!(a > 0.001) || !live) continue;
+      const ref = AMB_REC_REF[k], m = live.rec ? AMB.recMap[k] : null;
+      if (m && typeof m.sb === 'number' && m.sb < 0 && m.sb > -90 && typeof m.sh === 'number' && m.sh > 0) { const sh = Math.max(0.005, Math.min(1, m.sh)); parts.push([a, ref[0], ref[0] - 10 * Math.log10(sh)]); }   // levelled by its speech band, so its whole level follows from its share
+      else parts.push([a, ref[0], ref[1]]);   // generated, or a recording without numbers (levelled to the whole level of the generated layer)
+    }
+    return parts;
+  }
+  function ambDuckVec(st) {   // today's dip, scaled by the speech-band share of what is playing (only while speaking or unknown; a pause stays as it is)
+    const r = ambDuckBase(st);
+    if (st !== 's' && st !== 'u') return r;
+    try {
+      const now = performance.now();
+      if (!AMB.shT || now - AMB.shT > 150) { AMB.shT = now; AMB.shF = ambDuckFactor(ambDuckShare(ambDuckParts())); }
+      const f = AMB.shF || 1; if (f !== 1) { r.v[0] = Math.pow(r.v[0], f); r.v[1] *= f; r.v[2] *= f; }   // the gain dip and both carves grow or shrink together (in dB)
+    } catch (e) { /* no spectral scaling: today's dip */ }
+    return r;
   }
   function ambDuckSet(st, slow) {   // s speaking, p pause, u unknown, o off. Dip fast, let go slowly.
     const ctx = AMB.ctx, t = ctx.currentTime, r = ambDuckVec(st), v = r.v, tc = slow ? Math.max(r.tc, 1.2) : r.tc;

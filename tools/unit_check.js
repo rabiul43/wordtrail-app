@@ -570,6 +570,249 @@ queue.push(() => asyncTest('textSourceLink: a slow details file is given up afte
   });
 }
 
+/* ---------- ambient recordings: levelling to the reference of each sound (sound/ambient-recordings.js) ---------- */
+{
+  const recSrc = read('sound/ambient-recordings.js');
+  const AB = { recMap: {}, ctx: { createBuffer: (ch, len, sr) => { const d = Array.from({ length: ch }, () => new Float32Array(len)); return { numberOfChannels: ch, length: len, sampleRate: sr, duration: len / sr, getChannelData: c => d[c] }; } } };
+  const store0 = { get: () => ({ t: Date.now(), d: { rain: { file: 'rain.mp3', by: 'a', license: 'CC0', sb: -21.2, pk: 0.2, st: -20.2, sh: 0.7 }, wind: { file: 'wind.mp3' }, bad: { file: 'x.mp3' }, fire: {} } }), set() {} };
+  const rc = vm.createContext({ AMB: AB, URL, Math, Set, store: store0, ambRecPaint() {}, AMB_R2: 'https://sounds.test/' });
+  vm.runInContext([grab(recSrc, 'AMB_REC_KEYS'), grab(read('sound/ambient-scenes.js'), 'AMB_REC_REF'), grab(recSrc, 'AMB_REC_LIMIT'), grab(recSrc, 'ambRecNum'), grab(recSrc, 'ambRecGain'), grab(recSrc, 'ambRecPrep'), grab(recSrc, 'ambRecManifest'),
+    'this.f = { gain: ambRecGain, prep: ambRecPrep, manifest: ambRecManifest, REF: AMB_REC_REF, KEYS: AMB_REC_KEYS, LIM: AMB_REC_LIMIT };'].join('\n'), rc);
+  const R = rc.f, db = g => 20 * Math.log10(g), nearDb = (g, want, m) => assert.ok(Math.abs(db(g) - want) < 0.01, (m || '') + ': expected ' + want + ' dB, got ' + db(g).toFixed(3) + ' dB');
+  test('recordings: every recordable sound has a reference level, and nothing else is in the table', () => {
+    assert.deepStrictEqual(Object.keys(R.REF).sort(), Array.from(R.KEYS).sort());
+    Object.values(R.REF).forEach(v => { assert.strictEqual(v.length, 2); assert.ok(v[0] < 0 && v[1] < 0 && v[1] > v[0] - 1, 'the whole sound is not quieter than its speech band'); });
+  });
+  test('recordings: the reference table agrees with the generated layers (run tools/ambient_layer_levels.js and copy its numbers if this fails)', () => {
+    const out = JSON.parse(require('child_process').execFileSync(process.execPath, [path.join(root, 'tools/ambient_layer_levels.js'), '--json'], { encoding: 'utf8' }));
+    out.forEach(r => { const ref = R.REF[r.key]; if (!ref) return; assert.ok(Math.abs(ref[0] - r.sb) <= 0.2 && Math.abs(ref[1] - r.total) <= 0.2, r.key + ': table ' + ref + ' but layers give ' + r.sb + ', ' + r.total); });
+  });
+  test('recordings: a measured recording is levelled so its speech band lands on the reference of its sound', () => {
+    Object.keys(R.REF).forEach(k => { nearDb(R.gain(k, { sb: R.REF[k][0] - 6, pk: -20 }, null, 0.1), 6, k + ' 6 dB too quiet'); nearDb(R.gain(k, { sb: R.REF[k][0] + 6, pk: -20 }, null, 0.1), -6, k + ' 6 dB too loud'); nearDb(R.gain(k, { sb: R.REF[k][0], pk: -20 }, null, 0.1), 0, k + ' already right'); });
+  });
+  test('recordings: the real measured files from the library land on their reference (river -4.6 dB, rain +1.6 dB, engine -12.0 dB)', () => {
+    nearDb(R.gain('river', { sb: -20.1, pk: 1.1 }), -4.6, 'river'); nearDb(R.gain('rain', { sb: -21.2, pk: 0.2 }), 1.6, 'rain'); nearDb(R.gain('engine', { sb: -18.6, pk: -2.3 }), -12.0, 'engine');
+  });
+  test('recordings: a very quiet file now reaches its level (the old 5x limit stopped it 20 dB short)', () => {
+    nearDb(R.gain('rain', { sb: -50, pk: -30 }), 30.4, 'rain at -50 dB');
+    nearDb(R.gain('rain', { sb: -80, pk: -60 }), 36, 'a nearly silent file stops at the hard cap, +36 dB');
+  });
+  test('recordings: the loudest sample is held at +6 dBFS (a quiet file with a big spike is not boosted into the roof)', () => {
+    const g = R.gain('rain', { sb: -60, pk: -10 }); assert.ok(Math.abs(g * Math.pow(10, -10 / 20) - Math.pow(10, 6 / 20)) < 1e-9, 'peak after gain: ' + g * Math.pow(10, -10 / 20));
+  });
+  test('recordings: a very loud file is turned down, to the -40 dB floor at most', () => { nearDb(R.gain('drone', { sb: 0, pk: 0 }), -31.2, 'drone at full scale'); nearDb(R.gain('drone', { sb: -0.1, pk: 0 }), -31.1, 'drone just under'); });
+  test('recordings: with no measured numbers the plain level is matched to the whole-sound level of the generated layer (fallback)', () => {
+    nearDb(R.gain('rain', null, -18.4, 0.3), 1.5, 'rain fallback'); nearDb(R.gain('engine', {}, -30, 0.05), 17.2, 'engine fallback'); nearDb(R.gain('wind', undefined, -26.8, 0.3), 0, 'wind fallback');
+  });
+  test('recordings: the +6 dBFS peak cap also holds in the fallback (a file with a loud spike is boosted less)', () => { nearDb(R.gain('engine', {}, -30, 0.3), 16.46, 'engine with a 0.3 peak'); });
+  test('recordings: numbers that are missing, text, out of range or not finite fall back instead of being used', () => {
+    [{ sb: NaN }, { sb: 'loud' }, { sb: 3 }, { sb: -200 }, { sb: Infinity }, { sb: null }, { pk: 1 }, 'x', 5].forEach(m => nearDb(R.gain('rain', m, -18.4, 0.3), 1.5, 'meta ' + JSON.stringify(m)));
+    nearDb(R.gain('rain', { sb: -21.2, pk: 'x' }, -18.4, 0.3), 1.6, 'a bad pk keeps the good sb and uses the measured peak');
+  });
+  test('recordings: nothing to measure (silent file, no peak, unknown sound, odd input) never throws and never gives zero, NaN or a negative gain', () => {
+    [R.gain('rain', null, null, 0), R.gain('rain', null, -Infinity, 0), R.gain('nope', null, -20, 0.2), R.gain(undefined, undefined, undefined, undefined), R.gain('rain', { sb: -21 }, null, -1)].forEach(g => assert.ok(g > 0 && isFinite(g), 'gain ' + g));
+    assert.strictEqual(R.gain('rain', null, null, 0), 1);
+  });
+  const sine = (len, amp, hz) => Float32Array.from({ length: len }, (_, i) => amp * Math.sin(2 * Math.PI * hz * i / 44100));
+  const meanPow = a => a.reduce((s, x) => s + x * x, 0) / a.length;
+  const bufOf = chans => ({ numberOfChannels: chans.length, length: chans[0].length, sampleRate: 44100, duration: chans[0].length / 44100, getChannelData: c => chans[c] });
+  test('recordings: the fallback measures BOTH channels (a file with a silent left side used to be boosted as if it were silent)', () => {
+    const r = R.prep(bufOf([new Float32Array(44100), sine(44100, 0.1, 440)]), 'rain', null);
+    const want = -16.9, got = 10 * Math.log10((meanPow(r.getChannelData(0)) + meanPow(r.getChannelData(1))) / 2);
+    assert.ok(Math.abs(got - want) < 0.2, 'whole level after levelling ' + got.toFixed(2) + ', want ' + want);
+  });
+  test('recordings: a mono file and the same sound on both sides get the same gain', () => {
+    const m = R.prep(bufOf([sine(44100, 0.1, 440)]), 'cafe', null), s = R.prep(bufOf([sine(44100, 0.1, 440), sine(44100, 0.1, 440)]), 'cafe', null);
+    assert.ok(Math.abs(m.getChannelData(0)[1000] - s.getChannelData(0)[1000]) < 1e-6 && Math.abs(m.getChannelData(0)[1000] - s.getChannelData(1)[1000]) < 1e-6);
+  });
+  test('recordings: prep uses the measured numbers when given, and the loop blend still keeps the length (end fades into start)', () => {
+    const len = 44100 * 10, b = bufOf([sine(len, 0.2, 440)]), r = R.prep(b, 'rain', { sb: -25.6, pk: -14 });   // 6 dB under the reference: gain x2
+    assert.ok(Math.abs(r.getChannelData(0)[200000] / b.getChannelData(0)[200000] - 2.0) < 0.01, 'a sample after the blended start is doubled');
+    assert.strictEqual(r.length, len - Math.floor(Math.min(1.5, 10 * 0.2) * 44100));
+  });
+  test('recordings: the numbers in recordings.json reach the loader, and a list without them still works', async () => {
+    await R.manifest();
+    assert.strictEqual(AB.recMap.rain.sb, -21.2); assert.strictEqual(AB.recMap.rain.pk, 0.2); assert.strictEqual(AB.recMap.rain.url, 'https://sounds.test/rain.mp3');
+    assert.strictEqual(AB.recMap.wind.sb, undefined, 'an entry with no numbers is kept');
+    assert.ok(!AB.recMap.fire && !AB.recMap.bad, 'an entry with no file, or a sound that cannot be a recording, is left out');
+    nearDb(R.gain('wind', AB.recMap.wind, -26.8, 0.3), 0, 'and it takes the fallback');
+  });
+}
+
+/* ---------- spot clips: levelled by speech-band loudness, not by peak (sound/ambient-spot.js) ---------- */
+{
+  const spSrc = read('sound/ambient-spot.js');
+  const mapSrc = spSrc.slice(spSrc.indexOf('const AMB_SPOT_MAP = {'), spSrc.indexOf('\n  };', spSrc.indexOf('const AMB_SPOT_MAP = {')) + 5);
+  const AB = { ctx: { createBuffer: (ch, len, sr) => { const d = Array.from({ length: ch }, () => new Float32Array(len)); return { numberOfChannels: ch, length: len, sampleRate: sr, duration: len / sr, getChannelData: c => d[c] }; } } };
+  const sc = vm.createContext({ AMB: AB, Math, Float64Array });
+  vm.runInContext([mapSrc, spSrc.slice(spSrc.indexOf('const AMB_SPOT_REF'), spSrc.indexOf('\n', spSrc.indexOf('const AMB_SPOT_REF'))), grab(spSrc, 'ambSpotLevel'), grab(spSrc, 'ambSpotGain'), grab(spSrc, 'ambSpotPrep'),
+    'this.f = { level: ambSpotLevel, gain: ambSpotGain, prep: ambSpotPrep, MAP: AMB_SPOT_MAP, REF: AMB_SPOT_REF, PEAK: AMB_SPOT_PEAK };'].join('\n'), sc);
+  const S = sc.f, SR = 44100, db = g => 20 * Math.log10(g);
+  const sine = (sec, amp, hz) => Float32Array.from({ length: Math.floor(SR * sec) }, (_, i) => amp * Math.sin(2 * Math.PI * hz * i / SR));
+  const lvl = (chs, len) => S.level(chs, SR, len == null ? chs[0].length : len);
+  const near1 = (got, want, tol, m) => assert.ok(got !== null && Math.abs(got - want) <= tol, (m || '') + ': expected ' + want + ' +/- ' + tol + ', got ' + got);
+  test('spot clips: no hand-set volume is left; every sound has a small dB offset instead', () => {
+    assert.ok(!/\bvol\s*:/.test(mapSrc) && !/m\.vol|\.vol\b/.test(spSrc.replace(/\/\*[\s\S]*?\*\//g, '')), 'old vol still used');
+    const ks = Object.keys(S.MAP); assert.strictEqual(ks.length, 9); ks.forEach(k => { const o = S.MAP[k].off; assert.ok(typeof o === 'number' && o <= 0 && o >= -6, k + ' offset ' + o); });
+  });
+  test('spot clips: the in-app speech-band measure agrees with tools/ambient_prep.py on the same made-up sounds (1 kHz tone -23.0, 100 Hz tone -28.1)', () => {
+    near1(lvl([sine(6, 0.1, 1000), sine(6, 0.1, 1000)]), -23.0, 0.3, '1 kHz tone, two sides');
+    near1(lvl([sine(6, 0.5, 100), sine(6, 0.5, 100)]), -28.1, 1.0, '100 Hz tone: the high-pass takes it down');
+  });
+  test('spot clips: the measure reads both channels, and a mono clip equals the same clip on both sides', () => {
+    near1(lvl([sine(6, 0.1, 1000)]), lvl([sine(6, 0.1, 1000), sine(6, 0.1, 1000)]), 0.01, 'mono = both sides');
+    near1(lvl([new Float32Array(SR * 6), sine(6, 0.1, 1000)]), -26.0, 0.3, 'one silent side is 3 dB down, as a mean of both');
+  });
+  test('spot clips: silence around a sound is ignored (a clock that ticks and is quiet in between is measured while it ticks)', () => {
+    const a = new Float32Array(SR * 8); a.set(sine(4, 0.1, 1000)); near1(lvl([a, a]), -23.0, 0.3, 'tone then silence');
+    const q = sine(12, 0.02, 1100), b = sine(3, 0.2, 1000); for (let i = 0; i < b.length; i++) q[4 * SR + i] += b[i];
+    const l = lvl([q, q]); assert.ok(l > -30 && l < -17.5, 'a burst in a quiet bed reads between them, got ' + l);
+  });
+  test('spot clips: nothing to measure gives null (silence, empty, NaN, odd input), never an error', () => {
+    assert.strictEqual(lvl([new Float32Array(SR * 3)]), null); assert.strictEqual(S.level([], SR, 100), null); assert.strictEqual(S.level([sine(1, .1, 1000)], SR, 0), null);
+    const nan = sine(1, 0.1, 1000); nan[500] = NaN; assert.strictEqual(lvl([nan]), null); assert.strictEqual(S.level(null, SR, 10), null); assert.strictEqual(S.level([sine(1, .1, 1000)], 0, 100), null);
+  });
+  test('spot clips: the gain brings the level to the reference plus the offset of the sound', () => {
+    near1(db(S.gain(0, S.REF, 0.1)), 0, 0.01, 'already right'); near1(db(S.gain(0, S.REF - 6, 0.05)), 6, 0.01, '6 dB too quiet'); near1(db(S.gain(0, S.REF + 6, 0.5)), -6, 0.01, '6 dB too loud');
+    near1(db(S.gain(-2.9, S.REF, 0.05)), -2.9, 0.01, 'the clock sits 2.9 dB lower'); near1(db(S.gain(-1.3, S.REF - 3, 0.02)), 1.7, 0.01, 'the bell, 3 dB quiet');
+  });
+  test('spot clips: peak does not decide the level any more: two clips of the same loudness get the same gain, whatever their peaks', () => {
+    near1(db(S.gain(0, -30, 0.1)), db(S.gain(0, -30, 0.2)), 0.01, 'a low and a higher peak, same level');
+  });
+  test('spot clips: the loudest sample is held under the old ceiling (0.63 at 0 dB, lower with the offset), so a spiky clip is never louder at its peak than before', () => {
+    near1(S.gain(0, -40, 0.9) * 0.9, 0.63, 1e-9, 'a quiet clip with a loud spike stops at the ceiling'); near1(S.gain(-2.9, -40, 0.9) * 0.9, 0.63 * Math.pow(10, -2.9 / 20), 1e-9, 'clock ceiling = 0.9 x 0.5 = 0.45');
+    near1(S.gain(-1.3, -40, 0.9) * 0.9, 0.54, 0.005, 'bell ceiling = 0.9 x 0.6 (the offset is rounded to -1.3 dB)');
+  });
+  test('spot clips: without a level the peak is levelled as before (to 0.9 x the old volume), and odd input never gives 0, NaN or negative', () => {
+    near1(S.gain(0, null, 0.3) * 0.3, 0.63, 1e-9, 'fallback to the ceiling'); near1(S.gain(-2.9, null, 0.3) * 0.3, 0.45, 0.005, 'clock fallback');
+    [S.gain(0, null, 0), S.gain(0, NaN, -1), S.gain(undefined, undefined, undefined), S.gain(0, -200, 0.1), S.gain(0, 100, 0.1)].forEach(g => assert.ok(g > 0 && isFinite(g), 'gain ' + g));
+    near1(db(S.gain(0, -200, 0)), 30, 0.01, 'a nearly silent clip stops at +30 dB'); near1(db(S.gain(0, 100, 0)), -30, 0.01, 'and a very loud one at -30 dB');
+  });
+  test('spot clips: prep levels the clip so its speech band lands on the reference, in both channels, and keeps its length', () => {
+    const mk = (chs) => ({ numberOfChannels: chs.length, length: chs[0].length, sampleRate: SR, duration: chs[0].length / SR, getChannelData: c => chs[c] });
+    const o = S.prep(mk([sine(3, 0.01, 1000), sine(3, 0.01, 1000)]), 10, 0);   // -43 dB, so it needs +21 dB; the peak 0.1 is under the ceiling
+    near1(lvl([o.getChannelData(0), o.getChannelData(1)]), S.REF, 0.4, 'level after prep'); assert.strictEqual(o.length, SR * 3);
+    const o2 = S.prep(mk([sine(3, 0.01, 1000)]), 10, -2.9); near1(lvl([o2.getChannelData(0)]), S.REF - 2.9, 0.4, 'with the clock offset');
+  });
+  test('spot clips: a long clip is cut to its longest length with a fade at the end, and only the part that plays is measured', () => {
+    const long = new Float32Array(SR * 10); long.set(sine(4, 0.05, 1000)); const b = { numberOfChannels: 1, length: long.length, sampleRate: SR, duration: 10, getChannelData: () => long };
+    const o = S.prep(b, 4, 0); assert.strictEqual(o.length, SR * 4); const d = o.getChannelData(0); assert.ok(Math.abs(d[SR * 4 - 1]) < 1e-3, 'faded to zero at the cut');
+  });
+}
+
+/* ---------- ambient ducking: the dip follows the speech-band share of what is playing (sound/ambient-ducking.js) ---------- */
+{
+  const dkSrc = read('sound/ambient-ducking.js'), scSrc = read('sound/ambient-scenes.js'), T = { t: 1000 };
+  const mkCtx = (P, AMB) => { const c = vm.createContext({ P, AMB, performance: { now: () => T.t }, Math, isFinite });
+    vm.runInContext([grab(scSrc, 'AMB_REC_REF'), grab(dkSrc, 'AMB_DUCK_AVG'), grab(dkSrc, 'ambDuckBase'), grab(dkSrc, 'ambDuckShare'), grab(dkSrc, 'ambDuckFactor'), grab(dkSrc, 'ambDuckParts'), grab(dkSrc, 'ambDuckVec'),
+      'this.f = { base: ambDuckBase, share: ambDuckShare, factor: ambDuckFactor, vec: ambDuckVec, REF: AMB_REC_REF };'].join('\n'), c); return c.f; };
+  const play = (A, k, a, rec) => { A.g[k] = { gain: { value: a } }; A.live[k] = rec ? { rec: true } : {}; };
+  const fresh = (smart) => { const A = { g: {}, live: {}, recMap: {}, scene: { dens: 0.5, hold: false }, swellUntil: 0 }; return { A, D: mkCtx({ ambSmart: smart }, A) }; };
+  const nearV = (got, want, m) => { got.forEach((x, i) => assert.ok(Math.abs(x - want[i]) < 1e-9, (m || '') + ' part ' + i + ': expected ' + want[i] + ', got ' + x)); };
+  const shareOf = D => k => D.REF[k][0] - D.REF[k][1];
+  test('ducking: the dip factor is 1 for the average share (or when unknown), 0.6 for none and 1.4 for all, growing with the share', () => {
+    const { D } = fresh(false);
+    [null, undefined, NaN, 'x', 0.5, Infinity].forEach(x => assert.strictEqual(D.factor(x), x === Infinity ? 1 : 1, 'share ' + x));
+    assert.strictEqual(D.factor(0.5), 1); assert.strictEqual(D.factor(0), 0.6); assert.strictEqual(D.factor(1), 1.4); assert.strictEqual(D.factor(-3), 0.6); assert.strictEqual(D.factor(7), 1.4);
+    let last = 0; for (let i = 0; i <= 20; i++) { const f = D.factor(i / 20); assert.ok(f >= last, 'not decreasing'); assert.ok(Math.abs(f * 50 - Math.round(f * 50)) < 1e-9, 'steps of 0.02'); last = f; }
+  });
+  test('ducking: the share of a sound alone is its own share; a mix is weighted by the live level of each sound; nothing playing gives null', () => {
+    const { D } = fresh(false), sh = shareOf(D);
+    assert.ok(Math.abs(D.share([[0.4, D.REF.rain[0], D.REF.rain[1]]]) - Math.pow(10, sh('rain') / 10)) < 1e-9, 'rain alone');
+    assert.strictEqual(D.share([]), null); assert.strictEqual(D.share([[0, -20, -15]]), null); assert.strictEqual(D.share([[NaN, -20, -15]]), null);
+    const rain = a => [a, D.REF.rain[0], D.REF.rain[1]], drone = a => [a, D.REF.drone[0], D.REF.drone[1]];
+    const even = D.share([rain(0.3), drone(0.3)]), moreRain = D.share([rain(0.5), drone(0.3)]), moreDrone = D.share([rain(0.3), drone(0.5)]);
+    assert.ok(even > Math.pow(10, sh('drone') / 10) && even < Math.pow(10, sh('rain') / 10), 'a mix is between its parts: ' + even);
+    assert.ok(moreRain > even && moreDrone < even, 'louder rain raises the share, louder drone lowers it');
+    assert.ok(D.share([rain(0.0001), drone(0.3)]) < 0.03, 'a very quiet rain barely counts');
+  });
+  test('ducking: nothing playing, or an average mix, gives exactly today\'s dip (speaking and unknown), in the smart and the plain mode', () => {
+    [false, true].forEach(smart => ['s', 'u'].forEach(st => {
+      const { A, D } = fresh(smart); T.t += 1000;
+      nearV(D.vec(st).v, D.base(st).v, 'nothing playing ' + st + ' smart=' + smart);
+      A.recMap.rain = { sb: -21, sh: 0.5 }; play(A, 'rain', 0.3, true); T.t += 1000; nearV(D.vec(st).v, D.base(st).v, 'a recording with share 0.5 ' + st + ' smart=' + smart);
+    }));
+  });
+  test('ducking: a mid-band sound is dipped and carved deeper than a bass-heavy one, both around today\'s dip', () => {
+    const base = fresh(false).D.base('s').v;
+    const rain = fresh(false); play(rain.A, 'rain', 0.3, false); T.t += 1000; const r = rain.D.vec('s').v;
+    const drone = fresh(false); play(drone.A, 'drone', 0.3, false); T.t += 1000; const d = drone.D.vec('s').v;
+    assert.ok(r[0] < base[0] && r[1] < base[1] && r[2] < base[2], 'rain: deeper than the baseline');
+    assert.ok(d[0] > base[0] && d[1] > base[1] && d[2] > base[2], 'drone: shallower than the baseline');
+    assert.ok(d[0] > r[0] && d[1] > r[1] && d[2] > r[2], 'drone dips less than rain at every part');
+    const fd = fresh(false).D.factor(Math.pow(10, shareOf(fresh(false).D)('drone') / 10)); assert.ok(fd >= 0.6 && fd < 0.65, 'drone factor ' + fd);   // about 0.62: its share is 0.017
+    near(d[1], base[1] * fd, 'drone: the 3 kHz carve is ' + fd + ' of today\'s'); near(d[0], Math.pow(base[0], fd), 'drone: the gain dip is ' + fd + ' of today\'s, in dB');
+  });
+  test('ducking: a recording is judged by its own measured share, not by its generated twin (wind: 0.14 as a recording, 0.70 generated)', () => {
+    const g = fresh(false); play(g.A, 'wind', 0.3, false); T.t += 1000; const gen = g.D.vec('s').v;
+    const r = fresh(false); r.A.recMap.wind = { sb: -19.7, sh: 0.14 }; play(r.A, 'wind', 0.3, true); T.t += 1000; const rec = r.D.vec('s').v;
+    const n = fresh(false); play(n.A, 'wind', 0.3, true); T.t += 1000; const nonum = n.D.vec('s').v;   // a recording with no numbers: the generated share
+    assert.ok(rec[1] > gen[1], 'the bass-heavy recording gets the shallower carve'); nearV(nonum, gen, 'no numbers: as the generated sound');
+  });
+  test('ducking: only speaking and unknown are scaled; a pause, off and the timing are untouched', () => {
+    const { A, D } = fresh(true); play(A, 'rain', 0.4, false); play(A, 'cafe', 0.4, false); T.t += 1000;
+    ['p', 'o'].forEach(st => { nearV(D.vec(st).v, D.base(st).v, st); assert.strictEqual(D.vec(st).tc, D.base(st).tc, 'time constant ' + st); });
+    ['s', 'u'].forEach(st => assert.strictEqual(D.vec(st).tc, D.base(st).tc, 'dip fast, time constant ' + st));
+    assert.strictEqual(D.vec('s').tc, 0.08, 'speaking still dips fast');
+  });
+  test('ducking: a sound that has faded out no longer counts, the value is held for 150 ms between reads, and a broken engine state never throws', () => {
+    const { A, D } = fresh(false); play(A, 'drone', 0.3, false); T.t += 1000; const a = D.vec('s').v[1];
+    play(A, 'rain', 0.0005, false); T.t += 10; assert.strictEqual(D.vec('s').v[1], a, 'held within 150 ms, and a faded sound is ignored');
+    play(A, 'rain', 0.6, false); T.t += 200; assert.ok(D.vec('s').v[1] < a, 'loud rain now joins');
+    const bad = fresh(false); bad.A.g = null; T.t += 1000; nearV(bad.D.vec('s').v, bad.D.base('s').v, 'broken state falls back to today\'s dip');
+  });
+  test('ducking: no new coupling (the ducking reads only the shared AMB object and the reference table in the same file group)', () => {
+    const body = dkSrc.slice(dkSrc.indexOf('const AMB_DUCK_AVG'), dkSrc.indexOf('function ambDuckSet'));
+    ['ambLive', 'ambRec', 'ambLayer', 'AMB_REC_KEYS'].forEach(n => assert.ok(!body.includes(n), n + ' must not be used by the spectral ducking'));
+  });
+}
+
+/* ---------- ambient safety limiter: bursts cannot pass a ceiling, normal levels are untouched (sound/ambient-engine.js) ---------- */
+{
+  const enSrc = read('sound/ambient-engine.js');
+  const lc = vm.createContext({ Math, Float32Array });
+  vm.runInContext([grab(enSrc, 'AMB_LIM'), grab(enSrc, 'ambLimCurve'), 'this.f = { LIM: AMB_LIM, curve: ambLimCurve };'].join('\n'), lc);
+  const L = lc.f, N = 2049, C = L.curve(N, L.LIM.knee, L.LIM.ceil);
+  const shape = x => { if (x <= -1) return C[0]; if (x >= 1) return C[N - 1]; const p = (N - 1) / 2 * (x + 1), i = Math.floor(p), f = p - i; return C[i] + (C[i + 1] - C[i]) * f; };   // how a waveshaper reads its curve
+  test('limiter: the curve is the straight line up to the knee, so normal levels pass exactly as they were', () => {
+    for (let i = 0; i < N; i++) { const x = 2 * i / (N - 1) - 1; if (Math.abs(x) <= L.LIM.knee) assert.ok(Math.abs(C[i] - Math.fround(x)) < 1e-7, 'point ' + i + ' x=' + x + ' got ' + C[i]); }
+    for (let k = 0; k < 4000; k++) { const x = 0.49 * Math.sin(k * 0.37) * Math.cos(k * 0.011); assert.ok(Math.abs(shape(x) - x) < 1e-6, 'a signal under the knee changed at sample ' + k); }
+  });
+  test('limiter: above the knee it bends smoothly and never goes past the ceiling, whatever comes in (even far over full scale)', () => {
+    let last = -1; for (const x of [0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.5, 2, 5, 100, Infinity]) { const y = shape(x); assert.ok(y >= last - 1e-9, 'not rising at ' + x); assert.ok(y < L.LIM.ceil, 'above the ceiling at ' + x + ': ' + y); last = y; }
+    assert.ok(Math.abs(shape(1) - shape(100)) < 1e-9, 'beyond full scale the curve end holds');
+    const slope = (shape(0.5 + 0.004) - shape(0.5 + 0.002)) / 0.002; assert.ok(Math.abs(slope - 1) < 0.03, 'no corner at the knee: slope just above it is ' + slope);
+    assert.ok(Math.abs(20 * Math.log10(shape(0.7) / 0.7)) < 0.5, 'a mild burst loses under half a dB'); assert.ok(20 * Math.log10(shape(1) / 1) > -2, 'full scale loses under 2 dB');
+  });
+  test('limiter: the curve is the same on both sides of zero, starts at zero, and has the size it was asked for', () => {
+    assert.strictEqual(C.length, N); assert.strictEqual(C[(N - 1) / 2], 0); for (let i = 0; i < N; i++) assert.ok(Math.abs(C[i] + C[N - 1 - i]) < 1e-7, 'asymmetric at ' + i);
+    const odd = L.curve(9, 0.5, 0.9); assert.strictEqual(odd.length, 9); assert.ok(Math.abs(odd[8] - odd[0] * -1) < 1e-7);
+  });
+  test('limiter: a burst on top of a normal bed is held under the ceiling while the bed alone is untouched', () => {
+    const bed = k => 0.2 * Math.sin(k * 0.05) + 0.1 * Math.sin(k * 0.31), burst = k => (k > 500 && k < 700 ? 1.6 * Math.sin(k * 0.12) : 0);
+    let bedMax = 0, mixMax = 0;
+    for (let k = 0; k < 1000; k++) { const x = bed(k) + burst(k); mixMax = Math.max(mixMax, Math.abs(shape(x))); if (!burst(k)) { assert.ok(Math.abs(shape(x) - x) < 1e-6, 'the bed changed at ' + k); bedMax = Math.max(bedMax, Math.abs(x)); } }
+    assert.ok(bedMax < 0.5, 'the bed stays under the knee'); assert.ok(mixMax < L.LIM.ceil, 'the burst stays under the ceiling: ' + mixMax);
+  });
+  /* the wiring in ambBuild, run against a stand-in audio context */
+  const wireSrc = enSrc.slice(enSrc.indexOf("try {   // the safety limiter"), enSrc.indexOf("const cue = ctx.createGain()"));
+  const wire = (failShaper) => {
+    const edges = [], node = n => ({ n, connect(d) { edges.push(n + '>' + d.n); } }), mg = node('mg'), warm = node('warm'), AMB = {};
+    const ctx = { createWaveShaper() { if (failShaper) throw new Error('none here'); const w = node('lim'); w.curve = null; w.oversample = ''; return w; } };
+    new Function('ctx', 'mg', 'warm', 'AMB', 'ambLimCurve', 'AMB_LIM', wireSrc)(ctx, mg, warm, AMB, L.curve, L.LIM); return { edges, AMB };
+  };
+  test('limiter: the mood stage goes through the limiter on its way to the warm filter, with no oversampling and the full curve', () => {
+    const { edges, AMB } = wire(false); assert.deepStrictEqual(edges, ['mg>lim', 'lim>warm']); assert.ok(AMB.lim && AMB.lim.curve.length === 2049 && AMB.lim.oversample === 'none');
+  });
+  test('limiter: where a waveshaper cannot be made, the bus goes straight on as before (the sound must never break)', () => {
+    const { edges, AMB } = wire(true); assert.deepStrictEqual(edges, ['mg>warm']); assert.strictEqual(AMB.lim, undefined);
+  });
+  test('limiter: nothing else connects the mood stage to the warm filter, story sounds still skip the limiter and the music engine is not involved', () => {
+    const before = enSrc.slice(0, enSrc.indexOf("try {   // the safety limiter")); assert.ok(!/mg\.connect\(warm\)/.test(before), 'a direct mg to warm connection is left in front of the limiter');
+    assert.ok(/cue\.connect\(warm\)/.test(enSrc), 'the story-sound path is unchanged'); assert.ok(!/createDynamicsCompressor|WaveShaper/.test(read('sound/music-bus.js') + read('sound/music-playback.js')), 'the music side is not touched');
+  });
+}
+
 (async () => {
   for (const q of queue) await q();
   console.log('\n' + (failed ? failed + ' of ' + total + ' failed' : 'all ' + total + ' passed'));

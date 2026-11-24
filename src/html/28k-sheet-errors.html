@@ -1,0 +1,12 @@
+<section id="sheet-errfinder" class="sheet ef" hidden role="dialog" aria-modal="true" aria-labelledby="h-ef">
+  <header><h2 id="h-ef">Error finder</h2><button class="ib" data-close aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <p class="help" id="ef-sum"></p>
+    <div id="ef-off" class="ef__off" hidden><span>Logging is off, so new problems are not being recorded.</span><button id="ef-on" type="button" class="chip">Turn on</button></div>
+    <div class="chips" id="ef-chips" role="group" aria-label="Show"></div>
+    <div id="ef-list" class="ef__list"></div>
+    <p class="help" id="ef-ctx"></p>
+    <p class="help" id="ef-send"></p>
+    <div class="ef__bar"><button id="ef-refresh" class="chip" type="button">Refresh</button><button id="ef-copy" class="chip" type="button">Copy report</button><button id="ef-clear" class="chip" type="button">Clear</button></div>
+  </div>
+</section>

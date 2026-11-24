@@ -10,7 +10,8 @@
        music   the level of the music bus after its ducking (tap on MUS.duck), with the dip taken out again (see SMX_NOM)
        ambient the level of the ambient bus after its ducking (tap on AMB.master), with the dip taken out again
      What it does: every ~2 s it compares each bus with its target and moves a small trim (dB) for that bus, slowly
-     (at most 1.5 dB a step, never more than -15 .. +9 dB). The trim is a multiplier inside musBusLevel() / ambGain()
+     (at most 1.5 dB a step, never more than -15 .. +9 dB; the ambient trim may go down to -18 dB, and its first move is larger when the starting level is clearly off, see SMX_AMB).
+     The trim is a multiplier inside musBusLevel() / ambGain()
      (through sndBalMus() / sndBalAmb() in sound-core.js), so the saved sliders never change (and stay free: see smxFree).
      The target of each bus is "this many dB under the voice" (SMX_REL, and a little lower for both while music and sounds play together: SMX_BOTH), moved by the user's own slider: a slider at its usual
      position gives the balanced mix, and moving it still makes the sound louder or quieter on purpose.
@@ -27,6 +28,11 @@ const SMX_NOM = { mus: 0.28, amb: 0.68 };
 const SMX_BOTH = { mus: -2, amb: -1 };      // extra dB under the voice for each bus while BOTH are heard: together they then sit about where one alone would (music -20 and sounds -23 add up to about -18)
 const SMX_REF = { mus: 0.40, amb: 0.70 };   // the reference slider positions (the defaults of musVol() and ambVol())
   const SMX_LIM = { lo: -15, hi: 9, dead: 1.5, step: 1.5, first: 6, need: 16 };
+  /* The ambient bus only (the music side is not changed). The recorded sounds are now levelled before they get here, so this stays the fine trim, but it has a little more room
+     downwards (-18 dB) and a bigger first move when the starting level is clearly off: from `far` dB of error on, the first move grows twice as fast (0.8 per dB, not 0.4 for the
+     part above `far`), up to `firstFar` dB. Below `far` it is exactly as before. After the first move the steps are the same small ones. */
+  const SMX_AMB = { lo: -18, far: 8, slope: 0.8, firstFar: 12 };
+  const smxLo = k => (k === 'amb' ? SMX_AMB.lo : SMX_LIM.lo);
   const SMX = { t: { mus: 0, amb: 0 }, lin: { mus: 1, amb: 1 }, r: { v: [], mus: [], amb: [] }, tap: { mus: null, amb: null }, fresh: { mus: true, amb: true }, live: false, book: null, ticks: 0, saved: 0, buf: null, vbuf: null, dec: { mus: 0, amb: 0 }, learned: false, src: null, dirty: false };
   const smxOn = () => P.smartMix !== false && sndOn();
   const smxLive = () => smxOn() && SMX.live;
@@ -41,8 +47,11 @@ const SMX_REF = { mus: 0.40, amb: 0.70 };   // the reference slider positions (t
     const target = V + SMX_REL[k] + (both ? SMX_BOTH[k] : 0) + (lift || 0) + 20 * Math.log10(Math.max(vol, 0.02) / SMX_REF[k]);
     const err = target - L;
     if (Math.abs(err) < SMX_LIM.dead) return cur;
-    const cap = first ? SMX_LIM.first : SMX_LIM.step;
-    return Math.max(SMX_LIM.lo, Math.min(SMX_LIM.hi, cur + Math.max(-cap, Math.min(cap, err * 0.4))));
+    let move = err * 0.4, cap = first ? SMX_LIM.first : SMX_LIM.step;
+    if (first && k === 'amb' && Math.abs(err) > SMX_AMB.far) {   // clearly off at the start: the part of the error above `far` counts double, so the first move gets close
+      move = Math.sign(err) * (0.4 * SMX_AMB.far + SMX_AMB.slope * (Math.abs(err) - SMX_AMB.far)); cap = SMX_AMB.firstFar;
+    }
+    return Math.max(smxLo(k), Math.min(SMX_LIM.hi, cur + Math.max(-cap, Math.min(cap, move))));
   }
   /* Level (dB) of the last ~40 ms (2048 samples) of an analyser, counted in the speech band only (SMX_BAND, Hz). That band carries the
      consonants, and it is where music and room sounds hide them; rumble and bass would otherwise count as much as the band that matters.
@@ -198,7 +207,7 @@ const SMX_REF = { mus: 0.40, amb: 0.70 };   // the reference slider positions (t
     const g = m ? null : smxGlobal();
     SMX.t = { mus: m && typeof m.m === 'number' ? m.m : g ? g.m : 0, amb: m && typeof m.a === 'number' ? m.a : g ? g.a : 0 };
     if (m) SMX.fresh = { mus: false, amb: false };
-    if (m && m.s && typeof m.s === 'object') ['mus', 'amb'].forEach(k => { const o = m.s[k]; if (o && typeof o === 'object') Object.keys(o).slice(0, SMX_MEM).forEach(key => { if (typeof o[key] === 'number') SMX.src[k].mem[key] = Math.max(SMX_LIM.lo, Math.min(SMX_LIM.hi, o[key])); }); });
+    if (m && m.s && typeof m.s === 'object') ['mus', 'amb'].forEach(k => { const o = m.s[k]; if (o && typeof o === 'object') Object.keys(o).slice(0, SMX_MEM).forEach(key => { if (typeof o[key] === 'number') SMX.src[k].mem[key] = Math.max(smxLo(k), Math.min(SMX_LIM.hi, o[key])); }); });
     SMX.lin = { mus: smxLin(SMX.t.mus), amb: smxLin(SMX.t.amb) };
     smxApply(0.3);
   }

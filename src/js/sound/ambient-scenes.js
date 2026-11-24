@@ -3,6 +3,14 @@
      They follow the book: on while it plays, faded out when it pauses (so the sleep timer ends them too). While the
      mixer is open they play so you can hear your mix. Settings > Audio switches the feature on or off. */
   const AMB = { ctx: null, master: null, g: {}, built: false, on: false, preview: false, clinkIv: 0, evIv: 0, live: {}, nx: {}, tickAt: 0, beatAt: 0, tickAlt: 0, duckIv: 0, duck: null, duckT: 1, slow: false, rec: {}, recBusy: {}, recFail: {}, recMap: {}, bookId: '', nextThunder: 0, white: null, brown: null, scene: null, narr: null, sceneK: '' };
+  /* How loud each sound should be once levelled: two numbers per sound, [speech band 300-4000 Hz, whole sound], in dB of mean power.
+     They are the level of the GENERATED layer of the same name, so a sound keeps its loudness when it switches between generated and recorded
+     (hybrid mode). tools/ambient_layer_levels.js reads sound/ambient-layers.js and works them out; run it again if a layer there changes
+     (tools/unit_check.js fails when this table and the layers disagree). A recording whose recordings.json entry has a measured speech-band
+     level (sb, written by tools/ambient_prep.py) is levelled to the first number, because the speech band is the part that hides the narrator.
+     A file with no measure (the reader's own test file) is levelled by its plain RMS to the second number.
+     The ducking (ambient-ducking.js) also reads this table: speech band over whole sound is the share of a generated sound's energy that can hide the voice. */
+  const AMB_REC_REF = { rain: [-19.6, -16.9], cafe: [-21.8, -19.1], wind: [-28.3, -26.8], waves: [-24.8, -19.6], fire: [-27.9, -21.5], river: [-24.7, -22.3], brown: [-21.8, -15.9], engine: [-30.6, -12.8], night: [-31.2, -27.3], crowd: [-27.8, -22.4], train: [-31.4, -18.4], drone: [-31.2, -15.0] };
   const AMB_SOUNDS = [
     ['rain', 'Rain', 'nature'], ['wind', 'Wind', 'nature'], ['waves', 'Waves', 'nature'], ['river', 'River', 'nature'], ['birds', 'Birds', 'nature'], ['night', 'Night', 'nature'], ['thunder', 'Thunder', 'nature'],
     ['fire', 'Fire', 'indoors'], ['cafe', 'Café', 'indoors'], ['clock', 'Clock', 'indoors'], ['creaks', 'Creaks', 'indoors'], ['drips', 'Drips', 'indoors'],

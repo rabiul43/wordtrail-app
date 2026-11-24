@@ -29,12 +29,12 @@ const env = {
 };
 const ctx = vm.createContext(env);
 let T;
-try { vm.runInContext(src + '\n;this.__T = { SMX, SMX_REL, SMX_NOM, SMX_BOTH, SMX_LIM, SMX_BAND, smxPlan, smxDb, smxTap, smxUntap, smxSrcStep, smxMean, smxSnap, smxLearn, smxGlobal, smxSave, smxIndexTouch, smxIndexInit, smxDuckDb, smxLift, smxSrcNew };', ctx); T = ctx.__T; } catch (e) { console.error('cannot load smart-mix.js:', e.message); process.exit(2); }
+try { vm.runInContext(src + '\n;this.__T = { SMX, SMX_REL, SMX_NOM, SMX_BOTH, SMX_LIM, SMX_BAND, smxPlan, smxDb, smxTap, smxUntap, smxSrcStep, smxMean, smxSnap, smxLearn, smxGlobal, smxSave, smxIndexTouch, smxIndexInit, smxDuckDb, smxLift, smxSrcNew, SMX_AMB, smxLo, smxBook };', ctx); T = ctx.__T; } catch (e) { console.error('cannot load smart-mix.js:', e.message); process.exit(2); }
 
 let pass = 0, fail = 0;
 function check(name, fn) { try { fn(); pass++; console.log('ok    ' + name); } catch (e) { fail++; console.log('FAIL  ' + name + '\n        ' + String(e.message).split('\n')[0]); } }
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, (msg || '') + ' got ' + a + ', wanted ' + b + ' (+-' + tol + ')');
-const { smxPlan, SMX_REL, SMX_LIM } = T;
+const { smxPlan, SMX_REL, SMX_LIM, SMX_AMB } = T;
 
 /* ---- the plan ---- */
 check('plan: inside the dead-zone nothing moves', () => {
@@ -154,6 +154,46 @@ check('notes: only the last 150 books keep a note; other keys are left alone', (
   const idx = JSON.parse(ls['wt:smxidx']); assert.strictEqual(idx.length, 150); assert.ok(!('wt:smx:b0' in ls) && 'wt:smx:b159' in ls);
   assert.ok('wt:smx:global' in ls && 'wt:prefs' in ls);
   T.smxIndexTouch('b20'); assert.strictEqual(JSON.parse(ls['wt:smxidx']).slice(-1)[0], 'b20');
+});
+
+/* ---- the ambient bus as a fine trim: more room down, a bigger first move when clearly off (the music side is not changed) ---- */
+const planAt = (k, V, err, cur, first) => { const vol = k === 'amb' ? 0.7 : 0.4; return smxPlan(k, V, V + SMX_REL[k] - err, vol, cur, first, false, 0); };   // slider at its reference position, so target = voice + SMX_REL
+check('ambient plan: the lowest trim is -18 dB; the music trim still stops at -15 dB', () => {
+  assert.strictEqual(planAt('amb', -20, -62, -17.5, true), -18); assert.strictEqual(planAt('amb', -20, -62, -17.5, false), -18); assert.strictEqual(planAt('amb', -20, -62, -12, false), -13.5);
+  assert.strictEqual(planAt('mus', -20, -62, -14.5, true), -15); assert.strictEqual(planAt('mus', -20, -62, -14.5, false), -15); assert.strictEqual(planAt('amb', -20, 90, 8.5, true), 9, 'the top is still +9');
+  assert.strictEqual(SMX_LIM.lo, -15, 'the shared limits are as they were');
+});
+check('ambient plan: up to 8 dB of error the first move is exactly what it was (0.4 of the error), and the music is identical to the ambient there', () => {
+  [2, 4, 6, 7.9, 8, -3, -7.9, -8].forEach(e => { const want = Math.max(-15, Math.min(9, 0.4 * e)); near(planAt('amb', -20, e, 0, true), want, 1e-9, 'amb err ' + e); near(planAt('mus', -20, e, 0, true), want, 1e-9, 'mus err ' + e); });
+});
+check('ambient plan: clearly off at the start (over 8 dB) the first move grows smoothly, twice as fast on the part above 8 dB, up to 12 dB', () => {
+  [[9, 4.0], [12, 6.4], [15, 8.8], [20, 12], [40, 12], [-9, -4.0], [-12, -6.4], [-15, -8.8], [-40, -12]].forEach(([e, want]) => near(planAt('amb', -20, e, 0, true), Math.max(-18, Math.min(9, want)), 1e-9, 'err ' + e));
+  near(planAt('amb', -20, 8.001, 0, true), planAt('amb', -20, 8, 0, true), 0.01, 'no jump at 8 dB'); assert.ok(planAt('amb', -20, 15, 0, true) > 6, 'larger than the old cap of 6 dB');
+  assert.ok(planAt('amb', -20, 11, 0, true) < planAt('amb', -20, 12, 0, true) && planAt('amb', -20, 12, 0, true) < planAt('amb', -20, 14, 0, true), 'grows with the error');
+});
+check('ambient plan: the music first move is untouched (still up to 6 dB however far off), and later steps are the same small ones on both buses', () => {
+  assert.strictEqual(planAt('mus', -20, 30, 0, true), 6); assert.strictEqual(planAt('mus', -20, 15, 0, true), 6); assert.strictEqual(planAt('mus', -20, -30, 0, true), -6);
+  assert.strictEqual(planAt('amb', -20, 20, 0, false), 1.5); assert.strictEqual(planAt('amb', -20, -20, 0, false), -1.5); assert.strictEqual(planAt('mus', -20, 20, 0, false), 1.5);
+  assert.strictEqual(planAt('amb', -20, 1.4, 2, true), 2, 'inside the dead-zone nothing moves');
+});
+check('ambient loop: a start that is 14 dB off settles in fewer decisions than with the old first move, with no swinging and never below -18 dB', () => {
+  const run = (oldRule) => {
+    let t = 0, L = -20 + SMX_REL.amb + 14, n = 0, flips = 0, prev = 0, min = 0;   // 14 dB too loud: the trim must come down
+    for (let i = 0; i < 100; i++) {
+      const before = t; t = oldRule ? (() => { const e = (-20 + SMX_REL.amb) - L; if (Math.abs(e) < SMX_LIM.dead) return t; const cap = i === 0 ? SMX_LIM.first : SMX_LIM.step; return Math.max(-15, Math.min(9, t + Math.max(-cap, Math.min(cap, e * 0.4)))); })() : planAt('amb', -20, (-20 + SMX_REL.amb) - L, t, i === 0) ;
+      const d = t - before; if (d) { n++; if (prev && Math.sign(d) !== Math.sign(prev)) flips++; prev = d; } L += d; min = Math.min(min, t);
+    }
+    return { n, flips, min, settled: Math.abs((-20 + SMX_REL.amb) - L) < SMX_LIM.dead + 0.01 };
+  };
+  const o = run(true), nw = run(false);
+  assert.ok(o.settled && nw.settled, 'both settle'); assert.strictEqual(nw.flips, 0, 'no swinging'); assert.ok(nw.min >= -18, 'never below -18 dB'); assert.ok(nw.n < o.n, 'fewer decisions: new ' + nw.n + ', old ' + o.n);
+});
+check('ambient trims saved for a book come back inside -18..+9 dB for the ambient bus and -15..+9 dB for the music', () => {
+  ls['wt:smx:bLim'] = JSON.stringify({ m: -17, a: -17, s: { mus: { 'a.mp3': -17, 'b.mp3': 12 }, amb: { 'rain+wind': -17, 'fire': -25, 'night': 12 } } });
+  T.SMX.book = 'other'; T.SMX.dirty = false; S.book = { id: 'bLim' }; T.smxBook();
+  assert.strictEqual(T.SMX.src.amb.mem['rain+wind'], -17, 'an ambient trim of -17 is kept'); assert.strictEqual(T.SMX.src.amb.mem['fire'], -18, 'and stops at -18'); assert.strictEqual(T.SMX.src.amb.mem['night'], 9);
+  assert.strictEqual(T.SMX.src.mus.mem['a.mp3'], -15, 'a music trim of -17 is still brought back to -15'); assert.strictEqual(T.SMX.src.mus.mem['b.mp3'], 9);
+  S.book = { id: 'b1' }; T.smxBook();
 });
 
 /* ---- analysers ---- */

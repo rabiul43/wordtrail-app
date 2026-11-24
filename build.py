@@ -25,6 +25,10 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 # ('devlit', text) = fixed text that belongs to a developer piece, left out with it
 PARTS = [
     ('file', 'src/html/00-head.html'),
+    ('file', 'src/html/00a-error-privacy.html'),
+    ('file', 'src/html/00b-error-collector.html'),
+    ('file', 'src/html/00c-error-context.html'),
+    ('file', 'src/html/00d-error-sender.html'),
     ('lit', '<style>\n'),
     ('file', 'src/css/10-base-layout.css'),
     ('file', 'src/css/20-home-library.css'),
@@ -102,6 +106,7 @@ PARTS = [
     ('file', 'src/css/99r-skip-ready.css'),
     ('file', 'src/css/99s-learn-screen.css'),
     ('file', 'src/css/99t-listen-only.css'),
+    ('file', 'src/css/99u-error-finder.css'),
     ('lit', '</style>\n'),
     ('file', 'src/html/10-body-views.html'),
     ('file', 'src/html/20-sheets-player.html'),
@@ -128,6 +133,7 @@ PARTS = [
     ('file', 'src/html/28i-sheet-sound-drill.html'),
     ('file', 'src/html/28e-sheet-class-worksheet.html'),
     ('file', 'src/html/28f-sheet-ielts.html'),
+    ('file', 'src/html/28k-sheet-errors.html'),
     ('lit', '<script type="application/json" id="lt-variants">\n'),
     ('file', 'src/data/spelling-variants.json'),
     ('lit', '</script>\n'),
@@ -294,6 +300,7 @@ PARTS = [
     ('file', 'src/js/290-backup-maintenance.js'),
     ('file', 'src/js/295-account-sync.js'),
     ('file', 'src/js/296-desktop-bar.js'),
+    ('file', 'src/js/296b-error-finder.js'),
     ('file', 'src/js/298-pwa.js'),
     ('file', 'src/js/300-wiring.js'),
     ('file', 'src/js/301-open-shared-link.js'),
@@ -379,6 +386,7 @@ HOST_SLOTS = {
     "scene":    (b"__WT_HOST_SCENE__",    True,  False),
     "music":    (b"__WT_HOST_MUSIC__",    False, True),
     "admin":    (b"__WT_HOST_ADMIN__",    True,  False),   # the admin Worker: the app reads my cover choices from its public address
+    "errors":   (b"__WT_HOST_ERRORS__",   True,  False),   # the wordtrail-errors Worker (tools/errors-worker/): empty = error reports are not sent
     "sounds":   (b"__WT_HOST_SOUNDS__",   False, True),   # R2 bucket for real ambient recordings (recordings.json + audio files)
 }
 
@@ -432,7 +440,7 @@ def apply_hosts_headers(text, hosts):
     audio files directly. With today's addresses the wildcards there already cover them, so nothing is added;
     after a move to a new domain the new address is added for you."""
     text = text.replace("__WT_HOST_PROXY__", host_origin(hosts["proxy"]))
-    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "sounds") if hosts[k]]
+    origins = [host_origin(hosts[k]) for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "errors", "sounds") if hosts[k]]
     sounds_origin = host_origin(hosts["sounds"]) if hosts.get("sounds") else None
     lines = text.split("\n")
     for i, line in enumerate(lines):
@@ -512,7 +520,7 @@ if __name__ == "__main__":
         with open(hp, "w", encoding="utf-8", newline="") as f:
             f.write(apply_hosts_headers(ht, hosts))
     check_no_placeholders(dist)
-    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "sounds")))
+    print("hosts:  " + "  ".join("%s=%s" % (k, hosts[k] or "(off)") for k in ("proxy", "hf_proxy", "stats", "scene", "music", "admin", "errors", "sounds")))
     # self-hosted fonts (only when tools/fetch_fonts.py has been run); a stale dist/fonts from an older build is replaced
     fonts_out = os.path.join(dist, "fonts")
     shutil.rmtree(fonts_out, ignore_errors=True)

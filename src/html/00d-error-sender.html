@@ -1,0 +1,67 @@
+<script>
+/* Error sender (error-tracking task 5): the offline queue and the sending of reports. Builds on 00a-00c (window.__wtDiag).
+   OFF unless hosts.json "errors" holds the address of the wordtrail-errors Worker (tools/errors-worker/). With no address nothing here runs.
+   What is sent: report format v1, only problems of severity error or warn (not 404 notes, not slow moments), only what is new since the last send.
+   Counts are absolute per session (n), so a report sent twice is counted once by the Worker.
+   When: 20 s after a new problem, when the page is hidden or closed (sendBeacon), when the phone comes back online, and the leftover queue 8 s after start.
+   Limits: one send per 30 s, 10 sends per page load, at most 5 waiting reports, 20 problems and about 30 KB each, reports older than 3 days are dropped.
+   Failure: a server or network failure keeps the report in the queue (saved in wt:errq, so it survives closing the app) and waits 1, 3, 9, 27, 30 min.
+   A refused report (4xx other than 429) is dropped, it would never be accepted. When the page closes while offline or after a failure,
+   nothing is handed over (a beacon gives no answer): the report stays saved.
+   Rules: only runs while D.sendable() allows it (logging on AND Settings "Send anonymous error reports" on); switched off = the queue is emptied.
+   The original fetch (D.rawFetch) is used, so a failed send is never itself reported as a problem. D.flush() sends now. D.sendStatus() is shown in the Error finder. */
+(function(){
+var D=window.__wtDiag,HOST='__WT_HOST_ERRORS__';
+if(!D||!D.sendable)return;
+D.sendStatus=function(){return {configured:false,on:false,queued:0,lastOk:0,fail:0};};
+if(!HOST||HOST.indexOf('__WT_HOST')===0)return;
+var KEY='wt:errq',GAP=30000,DELAY=20000,MAX_SENDS=10,MAX_Q=5,MAX_BYTES=30000,MAX_AGE=3*864e5,MAX_PROBLEMS=20,SEND={error:1,warn:1};
+var sent={},st={sends:0,last:0,lastOk:0,fail:0,next:0,timer:0,busy:false};
+function now(){return Date.now();}
+function load(){try{var q=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(q)?q:[];}catch(e){return [];}}
+function save(q){try{if(q.length)localStorage.setItem(KEY,JSON.stringify(q));else localStorage.removeItem(KEY);}catch(e){}}
+function allowed(){return !!(D.on&&D.canSend());}
+
+/* what changed since the last time: the report, filtered and cut to size */
+function build(){var r=D.report(),ps=r.problems.filter(function(p){return SEND[p.sev]&&p.n>(sent[p.id]||0);});
+if(!ps.length)return null;
+ps.sort(function(a,b){return (a.sev===b.sev?0:a.sev==='error'?-1:1)||b.last-a.last;});ps=ps.slice(0,MAX_PROBLEMS);
+var b={v:1,app:'wordtrail',sid:r.sid,t:r.t,ctx:r.ctx,problems:ps};
+for(var i=ps.length-1;JSON.stringify(b).length>MAX_BYTES&&i>=0;i--){ps[i].crumbs=[];ps[i].stack='';}
+while(JSON.stringify(b).length>MAX_BYTES&&ps.length>1)ps.pop();
+ps.forEach(function(p){sent[p.id]=p.n;});return b;}
+function enqueue(){try{var b=build();if(!b)return;var q=load();q.push({t:now(),b:b});while(q.length>MAX_Q)q.shift();save(q);}catch(e){}}
+
+function backoff(){st.fail++;st.next=now()+Math.min(30*60000,60000*Math.pow(3,st.fail-1));}
+function done(q){save(q);if(q.length)schedule(GAP);}
+function schedule(ms){if(st.timer)return;st.timer=setTimeout(function(){st.timer=0;flush(false);},ms||DELAY);}
+
+function flush(beacon){
+if(!allowed()){save([]);return;}
+enqueue();
+var q=load().filter(function(x){return now()-x.t<MAX_AGE;});
+if(!q.length){save(q);return;}
+if(beacon){                                   /* the page is closing: hand over what is waiting, no answer to wait for. Not while offline or after a failure: a beacon cannot tell, so the report stays saved for the next start */
+if(navigator.onLine===false||st.fail>0){save(q);return;}
+var n=0;while(q.length&&n<3){var x=q[0],ok=false;try{ok=!!(navigator.sendBeacon&&navigator.sendBeacon(HOST+'/e',new Blob([JSON.stringify(x.b)],{type:'text/plain;charset=UTF-8'})));}catch(e){}
+if(!ok)break;q.shift();n++;st.sends++;st.lastOk=now();}
+save(q);return;}
+if(st.busy||now()<st.next||now()-st.last<GAP||st.sends>=MAX_SENDS||navigator.onLine===false){if(q.length&&st.sends<MAX_SENDS)schedule(Math.max(GAP,st.next-now()));save(q);return;}
+var x=q[0],f=D.rawFetch||window.fetch;st.busy=true;st.last=now();st.sends++;
+var p;try{p=f.call(window,HOST+'/e',{method:'POST',headers:{'content-type':'text/plain;charset=UTF-8'},body:JSON.stringify(x.b),keepalive:true,credentials:'omit',mode:'cors'});}catch(e){p=Promise.reject(e);}
+p.then(function(r){st.busy=false;
+if(r.ok||r.status===204){q.shift();st.fail=0;st.lastOk=now();done(q);}
+else if(r.status>=500||r.status===429){backoff();save(q);schedule(Math.max(GAP,st.next-now()));}
+else{q.shift();done(q);}                       /* refused for good (bad data): drop it */
+},function(){st.busy=false;backoff();save(q);schedule(Math.max(GAP,st.next-now()));});}
+
+D.flush=function(){st.next=0;st.last=0;flush(false);};
+D.sendStatus=function(){return {configured:true,on:allowed(),queued:load().length,lastOk:st.lastOk,fail:st.fail};};
+
+var oh=D.hook;D.hook=function(t,m,s){var p=oh?oh(t,m,s):null;try{if(p&&SEND[p.sev]&&allowed())schedule(DELAY);}catch(e){}return p;};
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush(true);});
+addEventListener('pagehide',function(){flush(true);});
+addEventListener('online',function(){schedule(3000);});
+setTimeout(function(){if(!allowed())save([]);else if(load().length)flush(false);},8000);
+})();
+</script>

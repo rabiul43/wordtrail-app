@@ -1,0 +1,1864 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<title>Wordtrail R2 Clip Admin</title>
+<style>
+:root{--bg:#F2F3F8;--card:#fff;--line:#DDE0EA;--fg:#14161F;--mut:#5A6074;--acc:#4338CA;--del:#C2362B;--keep:#2E9E5B;--soft:#E9E8FB;--ok:#E6F6EC;--okfg:#13693A;--warn:#9A6700}
+@media (prefers-color-scheme:dark){:root{--bg:#0D0E14;--card:#151722;--line:#23263A;--fg:#ECEDF4;--mut:#A3A8BC;--acc:#8C86FF;--del:#FF7A6B;--keep:#5EC58F;--soft:#26225A;--ok:#173226;--okfg:#7EE2B8;--warn:#F2C55C}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.4 Manrope,system-ui,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column}
+header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--line)}
+header h1{font-size:19px;font-weight:800;margin:0 10px 0 0}header h1 b{color:var(--acc)}
+input,button,select{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:40px}
+input{min-width:200px}input[type=checkbox]{min-width:0;min-height:0;width:18px;height:18px;padding:0}button,select{cursor:pointer}button:hover{border-color:var(--acc)}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.danger{background:var(--del);color:#fff;border-color:var(--del)}
+button:disabled{opacity:.5;cursor:default}
+body:not(.conn) .needconn{display:none!important}body.conn #welcome{display:none}
+#welcome{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;max-width:500px;width:100%;display:flex;flex-direction:column;gap:12px}
+.wcard h2{margin:0;font-size:26px;font-weight:800}.wcard input{width:100%}.wcard button{min-height:46px;font-weight:800}
+.wcard ol{margin:6px 0 0;padding-left:20px;color:var(--mut)}.wcard li{margin-bottom:6px}
+#summary{padding:8px 24px 0;color:var(--mut);font-size:13px}
+button.danger:disabled{background:var(--card);color:var(--mut);border-color:var(--line)}
+#prog{display:flex;gap:3px;padding:8px 24px 0}#prog i{flex:1;height:8px;border-radius:4px;background:var(--line)}#prog i.d{background:var(--keep)}
+main{flex:1;display:flex;min-height:0}
+nav{width:216px;overflow:auto;padding:14px}
+nav .mood{display:block;width:100%;text-align:left;margin-bottom:4px;padding:10px 12px;border:0;background:transparent}
+nav .mood.on{background:var(--card);box-shadow:0 1px 3px rgba(20,22,31,.14)}
+nav .bar{height:4px;background:var(--line);border-radius:2px;margin-top:6px;overflow:hidden}
+nav .bar i{display:block;height:100%;background:var(--keep)}
+small{color:var(--mut)}
+section{flex:1;overflow:auto;padding:14px 16px;min-width:0}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}
+th{text-align:left;font-weight:700;color:var(--mut);padding:4px 8px}
+td{padding:8px;background:var(--card);vertical-align:middle}td:first-child{border-radius:12px 0 0 12px}td:last-child{border-radius:0 12px 12px 0}
+tr.playing td{background:var(--soft)}
+tr.del td.name{text-decoration:line-through;color:var(--mut)}
+tr.ret td{opacity:.5}
+tr.ret td.name::after{content:"  (retired)";color:var(--mut);font-size:12px}
+tr.keep td.name::before{content:"\2713 ";color:var(--keep)}
+.sm{padding:2px 10px;min-height:32px}
+footer{border-top:1px solid var(--line);background:var(--card);padding:8px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+footer audio{flex:1;min-width:240px}
+#now{min-width:200px;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+label{display:inline-flex;gap:5px;align-items:center;color:var(--mut)}
+#msg{padding:30px 14px;color:var(--mut);max-width:620px}
+#queue{width:272px;padding:14px 24px 14px 8px;overflow:auto;display:flex;flex-direction:column;gap:8px}#queue:empty{display:none}
+.qh{font:700 12px/1 JetBrains Mono,monospace;letter-spacing:.08em;color:var(--mut);padding:4px 0}
+.qi{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 12px;border-radius:12px}
+.qi b{display:block;font-weight:700}.qi small{display:block}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line);flex:none}.dot.ok{background:var(--keep)}
+.chip{font:600 11px JetBrains Mono,monospace;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--mut);white-space:nowrap}.chip.hi{background:var(--ok);color:var(--okfg)}
+.crumb{font:600 13px JetBrains Mono,monospace;color:var(--mut);text-transform:uppercase}
+.ctitle{display:flex;gap:12px;align-items:center;margin:4px 0 14px;flex-wrap:wrap}.ctitle h2{margin:0;font-size:36px;font-weight:800;letter-spacing:-.02em}
+.panel{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:14px}
+.pp{width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;border:0;padding:0;font-size:18px;flex:none}
+.wv{position:relative;flex:1;height:96px;background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 5px)}
+.wv i{position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(90deg,var(--acc) 0 2px,transparent 2px 5px)}
+#tm{font:600 13px JetBrains Mono,monospace;color:var(--mut);white-space:nowrap}
+.cards{display:flex;gap:10px;margin-bottom:14px}
+.card{flex:1;min-width:0;text-align:left;padding:12px;border-radius:16px;display:flex;flex-direction:column;gap:8px}
+.card .top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:18px}
+.card .wv{flex:none;height:30px;background:repeating-linear-gradient(90deg,var(--mut) 0 2px,transparent 2px 5px);opacity:.55}
+.card.playing{border:2px solid var(--acc);padding:11px}.card.playing .wv{background:repeating-linear-gradient(90deg,var(--acc) 0 2px,transparent 2px 5px);opacity:1}
+.card.del{opacity:.5}.card.keep{border-color:var(--keep)}
+.score{font:800 26px/1 Manrope,system-ui,sans-serif}
+.meta{display:flex;gap:6px;align-items:center;color:var(--mut);font-size:12px;overflow:hidden;white-space:nowrap}
+.acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.acts button{min-height:48px;padding:0 20px;font-weight:800;border-radius:14px}
+.acts .go{flex:1;background:var(--acc);color:#fff;border-color:var(--acc)}.acts .no{color:var(--del);border-color:var(--del)}
+.hint{color:var(--mut);font-size:12px;margin-top:10px}
+.sw{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px}
+.sw button{border:0;background:transparent;border-radius:999px;min-height:34px;padding:4px 16px;font-weight:800;color:var(--mut)}
+.sw button.on{background:var(--acc);color:#fff;box-shadow:0 0 18px color-mix(in srgb,var(--acc) 55%,transparent)}
+header{position:relative}
+#gmenu{position:fixed;right:24px;top:64px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:240px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.werr{background:rgba(194,54,43,.12);border:1px solid var(--del);color:var(--del);border-radius:12px;padding:10px 12px;font-size:13px}
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:var(--ok);color:var(--okfg);border:1px solid var(--keep);padding:10px 16px;border-radius:12px;z-index:9}
+.wcard details summary{cursor:pointer;color:var(--mut)}.wcard details input{margin-top:8px}.wcard p{margin:0;color:var(--mut)}
+[hidden]{display:none!important}
+/* ---- Ambient file-explorer view ---- */
+body.amb #queue{display:none!important}
+.ebar{display:flex;gap:8px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
+.crumbs{display:flex;gap:2px;align-items:center;flex-wrap:wrap;flex:1;min-width:0}
+.crumbs button{border:0;background:transparent;padding:4px 8px;min-height:32px;border-radius:8px;color:var(--acc);font-weight:700}
+.crumbs button:hover{background:var(--soft)}.crumbs .sep{color:var(--mut)}.crumbs b{padding:4px 8px}
+.erow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 14px;border-radius:12px;margin-bottom:6px;background:var(--card);border:1px solid var(--line)}
+.efolder{min-height:56px;cursor:pointer}.efolder:hover{border-color:var(--acc)}
+.eic{font-size:24px;flex:none;width:32px;text-align:center}
+.etxt{flex:1;min-width:0}.etxt b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.etxt small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chev{color:var(--mut);font-size:22px;flex:none}
+.eclip{cursor:pointer}.eclip.playing{background:var(--soft);border-color:var(--acc)}
+.eclip.live,.eclip.keep{border-color:var(--keep)}
+.eclip.del{opacity:.6}.eclip.del .etxt b{text-decoration:line-through;color:var(--mut)}.eclip.ret{opacity:.45}
+.epl{width:40px;height:40px;min-height:0;border-radius:50%;padding:0;flex:none;background:var(--acc);color:#fff;border:0}
+.eacts{display:flex;gap:6px;flex:none}.eacts button{min-height:34px;padding:2px 12px;font-weight:700}
+.eacts .mk{background:var(--acc);color:#fff;border-color:var(--acc)}.eacts .no{color:var(--del);border-color:var(--del)}
+.chip.no{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.ehelp{background:var(--soft);border-radius:12px;padding:10px 14px;margin:0 0 10px}
+.enx{display:flex;margin:0 0 12px}
+@media (max-width:700px){.eclip{flex-wrap:wrap}.eclip .etxt{flex:1 1 60%}.eacts{width:100%}.eacts button{flex:1}.ctitle h2{font-size:24px}}
+@media (max-width:900px){#queue{display:none}nav{width:150px}.cards{flex-wrap:wrap}.card{flex:1 1 140px}}
+#tabs,#fpane,#cpane,#spane{display:none}
+@media (max-width:700px){
+header{padding:10px 14px;gap:8px}header h1{font-size:17px;margin:0}
+.sw{margin-left:auto}.sw button{padding:4px 12px;font-size:13px}
+#mode,#gear,#gmenu,#prog{display:none!important}
+#q,#fstat{display:none}body[data-tab=folders] #q,body[data-tab=folders] #fstat{display:block;flex:1 1 100%;width:100%!important}
+#summary{padding:6px 14px;font-size:12px}
+main{flex-direction:column;overflow:hidden}
+#queue{display:none!important}
+#moods,#list,#fpane,#cpane,#spane{display:none}
+#moods{width:100%;flex:none;flex-direction:row;gap:8px;overflow-x:auto;padding:10px 14px}
+body[data-tab=folders] #moods,body[data-tab=review]:not(.amb) #moods{display:flex}
+nav .mood{flex:none;width:auto;white-space:nowrap;margin:0;border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-height:0;background:var(--card)}
+nav .mood small,nav .mood .bar{display:none}nav .mood.on{background:var(--acc);color:#fff;border-color:var(--acc);box-shadow:none}
+body[data-tab=review] #list,body[data-tab=folders] #fpane,body[data-tab=clean] #cpane,body[data-tab=settings] #spane{display:block;flex:1;min-height:0;overflow:auto;padding:8px 14px}
+.ctitle h2{font-size:26px}.panel{padding:12px;gap:12px}.pp{width:48px;height:48px}.wv{height:56px}
+.cards{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.card{flex:0 0 150px}
+.acts{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding:14px 0 8px;flex-wrap:nowrap;gap:8px}
+.acts button{min-height:50px;padding:0 10px;font-size:14px}.acts .go{flex:2.2}.acts .no,.acts button:nth-child(2){flex:1}
+.hint{display:none}
+footer{padding:6px 12px;gap:8px}#now{display:none}footer audio{min-width:0;height:40px}
+#tabs{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;flex:none}
+#tabs button{flex:none;display:flex;gap:6px;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;font-weight:700;font-size:13px;color:var(--mut)}
+#tabs button b{font-size:15px;font-weight:400}#tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.fb{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:13px 14px;border-radius:16px;margin-bottom:8px}.fb.on{border-color:var(--acc)}.fb small{display:block}
+.card2{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}.card2 h4{margin:0;font-size:15px}.card2 p{margin:0;color:var(--mut)}
+.card2 button,#cbtns button{width:100%;min-height:48px;font-weight:800}#cbtns{display:flex;flex-direction:column;gap:10px}
+#sp-play{display:flex;flex-direction:column;gap:12px}#sp-play label{display:flex}#ljson input{width:100%!important;min-width:0!important;margin-left:6px}
+#toast{bottom:150px;width:calc(100% - 28px);text-align:center}
+}
+
+/* ---- Covers tab ---- */
+#covpane{display:none}
+body.cov #covpane{display:flex!important;flex:1;min-width:0;min-height:0}
+body.cov #moods,body.cov #list,body.cov #queue,body.cov #fpane,body.cov #cpane,body.cov #spane,body.cov #tabs,body.cov footer,body.cov #prog,body.cov #q,body.cov #fstat,body.cov #hbtns{display:none!important}
+#cvlist{width:340px;flex:none;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px;border-right:1px solid var(--line)}
+#cvlist .ctl{display:flex;flex-direction:column;gap:8px}#cvlist .ctl input,#cvlist .ctl select{width:100%;min-width:0}
+#cvitems{display:flex;flex-direction:column;gap:6px}
+.cvi{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:12px;margin:0}
+.cvi.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.cvi b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cvi small{display:flex;gap:6px;align-items:center;overflow:hidden;white-space:nowrap}
+.note{color:var(--mut);font-size:12px;line-height:1.45}
+#cvmain{flex:1;min-width:0;overflow:auto;padding:14px 20px}
+.ccards{display:flex;gap:12px;margin:12px 0 14px;flex-wrap:wrap;align-items:stretch}
+.ccard{flex:1 1 170px;max-width:250px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.ccard.keep{border:2px solid var(--keep);padding:9px}.ccard.del .im{opacity:.35}.ccard.none{opacity:.6}
+.ccard .top{display:flex;justify-content:space-between;align-items:center;font-weight:800;gap:6px}
+.ccard .im{aspect-ratio:2/3;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--mut);font-size:12px;text-align:center;padding:6px}
+.ccard .im img{width:100%;height:100%;object-fit:contain;display:block}
+.ccard button{width:100%;min-height:42px;font-weight:800}
+.cvback{display:none}
+@media (max-width:700px){
+body.cov{padding-bottom:0!important}
+body.cov #covpane{flex-direction:column}
+#cvlist{width:100%;border-right:0;flex:1;min-height:0;padding:10px 14px}
+#cvmain{padding:12px 14px;min-height:0}
+#cvmain .acts{position:static;background:none;padding:4px 0 16px;flex-wrap:wrap}
+#cvmain .acts button{min-height:46px}#cvmain .acts .go{flex:1 1 120px}
+#covpane.pick #cvlist{display:none}
+#covpane:not(.pick) #cvmain{display:none}
+.cvback{display:inline-block;margin-bottom:8px}
+.ccards{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.ccard{flex:0 0 165px}
+.sw button{padding:4px 9px;font-size:12px}
+}
+/* ---- Books tab (Task 6b) ---- */
+#bkpane{display:none}
+body.bk #bkpane{display:flex!important;flex:1;min-width:0;min-height:0}
+body.bk #moods,body.bk #list,body.bk #queue,body.bk #fpane,body.bk #cpane,body.bk #spane,body.bk #tabs,body.bk footer,body.bk #prog,body.bk #q,body.bk #fstat,body.bk #hbtns{display:none!important}
+#bklist{width:360px;flex:none;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px;border-right:1px solid var(--line)}
+#bklist .ctl{display:flex;flex-direction:column;gap:8px}#bklist .ctl input,#bklist .ctl select{width:100%;min-width:0}
+#bkitems{display:flex;flex-direction:column;gap:6px}
+.bki{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:12px;margin:0}
+.bki.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.bki b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bki small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#bkmain{flex:1;min-width:0;overflow:auto;padding:14px 20px}
+.bkcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0;display:flex;flex-direction:column;gap:10px;max-width:760px}
+.bkcard h4{margin:0;font-size:15px}
+.bkcard .row{display:flex;gap:10px;flex-wrap:wrap}.bkcard .row button{min-height:44px;font-weight:800}
+.src{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:6px 12px;font-size:13px;margin:0}
+.src dt{color:var(--mut)}.src dd{margin:0;overflow-wrap:anywhere}.src a{color:var(--acc)}
+#bkmain textarea{width:100%;min-height:150px;font:13px/1.4 JetBrains Mono,monospace;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.vd{font-size:13px;padding:8px 10px;border-radius:10px;overflow-wrap:anywhere}
+.vd.bad{background:rgba(194,54,43,.12);color:var(--del);border:1px solid var(--del)}
+.vd.warn{background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--warn);border:1px solid var(--warn)}
+.vd.ok{background:var(--ok);color:var(--okfg);border:1px solid var(--keep)}
+.bkprev{white-space:pre-wrap;font:12px/1.5 JetBrains Mono,monospace;background:var(--bg);border-radius:10px;padding:10px;max-height:220px;overflow:auto;overflow-wrap:anywhere}
+.bkback{display:none}
+.bkcard>button{min-height:48px;font-weight:800}
+#bkmain .chip:not(.hi){background:var(--card);border:1px solid var(--line)}
+.chip.no{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}.chip.me{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc)}
+#bkfl{display:grid;grid-template-columns:1fr 1fr;gap:8px}#bkfl button{min-height:44px;font-weight:700}#bkfl button.on{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+#bklist .en{display:flex;align-items:center;gap:10px;min-height:44px;color:var(--mut);font-size:14px}#bklist .en input{width:20px;height:20px;min-width:0}
+#bknext{background:var(--card);border:1px solid var(--keep);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}#bknext button{min-height:44px;font-weight:800}
+.pdl{display:flex;gap:10px;align-items:flex-start;color:var(--fg);font-weight:700}
+@media (max-width:700px){
+body.bk{padding-bottom:0!important}
+body.bk #bkpane{flex-direction:column}
+#bklist{width:100%;border-right:0;flex:1;min-height:0;padding:10px 14px}
+#bkmain{padding:12px 14px;min-height:0}
+#bkpane.pick #bklist{display:none}
+#bkpane:not(.pick) #bkmain{display:none}
+.bkback{display:inline-block;margin-bottom:8px}
+.src{grid-template-columns:1fr}.src dt{margin-top:6px}
+.bkcard .row button{flex:1 1 140px}
+#bkmain textarea,#bklist input,#bklist select{font-size:16px}
+#bkmain .acts{position:static;background:none;padding:4px 0 16px;flex-wrap:wrap}
+#bkmain .acts button{min-height:46px}#bkmain .acts .go{flex:1 1 120px}
+#bkmain h2{font-size:26px!important}
+}
+/* ---- Layout: rail on large screens, bottom bar on phones ---- */
+#app{flex:1;min-height:0;display:flex}
+#col{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+#rail{width:224px;flex:none;padding:24px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);box-sizing:border-box;overflow:auto}
+.rl{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin:0 8px 24px}
+.rl i{width:34px;height:34px;border-radius:11px;background:var(--acc);display:grid;place-items:center;color:#fff;flex:none}
+#rail .nv{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;padding:0 14px;border:0;border-radius:14px;background:transparent;color:var(--mut);font-weight:700;text-align:left}
+#rail .nv.on{background:var(--card);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}#rail .nv.on svg{color:var(--acc)}
+@media (min-width:701px){header h1{display:none}}
+@media (min-width:701px) and (max-width:1000px){#rail{width:76px;padding:20px 10px;align-items:center}.rl span,#rail .nv span{display:none}.rl{margin:0 0 20px}#rail .nv{justify-content:center;padding:0}}
+@media (max-width:700px){#app{flex-direction:column}#rail{order:2;width:100%;height:calc(72px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);flex-direction:row;gap:0;border-right:0;border-top:1px solid var(--line);overflow:visible}.rl{display:none}#rail .nv{flex:1;flex-direction:column;justify-content:center;gap:4px;padding:0;min-height:44px;border-radius:0;font-size:11px;text-align:center;background:transparent!important;box-shadow:none!important}#rail .nv.on{color:var(--acc)}}
+/* ---- Reviews tab ---- */
+#rvpane{display:none}
+body.rv #rvpane{display:block!important;flex:1;min-width:0;min-height:0;overflow:auto;padding:16px 24px}
+body.rv #moods,body.rv #list,body.rv #queue,body.rv #fpane,body.rv #cpane,body.rv #spane,body.rv #tabs,body.rv footer,body.rv #prog,body.rv #q,body.rv #fstat,body.rv #hbtns{display:none!important}
+.rv-wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+#rvpane .card2{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0;display:flex;flex-direction:column;gap:10px}#rvpane .card2 h4{margin:0;font-size:15px}#rvpane .card2 p{margin:0;color:var(--mut)}
+.rv-view{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rv-bar,.rv-seg,.rv-meta,.rv-act{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rv-bar button.on,.rv-seg button.on{background:var(--soft);border-color:var(--acc)}
+.rv-bar .rv-sp{flex:1}
+.rv-card .rv-hd{display:flex;flex-direction:column;gap:2px}
+.rv-st{color:var(--warn);letter-spacing:2px;font-size:15px}
+.rv-txt{margin:0;padding:10px 12px;border-left:3px solid var(--line);background:var(--bg);border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.rv-txt.gone{color:var(--mut);font-style:italic}
+.rv-act button{flex:1 1 130px;min-height:44px;font-weight:800}
+.rv-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.rv-row:first-of-type{border-top:0}
+.rv-row>div{flex:1;min-width:0}.rv-row b{display:block}.rv-row button{flex:none;width:auto!important;min-height:40px!important;padding:0 14px}
+.rv-err{border-color:var(--del)!important}.rv-err b{color:var(--del)}
+.rv-in{display:flex;gap:8px;flex-wrap:wrap}.rv-in input{flex:1 1 220px}.rv-in button{width:auto!important;flex:none;padding:0 16px}
+@media (max-width:700px){body.rv{padding-bottom:0!important}body.rv #rvpane{padding:12px 14px}}
+/* ---- Errors tab (the app's anonymous error reports) ---- */
+#erpane{display:none}
+body.er #erpane{display:block!important;flex:1;min-width:0;min-height:0;overflow:auto;padding:16px 24px}
+body.er #moods,body.er #list,body.er #queue,body.er #fpane,body.er #cpane,body.er #spane,body.er #tabs,body.er footer,body.er #prog,body.er #q,body.er #fstat,body.er #hbtns{display:none!important}
+.er-wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+#erpane .card2{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0;display:flex;flex-direction:column;gap:10px}#erpane .card2 h4{margin:0;font-size:15px}#erpane .card2 p{margin:0;color:var(--mut)}
+.er-back{align-self:flex-start;width:auto}
+.er-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.er-top h3{margin:0;font-size:20px;font-weight:800;flex:1}
+.er-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.er-tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:0}
+.er-tile b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.er-tile b.sm2{font-size:16px;line-height:1.5}
+.er-tile small{display:block}
+.er-chart svg{display:block;width:100%;height:auto;overflow:visible}.er-chart text{font:11px JetBrains Mono,monospace;fill:var(--mut)}
+.er-chart .bar{fill:var(--acc);opacity:.92}.er-chart .col:hover .bar,.er-chart .col.hot .bar{opacity:1;filter:brightness(1.12)}.er-chart .col rect.hit{fill:transparent}
+.er-chart .ax{stroke:var(--line);stroke-width:1}.er-chart .gl{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}
+.er-chart summary{cursor:pointer;color:var(--mut);font-size:13px}.er-chart table{margin-top:6px}
+#ertip{position:fixed;z-index:50;pointer-events:none;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;box-shadow:0 4px 14px rgba(20,22,31,.18)}
+.er-filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.er-filters button.on{background:var(--soft);border-color:var(--acc)}.er-filters input{min-width:0;flex:1 1 160px}.er-filters .sp{flex:1}
+.er-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;min-height:0}
+.er-row b{display:block;font-weight:700}.er-msg{font:12px/1.35 JetBrains Mono,monospace;color:var(--mut);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.er-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.er-num b{font-size:18px}
+.er-sev{font:700 11px JetBrains Mono,monospace;padding:3px 8px;border-radius:6px;white-space:nowrap;background:var(--bg);color:var(--mut)}
+.er-sev.error{background:var(--del);color:#fff}.er-sev.warn{background:var(--soft);color:var(--warn)}
+.er-st{font:700 11px JetBrains Mono,monospace;padding:3px 8px;border-radius:6px;background:var(--bg);color:var(--mut)}.er-st.fixed{background:var(--ok);color:var(--okfg)}
+.er-spark{display:block;margin:2px 0 0 auto}.er-spark polyline{fill:none;stroke:var(--acc);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.er-spark line{stroke:var(--line);stroke-width:2}
+.er-code{margin:0;padding:10px 12px;border-left:3px solid var(--line);background:var(--bg);border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.45 JetBrains Mono,monospace}
+.er-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.er-meter{display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:4px 8px;align-items:center;font-size:13px}.er-meter i{grid-column:1/3;display:block;height:6px;border-radius:3px;background:var(--bg);overflow:hidden}.er-meter i u{display:block;height:100%;background:var(--acc);border-radius:3px}
+.er-trail{list-style:none;margin:0;padding:0;display:grid;gap:2px;font:12px/1.4 JetBrains Mono,monospace;overflow-wrap:anywhere}
+@media (max-width:700px){body.er{padding-bottom:0!important}body.er #erpane{padding:12px 14px}.er-row{grid-template-columns:auto minmax(0,1fr)}.er-row .er-num{grid-column:2;text-align:left;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.er-spark{margin:0}}
+
+/* ---- Home tab ---- */
+#homepane{display:none}
+body.home #homepane{display:block!important;flex:1;min-width:0;min-height:0;overflow:auto}
+body.home header,body.home #summary,body.home #moods,body.home #list,body.home #queue,body.home #fpane,body.home #cpane,body.home #spane,body.home #covpane,body.home #bkpane,body.home #tabs,body.home footer,body.home #prog{display:none!important}
+.h-wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px;box-sizing:border-box}
+.h-d{padding:28px 32px 40px}.h-m{padding:0 16px 16px;gap:12px}
+@media (max-width:700px){.h-d{display:none}}@media (min-width:701px){.h-m{display:none}}
+.h-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.h-top h2{margin:10px 0 0;font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.h-tr{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.h-tr button.primary{min-height:46px;padding:0 20px;font-weight:800;border-radius:14px}
+.h-ib{width:44px;height:44px;min-height:0;padding:0;border-radius:14px;display:grid;place-items:center;font-size:18px}
+.h-lab{font:600 11px/1 JetBrains Mono,monospace;letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
+.h-cols,.h-tiles{display:flex;gap:16px;flex-wrap:wrap}
+.h-card{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0;text-align:left;color:var(--fg);box-sizing:border-box}
+.h-m .h-card{padding:16px;border-radius:22px;gap:12px}
+button.h-card{cursor:pointer;font:inherit}button.h-card:hover{border-color:var(--acc)}
+.h-hero{flex:5 1 320px;background:radial-gradient(120% 70% at 50% 0%,var(--soft),var(--card) 65%)}.h-m .h-hero{background:radial-gradient(120% 90% at 20% 0%,var(--soft),var(--card) 65%)}
+.h-rt{flex:7 1 440px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.h-tiles .h-card{flex:1 1 170px;gap:10px}
+.h-ic{width:40px;height:40px;border-radius:13px;display:grid;place-items:center}
+.h-big{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}.h-big small{font-size:18px;font-weight:700}
+.h-card h3{margin:0;font-size:19px;font-weight:800}.h-m .h-card h3{font-size:17px}
+.h-hh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.h-trk{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex;gap:2px}.h-trk i{display:block;height:100%}
+.h-lg{display:flex;gap:14px;flex-wrap:wrap;color:var(--mut);font-size:12px}.h-lg.c{justify-content:center}.h-lg.v{flex-direction:column;gap:6px;font-size:13px}.h-lg u{text-decoration:none;display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+.h-ring{display:grid;place-items:center;position:relative;padding:4px 0;flex:none}.h-ring>div{position:absolute;text-align:center}
+.h-hrow{display:flex;align-items:center;gap:16px}.h-hrow>div:last-child{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.h-mr{display:grid;grid-template-columns:72px 1fr 44px;gap:12px;align-items:center}.h-m .h-mr{grid-template-columns:60px 1fr 36px;gap:10px;min-height:30px}
+.h-mr b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.h-mr span{font:600 12px JetBrains Mono,monospace;color:var(--mut);text-align:right}
+.h-bar{display:flex;gap:3px;height:16px}.h-m .h-bar{height:14px}.h-bar i{display:block;height:100%;border-radius:8px}
+.h-k{background:var(--keep)}.h-d2{background:var(--del)}.h-p{background:var(--line)}
+.h-li,.h-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}.h-li:first-of-type,.h-row.f{border-top:0}
+.h-row{min-height:56px;padding:0;border-left:0;border-right:0;border-bottom:0;border-radius:0;background:transparent;color:var(--fg);text-align:left;font:inherit;width:100%}
+.h-li div,.h-row div{flex:1;min-width:0}.h-li b,.h-row b{display:block}
+.h-note{color:var(--mut);font-size:12px}
+.h-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.h-mbar{display:flex;align-items:center;gap:10px;min-height:64px;padding:12px 0}.h-mbar h1{flex:1;margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.h-lm{width:34px;height:34px;border-radius:11px;background:var(--acc);display:grid;place-items:center;color:#fff}
+.h-chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.h-d .chip,.h-m .chip{font-size:12px;padding:4px 9px;border-radius:8px}
+@media (prefers-color-scheme:dark){button.primary,.acts .go,.eacts .mk,.pp,.epl,.sw button.on,#tabs button.on,nav .mood.on,button.danger,.rl i,.h-lm{color:#0D0E14}}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="rail" class="needconn" role="navigation" aria-label="Sections"><div class="rl"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h3l3-8 4 16 3-8h5"/></svg></i><span>Wordtrail</span></div><button class="nv" data-m="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg><span>Home</span></button><button class="nv" data-m="music"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>Music</span></button><button class="nv" data-m="amb"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12c3-8 6-8 9 0s6 8 9 0"/></svg><span>Ambient</span></button><button class="nv" data-m="cov"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg><span>Covers</span></button><button class="nv" data-m="bk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg><span>Books</span></button><button class="nv" data-m="rv"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.5 6 .9-4.4 4.3 1 6-5.3-2.8L6.7 19.7l1-6L3.3 9.4l6-.9z"/></svg><span>Reviews</span></button><button class="nv" data-m="er"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg><span>Errors</span></button></div>
+<div id="col">
+<header>
+  <h1>Wordtrail <b>Admin</b></h1>
+    <span id="mode" class="chip needconn"></span>
+  <input id="q" class="needconn" type="search" placeholder="Search clips (all sections)…" style="min-width:170px;width:240px">
+  <select id="fstat" class="needconn"><option value="">All clips</option><option value="none">Unreviewed</option><option value="keep">Kept</option><option value="del">Marked to delete</option></select>
+  <span style="flex:1"></span>
+  <span id="hbtns" style="display:contents"><button id="sync" class="needconn" disabled>Sync list…</button>
+  <button id="retire" class="needconn" disabled>1 · Retire marked…</button>
+  <button class="danger needconn" id="purge" disabled>2 · Delete retired…</button>
+  <button class="danger needconn" id="delnow" disabled>Delete now…</button></span>
+  <button id="gear" class="needconn" title="Connection">⚙</button>
+  <div id="gmenu" class="needconn" hidden><small id="gwho"></small><button id="chg">Change token / Worker</button><button id="forget" class="danger">Disconnect &amp; forget</button></div>
+</header>
+<div id="summary" class="needconn"></div>
+<div id="prog" class="needconn"></div>
+<div id="tabs" class="needconn"><button data-t="review"><b>🎧</b>Review</button><button data-t="folders"><b>📁</b>Folders</button><button data-t="clean"><b>🧹</b>Clean-up</button><button data-t="settings"><b>⚙</b>Settings</button></div>
+<div id="welcome"><div class="wcard">
+  <h2>Connect</h2>
+  <p>One password opens Home, Music, Ambient, Covers, Books and Reviews.</p>
+  <div id="werr" class="werr" hidden></div>
+  <input id="tok" type="password" placeholder="Admin token" autocomplete="current-password">
+  <label><input type="checkbox" id="rem" checked> Remember on this device</label>
+  <button class="primary" id="go">Connect</button>
+  <details><summary>Worker URL</summary><input id="base" placeholder="Worker URL"></details>
+  <ol><li>Connect once. Next time the page connects by itself. Use the menu on the left (bottom on a phone) to switch between Home, Music, Ambient, Covers, Books and Reviews.</li>
+  <li>Pick a section on the left, play clips, press <b>Keep</b> or <b>Delete</b>. In Ambient, <b>Make best</b> picks the live clip for a folder.</li>
+  <li>When done: <b>1 · Retire</b>, wait about 3 days, then <b>2 · Delete retired</b>.</li></ol>
+</div></div>
+<main class="needconn">
+  <div id="homepane"></div>
+  <nav id="moods"></nav>
+  <section id="list"></section>
+  <aside id="queue"></aside>
+  <div id="fpane"></div>
+  <div id="covpane">
+    <div id="cvlist">
+      <div class="ctl"><input id="cvq" type="search" placeholder="Search title, author, or book number…">
+        <select id="cvf"><option value="">All books</option><option value="none">No cover</option><option value="one">Only one candidate</option><option value="changed">I changed this</option></select></div>
+      <div id="cvstat" class="note"></div>
+      <button id="cvcopy" hidden>2 · Copy removed-file list…</button>
+      <div id="cvitems"></div>
+      <details id="cvset"><summary class="note">Covers address</summary><input id="cvbase" style="width:100%;margin-top:8px"><div class="note" style="margin-top:8px">Catalog address (for titles)</div><input id="cvcat" style="width:100%;margin-top:4px"><button id="cvsave" style="width:100%;margin-top:8px">Save &amp; reload</button></details>
+    </div>
+    <div id="cvmain"></div>
+  </div>
+  <div id="bkpane">
+    <div id="bklist">
+      <div id="bknext" hidden></div>
+      <div class="ctl"><input id="bkq" type="search" placeholder="Search title, author, or book number…"></div>
+      <div id="bkfl"><button data-f="none" aria-pressed="false">Needs text</button><button data-f="mine" aria-pressed="false">Uploaded by me</button><button data-f="review" aria-pressed="false">To check</button><button data-f="removed" aria-pressed="false">Removed</button></div>
+      <label class="en"><input type="checkbox" id="bken"> English books only</label>
+      <div id="bkstat" class="note"></div>
+      <button id="bkdel" hidden>Delete for good…</button>
+      <div id="bkitems"></div>
+      <details id="bkset"><summary class="note">Books settings · page version books-2</summary><div class="note" style="margin-top:8px">Status list address (Hugging Face, Book_Text/status)</div><input id="bkbase" style="width:100%;margin-top:4px"><div class="note" style="margin-top:8px">Catalog address (same one the Covers tab uses)</div><input id="bkcat" style="width:100%;margin-top:4px"><button id="bksave" style="width:100%;margin-top:8px">Save &amp; reload</button></details>
+    </div>
+    <div id="bkmain"></div>
+  </div>
+  <div id="rvpane"></div>
+  <div id="erpane"></div>
+  <div id="cpane"><div class="card2"><h4>Clean-up in 2 steps</h4><p>Nothing is removed until you press. Retired files are only deleted when you press step 2.</p><div id="cbtns"></div></div></div>
+  <div id="spane"><div class="card2"><h4>Connection</h4><p id="swho"></p><button id="chg2">Change token / Worker</button><button id="forget2" class="danger">Disconnect &amp; forget</button></div>
+    <div class="card2"><h4>Playback</h4><div id="sp-play"></div></div></div>
+</main>
+<footer class="needconn">
+  <span id="now">Nothing playing</span>
+  <audio id="a" controls></audio>
+  <span id="fopts" style="display:contents">
+  <label id="lmid"><input type="checkbox" id="mid" checked> start at 30%</label>
+  <label id="lauto"><input type="checkbox" id="auto"> auto-next</label>
+  <label id="ljson">JSON files <input id="jsons" value="music.json" style="min-width:120px;width:270px"></label></span>
+</footer>
+</div></div>
+<div id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const TARGET=100, FREE_GB=10;
+const $=id=>document.getElementById(id), enc=encodeURIComponent;
+function ls0(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+const st={base:"",tok:"",objs:[],moods:{},marks:{},mood:null,idx:-1,rows:[],url:null,jsonKeys:[],retired:{},amb:false,meta:{},folderOf:{},fol:{},index:null,baked:false,busy:false,root:"",which:(["home","music","amb","cov","bk","rv","er"].includes(ls0("r2-which"))?ls0("r2-which"):"home")};
+function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+function saveMarks(){ ls("r2-marks:"+st.base, JSON.stringify(st.marks)); }
+const mb=n=>(n/1048576).toFixed(1)+" MB";
+const stripMusic=k=>k.replace(/^music\//,"");
+const moodOf=k=>{ k=stripMusic(k); return k.includes("/")?k.split("/")[0]:"(root)"; };
+const nameOf=k=>k.split("/").pop();
+const fo=k=>st.folderOf[k]||k.split("/").slice(0,-1).join("/");          // ambient: section/item/variation
+const isLive=k=>!!(st.amb&&st.index&&st.index[fo(k)]&&st.index[fo(k)].r2_key===k);
+const isRev=f=>!!(st.index&&st.index[f]&&st.index[f].reviewed);
+
+async function api(path,opt={}){
+  return fetch(st.base+path,{...opt,headers:{Authorization:"Bearer "+st.tok,...(opt.headers||{})}});
+}
+
+async function connect(){
+  const b=$("go"); b.disabled=true; b.textContent="Connecting…";
+  try{ await connect0(); } finally{ b.disabled=false; b.textContent="Connect"; }
+}
+function showErr(m){ const e=$("werr"); e.textContent=m; e.hidden=false; document.body.classList.remove("conn"); $("summary").textContent=""; }
+function toast(m){ const t=$("toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>{t.hidden=true;},6000); }
+function updateSw(){ document.querySelectorAll("#rail .nv").forEach(b=>b.classList.toggle("on",b.dataset.m===st.which)); }
+function forgetTok(){ try{localStorage.removeItem("r2-tok");sessionStorage.removeItem("r2-tok");}catch(e){} }
+async function connect0(){
+  $("werr").hidden=true;
+  st.root=$("base").value.trim().replace(/\/+$/,""); st.tok=$("tok").value.trim();
+  if(!/^https?:\/\//.test(st.root)||!st.tok){ showErr("Enter your admin token."); return; }
+  st.base=st.root+(st.which==="amb"?"/ambient":"");
+  ls("r2-base",st.root); forgetTok();
+  try{ if($("rem").checked) localStorage.setItem("r2-tok",st.tok); else sessionStorage.setItem("r2-tok",st.tok); }catch(e){}
+  document.body.classList.toggle("cov",st.which==="cov"); document.body.classList.toggle("bk",st.which==="bk"); document.body.classList.toggle("rv",st.which==="rv"); document.body.classList.toggle("er",st.which==="er"); document.body.classList.toggle("home",st.which==="home");
+  if(st.which==="home") return connectHome();
+  if(st.which==="cov") return connectCov();
+  if(st.which==="bk") return connectBk();
+  if(st.which==="rv") return connectRv();
+  if(st.which==="er") return connectEr();
+  $("summary").textContent="Loading list…";
+  const all=[]; let cursor=null;
+  try{
+    do{
+      const r=await api("/api/list"+(cursor?"?cursor="+enc(cursor):""));
+      if(r.status===401){ showErr("That token didn't work (401). Check it and try again."); return; }
+      if(!r.ok){ let t=""; try{ t=(await r.json()).error||""; }catch(e){} throw new Error(t||("HTTP "+r.status)); }
+      const d=await r.json(); all.push(...d.objects); cursor=d.cursor;
+    }while(cursor);
+  }catch(e){ showErr(/AMBIENT binding/.test(e.message)?"Ambient is not set up on the Worker (AMBIENT binding missing). Add it in Cloudflare, Worker, Settings, Bindings.":"Can't reach the Worker ("+e.message+"). Check the Worker URL below."); return; }
+  st.objs=all; st.jsonKeys=all.filter(o=>/\.json$/i.test(o.key)).map(o=>o.key);
+  st.retired={}; try{ const rr=await api("/api/file?key=retired.json"); if(rr.ok) st.retired=JSON.parse(await rr.text()); }catch(e){}
+  try{ st.marks=JSON.parse(ls("r2-marks:"+st.base)||"{}"); }catch(e){ st.marks={}; }
+  await loadAmbient(all);
+  if(st.which==="amb"&&!st.amb){ st.which="music"; ls("r2-which","music"); toast("Ambient has no clips yet (ambient-candidates.json not found). Showing Music."); return connect0(); }
+  if(!st.amb&&/ambient/.test($("jsons").value)) $("jsons").value="music.json";
+  updateSw(); $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent; document.body.classList.toggle("amb",st.amb);
+  $("mode").textContent=st.amb?"AMBIENT BUCKET":"MUSIC BUCKET"; document.body.classList.add("conn");
+  regroup(); st.mood=Object.keys(st.moods).sort()[0]||null; st.idx=-1; st.path=[];
+  $("sync").disabled=false; renderNav(); renderList();
+}
+
+/* Ambient mode switches on only when ambient-candidates.json is in the bucket; the music bucket behaves as before. */
+async function loadAmbient(all){
+  st.amb=all.some(o=>o.key==="ambient-candidates.json"); st.meta={}; st.folderOf={}; st.index=null; st.baked=false;
+  const old=$("fstat").querySelector("[value=unrev]"); if(old) old.remove();
+  if(!st.amb) return;
+  const opt=document.createElement("option"); opt.value="unrev"; opt.textContent="Folders not reviewed"; $("fstat").appendChild(opt);
+  try{
+    const rc=await api("/api/file?key=ambient-candidates.json"); if(!rc.ok) throw new Error("HTTP "+rc.status);
+    const cand=JSON.parse(await rc.text());
+    for(const f in cand) for(const e of cand[f]){ st.folderOf[e.r2_key]=f; st.meta[e.r2_key]=e; }
+  }catch(e){ alert("Could not read ambient-candidates.json ("+e.message+"). Scores will be missing."); }
+  try{
+    const ri=await api("/api/file?key=ambient-index.json");
+    if(ri.ok) st.index=JSON.parse(await ri.text());
+    else alert("ambient-index.json not found (HTTP "+ri.status+"). Make best is off until it exists.");
+  }catch(e){ alert("ambient-index.json is not valid JSON. Make best is off."); }
+  if(/^music\.json$/i.test($("jsons").value.trim())) $("jsons").value="ambient-candidates.json,ambient-index.json";
+}
+
+function regroup(){
+  st.moods={}; st.fol={}; st.ambAll=null;
+  for(const o of st.objs){ if(!/\.mp3$/i.test(o.key)) continue; (st.moods[moodOf(o.key)] ||= []).push(o); if(st.amb) (st.fol[fo(o.key)] ||= []).push(o); }
+  const cmp=(a,b)=>(st.amb?fo(a.key).localeCompare(fo(b.key)):0)||a.key.localeCompare(b.key,undefined,{numeric:true});
+  for(const m in st.moods) st.moods[m].sort(cmp);
+}
+
+function counts(m){ let k=0,d=0,r=0; for(const o of st.moods[m]){ if(st.retired[o.key]){r++;continue;} const v=st.marks[o.key]; if(v==="keep")k++; else if(v==="del")d++; } return {n:st.moods[m].length,k,d,r}; }
+
+function folderStats(m){ const seen=new Set(); let r=0; for(const o of st.moods[m]){ const f=fo(o.key); if(seen.has(f)) continue; seen.add(f); if(isRev(f)) r++; } return {n:seen.size,r}; }
+
+function renderNav(){
+  const nav=$("moods"); nav.textContent=""; let del=0,total=0,bytes=0,fn=0,fr=0,kk=0,rr=0;
+  for(const m of Object.keys(st.moods).sort()){
+    const c=counts(m); del+=c.d; kk+=c.k; rr+=c.r; total+=c.n; for(const o of st.moods[m]) bytes+=o.size;
+    const b=document.createElement("button"); b.className="mood"+(m===st.mood?" on":"");
+    const t=document.createElement("div"); t.textContent=m; b.appendChild(t);
+    const s=document.createElement("small"); const bar=document.createElement("div"); bar.className="bar"; const i=document.createElement("i");
+    if(st.amb){ const q=folderStats(m); fn+=q.n; fr+=q.r;
+      s.textContent=q.r+"/"+q.n+" folders reviewed · "+(c.n-c.r)+" clips"+(c.d?" · "+c.d+" marked":"")+(c.r?" · "+c.r+" retired":"");
+      i.style.width=(q.n?q.r/q.n*100:0)+"%"; }
+    else{ s.textContent=(c.n-c.r)+" live · "+c.k+" kept · "+c.d+" marked"+(c.r?" · "+c.r+" retired":"");
+      i.style.width=Math.min(100,(c.n-c.d-c.r)/TARGET*100)+"%"; }
+    b.appendChild(s); bar.appendChild(i); b.appendChild(bar);
+    b.onclick=()=>{ st.mood=m; if(st.amb) st.path=[m]; else st.idx=-1; renderNav(); renderList(); };
+    nav.appendChild(b);
+  }
+  $("retire").disabled=del===0; $("retire").textContent="1 · Retire marked… ("+del+")";
+  const nret=Object.keys(st.retired).length; $("purge").disabled=nret===0; $("purge").textContent="2 · Delete retired… ("+nret+")";
+  $("delnow").disabled=del===0||st.busy; $("delnow").textContent="Delete now… ("+del+")";
+  $("summary").textContent=!total?"No .mp3 objects found":st.amb?total+" clips · "+(bytes/1073741824).toFixed(2)+" GB (ambient bucket; the "+FREE_GB+" GB free tier is shared with music) · "+fr+"/"+fn+" folders reviewed":total+" clips · "+(bytes/1073741824).toFixed(2)+" GB of "+FREE_GB+" GB free tier · "+kk+" kept · "+del+" marked";
+  renderProg(st.amb?fr:kk+del+rr,st.amb?fn:total);
+}
+
+function renderProg(done,total){
+  const p=$("prog"); p.textContent=""; const n=total?Math.round(done/total*40):0;
+  for(let i=0;i<40;i++){ const d=document.createElement("i"); if(i<n) d.className="d"; p.appendChild(d); }
+}
+const el=(t,c,x)=>{ const e=document.createElement(t); if(c) e.className=c; if(x!=null) e.textContent=x; return e; };
+const fmt=t=>isFinite(t)?Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0"):"–";
+const pretty=t=>{ t=String(t||"").replace(/-/g," "); return t.charAt(0).toUpperCase()+t.slice(1); };
+const hashOf=s=>{ let h=7; for(const c of s) h=(Math.imul(h,31)+c.charCodeAt(0))>>>0; return h; };
+function envPoly(seed){   // decorative envelope only (not the real waveform)
+  let x=seed||1,v=30; const h=[]; for(let i=0;i<24;i++){ x=(Math.imul(x,1103515245)+12345)&0x7fffffff; v=Math.max(10,Math.min(49,v+(x/0x7fffffff-.5)*36)); h.push(v); }
+  const xs=h.map((_,i)=>(i*100/23).toFixed(1));
+  return "polygon("+xs.map((a,i)=>a+"% "+(50-h[i]).toFixed(0)+"%").concat(xs.map((a,i)=>xs[23-i]+"% "+(50+h[23-i]).toFixed(0)+"%")).join(",")+")";
+}
+function wave(seed,withFill){ const w=el("div","wv"); w.style.clipPath=envPoly(seed); if(withFill){ const i=document.createElement("i"); i.id="wf"; w.appendChild(i); } return w; }
+function setPP(){ const b=$("pp"); if(b){ const a=$("a"); b.textContent=a.paused?"▶":"❚❚"; b.setAttribute("aria-label",a.paused?"Play":"Pause"); } }
+
+/* Ambient: one folder at a time, with its candidates as cards. */
+function renderFocus(sec){
+  if(!st.rows.length){ sec.appendChild(el("p","hint","No clips match the search or filter.")); return; }
+  if(st.idx<0||st.idx>=st.rows.length) st.idx=0;
+  const cur=st.rows[st.idx], fk=fo(cur.key), idxs=[]; st.rows.forEach((o,i)=>{ if(fo(o.key)===fk) idxs.push(i); });
+  const parts=fk.split("/"), keys=Object.keys(st.fol).sort(), m0=st.meta[cur.key]||{};
+  sec.appendChild(el("div","crumb",parts.slice(0,2).join(" / ")+" · folder "+(keys.indexOf(fk)+1)+" of "+keys.length));
+  const t=el("div","ctitle"); t.appendChild(el("h2",null,pretty(parts[2]||parts[1]))); t.appendChild(el("span","chip"+(isRev(fk)?" hi":""),isRev(fk)?"reviewed":"auto pick")); sec.appendChild(t);
+  const pn=el("div","panel"); const pp=el("button","pp","▶"); pp.id="pp"; pp.onclick=()=>{ const a=$("a"); if(!a.src) play(st.idx); else a.paused?a.play().catch(()=>{}):a.pause(); };
+  pn.append(pp,wave(hashOf(fk),true),el("span",null,"")); pn.lastChild.id="tm"; pn.lastChild.textContent="0:00 / –"; sec.appendChild(pn);
+  const cs=el("div","cards");
+  idxs.forEach(i=>{ const o=st.rows[i], m=st.meta[o.key]||{}, v=st.retired[o.key]?"ret":(st.marks[o.key]||"");
+    const c=el("button","card "+v+(i===st.idx?" playing":"")); c.id="r"+i; c.onclick=()=>play(i); c.title=[m.title,m.author].filter(Boolean).join(" — ");
+    const top=el("div","top"); top.appendChild(el("span",null,"#"+(nameOf(o.key).match(/-(\d+)\.mp3$/)||[,""])[1].replace(/^0/,""))); top.appendChild(el("span","chip"+(isLive(o.key)?" hi":""),isLive(o.key)?"LIVE":(m.dur?Math.round(m.dur)+" s":"–")));
+    const mt=el("div","meta"); mt.appendChild(el("span","chip"+(m.license==="CC0"?" hi":""),m.license||"–")); mt.appendChild(el("span",null,m.author||""));
+    c.append(top,wave(hashOf(o.key)),el("div","score",m.score!=null?Number(m.score).toFixed(1):"–"),mt); cs.appendChild(c); });
+  sec.appendChild(cs);
+  const ac=el("div","acts"); const d=el("button","no","Delete  D"); d.onclick=()=>mark(st.idx,"del"); const k=el("button",null,"Keep  K"); k.onclick=()=>mark(st.idx,"keep");
+  const g=el("button","go","Make best and go to next folder  B"); g.onclick=()=>bestAndNext(st.idx); ac.append(d,k,g); sec.appendChild(ac);
+  sec.appendChild(el("p","hint","Keys: Space play · ← → clip · ↑ ↓ folder · K keep · D delete · B best"+(m0.license==="CC-BY"?". Credit shown in app: "+pretty(parts[2])+" by "+(m0.author||"?")+", CC-BY":"")));
+  setPP();
+}
+
+/* ---- Ambient as a file explorer: Ambient › section › item › folder (clips). st.rows = every clip, in folder order, so play/next/keys work across folders. ---- */
+const nice=s=>pretty(String(s||"").replace(/^\d+[_-]/,"").replace(/_/g," "));
+function ambAll(){ return st.ambAll||(st.ambAll=Object.values(st.moods).flat().sort((a,b)=>fo(a.key).localeCompare(fo(b.key))||a.key.localeCompare(b.key,undefined,{numeric:true}))); }
+function goPath(p){ st.path=p; if(p[0]) st.mood=p[0]; renderNav(); renderList(); $("list").scrollTop=0; }
+function nextFolderKey(dir,from){ const keys=Object.keys(st.fol).sort((a,b)=>a.localeCompare(b)), i=keys.indexOf(from); return i<0?null:(keys[i+dir]||null); }
+function goFolder(key,autoplay){ goPath(key.split("/")); if(autoplay){ const j=st.rows.findIndex(o=>fo(o.key)===key); if(j>=0) play(j); } }
+function clipRow(i,showFolder){
+  const o=st.rows[i], m=st.meta[o.key]||{}, v=st.retired[o.key]?"ret":(st.marks[o.key]||""), live=isLive(o.key), fk=fo(o.key);
+  const r=el("div","erow eclip "+v+(live?" live":"")+(i===st.idx?" playing":"")); r.id="r"+i; r.onclick=()=>play(i);
+  const pl=el("button","epl","▶"); pl.title="Play"; pl.onclick=e=>{ e.stopPropagation(); play(i); };
+  const n=(nameOf(o.key).match(/-(\d+)\.mp3$/)||[,""])[1].replace(/^0+/,"");
+  const t=el("div","etxt"); t.appendChild(el("b",null,(showFolder?nice(fk.split("/").pop())+" · ":"")+(n?"Clip "+n:nameOf(o.key))));
+  t.appendChild(el("small",null,[m.dur?Math.round(m.dur)+" s":"",m.score!=null?"score "+Number(m.score).toFixed(1):"",m.author||"",mb(o.size),showFolder?fk:""].filter(Boolean).join(" · ")));
+  r.append(pl,t);
+  if(m.license) r.appendChild(el("span","chip"+(m.license==="CC0"?" hi":""),m.license));
+  if(live) r.appendChild(el("span","chip hi","★ LIVE")); else if(v==="keep") r.appendChild(el("span","chip hi","✓ kept")); else if(v==="del") r.appendChild(el("span","chip no","will delete")); else if(v==="ret") r.appendChild(el("span","chip","retired"));
+  if(v!=="ret"){
+    const ac=el("div","eacts");
+    if(!live){ const mk=el("button","mk","★ Make live"); mk.title="Use this clip in the app for this folder; the other clips get marked for deletion";
+      mk.onclick=async e=>{ e.stopPropagation(); const nx=($("ambnext")&&$("ambnext").checked)?nextFolderKey(1,fk):null;
+        if(!(await makeBest(i))) return; const sc=$("list").scrollTop; renderNav(); renderList(); $("list").scrollTop=sc; if(nx) goFolder(nx,true); else toast("Live clip set for "+nice(fk.split("/").pop())); };
+      ac.appendChild(mk); }
+    const kb=el("button",null,v==="keep"?"Kept ✓":"Keep"); kb.onclick=e=>{ e.stopPropagation(); mark(i,"keep"); };
+    const db=el("button","no",v==="del"?"Undo delete":"Delete"); db.onclick=e=>{ e.stopPropagation(); mark(i,"del"); };
+    ac.append(kb,db); r.appendChild(ac);
+  }
+  return r;
+}
+function renderExplorer(sec,words){
+  const q=words.length>0, f=$("fstat").value, flat=q||!!f; st.flat=flat; if(!st.path) st.path=[];
+  const all=ambAll(), P=st.path.join("/"), pre=P?P+"/":"";
+  st.rows=flat?all.filter(o=>{
+    if(q){ const k=(stripMusic(o.key)+" "+fo(o.key)).toLowerCase(); if(!words.every(w=>k.includes(w))) return false; }
+    if(f==="unrev") return !isRev(fo(o.key));
+    if(f) return (st.marks[o.key]||"none")===f;
+    return true; }):all;
+  const bar=el("div","ebar"), cr=el("div","crumbs");
+  if(flat){
+    cr.appendChild(el("b",null,(q?"Search results":"Filtered")+" · "+st.rows.length+" clip"+(st.rows.length===1?"":"s")));
+    const cl=el("button","sm","✕ Clear"); cl.onclick=()=>{ $("q").value=""; $("fstat").value=""; renderList(); }; bar.append(cr,cl);
+  }else{
+    const up=el("button","sm","↑ Up"); up.disabled=!st.path.length; up.onclick=()=>goPath(st.path.slice(0,-1));
+    const root=el("button",null,"🏠 Ambient"); root.onclick=()=>goPath([]); cr.appendChild(root);
+    st.path.forEach((s,i)=>{ cr.appendChild(el("span","sep","›")); if(i===st.path.length-1) cr.appendChild(el("b",null,nice(s))); else{ const b=el("button",null,nice(s)); b.onclick=()=>goPath(st.path.slice(0,i+1)); cr.appendChild(b); } });
+    bar.append(up,cr);
+  }
+  sec.appendChild(bar);
+  if(flat){
+    if(!st.rows.length){ sec.appendChild(el("p","note","No clips match.")); return; }
+    const cap=300; for(let i=0;i<Math.min(cap,st.rows.length);i++) sec.appendChild(clipRow(i,true));
+    if(st.rows.length>cap) sec.appendChild(el("p","note","Showing the first "+cap+" of "+st.rows.length+". Type more of the name to narrow it down."));
+    return;
+  }
+  const kids=new Map(); let tl=0,tr=0;
+  for(const fk in st.fol){
+    if(fk===P||(P&&!fk.startsWith(pre))) continue;
+    const seg=fk.slice(pre.length).split("/")[0]; let c=kids.get(seg); if(!c){ c={name:seg,path:pre+seg,clips:0,leafs:0,rev:0}; kids.set(seg,c); }
+    c.clips+=st.fol[fk].filter(o=>!st.retired[o.key]).length; c.leafs++; tl++; if(isRev(fk)){ c.rev++; tr++; }
+  }
+  const list=[...kids.values()].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+  if(list.length){
+    sec.appendChild(el("div","note",tr+" of "+tl+" folders reviewed"+(P?" in "+nice(st.path[st.path.length-1]):"")+". Click a folder to open it."));
+    list.forEach(c=>{
+      const b=el("button","erow efolder"); b.appendChild(el("span","eic","📁"));
+      const t=el("div","etxt"); t.appendChild(el("b",null,nice(c.name))); t.appendChild(el("small",null,c.clips+" clip"+(c.clips===1?"":"s")+(c.leafs>1?" · "+c.leafs+" folders":""))); b.appendChild(t);
+      const one=!!st.fol[c.path]&&c.leafs===1;
+      b.appendChild(el("span","chip"+(c.rev===c.leafs?" hi":""),one?(c.rev?"✓ reviewed":"to review"):c.rev+"/"+c.leafs+" reviewed")); b.appendChild(el("span","chev","›"));
+      b.onclick=()=>goPath(c.path.split("/")); sec.appendChild(b);
+    });
+  }
+  if(st.fol[P]){   // a folder that holds clips
+    const t=el("div","ctitle"); t.appendChild(el("h2",null,nice(st.path[st.path.length-1]))); t.appendChild(el("span","chip"+(isRev(P)?" hi":""),isRev(P)?"✓ reviewed":"not reviewed yet"));
+    const pk=nextFolderKey(-1,P), nk=nextFolderKey(1,P);
+    const pb=el("button","sm","‹ Previous folder"); pb.disabled=!pk; pb.onclick=()=>goFolder(pk,true);
+    const nb=el("button","sm","Next folder ›"); nb.disabled=!nk; nb.onclick=()=>goFolder(nk,true);
+    t.append(pb,nb); sec.appendChild(t);
+    sec.appendChild(el("div","ehelp","Play the clips and pick the best one: press ★ Make live. The app will use that clip for this folder, and the other clips get marked for deletion (nothing is deleted until you run the clean-up)."));
+    const lb=el("label","enx"); const cb=document.createElement("input"); cb.type="checkbox"; cb.id="ambnext"; cb.checked=ls0("amb-autonext")!=="0"; cb.onchange=()=>ls("amb-autonext",cb.checked?"1":"0");
+    lb.append(cb," After Make live, go to the next folder"); sec.appendChild(lb);
+    st.rows.forEach((o,i)=>{ if(fo(o.key)===P) sec.appendChild(clipRow(i,false)); });
+  }else if(!list.length) sec.appendChild(el("p","note","Nothing in this folder."));
+}
+
+function renderQueue(){
+  const q=$("queue"); q.textContent=""; if(!st.rows.length) return;
+  const from=Math.max(0,st.idx), items=[];
+  if(st.amb){ const seen=new Set([fo(st.rows[Math.min(from,st.rows.length-1)].key)]);
+    for(let i=from+1;i<st.rows.length&&items.length<6;i++){ const f=fo(st.rows[i].key); if(seen.has(f)) continue; seen.add(f); const p=f.split("/"); items.push({i,a:pretty(p[2]||p[1]),b:p.slice(0,2).join(" / "),ok:isRev(f)}); } }
+  else for(let i=from+(st.idx>=0?1:0);i<st.rows.length&&items.length<6;i++){ const o=st.rows[i]; items.push({i,a:nameOf(o.key),b:mb(o.size),ok:st.marks[o.key]==="keep"}); }
+  if(!items.length) return;
+  q.appendChild(el("div","qh","UP NEXT"));
+  for(const it of items){ const b=el("button","qi"); b.appendChild(el("span","dot"+(it.ok?" ok":""))); const d=el("div"); d.appendChild(el("b",null,it.a)); d.appendChild(el("small",null,it.b)); b.appendChild(d); b.onclick=()=>play(it.i); q.appendChild(b); }
+}
+
+function renderFolders(){
+  const p=$("fpane"); p.textContent="";
+  if(st.amb){ p.appendChild(el("p","note","Open folders in the Review tab: tap a folder to go into it.")); return; }
+  if(!st.amb){ p.appendChild(el("p","hint","Pick a mood above, then open the Review tab.")); return; }
+  const seen=new Map(); st.rows.forEach((o,i)=>{ const f=fo(o.key); if(!seen.has(f)) seen.set(f,{i,n:0}); seen.get(f).n++; });
+  const cur=st.idx>=0&&st.rows[st.idx]?fo(st.rows[st.idx].key):null;
+  for(const [f,v] of seen){ const pt=f.split("/"), b=el("button","fb"+(f===cur?" on":"")); b.appendChild(el("span","dot"+(isRev(f)?" ok":"")));
+    const d=el("div"); d.appendChild(el("b",null,pretty(pt[2]||pt[1]))); d.appendChild(el("small",null,pt.slice(0,2).join(" / ")+" · "+v.n+" clips · "+(isRev(f)?"reviewed":"not reviewed"))); b.appendChild(d);
+    b.onclick=()=>{ setTab("review"); play(v.i); }; p.appendChild(b); }
+  if(!seen.size) p.appendChild(el("p","hint","No folders match."));
+}
+function setTab(t){ document.body.dataset.tab=t; document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); }
+
+function jumpFolder(dir){
+  if(!st.rows.length) return; const i=Math.max(0,st.idx), f=fo(st.rows[i].key); let j;
+  if(dir>0){ j=st.rows.findIndex((o,n)=>n>i&&fo(o.key)!==f); }
+  else{ let k=i; while(k>=0&&fo(st.rows[k].key)===f) k--; if(k<0) return; const pf=fo(st.rows[k].key); j=st.rows.findIndex(o=>fo(o.key)===pf); }
+  if(j>=0) play(j);
+}
+
+function renderList(){
+  const sec=$("list"); sec.textContent="";
+  const words=($("q")?$("q").value:"").toLowerCase().split(/\s+/).filter(Boolean), searching=words.length>0;
+  if(st.amb){ renderExplorer(sec,words); renderFolders(); return; }
+  if(!st.mood&&!searching){ renderQueue(); return; }
+  const f=$("fstat").value;
+  let pool=searching?Object.values(st.moods).flat().filter(o=>{ const k=stripMusic(o.key).toLowerCase(); return words.every(w=>k.includes(w)); }).sort((a,b)=>a.key.localeCompare(b.key,undefined,{numeric:true})):(st.moods[st.mood]||[]);
+  if(searching&&st.amb) pool.sort((a,b)=>fo(a.key).localeCompare(fo(b.key))||a.key.localeCompare(b.key,undefined,{numeric:true}));
+  st.rows=pool.filter(o=>!f||(f==="unrev"?!isRev(fo(o.key)):(st.marks[o.key]||"none")===f));
+  if(st.amb){ renderFocus(sec); renderQueue(); renderFolders(); return; }
+  if(searching){ const h=document.createElement("p"); h.style.cssText="color:var(--mut);margin:8px 14px"; h.textContent="Search results: "+st.rows.length+" clip(s) in all moods. Clear the box to go back."; sec.appendChild(h); }
+  const tbl=document.createElement("table"); const hr=tbl.insertRow();
+  ["","File","Size",""].forEach(h=>{ const th=document.createElement("th"); th.textContent=h; hr.appendChild(th); });
+  st.rows.forEach((o,i)=>{
+    const v=st.retired[o.key]?"ret":(st.marks[o.key]||""); const tr=tbl.insertRow(); tr.className=v+(i===st.idx?" playing":""); tr.id="r"+i;
+    const c0=tr.insertCell(); const p=document.createElement("button"); p.className="sm"; p.textContent="▶"; p.onclick=()=>play(i); c0.appendChild(p);
+    const c1=tr.insertCell(); c1.className="name"; c1.textContent=searching?stripMusic(o.key):nameOf(o.key);
+    const c2=tr.insertCell(); c2.textContent=mb(o.size); c2.style.color="var(--mut)";
+    const c3=tr.insertCell(); c3.style.whiteSpace="nowrap";
+    const kb=document.createElement("button"); kb.className="sm"; kb.textContent="Keep"; kb.onclick=()=>mark(i,"keep");
+    const db=document.createElement("button"); db.className="sm"; db.textContent="Delete"; db.style.marginLeft="4px"; db.onclick=()=>mark(i,"del");
+    c3.append(kb,db);
+  });
+  sec.appendChild(tbl);
+  if(!st.rows.length){ const p=document.createElement("p"); p.style.color="var(--mut)"; p.textContent=searching?"No clips match the search.":"No clips match the filter."; sec.appendChild(p); }
+  renderQueue(); renderFolders();
+}
+
+function mark(i,val){
+  const o=st.rows[i]; if(!o) return;
+  if(st.retired[o.key]) return;
+  if(val==="del"&&isLive(o.key)){ alert("This is the live clip for its folder. Use Make best on another clip first."); return; }
+  if(st.marks[o.key]===val) delete st.marks[o.key]; else st.marks[o.key]=val;
+  saveMarks(); const sc=$("list").scrollTop; renderNav(); renderList(); $("list").scrollTop=sc;
+}
+/* Make best: write the clip into ambient-index.json (backup once per session), then mark its folder-mates Delete. */
+async function makeBest(i){
+  const o=st.rows[i]; if(!st.amb||!o||st.retired[o.key]||st.busy) return false;
+  const m=st.meta[o.key]; if(!m){ alert("This clip is not in ambient-candidates.json."); return false; }
+  if(!st.index){ alert("ambient-index.json was not loaded, so Make best is off."); return false; }
+  st.busy=true;
+  try{
+    if(!st.baked){
+      const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14), bak="ambient-index.bak-"+ts+".json";
+      if(!(await putJson(bak,JSON.stringify(st.index))).ok){ alert("Backup failed; nothing changed."); return false; }
+      st.baked=true;
+    }
+    const f=fo(o.key), idx={...st.index,[f]:{url:m.url,r2_key:m.r2_key,license:m.license,author:m.author,reviewed:true}};
+    const r=await putJson("ambient-index.json",JSON.stringify(idx));
+    if(!r.ok){ alert("Writing ambient-index.json failed (HTTP "+r.status+"). Nothing changed."); return false; }
+    st.index=idx; st.marks[o.key]="keep";
+    (st.fol[f]||[]).forEach(x=>{ if(x.key!==o.key&&!st.retired[x.key]) st.marks[x.key]="del"; });
+    saveMarks(); return true;
+  }catch(e){ alert("Make best failed: "+e.message); return false; }
+  finally{ st.busy=false; }
+}
+async function bestAndNext(i){
+  const o=st.rows[i]; if(!o) return; const f=fo(o.key);
+  const nx=st.rows.slice(i+1).find(r=>fo(r.key)!==f);
+  if(!(await makeBest(i))) return;
+  const sc=$("list").scrollTop; renderNav(); renderList(); $("list").scrollTop=sc;
+  if(nx){ const j=st.rows.findIndex(r=>r.key===nx.key); if(j>=0) play(j); }
+}
+function advance(val){
+  const i=st.idx; if(i<0) return; mark(i,val);
+  const next=$("fstat").value?i:i+1; if(st.rows.length) play(Math.min(st.rows.length-1,next));
+}
+
+const streamUrl=k=>st.base+"/api/file?key="+enc(k)+"&token="+encodeURIComponent(st.tok);
+// Warm the browser cache with the next clip in the list, so auto-next / advance starts almost instantly.
+// Runs only once the current clip can play (so it doesn't compete for bandwidth). Best effort: the browser decides how much to buffer.
+function preloadNext(){
+  const n=st.rows[st.idx+1]; if(!n) return;
+  if(st.pre&&st.pre.dataset.key===n.key) return;
+  if(st.pre){ st.pre.removeAttribute("src"); st.pre.load(); }
+  const p=new Audio(); p.preload="auto"; p.dataset.key=n.key; p.src=streamUrl(n.key); st.pre=p;
+}
+$("a").addEventListener("canplay",()=>{ if($("a").dataset.mode==="stream") preloadNext(); });
+async function play(i){
+  const o=st.rows[i]; if(!o) return; const pf=st.amb&&st.rows[st.idx]?fo(st.rows[st.idx].key):null; st.idx=i;
+  if(st.amb&&!st.flat&&(st.path||[]).join("/")!==fo(o.key)){ st.path=fo(o.key).split("/"); st.mood=st.path[0]; renderNav(); renderList(); }   // follow the playing clip into its folder
+  document.querySelectorAll("tr.playing,.card.playing,.erow.playing").forEach(r=>r.classList.remove("playing")); const r0=$("r"+i); if(r0) r0.classList.add("playing");
+  $("now").textContent="Loading "+nameOf(o.key)+"…";
+  // Stream straight from the Worker (starts after the first chunk) instead of downloading the whole blob first.
+  // <audio> can't send an Authorization header, so the token goes in the query string (&token=).
+  // If streaming fails (e.g. Worker doesn't accept ?token=), the "error" handler below falls back to the blob method.
+  const a=$("a"); if(st.url){ URL.revokeObjectURL(st.url); st.url=null; }
+  a.dataset.key=o.key; a.dataset.mode="stream";
+  a.src=streamUrl(o.key); a.play().catch(()=>{});
+  $("now").textContent=(st.amb?fo(o.key):moodOf(o.key))+" · "+nameOf(o.key);
+  document.querySelectorAll("tr.playing,.card.playing,.erow.playing").forEach(r=>r.classList.remove("playing"));
+  const r=$("r"+i); if(r){ r.classList.add("playing"); r.scrollIntoView({block:"nearest"}); }
+}
+$("a").addEventListener("loadedmetadata",()=>{ const a=$("a"); if($("mid").checked&&isFinite(a.duration)&&a.duration>40) a.currentTime=a.duration*0.3; });
+$("a").addEventListener("timeupdate",()=>{ const a=$("a"),w=$("wf"),t=$("tm"); if(w&&isFinite(a.duration)&&a.duration>0) w.style.width=(a.currentTime/a.duration*100)+"%"; if(t) t.textContent=fmt(a.currentTime)+" / "+fmt(a.duration); });
+$("a").addEventListener("error",async()=>{   // streaming failed -> old behaviour: fetch whole file with the auth header
+  const a=$("a"); if(a.dataset.mode!=="stream") return; a.dataset.mode="blob"; const key=a.dataset.key;
+  $("now").textContent="⚠ Streaming failed – downloading the whole file instead… "+nameOf(key);
+  try{   // probe what the server says to the streaming URL, so the cause is visible
+    const pr=await fetch(streamUrl(key),{headers:{Range:"bytes=0-99"}});
+    const why=pr.status===401?"401 = this Worker doesn't accept ?token= (old code / different Worker)":pr.status===206?"206 OK (server fine; browser rejected the audio: "+(a.error?("code "+a.error.code):"?")+", type "+pr.headers.get("content-type")+")":pr.status===200?"200 = Range ignored by Worker":"HTTP "+pr.status;
+    $("now").textContent="⚠ Streaming failed: "+why+" · "+nameOf(key);
+  }catch(e){ $("now").textContent="⚠ Streaming failed: could not reach "+st.base+" ("+e.message+")"; }
+  try{
+    const r=await api("/api/file?key="+enc(key)); if(!r.ok) throw new Error("HTTP "+r.status);
+    const b=await r.blob(); if(a.dataset.key!==key) return;
+    if(st.url) URL.revokeObjectURL(st.url); st.url=URL.createObjectURL(b); a.src=st.url; a.play().catch(()=>{});
+  }catch(e){ $("now").textContent="Error: "+e.message; }
+});
+$("a").addEventListener("play",setPP); $("a").addEventListener("pause",setPP);
+$("a").addEventListener("ended",()=>{ if($("auto").checked) play(st.idx+1); });
+
+const putJson=(k,t)=>api("/api/json?key="+enc(k),{method:"PUT",headers:{"Content-Type":"application/json"},body:t});
+const normPath=s=>{ s=String(s).replace(/\?.*$/,""); try{s=decodeURIComponent(s);}catch(e){} return s.replace(/^[a-z]+:\/\/[^/]+\//i,"").replace(/^\/+/,"").replace(/^music\//i,"").toLowerCase(); };
+function mp3Raw(item){ const out=[]; (function w(v,d){ if(typeof v==="string"){ if(/\.mp3(\?.*)?$/i.test(v)) out.push(v); }
+  else if(d<2&&v&&typeof v==="object"&&!Array.isArray(v)) for(const k in v) w(v[k],d+1); })(item,0); return out; }
+function pruneRel(node,set,removed){   // drop clip entries whose file path (e.g. "peace/song.mp3") is in the set
+  if(Array.isArray(node)){ const out=[];
+    for(const it of node){ const hit=mp3Raw(it).find(x=>set.has(normPath(x))); if(hit){ removed.push(normPath(hit)); continue; } out.push(pruneRel(it,set,removed)); }
+    return out; }
+  if(node&&typeof node==="object"){ const out={}; for(const k of Object.keys(node)) out[k]=pruneRel(node[k],set,removed); return out; }
+  return node;
+}
+const saveRetired=()=>putJson("retired.json",JSON.stringify(st.retired));
+
+/* Step 1: take the clips out of music.json. The files stay in R2, so phones with an old cached list still find them. */
+async function retire(){
+  const keys=Object.keys(st.marks).filter(k=>st.marks[k]==="del"&&!st.retired[k]&&!isLive(k)&&st.objs.some(o=>o.key===k));
+  if(!keys.length) return;
+  const set=new Set(keys.map(k=>stripMusic(k).toLowerCase()));
+  const names=$("jsons").value.split(",").map(s=>s.trim()).filter(Boolean);
+  let matched=0; const plan=[];
+  for(const name of names){
+    const r=await api("/api/file?key="+enc(name)); if(!r.ok){ alert(name+": not found in the bucket (HTTP "+r.status+"). Nothing changed."); return; }
+    let data; try{ data=JSON.parse(await r.text()); }catch(e){ alert(name+" is not valid JSON. Nothing changed."); return; }
+    const removed=[]; const clean=pruneRel(data,set,removed); matched+=removed.length; plan.push({name,data,clean,removed});
+  }
+  let msg="Retire "+keys.length+" clip(s)?\n\nThis removes "+matched+" entr"+(matched===1?"y":"ies")+" from "+names.join(", ")+" (a backup is saved first). The files stay in R2 so phones with the old list keep working.";
+  if(!matched) msg="WARNING: none of these clips were found in "+names.join(", ")+". Retiring would change nothing in the app's list. Continue anyway?\n\n"+keys.slice(0,5).join("\n");
+  if(!confirm(msg)) return;
+  const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14);
+  for(const p of plan){ if(!p.removed.length) continue;
+    const bak=p.name.replace(/\.json$/i,"")+".bak-"+ts+".json";
+    if(!(await putJson(bak,JSON.stringify(p.data))).ok){ alert("Backup failed; nothing changed."); return; }
+    if(!(await putJson(p.name,JSON.stringify(p.clean))).ok){ alert("Writing "+p.name+" failed; backup is "+bak); return; } }
+  const now=Date.now(); keys.forEach(k=>{ st.retired[k]=now; delete st.marks[k]; });
+  saveMarks(); await saveRetired(); renderNav(); renderList();
+  alert("Retired "+keys.length+". Wait about 3 days (the app caches music.json for 24 h), then use “2 · Delete retired…”.");
+}
+
+/* Step 2: delete retired files for good, once old caches have expired. */
+async function purge(){
+  const AGE=3*86400e3, all=Object.keys(st.retired).filter(k=>st.objs.some(o=>o.key===k));
+  const ready=all.filter(k=>Date.now()-st.retired[k]>=AGE);
+  let keys=ready;
+  if(!ready.length){
+    if(!all.length){ alert("Nothing retired."); return; }
+    if(!confirm("None of the "+all.length+" retired clips is 3 days old yet; phones may still use the old list. Delete them anyway?")) return;
+    keys=all;
+  } else if(!confirm("Permanently delete "+ready.length+" retired clip(s) from R2 (retired 3+ days ago)? This cannot be undone.")) return;
+  const a=$("a"); a.pause(); a.removeAttribute("src"); a.load();
+  let done=0;
+  try{
+    for(let i=0;i<keys.length;i+=500){
+      const chunk=keys.slice(i,i+500);
+      const r=await api("/api/delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({keys:chunk})});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      done+=chunk.length;
+    }
+  }catch(e){ alert("Stopped after "+done+" deletions: "+e.message); }
+  const gone=new Set(keys.slice(0,done)); gone.forEach(k=>delete st.retired[k]);
+  st.objs=st.objs.filter(o=>!gone.has(o.key)); regroup(); await saveRetired();
+  if(!st.moods[st.mood]) st.mood=Object.keys(st.moods).sort()[0]||null;
+  st.idx=-1; renderNav(); renderList();
+  alert("Deleted "+done+" file(s).");
+}
+
+/* Delete now: Retire + Delete in one go. Order: (1) list updated with a backup, (2) clips noted in retired.json, (3) files deleted.
+   If it stops halfway, the clips are already out of the list and the rest stay under "2 · Delete retired". */
+async function deleteNow(){
+  if(st.busy) return;
+  const keys=Object.keys(st.marks).filter(k=>st.marks[k]==="del"&&!st.retired[k]&&!isLive(k)&&st.objs.some(o=>o.key===k));
+  if(!keys.length) return;
+  const set=new Set(keys.map(k=>stripMusic(k).toLowerCase()));
+  const names=$("jsons").value.split(",").map(s=>s.trim()).filter(Boolean);
+  let matched=0; const plan=[];
+  for(const name of names){
+    const r=await api("/api/file?key="+enc(name)); if(!r.ok){ alert(name+": not found in the bucket (HTTP "+r.status+"). Nothing changed."); return; }
+    let data; try{ data=JSON.parse(await r.text()); }catch(e){ alert(name+" is not valid JSON. Nothing changed."); return; }
+    const removed=[]; const clean=pruneRel(data,set,removed); matched+=removed.length; plan.push({name,data,clean,removed});
+  }
+  const msg="Delete "+keys.length+" clip(s) NOW?\n\n1. They are removed from "+names.join(", ")+(matched?" ("+matched+" entr"+(matched===1?"y":"ies")+"; a backup of the list is saved first)":" (none of them were in the list)")+".\n2. The audio files are deleted for good. This cannot be undone.\n\nA phone that still has the old list may skip these clips until its list refreshes (up to about 24 h).";
+  if(!confirm(msg)) return;
+  const btn=$("delnow"), say=t=>{ btn.textContent=t; }; let done=0;
+  st.busy=true; btn.disabled=true;
+  try{
+    say("1/3 Updating list…");
+    const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14);
+    for(const p of plan){ if(!p.removed.length) continue;
+      const bak=p.name.replace(/\.json$/i,"")+".bak-"+ts+".json";
+      if(!(await putJson(bak,JSON.stringify(p.data))).ok){ alert("Backup failed; nothing changed."); return; }
+      if(!(await putJson(p.name,JSON.stringify(p.clean))).ok){ alert("Writing "+p.name+" failed; backup is "+bak+". No file was deleted."); return; } }
+    say("2/3 Saving…");
+    const now=Date.now(); keys.forEach(k=>{ st.retired[k]=now; delete st.marks[k]; });
+    saveMarks(); await saveRetired();
+    const a=$("a"); a.pause(); a.removeAttribute("src"); a.load();
+    for(let i=0;i<keys.length;i+=500){
+      const chunk=keys.slice(i,i+500); say("3/3 Deleting "+Math.min(i+chunk.length,keys.length)+" of "+keys.length+"…");
+      const r=await api("/api/delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({keys:chunk})});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      done+=chunk.length;
+    }
+  }catch(e){ alert("Stopped after "+done+" of "+keys.length+" deletions: "+e.message+"\nThe rest are saved under \"2 · Delete retired\"."); }
+  finally{
+    const gone=new Set(keys.slice(0,done)); gone.forEach(k=>delete st.retired[k]);
+    st.objs=st.objs.filter(o=>!gone.has(o.key)); regroup(); try{ await saveRetired(); }catch(e){}
+    if(!st.moods[st.mood]) st.mood=Object.keys(st.moods).sort()[0]||null;
+    st.idx=-1; st.busy=false; renderNav(); renderList();
+  }
+  if(done===keys.length) alert("Deleted "+done+" file(s).");
+}
+
+/* ---- keep music.json in step with the bucket (removes entries whose mp3 no longer exists) ---- */
+const base=s=>{ s=String(s).replace(/\?.*$/,""); try{s=decodeURIComponent(s);}catch(e){} return s.split(/[\\/]/).pop().toLowerCase(); };
+function mp3Names(item){ const out=[]; (function w(v,d){ if(typeof v==="string"){ if(/\.mp3(\?.*)?$/i.test(v)) out.push(base(v)); }
+  else if(d<2&&v&&typeof v==="object"&&!Array.isArray(v)) for(const k in v) w(v[k],d+1); })(item,0); return out; }
+function countMp3(n){ if(typeof n==="string") return /\.mp3(\?.*)?$/i.test(n)?1:0; if(Array.isArray(n)) return n.reduce((s,x)=>s+countMp3(x),0);
+  if(n&&typeof n==="object") return Object.keys(n).reduce((s,k)=>s+(/\.mp3$/i.test(k)?1:0)+countMp3(n[k]),0); return 0; }
+function prune(node,have,removed){
+  if(Array.isArray(node)){ const out=[];
+    for(const it of node){ const names=mp3Names(it); const miss=names.find(n=>!have.has(n)); if(miss){ removed.push(miss); continue; } out.push(prune(it,have,removed)); }
+    return out; }
+  if(node&&typeof node==="object"){ const out={};
+    for(const k of Object.keys(node)){ if(/\.mp3$/i.test(k)&&!have.has(base(k))){ removed.push(base(k)); continue; } out[k]=prune(node[k],have,removed); }
+    return out; }
+  return node;
+}
+
+async function syncOne(name){
+  const have=new Set(st.objs.filter(o=>/\.mp3$/i.test(o.key)).map(o=>base(o.key)));
+  if(!have.size){ alert("No mp3 objects loaded; refusing to sync."); return; }
+  const r=await api("/api/file?key="+enc(name));
+  if(!r.ok){ alert(name+": not found in the bucket (HTTP "+r.status+")."); return; }
+  let data; try{ data=JSON.parse(await r.text()); }catch(e){ alert(name+" is not valid JSON."); return; }
+  const total=countMp3(data), removed=[]; const clean=prune(data,have,removed);
+  if(!removed.length){ alert(name+": already in sync ("+total+" clip references)."); return; }
+  let msg=name+": remove "+removed.length+" of "+total+" clip entries that no longer exist?\n\n"+removed.slice(0,10).join("\n")+(removed.length>10?"\n…":"");
+  if(removed.length>total*0.5) msg="WARNING: this removes more than half of the entries.\n\n"+msg;
+  if(!confirm(msg)) return;
+  const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14);
+  const bak=name.replace(/\.json$/i,"")+".bak-"+ts+".json";
+  const put=(k,t)=>api("/api/json?key="+enc(k),{method:"PUT",headers:{"Content-Type":"application/json"},body:t});
+  const b=await put(bak,JSON.stringify(data)); if(!b.ok){ alert("Backup failed (HTTP "+b.status+"); nothing changed."); return; }
+  const w=await put(name,JSON.stringify(clean)); if(!w.ok){ alert("Write failed (HTTP "+w.status+"); backup is "+bak); return; }
+  alert(name+" updated. Backup saved as "+bak+".\nPhones cache music.json for up to 24 h.");
+}
+async function syncAll(){ const names=$("jsons").value.split(",").map(s=>s.trim()).filter(Boolean); for(const n of names) await syncOne(n); }
+
+
+/* =================== Covers tab ===================
+   Reads the program's index.json (public, from the covers address) and your choices (covers/overrides.json in the Worker's bucket).
+   Writes ONLY covers/overrides.json (plus a backup copy once per visit). It never touches the cover pictures. */
+const ORDER=["se","ol","pg","lv"], SRCN={se:"Standard Ebooks",ol:"Open Library",pg:"Gutenberg",lv:"LibriVox"};
+const OV_KEY="covers/overrides.json", DEF_COVERS="https://huggingface.co/datasets/rabiul43/Book_Covers/resolve/main/covers";
+const cv={books:{},ids:[],ov:{},rows:[],sel:null,shown:150,baked:false,busy:false,err:"",info:"",catNote:""};
+const CAT_DEF="https://raw.githubusercontent.com/rabiul43/wordtrail-data/main/catalog.json";
+const catUrl=()=>ls("cov-catalog")||CAT_DEF;
+const cvBase=()=>(ls("cov-base")||DEF_COVERS).replace(/\/+$/,"");
+const cvPath=(id,s)=>Math.floor(id/1000)+"/"+id+"/"+s+".webp";
+const covHave=id=>{ const h=cv.books[id]&&cv.books[id].have; return Array.isArray(h)?h.filter(s=>ORDER.includes(s)):[]; };
+
+/* What the app will show: your choice, else the program's best, else the first left in the order se, ol, pg, lv. Removed covers never count. */
+function eff(id){
+  const b=cv.books[id]||{}, o=cv.ov[id]||{}, rm=o.removed||[], have=covHave(id).filter(s=>!rm.includes(s));
+  if(o.best&&have.includes(o.best)) return {have,pick:o.best,why:"your choice"};
+  if(b.best&&have.includes(b.best)) return {have,pick:b.best,why:"the program's pick"};
+  const p=ORDER.find(s=>have.includes(s))||null; return {have,pick:p,why:p?"next in the order":""};
+}
+
+async function connectCov(){
+  st.amb=false; document.body.classList.remove("amb"); $("summary").textContent="Loading covers…";
+  let r; try{ r=await api("/api/file?key="+enc(OV_KEY)); }
+  catch(e){ showErr("Can't reach the Worker ("+e.message+"). Check the Worker URL below."); return; }
+  if(r.status===401){ showErr("That token didn't work (401). Check it and try again."); return; }
+  cv.ov={};
+  if(r.ok){ try{ const d=JSON.parse(await r.text()); cv.ov=(d&&d.books)||{}; }catch(e){ showErr("covers/overrides.json in the bucket is not valid JSON. Nothing was changed. Fix or delete that file in Cloudflare R2."); return; } }
+  else if(r.status!==404){ showErr("Could not read overrides (HTTP "+r.status+")."); return; }
+  cv.baked=false; $("cvbase").value=cvBase(); $("cvcat").value=catUrl();
+  await loadCovIndex();
+  $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent;
+  updateSw(); $("mode").textContent="COVERS"; document.body.classList.add("conn");
+  cv.sel=null; $("covpane").classList.remove("pick"); covFilter(); if(cv.rows.length) cv.sel=cv.rows[0]; renderCov();
+}
+async function loadCovIndex(){
+  cv.err=""; cv.info=""; cv.books={};
+  try{
+    const r=await fetch(cvBase()+"/index.json",{cache:"no-cache"}); if(!r.ok) throw new Error("HTTP "+r.status);
+    const d=await r.json();
+    if(d&&d.b&&typeof d.b==="object"&&!Array.isArray(d.b)){          // real shape: "b":{"23075":["ol","ol",0], ...} = [best, "se,ol", gutenbergId]
+      for(const k in d.b){ const a=d.b[k]; if(/^\d+$/.test(k)&&Array.isArray(a)) cv.books[k]={best:a[0]||"",have:String(a[1]||"").split(",").map(x=>x.trim()).filter(Boolean),gid:Number(a[2])||0}; }
+    }else{                                                          // older/simple shape: "books":{"1":{"have":[..],"best":".."}}
+      const b=(d&&d.books)||d; for(const k in b) if(/^\d+$/.test(k)&&b[k]&&typeof b[k]==="object") cv.books[k]=b[k];
+    }
+    const n=Object.keys(cv.books).length; cv.info="Opened "+cvBase()+"/index.json and it worked, but it lists "+n+" book(s)."+(n?"":" The file contains: "+(Array.isArray(d)?"an empty list":(Object.keys(d||{}).slice(0,6).join(", ")||"nothing"))+".");
+  }catch(e){ cv.err=e.message; }
+  cv.ids=Object.keys(cv.books).sort((a,b)=>a-b);
+  await loadCovTitles();
+}
+/* Titles and authors come from catalog.json (row: [0]=LibriVox id, [1]=title, [2]=authors). If it cannot be read, books show as "Book #id". */
+async function loadCovTitles(){
+  cv.catNote="";
+  if(!cv.ids.length) return;
+  try{
+    const r=await fetch(catUrl(),{cache:"no-cache"}); if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=JSON.parse(await r.text());
+    const rows=Array.isArray(j)?j:(Object.values(j||{}).find(v=>Array.isArray(v))||[]);
+    let n=0; for(const row of rows){ if(!Array.isArray(row)) continue; const b=cv.books[String(row[0])]; if(b){ b.title=String(row[1]||""); b.author=String(row[2]||""); n++; } }
+    if(!n) throw new Error("no matching rows; the file format was not recognised");
+  }catch(e){ cv.catNote="Book titles could not be loaded ("+e.message+"). Books show as numbers. Check the catalog address under “Covers address”."; }
+}
+function covFilter(){
+  const words=$("cvq").value.toLowerCase().split(/\s+/).filter(Boolean), f=$("cvf").value;
+  cv.rows=cv.ids.filter(id=>{
+    const e=eff(id);
+    if(f==="none"&&e.have.length) return false; if(f==="one"&&e.have.length!==1) return false; if(f==="changed"&&!cv.ov[id]) return false;
+    if(!words.length) return true; const b=cv.books[id]; const hay=(id+" "+(b.title||"")+" "+(b.author||"")).toLowerCase(); return words.every(w=>hay.includes(w));
+  });
+}
+function removedList(){   // every removed file: {id,s,at}
+  const out=[]; for(const id in cv.ov){ const o=cv.ov[id]; for(const s of (o.removed||[])) out.push({id,s,at:(o.removedAt||{})[s]||0}); } return out;
+}
+function renderCov(){
+  const none=cv.ids.filter(id=>!eff(id).have.length).length, ch=Object.keys(cv.ov).length, rl=removedList().length;
+  $("summary").textContent=cv.ids.length?cv.ids.length+" books · "+none+" with no cover · "+ch+" changed by you":"No cover list loaded yet";
+  $("cvstat").textContent=cv.ids.length?(cv.rows.length+" book(s) match"+(cv.rows.length>cv.shown?" · showing the first "+cv.shown:"")+(cv.catNote?"\n"+cv.catNote:"")):""; $("cvstat").style.whiteSpace="pre-wrap";
+  const cb=$("cvcopy"); cb.hidden=!rl; cb.textContent="2 · Copy removed-file list… ("+rl+")";
+  const box=$("cvitems"), sc=$("cvlist").scrollTop; box.textContent="";
+  cv.rows.slice(0,cv.shown).forEach(id=>{
+    const b=cv.books[id], e=eff(id), it=el("button","cvi"+(id===cv.sel?" on":"")); it.dataset.id=id;
+    it.appendChild(el("b",null,b.title||("Book "+id)));
+    const s=el("small"); s.appendChild(el("span",null,(b.author||"")+" · #"+id)); s.appendChild(el("span","chip",e.have.length?e.have.length+" cover"+(e.have.length>1?"s":""):"none"));
+    if(cv.ov[id]) s.appendChild(el("span","chip hi","changed")); it.appendChild(s);
+    it.onclick=()=>{ cv.sel=id; $("covpane").classList.add("pick"); renderCov(); $("cvmain").scrollTop=0; }; box.appendChild(it);
+  });
+  if(cv.rows.length>cv.shown){ const m=el("button",null,"Show 150 more"); m.onclick=()=>{ cv.shown+=150; renderCov(); }; box.appendChild(m); }
+  $("cvlist").scrollTop=sc; renderCovMain();
+}
+function renderCovMain(){
+  const m=$("cvmain"); m.textContent="";
+  if(cv.err) m.appendChild(el("div","werr","Could not read the cover list (index.json) from "+cvBase()+" ("+cv.err+"). Open “Covers address” on the left and check it. If the covers are not uploaded yet, this is expected."));
+  const id=cv.sel; if(!id||!cv.books[id]){ if(!cv.err) m.appendChild(el("p","note",cv.ids.length?"No book matches. Change the search or the filter.":(cv.info||"No books yet.")+" The list stays empty until the Kaggle notebook (Tasks 1 and 2) has uploaded covers and index.json.")); return; }
+  const b=cv.books[id], o=cv.ov[id]||{}, rm=o.removed||[], e=eff(id), have=covHave(id);
+  const bk=el("button","cvback","← Back to list"); bk.onclick=()=>$("covpane").classList.remove("pick"); m.appendChild(bk);
+  m.appendChild(el("div","crumb","Book #"+id+(b.gid?" · Gutenberg "+b.gid:"")+" · "+(cv.rows.indexOf(id)+1)+" of "+cv.rows.length));
+  const t=el("div","ctitle"); t.appendChild(el("h2",null,b.title||("Book "+id)));
+  t.appendChild(el("span","chip"+(e.pick?" hi":""),e.pick?"app shows: "+SRCN[e.pick]:"no cover: colored box")); if(cv.ov[id]) t.appendChild(el("span","chip hi","changed by you")); m.appendChild(t);
+  if(b.author) m.appendChild(el("div","note",b.author));
+  const cs=el("div","ccards");
+  for(const s of ORDER){
+    const inIdx=have.includes(s), gone=rm.includes(s), pick=e.pick===s;
+    const c=el("div","ccard"+(gone?" del":"")+(pick?" keep":"")+(inIdx?"":" none"));
+    const top=el("div","top"); top.appendChild(el("span",null,SRCN[s])); top.appendChild(el("span","chip"+(pick?" hi":""),gone?"REMOVED":pick?"SHOWN":"")); c.appendChild(top);
+    const im=el("div","im"), meta=el("div","note",inIdx?"loading…":"");
+    if(inIdx){ const img=document.createElement("img"); img.alt=SRCN[s]+" cover"; img.loading="lazy"; img.src=cvBase()+"/"+cvPath(id,s);
+      img.onload=()=>{ meta.textContent=img.naturalWidth+"×"+img.naturalHeight+(s===o.best?" · your choice":s===b.best&&!o.best?" · program's pick":""); };
+      img.onerror=()=>{ im.textContent="File not found. The list says it exists."; meta.textContent="missing file"; }; im.appendChild(img); }
+    else im.textContent="No picture from this source";
+    c.append(im,meta);
+    if(inIdx&&!gone){ const mb1=el("button",pick&&o.best===s?"":"primary",pick&&o.best===s?"Your best ✓":"Make best"); mb1.disabled=cv.busy||o.best===s; mb1.onclick=()=>covSet(id,x=>{ x.best=s; return x; }); c.appendChild(mb1);
+      const rb=el("button","danger","Remove"); rb.disabled=cv.busy; rb.onclick=()=>covSet(id,x=>{ x.removed=[...new Set([...(x.removed||[]),s])]; x.removedAt={...(x.removedAt||{}),[s]:Date.now()}; if(x.best===s) delete x.best; return x; }); c.appendChild(rb); }
+    if(inIdx&&gone){ const ub=el("button",null,"Undo remove"); ub.disabled=cv.busy; ub.onclick=()=>covSet(id,x=>{ x.removed=(x.removed||[]).filter(v=>v!==s); if(x.removedAt) delete x.removedAt[s]; return x; }); c.appendChild(ub); }
+    cs.appendChild(c);
+  }
+  m.appendChild(cs);
+  const ac=el("div","acts"); const pv=el("button",null,"← Previous"); pv.onclick=()=>covStep(-1); const nx=el("button","go","Next →"); nx.onclick=()=>covStep(1);
+  ac.append(pv,nx); if(cv.ov[id]){ const rs=el("button","no","Reset this book"); rs.disabled=cv.busy; rs.onclick=()=>{ if(confirm("Forget all your changes for this book? Removed covers come back, and the program's pick is used again.")) covSet(id,()=>null); }; ac.appendChild(rs); }
+  m.appendChild(ac);
+  m.appendChild(el("p","note",e.pick?"The app will show "+SRCN[e.pick]+" ("+e.why+"). If it fails to load, the app tries the next one in the order Standard Ebooks, Open Library, Gutenberg, LibriVox. Keys: ← → change book.":"No cover is left for this book, so the app shows the colored title box."));
+  m.appendChild(el("p","note","Remove only hides a cover. The file stays on Hugging Face until you do step 2, at least 3 days later."));
+}
+function covStep(d){
+  if(!cv.rows.length) return; const i=cv.rows.indexOf(cv.sel), j=Math.max(0,Math.min(cv.rows.length-1,(i<0?0:i+d)));
+  cv.sel=cv.rows[j]; if(j>=cv.shown) cv.shown=j+1; $("covpane").classList.add("pick"); renderCov();
+  const on=document.querySelector("#cvitems .cvi.on"); if(on) on.scrollIntoView({block:"nearest"});
+}
+/* Save one book's change: read the newest overrides.json first, change only this book, then write (so a second device is never overwritten). */
+async function covSet(id,fn){
+  if(cv.busy) return; cv.busy=true; renderCovMain();
+  try{
+    let cur={version:1,books:{}}; const r=await api("/api/file?key="+enc(OV_KEY));
+    if(r.ok){ cur=JSON.parse(await r.text()); if(!cur||typeof cur!=="object") cur={}; if(!cur.books) cur.books={}; }
+    else if(r.status!==404) throw new Error("could not read the current file (HTTP "+r.status+")");
+    if(r.ok&&!cv.baked){ const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14);
+      if(!(await putJson("covers/overrides.bak-"+ts+".json",JSON.stringify(cur))).ok) throw new Error("backup failed"); cv.baked=true; }
+    const x=fn(JSON.parse(JSON.stringify(cur.books[id]||{})));
+    if(x&&(x.best||(x.removed&&x.removed.length))){ if(!(x.removed&&x.removed.length)){ delete x.removed; delete x.removedAt; } x.changed=Date.now(); cur.books[id]=x; } else delete cur.books[id];
+    cur.version=1; cur.updated=new Date().toISOString();
+    const w=await putJson(OV_KEY,JSON.stringify(cur)); if(!w.ok) throw new Error("writing failed (HTTP "+w.status+")");
+    cv.ov=cur.books;
+  }catch(e){ alert("Not saved: "+e.message+". Nothing was changed."); }
+  finally{ cv.busy=false; covFilter(); if(cv.sel&&!cv.rows.includes(cv.sel)&&$("cvf").value){ const k=cv.rows[0]; cv.sel=k||cv.sel; } renderCov(); }
+}
+/* Step 2 helper: lists removed files that are at least 3 days old. The Kaggle notebook deletes them later (it holds the Hugging Face key; this page never does). */
+async function covCopy(){
+  const AGE=3*86400e3, all=removedList(), ready=all.filter(x=>Date.now()-x.at>=AGE); let use=ready;
+  if(!ready.length){ if(!confirm("None of the "+all.length+" removed covers is 3 days old yet; phones may still show them. Copy the list anyway?")) return; use=all; }
+  const txt=use.map(x=>"covers/"+cvPath(x.id,x.s)).join("\n");
+  try{ await navigator.clipboard.writeText(txt); toast("Copied "+use.length+" file path(s)."); }catch(e){ prompt("Copy this list (Ctrl+C):",txt); }
+}
+$("cvq").oninput=()=>{ cv.shown=150; covFilter(); cv.sel=cv.rows[0]||null; renderCov(); };
+$("cvf").onchange=()=>{ cv.shown=150; covFilter(); cv.sel=cv.rows[0]||null; renderCov(); };
+$("cvcopy").onclick=covCopy;
+$("cvsave").onclick=async()=>{ const v=$("cvbase").value.trim().replace(/\/+$/,""); if(!/^https?:\/\//.test(v)){ alert("Enter a full address that starts with https://"); return; }
+  ls("cov-base",v); const c=$("cvcat").value.trim(); if(/^https?:\/\//.test(c)) ls("cov-catalog",c); await loadCovIndex(); covFilter(); cv.sel=cv.rows[0]||null; renderCov(); };
+
+/* =================== Books tab (Task 6b) ===================
+   Lists every book of catalog.json and where a text can come from (the status list the Kaggle notebook of Task 6a made:
+   Book_Text/status/texts.json), and lets you upload a public-domain text for a book that has none.
+   It writes ONLY text/<LibriVox id>.json in the Worker's bucket (plus one backup copy per visit, text/<id>.bak-<time>.json).
+   It never writes to Hugging Face and never holds a Hugging Face key. Remove is two steps: mark first, delete at least 3 days later. */
+const TXT_DEF="https://huggingface.co/datasets/rabiul43/Book_Text/resolve/main/status";
+const TXT_MAX=4500000, BODY_MAX=4900000, AGE3=3*86400e3, WPM=150;
+const bk={cat:{},ids:[],tx:null,found:{},maybe:{},up:{},baks:{},rows:[],sel:null,shown:150,fl:"",en:false,busy:false,baked:{},draft:{},prev:{},err:"",note:"",oldWorker:false};
+const bkBase=()=>(ls("bk-base")||TXT_DEF).replace(/\/+$/,"");
+const tkey=id=>"text/"+id+".json";
+const nfmt=n=>Number(n||0).toLocaleString("en-US");
+const fmtDur=s=>{ s=Math.round(+s||0); if(!s) return "unknown"; const h=Math.floor(s/3600), m=Math.round((s%3600)/60); return h?h+" h "+m+" min":m+" min"; };
+const fmtDate=ms=>{ try{ return ms?new Date(ms).toISOString().slice(0,10):""; }catch(e){ return ""; } };
+const lnk=(t,h)=>{ const a=el("a",null,t); a.href=h; a.target="_blank"; a.rel="noopener"; return a; };
+async function bkErr(r){ try{ const j=await r.json(); if(j&&j.error) return j.error; }catch(e){} return "HTTP "+r.status; }
+
+/* One book's picture of where a text can come from. If the status list is not there yet, only the catalog is used. */
+function bkInfo(id){
+  const c=bk.cat[id]||{}, t=bk.tx&&bk.tx[id], u=bk.up[id]||null, fl=t?String(t[1]||""):"", num=t?(Number(t[0])||0):(c.gid||0);
+  return {c,num,h:fl.includes("h"),p:fl.includes("p"),a:fl.includes("a")||!!c.ia,s:fl.includes("s"),live:u&&!u.removed?u:null,gone:u&&u.removed?u:null,maybe:bk.maybe[id]||null,found:bk.found[id]||null};
+}
+const bkNone=i=>!i.num&&!i.p&&!i.a&&!i.live;
+function bkChips(i){   // one clear status per book (the sources are listed in the detail view)
+  const o=[]; if(i.live) o.push(["Added by me","me"]); else if(i.num||i.p) o.push(["Has text","hi"]); else if(i.a) o.push(["Archive link only",""]); else o.push(["No text","no"]);
+  if(i.gone) o.push(["Removed",""]); return o;
+}
+const bkRemoved=()=>Object.keys(bk.up).filter(id=>bk.up[id].removed).map(id=>({id,at:bk.up[id].removedAt||0}));
+
+async function connectBk(){
+  st.amb=false; document.body.classList.remove("amb"); $("summary").textContent="Loading books…";
+  bk.baked={}; bk.draft={}; bk.prev={};
+  let ok; try{ ok=await bkLoadUploads(); }catch(e){ showErr("Can't reach the Worker ("+e.message+"). Check the Worker URL below."); return; }
+  if(ok==="401"){ showErr("That token didn't work (401). Check it and try again."); return; }
+  bk.oldWorker=false; try{ const pr=await fetch(st.root+"/public/texts-index.json",{cache:"no-store"}); bk.oldWorker=!pr.ok; }catch(e){}
+  await bkLoadBooks();
+  $("bkbase").value=bkBase(); $("bkcat").value=catUrl();
+  $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent;
+  updateSw(); $("mode").textContent="BOOKS"; document.body.classList.add("conn");
+  bk.sel=null; $("bkpane").classList.remove("pick"); bkFilter(); if(bk.rows.length) bk.sel=bk.rows[0]; renderBk();
+}
+async function bkLoadUploads(){   // every text/<id>.json in the bucket (and its backups), with the live/removed tag the Worker keeps
+  const up={}, baks={}; let cursor=null;
+  do{
+    const r=await api("/api/list?prefix="+enc("text/")+(cursor?"&cursor="+enc(cursor):""));
+    if(r.status===401) return "401";
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const d=await r.json(); cursor=d.cursor;
+    for(const o of d.objects){
+      let m=/^text\/(\d+)\.json$/.exec(o.key);
+      if(m){ const md=o.meta||{}; up[m[1]]={size:o.size,uploaded:o.uploaded,words:Number(md.words)||0,at:Number(md.at)||Date.parse(o.uploaded)||0,removed:md.removed==="1",removedAt:Number(md.removedAt)||0}; continue; }
+      m=/^text\/(\d+)\.bak-[^\/]*\.json$/.exec(o.key); if(m) (baks[m[1]]=baks[m[1]]||[]).push(o.key);
+    }
+  }while(cursor);
+  bk.up=up; bk.baks=baks; return "ok";
+}
+async function bkLoadBooks(){
+  bk.cat={}; bk.ids=[]; bk.tx=null; bk.found={}; bk.maybe={}; bk.note=""; bk.err="";
+  try{
+    const r=await fetch(catUrl(),{cache:"no-cache"}); if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=JSON.parse(await r.text()), rows=Array.isArray(j)?j:(Array.isArray(j&&j.b)?j.b:(Object.values(j||{}).find(v=>Array.isArray(v))||[]));
+    for(const row of rows){
+      if(!Array.isArray(row)||!/^\d+$/.test(String(row[0]))) continue; const id=String(row[0]);
+      bk.cat[id]={id,title:String(row[1]||("Book "+id)),author:String(row[2]||""),last:String(row[3]||""),lang:String(row[4]||""),gid:Number(row[5])||0,secs:Number(row[6])||0,ia:String(row[8]||""),url:String(row[10]||"")};
+    }
+    bk.ids=Object.keys(bk.cat).sort((a,b)=>a-b);
+    if(!bk.ids.length) throw new Error("no books found; the file format was not recognised");
+  }catch(e){ bk.err="Could not read the catalog ("+e.message+"). Check the catalog address under “Books settings”."; return; }
+  const get=async f=>{ const r=await fetch(bkBase()+"/"+f,{cache:"no-cache"}); if(!r.ok) throw new Error("HTTP "+r.status); const d=await r.json(); return (d&&d.b&&typeof d.b==="object"&&!Array.isArray(d.b))?d.b:null; };
+  try{ const b=await get("texts.json"); if(!b) throw new Error("unexpected format"); bk.tx=b; }
+  catch(e){ bk.note="The status list (texts.json) could not be read ("+e.message+"), so only the catalog is used for now. Run the Task 6a notebook first, or check the address under “Books settings”."; }
+  try{ bk.found=(await get("found-gutenberg.json"))||{}; }catch(e){}
+  try{ bk.maybe=(await get("maybe-gutenberg.json"))||{}; }catch(e){}
+}
+function bkFilter(){
+  const words=$("bkq").value.toLowerCase().split(/\s+/).filter(Boolean), f=bk.fl;
+  bk.rows=bk.ids.filter(id=>{
+    const i=bkInfo(id);
+    if(f==="none"&&!bkNone(i)) return false;
+    if(f==="mine"&&!i.live) return false;
+    if(f==="review"&&!(i.maybe&&!i.num)) return false;
+    if(f==="removed"&&!i.gone) return false;
+    if(bk.en&&!/^english$/i.test(i.c.lang)) return false;
+    if(!words.length) return true; const hay=(id+" "+i.c.title+" "+i.c.author+" "+(i.num||"")).toLowerCase(); return words.every(w=>hay.includes(w));
+  });
+}
+function renderBk(){
+  const none=bk.ids.filter(id=>bkNone(bkInfo(id))).length, mine=Object.keys(bk.up).filter(id=>!bk.up[id].removed).length, rl=bkRemoved(), ready=rl.filter(x=>Date.now()-x.at>=AGE3).length;
+  $("summary").textContent=bk.ids.length?nfmt(bk.ids.length)+" books · "+nfmt(none)+" with no text anywhere · "+mine+" uploaded by you":"No book list loaded yet";
+  $("bkstat").textContent=bk.ids.length?(nfmt(bk.rows.length)+" book(s) match"+(bk.rows.length>bk.shown?" · showing the first "+bk.shown:"")+(bk.fl==="removed"?"\nMarked removed: the app already stopped using these texts. You can delete them for good after 3 days.":"")+(bk.note?"\n"+bk.note:"")):""; $("bkstat").style.whiteSpace="pre-wrap";
+  const db=$("bkdel"); db.hidden=!rl.length; db.textContent="Delete for good… ("+ready+" ready of "+rl.length+")"; db.disabled=bk.busy;
+  document.querySelectorAll("#bkfl button").forEach(b=>{ const on=b.dataset.f===bk.fl; b.classList.toggle("on",on); b.setAttribute("aria-pressed",on?"true":"false"); }); $("bken").checked=bk.en;
+  const nx=$("bknext"), ne=bk.ids.filter(id=>{ const i=bkInfo(id); return bkNone(i)&&/^english$/i.test(i.c.lang); }).length; nx.textContent="";
+  if(ne&&!(bk.fl==="none"&&bk.en)){ nx.appendChild(el("div","note","What to do next")); nx.appendChild(el("b",null,nfmt(ne)+" English book"+(ne===1?" has":"s have")+" no text yet")); const sb=el("button","primary","Show these books"); sb.onclick=()=>{ bk.fl="none"; bk.en=true; bk.shown=150; bkFilter(); bk.sel=bk.rows[0]||null; renderBk(); }; nx.appendChild(sb); nx.hidden=false; } else nx.hidden=true;
+  const box=$("bkitems"), sc=$("bklist").scrollTop; box.textContent="";
+  bk.rows.slice(0,bk.shown).forEach(id=>{
+    const i=bkInfo(id), it=el("button","bki"+(id===bk.sel?" on":"")); it.dataset.id=id;
+    it.appendChild(el("b",null,i.c.title)); it.appendChild(el("small",null,(i.c.author||"")+" · #"+id+" · "+i.c.lang+(i.gone?" · delete allowed "+(Date.now()-(i.gone.removedAt||0)>=AGE3?"now":"in "+Math.ceil(((i.gone.removedAt||0)+AGE3-Date.now())/86400e3)+" day(s)"):"")));
+    const ch=el("div","chips"); for(const [t,cl] of bkChips(i)) ch.appendChild(el("span","chip"+(cl?" "+cl:""),t)); it.appendChild(ch);
+    it.onclick=()=>{ bk.sel=id; $("bkpane").classList.add("pick"); renderBk(); $("bkmain").scrollTop=0; }; box.appendChild(it);
+  });
+  if(bk.rows.length>bk.shown){ const m=el("button",null,"Show 150 more"); m.onclick=()=>{ bk.shown+=150; renderBk(); }; box.appendChild(m); }
+  $("bklist").scrollTop=sc; renderBkMain();
+}
+
+/* The length check and word count (like archiveCheck in the app, about 150 words a minute). "hard" stops saving; "warn" asks first. */
+function bkCheck(raw,c){
+  const text=String(raw||"").replace(/^\uFEFF/,"").replace(/\u0000/g,"").replace(/\r\n?/g,"\n").trim();
+  const r={text,len:text.length,words:0,expected:0,ratio:0,hard:[],warn:[],good:[]};
+  if(!text.length) return r;
+  r.words=text.split(/\s+/).length;
+  if(r.len<200) r.hard.push("This is too short to be a book text (under 200 characters).");
+  if(/^\s*<(!doctype|html)/i.test(text)) r.hard.push("This looks like a web page (HTML), not a plain text.");
+  if(r.len>TXT_MAX) r.hard.push("Too long for one file: "+nfmt(r.len)+" characters (the limit is "+nfmt(TXT_MAX)+", about 800,000 words). Cut it or split it.");
+  else if(JSON.stringify(text).length>BODY_MAX-1000) r.hard.push("Too long for one file once it is saved. Cut it a little.");
+  if(r.len>=2000){
+    const sample=text.slice(0,200000), toks=sample.split(/\s+/).filter(Boolean);
+    const plain=(sample.match(/[\p{L}\p{N}\s.,;:!?'"“”‘’()\-—_]/gu)||[]).length/sample.length;
+    const wl=toks.filter(w=>/^\p{L}+(?:['’-]\p{L}+)*$/u.test(w.replace(/^[^\p{L}]+|[^\p{L}]+$/gu,""))).length/(toks.length||1);
+    if(plain<0.9||wl<0.75) r.warn.push("Much of this text looks unreadable (scan errors or strange symbols).");
+    if(/^english$/i.test((c&&c.lang)||"")&&toks.length>=300){
+      const stop=new Set("the and of to a in that was he it is with as his for had you her but not be at on by this which from she they have were".split(" "));
+      if(toks.filter(w=>stop.has(w.toLowerCase().replace(/[^a-z]/g,""))).length/toks.length<0.12) r.warn.push("This does not look like English, but the book is in English.");
+    }
+  }
+  const secs=(c&&+c.secs)||0; r.expected=secs?Math.round(secs/60*WPM):0;
+  if(secs>=600){
+    r.ratio=r.words/r.expected;
+    if(r.ratio>2.5) r.warn.push("Much longer than the recording ("+Math.round(r.ratio*100)+"% of the expected length). It may hold other books or plays too.");
+    else if(r.ratio<0.25) r.warn.push("Much shorter than the recording ("+Math.round(r.ratio*100)+"% of the expected length). Part of the book may be missing.");
+    else r.good.push("About as long as the recording ("+Math.round(r.ratio*100)+"% of the expected length).");
+  }else r.good.push("The recording is short, so the length was not compared.");
+  return r;
+}
+function bkStep(d){
+  if(!bk.rows.length) return; const i=bk.rows.indexOf(bk.sel), j=Math.max(0,Math.min(bk.rows.length-1,i<0?0:i+d));
+  bk.sel=bk.rows[j]; if(j>=bk.shown) bk.shown=j+1; $("bkpane").classList.add("pick"); renderBk();
+  const on=document.querySelector("#bkitems .bki.on"); if(on) on.scrollIntoView({block:"nearest"});
+}
+function renderBkMain(){
+  const m=$("bkmain"); m.textContent="";
+  if(bk.err){ m.appendChild(el("div","werr",bk.err)); return; }
+  const id=bk.sel; if(!id||!bk.cat[id]){ m.appendChild(el("p","note",bk.ids.length?"No book matches. Change the search or the filter.":"No books yet.")); return; }
+  const i=bkInfo(id), c=i.c;
+  const bb=el("button","bkback","← Back to list"); bb.onclick=()=>$("bkpane").classList.remove("pick"); m.appendChild(bb);
+  const pos=bk.rows.indexOf(id);
+  m.appendChild(el("div","crumb","Book #"+id+(i.num?" · Gutenberg "+i.num:"")+(pos>=0?" · "+(pos+1)+" of "+bk.rows.length:"")));
+  const t=el("div","ctitle"); t.appendChild(el("h2",null,c.title)); m.appendChild(t);
+  const ch=el("div","chips"); for(const [x,cl] of bkChips(i)) ch.appendChild(el("span","chip"+(cl?" "+cl:""),x)); m.appendChild(ch);
+  m.appendChild(el("div","note",(c.author||"Unknown author")+" · "+(c.lang||"language unknown")+" · recording "+fmtDur(c.secs)+(c.secs?" (about "+nfmt(Math.round(c.secs/60*WPM))+" words)":"")));
+  if(bk.oldWorker) m.appendChild(el("div","werr","Your Worker does not have the new text code yet, so saving, removing and deleting are switched off. Paste the new admin-worker.js into Cloudflare (step 1 of the Task 6b notes), then press Books again."));
+  if(bk.note) m.appendChild(el("div","note",bk.note));
+  if(bkNone(i)) m.appendChild(el("p","note","No text anywhere for this book. The app can only offer “Use my own text”. Upload one below."));
+  /* where a text can come from */
+  const sc=el("div","bkcard"); sc.appendChild(el("h4",null,"Where a text can come from"));
+  const dl=el("dl","src"), row=(a,b)=>{ dl.appendChild(el("dt",null,a)); const d=el("dd"); if(b&&b.nodeType) d.appendChild(b); else d.textContent=b; dl.appendChild(d); };
+  row("Uploaded by me",i.live?"yes · "+nfmt(i.live.words)+" words · "+fmtDate(i.live.at):(i.gone?"removed on "+fmtDate(i.gone.removedAt):"no"));
+  if(i.num){ const d=el("span"); d.appendChild(document.createTextNode(String(i.num)+(i.s?" (found by search":" (from the catalog")+(i.s&&i.found?": matched “"+i.found[1]+"” by "+i.found[2]:"")+") · ")); d.appendChild(lnk("open on Gutenberg","https://www.gutenberg.org/ebooks/"+i.num)); row("Gutenberg number",d); }
+  else row("Gutenberg number","none");
+  row("Own copy in Book_Text",i.num?(i.h?"yes":(bk.tx?"not there yet (the app uses the usual Gutenberg routes)":"unknown (no status list)")):"no number, so no copy");
+  row("Timing file (wordtrail-packs)",bk.tx?(i.p?"yes":"no"):"unknown (no status list)");
+  if(c.ia){ const d=el("span"); d.appendChild(lnk(c.ia,"https://archive.org/details/"+encodeURIComponent(c.ia))); row("archive.org id",d); } else row("archive.org id","none");
+  if(c.url){ const d=el("span"); d.appendChild(lnk(c.url,c.url)); row("Text link in catalog",d); } else row("Text link in catalog","none");
+  if(i.maybe){ const d=el("span"); d.appendChild(document.createTextNode(String(i.maybe[0])+" “"+i.maybe[1]+"” by "+i.maybe[2]+" · "+(i.maybe[3]||"")+" · ")); d.appendChild(lnk("look","https://www.gutenberg.org/ebooks/"+i.maybe[0])); row("Doubtful match (never used by the app)",d); }
+  sc.appendChild(dl); m.appendChild(sc);
+  /* the uploaded text (live or removed) */
+  if(i.live||i.gone){
+    const u=i.live||i.gone, uc=el("div","bkcard"); uc.appendChild(el("h4",null,i.live?"Uploaded text":"Removed text"));
+    const ud=el("dl","src"), r2=(a,b)=>{ ud.appendChild(el("dt",null,a)); ud.appendChild(el("dd",null,b)); };
+    r2("Words",nfmt(u.words)); r2("File size",(u.size/1048576).toFixed(2)+" MB"); r2("Uploaded",fmtDate(u.at));
+    if(i.gone){ const left=Math.max(0,Math.ceil((u.removedAt+AGE3-Date.now())/86400e3)); r2("Removed on",fmtDate(u.removedAt)); r2("Delete for good allowed",left?"in "+left+" day(s) at the earliest":"ready now"); }
+    uc.appendChild(ud);
+    if(bk.prev[id]!=null) uc.appendChild(el("div","bkprev",bk.prev[id]));
+    const rw=el("div","row");
+    if(i.live){
+      const pv=el("button",null,bk.prev[id]!=null?"Hide the start":"Show the start of the text"); pv.disabled=bk.busy; pv.onclick=()=>bkPreview(id); rw.appendChild(pv);
+      const rb=el("button","danger","Mark removed"); rb.disabled=bk.busy||bk.oldWorker; rb.onclick=()=>{ if(confirm("Mark this text as removed? The app stops using it (phones may take up to 5 minutes). The file is deleted only when you press Delete for good, at least 3 days later.")) bkMark(id,true); }; rw.appendChild(rb);
+    }else{ const ub=el("button","primary","Undo remove"); ub.disabled=bk.busy||bk.oldWorker; ub.onclick=()=>bkMark(id,false); rw.appendChild(ub); }
+    uc.appendChild(rw); m.appendChild(uc);
+  }
+  /* the upload box */
+  const dr=bk.draft[id]||(bk.draft[id]={text:"",pd:false}), up=el("div","bkcard");
+  up.appendChild(el("h4",null,i.live?"Replace the uploaded text":"Upload a text for this book"));
+  up.appendChild(el("div","note","One plain text (.txt) for the whole book, pasted or chosen from a file. Only texts that are in the public domain."));
+  const fi=document.createElement("input"); fi.type="file"; fi.accept=".txt,text/plain"; fi.hidden=true;
+  const fb=el("button",null,"Choose a .txt file…"); fb.disabled=bk.busy; fb.onclick=()=>fi.click();
+  const ta=document.createElement("textarea"); ta.placeholder="…or paste the text here"; ta.value=dr.text; ta.disabled=bk.busy; ta.spellcheck=false;
+  const an=el("div"), cb=document.createElement("input"); cb.type="checkbox"; cb.id="bkpd"; cb.checked=dr.pd; cb.disabled=bk.busy;
+  const pdl=el("label","pdl"); pdl.appendChild(cb); pdl.appendChild(el("span",null,"This text is public domain. I checked it.")); pdl.htmlFor="bkpd";
+  const sv=el("button","primary","Save text for this book"); sv.id="bksavetext";
+  function refresh(){
+    const r=bkCheck(dr.text,c); an.textContent="";
+    if(!r.text.length) an.appendChild(el("div","note","Nothing yet. Paste a text or choose a file."));
+    else{
+      an.appendChild(el("div","note","Words: "+nfmt(r.words)+" · characters: "+nfmt(r.len)+(r.expected?" · expected from the recording: about "+nfmt(r.expected)+" words":"")));
+      for(const x of r.hard) an.appendChild(el("div","vd bad","✗ "+x)); for(const x of r.warn) an.appendChild(el("div","vd warn","! "+x)); if(!r.hard.length&&!r.warn.length) for(const x of r.good) an.appendChild(el("div","vd ok","✓ "+x));
+    }
+    sv.disabled=bk.busy||bk.oldWorker||!r.text.length||r.hard.length>0||!dr.pd; sv.textContent=r.warn.length&&!r.hard.length?"Save anyway…":"Save text for this book";
+  }
+  let tm=0; ta.oninput=()=>{ dr.text=ta.value; clearTimeout(tm); tm=setTimeout(refresh,250); };
+  cb.onchange=()=>{ dr.pd=cb.checked; refresh(); };
+  fi.onchange=async()=>{ const f=fi.files&&fi.files[0]; if(!f) return; try{ dr.text=await f.text(); ta.value=dr.text; }catch(e){ alert("Could not read that file: "+e.message); } fi.value=""; refresh(); };
+  sv.onclick=async()=>{ const r=bkCheck(dr.text,c); if(r.hard.length||!dr.pd||!r.text.length) return; if(r.warn.length&&!confirm("Check before saving:\n\n• "+r.warn.join("\n• ")+"\n\nSave this text anyway?")) return; await bkSave(id,r); };
+  const rw2=el("div","row"); rw2.append(fb,fi); up.append(rw2,ta,an,pdl,sv); refresh(); m.appendChild(up);
+  const ac=el("div","acts"); const pv2=el("button",null,"← Previous"); pv2.onclick=()=>bkStep(-1); const nx=el("button","go","Next →"); nx.onclick=()=>bkStep(1); ac.append(pv2,nx); m.appendChild(ac);
+  m.appendChild(el("p","note","Saving only writes text/"+id+".json in your Worker's bucket. Mark removed only hides the text from the app; the file is deleted by Delete for good, at least 3 days later. Keys: ← → change book."));
+}
+async function bkPreview(id){
+  if(bk.prev[id]!=null){ delete bk.prev[id]; renderBkMain(); return; }
+  try{ const r=await api("/api/file?key="+enc(tkey(id))); if(!r.ok) throw new Error("HTTP "+r.status); const o=JSON.parse(await r.text()); bk.prev[id]=String(o.text||"").slice(0,700)+(String(o.text||"").length>700?" …":""); }
+  catch(e){ alert("Could not read the text: "+e.message); }
+  renderBkMain();
+}
+/* One backup copy of the current file per book per visit, before the first change. */
+async function bkBackup(id,raw){
+  if(bk.baked[id]||!bk.up[id]) return;
+  if(raw==null){ const r=await api("/api/file?key="+enc(tkey(id))); if(r.status===404) return; if(!r.ok) throw new Error("could not read the current file (HTTP "+r.status+")"); raw=await r.text(); }
+  const ts=new Date().toISOString().replace(/[-:T]/g,"").slice(0,14), k="text/"+id+".bak-"+ts+".json", b=await putJson(k,raw);
+  if(!b.ok) throw new Error("backup failed ("+await bkErr(b)+")");
+  (bk.baks[id]=bk.baks[id]||[]).push(k); bk.baked[id]=true;
+}
+async function bkSave(id,r){
+  if(bk.busy) return; bk.busy=true; renderBkMain();
+  try{
+    const c=bk.cat[id], o={v:1,id:Number(id),title:c.title,text:r.text,words:r.words,pd:true,at:Date.now()}, body=JSON.stringify(o);
+    if(body.length>BODY_MAX) throw new Error("the text is too big for one file");
+    await bkBackup(id);
+    const w=await putJson(tkey(id),body); if(!w.ok) throw new Error(await bkErr(w));
+    bk.up[id]={size:body.length,uploaded:new Date().toISOString(),words:r.words,at:o.at,removed:false,removedAt:0};
+    delete bk.draft[id]; delete bk.prev[id]; toast("Saved: "+nfmt(r.words)+" words for “"+c.title+"”.");
+  }catch(e){ alert("Not saved: "+e.message+". Nothing was changed."); }
+  finally{ bk.busy=false; bkFilter(); renderBk(); }
+}
+/* Step 1 of Remove (and Undo): read the newest file, change only the removed mark, write it back. */
+async function bkMark(id,remove){
+  if(bk.busy) return; bk.busy=true; renderBkMain();
+  try{
+    const r=await api("/api/file?key="+enc(tkey(id))); if(!r.ok) throw new Error("could not read the current file (HTTP "+r.status+")");
+    const raw=await r.text(), o=JSON.parse(raw); await bkBackup(id,raw);
+    if(remove) o.removedAt=Date.now(); else delete o.removedAt;
+    const w=await putJson(tkey(id),JSON.stringify(o)); if(!w.ok) throw new Error(await bkErr(w));
+    bk.up[id]=Object.assign({},bk.up[id],{removed:!!remove,removedAt:remove?o.removedAt:0});
+    toast(remove?"Marked removed. The app stops using it. You can delete the file for good after 3 days.":"Restored. The app can use this text again.");
+  }catch(e){ alert("Not saved: "+e.message+". Nothing was changed."); }
+  finally{ bk.busy=false; bkFilter(); renderBk(); }
+}
+/* Step 2: delete removed texts (and their backups) that were removed at least 3 days ago. The list is read again first, so a text restored on another device is never deleted. */
+async function bkDelete(){
+  if(bk.busy) return; bk.busy=true; renderBk();
+  try{
+    await bkLoadUploads();
+    const all=bkRemoved(), ready=all.filter(x=>Date.now()-x.at>=AGE3);
+    if(!ready.length){ toast(all.length?"None of the "+all.length+" removed text(s) is 3 days old yet.":"Nothing is marked as removed."); return; }
+    const keys=[]; for(const x of ready){ keys.push(tkey(x.id)); for(const k of (bk.baks[x.id]||[])) keys.push(k); }
+    if(!confirm("Delete "+ready.length+" removed text file(s) and "+(keys.length-ready.length)+" backup cop"+(keys.length-ready.length===1?"y":"ies")+" for good? This cannot be undone.")) return;
+    for(let n=0;n<keys.length;n+=500){
+      const r=await api("/api/delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({keys:keys.slice(n,n+500)})});
+      if(!r.ok) throw new Error(await bkErr(r));
+    }
+    for(const x of ready){ delete bk.up[x.id]; delete bk.baks[x.id]; delete bk.baked[x.id]; delete bk.prev[x.id]; }
+    toast("Deleted "+ready.length+" removed text(s).");
+  }catch(e){ alert("Not finished: "+e.message+"."); }
+  finally{ bk.busy=false; bkFilter(); renderBk(); }
+}
+/* =================== Home tab ===================
+   Read-only overview. It reads the same lists and files the other tabs read and never writes anything.
+   Kept / delete marks are the ones saved on this device by the Music tab. */
+const hm={run:0,d:null};
+const hGet=(base,path)=>fetch(base+path,{headers:{Authorization:"Bearer "+st.tok}});
+async function hList(base,prefix){
+  const out=[]; let cursor=null;
+  do{
+    const q=[prefix?"prefix="+enc(prefix):"",cursor?"cursor="+enc(cursor):""].filter(Boolean).join("&");
+    const r=await hGet(base,"/api/list"+(q?"?"+q:""));
+    if(r.status===401){ const e=new Error("401"); e.code=401; throw e; }
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const d=await r.json(); out.push(...d.objects); cursor=d.cursor;
+  }while(cursor);
+  return out;
+}
+async function hJson(base,key){ const r=await hGet(base,"/api/file?key="+enc(key)); if(!r.ok) return null; try{ return JSON.parse(await r.text()); }catch(e){ return null; } }
+function goMode(m){ $("a").pause(); st.which=m; ls("r2-which",m); updateSw(); connect(); }
+async function hmMusic(){
+  const objs=await hList(st.root,""), retired=(await hJson(st.root,"retired.json"))||{}; let marks={};
+  try{ marks=JSON.parse(ls("r2-marks:"+st.root)||"{}"); }catch(e){}
+  const moods={}; let n=0,k=0,d=0,r=0,mbytes=0,other=0;
+  for(const o of objs){
+    if(!/\.mp3$/i.test(o.key)){ other+=o.size||0; continue; }
+    n++; mbytes+=o.size||0; const c=moods[moodOf(o.key)]||(moods[moodOf(o.key)]={n:0,k:0,d:0}); c.n++;
+    if(retired[o.key]){ r++; c.d++; } else if(marks[o.key]==="keep"){ k++; c.k++; } else if(marks[o.key]==="del"){ d++; c.d++; }
+  }
+  return {objs,moods,n,k,d,r,mbytes,other};
+}
+async function hmAmb(){
+  const base=st.root+"/ambient"; let objs;
+  try{ objs=await hList(base,""); }catch(e){ if(e.code===401) throw e; return {off:true}; }
+  if(!objs.some(o=>o.key==="ambient-candidates.json")) return {off:true};
+  const cand=(await hJson(base,"ambient-candidates.json"))||{}, idx=(await hJson(base,"ambient-index.json"))||{}, folderOf={}, fol=new Set(); let clips=0,bytes=0,rev=0;
+  for(const f in cand) for(const e of cand[f]) folderOf[e.r2_key]=f;
+  for(const o of objs){ if(!/\.mp3$/i.test(o.key)) continue; clips++; bytes+=o.size||0; fol.add(folderOf[o.key]||o.key.split("/").slice(0,-1).join("/")); }
+  for(const f of fol) if(idx[f]&&idx[f].reviewed) rev++;
+  return {clips,folders:fol.size,rev,bytes};
+}
+async function hmCov(){
+  const r=await fetch(cvBase()+"/index.json",{cache:"no-cache"}); if(!r.ok) throw new Error("HTTP "+r.status);
+  const j=await r.json(), books={};
+  if(j&&j.b&&typeof j.b==="object"&&!Array.isArray(j.b)){ for(const k in j.b){ const a=j.b[k]; if(/^\d+$/.test(k)&&Array.isArray(a)) books[k]=String(a[1]||"").split(",").map(x=>x.trim()).filter(x=>ORDER.includes(x)); } }
+  else{ const b=(j&&j.books)||j; for(const k in b) if(/^\d+$/.test(k)&&b[k]&&typeof b[k]==="object"){ const h=b[k].have; books[k]=Array.isArray(h)?h.filter(x=>ORDER.includes(x)):[]; } }
+  const ov=((await hJson(st.root,"covers/overrides.json"))||{}).books||{}, ids=Object.keys(books); let none=0;
+  for(const id of ids){ const rm=(ov[id]&&ov[id].removed)||[]; if(!books[id].filter(x=>!rm.includes(x)).length) none++; }
+  return {total:ids.length,none,changed:Object.keys(ov).length};
+}
+async function hmBk(){
+  const up={}; let baks=0;
+  for(const o of await hList(st.root,"text/")){
+    const m=/^text\/(\d+)\.json$/.exec(o.key);
+    if(m){ const md=o.meta||{}; up[m[1]]={words:Number(md.words)||0,at:Number(md.at)||Date.parse(o.uploaded)||0,removed:md.removed==="1",removedAt:Number(md.removedAt)||0}; }
+    else if(/^text\/\d+\.bak-/.test(o.key)) baks++;
+  }
+  const rc=await fetch(catUrl(),{cache:"no-cache"}); if(!rc.ok) throw new Error("catalog HTTP "+rc.status);
+  const j=JSON.parse(await rc.text()), rows=Array.isArray(j)?j:(Array.isArray(j&&j.b)?j.b:(Object.values(j||{}).find(v=>Array.isArray(v))||[])), cat={};
+  for(const row of rows) if(Array.isArray(row)&&/^\d+$/.test(String(row[0]))) cat[row[0]]={title:String(row[1]||""),lang:String(row[4]||""),gid:Number(row[5])||0,ia:String(row[8]||"")};
+  let tx=null; try{ const t=await fetch(bkBase()+"/texts.json",{cache:"no-cache"}); if(t.ok){ const x=await t.json(); if(x&&x.b&&typeof x.b==="object"&&!Array.isArray(x.b)) tx=x.b; } }catch(e){}
+  const ids=Object.keys(cat); let none=0,noneEn=0;
+  for(const id of ids){ const c=cat[id], t=tx&&tx[id], fl=t?String(t[1]||""):"", num=t?(Number(t[0])||0):c.gid, u=up[id];
+    if(!num&&!fl.includes("p")&&!(fl.includes("a")||c.ia)&&!(u&&!u.removed)){ none++; if(/^english$/i.test(c.lang)) noneEn++; } }
+  const mine=Object.keys(up).filter(id=>!up[id].removed), rem=Object.keys(up).filter(id=>up[id].removed);
+  return {cat,up,total:ids.length,none,noneEn,mine:mine.length,words:mine.reduce((s,id)=>s+up[id].words,0),removed:rem.length,ready:rem.filter(id=>Date.now()-up[id].removedAt>=AGE3).length,baks,tx:!!tx};
+}
+async function connectHome(){
+  st.amb=false; document.body.classList.remove("amb"); $("summary").textContent="Loading overview…";
+  const run=++hm.run; let music;
+  try{ music=await hmMusic(); }
+  catch(e){ showErr(e.code===401?"That token didn't work (401). Check it and try again.":"Can't reach the Worker ("+e.message+"). Check the Worker URL below."); return; }
+  if(run!==hm.run) return;
+  const d=hm.d={music,amb:null,cov:null,bk:null,err:{},rv:null,pending:new Set(["amb","cov","bk","rv"]),at:Date.now()};
+  $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent;
+  updateSw(); document.body.classList.add("conn"); hmRender();
+  await Promise.all([["amb",hmAmb],["cov",hmCov],["bk",hmBk],["rv",hmRv]].map(async([k,f])=>{
+    try{ d[k]=await f(); }catch(e){ d[k]=null; d.err[k]=e.message; }
+    d.pending.delete(k); if(run===hm.run){ d.at=Date.now(); hmRender(); }
+  }));
+}
+const ago=t=>{ const s=Math.max(0,(Date.now()-t)/1000); return s<90?"just now":s<5400?Math.round(s/60)+" min ago":s<129600?Math.round(s/3600)+" h ago":Math.round(s/86400)+" d ago"; };
+const IC={amb:'<path d="M3 12c3-8 6-8 9 0s6 8 9 0"/>',cov:'<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',rv:'<path d="m12 3 2.7 5.5 6 .9-4.4 4.3 1 6-5.3-2.8L6.7 19.7l1-6L3.3 9.4l6-.9z"/>',bk:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/>',ref:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',chev:'<path d="m9 6 6 6-6 6"/>',pulse:'<path d="M3 12h3l3-8 4 16 3-8h5"/>'};
+const ic=(k,sz)=>{ const e=document.createElement("span"); e.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[k]+'</svg>'; return e.firstChild; };
+function hmRender(){
+  const d=hm.d, p=$("homepane"); if(!d||st.which!=="home") return;
+  const m=d.music, GB=1073741824, pct=(a,b)=>b?Math.max(0,Math.min(100,a/b*100)):0, A=d.amb&&!d.amb.off?d.amb:null, left=m.n-m.k-m.d-m.r, pend=d.pending.size;
+  const upd=pend?"Loading…":"Updated "+new Date(d.at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  $("summary").textContent="Overview · "+upd;
+  const btn=(c,t,f)=>{ const b=el("button",c,t); b.onclick=f; return b; };
+  const lg=(a,cls)=>{ const l=el("div","h-lg"+(cls?" "+cls:"")); for(const [c,t,col] of a){ const s=el("span"), u=el("u",c); if(col) u.style.background=col; s.append(u,document.createTextNode(t)); l.appendChild(s); } return l; };
+  const leg=[["h-k","Kept "+nfmt(m.k)],["h-d2","Delete "+nfmt(m.d+m.r)],["h-p","Left "+nfmt(left)]];
+  const ring=(sz,fs,sub)=>{
+    const C=2*Math.PI*76, kl=m.n?m.k/m.n*C:0, dl=m.n?(m.d+m.r)/m.n*C:0, r=el("div","h-ring");
+    r.innerHTML='<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 200 200" role="img" aria-label="Music review progress"><g transform="rotate(-90 100 100)" fill="none" stroke-width="22"><circle cx="100" cy="100" r="76" style="stroke:var(--line)"/><circle cx="100" cy="100" r="76" style="stroke:var(--keep)" stroke-dasharray="'+kl+' '+C+'"/><circle cx="100" cy="100" r="76" style="stroke:var(--del)" stroke-dasharray="'+dl+' '+C+'" stroke-dashoffset="'+(-kl)+'"/></g></svg>';
+    const c=el("div"), b=el("div","h-big",m.n?Math.round((m.k+m.d+m.r)/m.n*100)+"%":"–"); b.style.fontSize=fs+"px"; c.appendChild(b); if(sub) c.appendChild(el("div","h-note",sub)); r.appendChild(c); return r;
+  };
+  const tile=(lab,key,mode,fn,icn,col,mob)=>{
+    const t=el("button","h-card"), s=d.pending.has(key)?"Loading…":(d[key]&&d[key].off)?"Not set up on the Worker":!d[key]?"Could not load ("+(d.err[key]||"no data")+")":"", r=s?null:fn(d[key]);
+    t.onclick=()=>goMode(mode);
+    if(!mob){ const b=el("div","h-ic"); b.style.background="color-mix(in srgb,"+col+" 18%,transparent)"; b.style.color=col; b.appendChild(ic(icn,20)); t.appendChild(b); }
+    const big=el("div","h-big",s?"–":r.val); if(mob) big.style.fontSize="28px";
+    if(r&&r.of!=null){ const o=el("small",null," / "+r.of); o.style.color="var(--mut)"; big.appendChild(o); }
+    const tr=el("div","h-trk"), i=document.createElement("i"); i.style.width=(r?r.pv:0)+"%"; i.style.background=r?col:"var(--line)"; tr.appendChild(i);
+    t.append(el("div","h-lab",lab),big,tr,el("div","h-note",s||r.sub)); return t;
+  };
+  const specs=[
+    ["Ambient folders","amb","amb",a=>({val:nfmt(a.rev),of:nfmt(a.folders),sub:nfmt(a.clips)+" clips · reviewed folders",pv:pct(a.rev,a.folders)}),"amb","var(--acc)"],
+    ["Book covers","cov","cov",c=>({val:nfmt(c.total-c.none),of:nfmt(c.total),sub:c.none?nfmt(c.none)+" books still need a cover":"Every book has a cover",pv:pct(c.total-c.none,c.total)}),"cov","var(--keep)"],
+    ["Book texts","bk","bk",b=>({val:nfmt(b.total-b.none),of:nfmt(b.total),sub:nfmt(b.mine)+" uploaded by you · "+nfmt(b.words)+" words"+(b.tx?"":" · status list missing"),pv:pct(b.total-b.none,b.total)}),"bk","var(--warn)"],
+    ["Reviews hidden","rv","rv",r=>({val:nfmt(r.hidden),sub:nfmt(r.reported)+" with reports · hidden from readers at 3+",pv:pct(r.hidden,Math.max(r.reported,1))}),"rv","var(--del)"]];
+  const T=(i,mob)=>tile(...specs[i],mob);
+  const at=[];
+  if(left>0) at.push([left,"Music clips to review","Mark each Keep or Delete","music","Review"]);
+  if(m.d>0) at.push([m.d,"Clips marked to delete","Step 1 · Retire marked","music","Open"]);
+  if(m.r>0) at.push([m.r,"Retired clips","Step 2 · Delete retired","music","Open"]);
+  if(d.cov&&d.cov.none>0) at.push([d.cov.none,"Books without a cover","Covers tab","cov","Open"]);
+  if(d.bk&&d.bk.noneEn>0) at.push([d.bk.noneEn,"English books with no text","Books tab","bk","Open"]);
+  if(d.rv&&d.rv.reported>0) at.unshift([d.rv.reported,"Reviews with reports",nfmt(d.rv.hidden)+" hidden from readers","rv","Review"]);
+  if(d.bk&&d.bk.ready>0) at.push([d.bk.ready,"Removed texts ready to delete","Older than 3 days","bk","Open"]);
+  if(A&&A.folders>A.rev) at.push([A.folders-A.rev,"Ambient folders not reviewed","Ambient tab","amb","Open"]);
+  const ev=[]; if(d.bk) for(const id in d.bk.up){ const u=d.bk.up[id], t=u.removed?(u.removedAt||u.at):u.at; if(t) ev.push([t,(u.removed?"Marked removed: ":"Saved text: ")+((d.bk.cat[id]&&d.bk.cat[id].title)||"Book "+id)]); }
+  for(const o of m.objs){ const t=Date.parse(o.uploaded)||0; if(o.key==="retired.json") ev.push([t,"Retired list updated"]); else if(o.key==="covers/overrides.json") ev.push([t,"Cover choices saved"]); }
+  ev.sort((a,b)=>b[0]-a[0]);
+  const attCard=mob=>{
+    const c=el("section","h-card"); c.style.flex="1 1 300px"; c.appendChild(el("h3",null,"Needs attention"));
+    if(!at.length&&!pend) c.appendChild(el("div","h-note","All caught up."));
+    at.slice(0,mob?3:5).forEach(([n,t,sub,mode,b],i)=>{ const tx=el("div"); tx.append(el("b",null,t),el("span","h-note",sub));
+      if(mob){ const r=el("button","h-row"+(i?"":" f")); r.onclick=()=>goMode(mode); r.append(el("span","chip no",nfmt(n)),tx,ic("chev",18)); c.appendChild(r); }
+      else{ const r=el("div","h-li"); r.append(el("span","chip no",nfmt(n)),tx,btn("sm",b,()=>goMode(mode))); c.appendChild(r); } });
+    return c;
+  };
+  const moodCard=(lim,mob)=>{
+    const c=el("section","h-card"), h=el("div","h-hh"); h.appendChild(el("h3",null,"Mood breakdown")); if(!mob) h.appendChild(lg([["h-k","Kept"],["h-d2","Delete"],["h-p","Left"]])); c.appendChild(h);
+    const mo=Object.entries(m.moods).sort((a,b)=>b[1].n-a[1].n); if(!mo.length) c.appendChild(el("div","h-note","No music clips found."));
+    for(const [name,x] of mo.slice(0,lim)){ const r=el("div","h-mr"), bar=el("div","h-bar"), k=el("i","h-k"), dd=el("i","h-d2"), l=el("i","h-p"); k.style.width=pct(x.k,x.n)+"%"; dd.style.width=pct(x.d,x.n)+"%"; l.style.flex="1"; bar.append(k,dd,l); r.append(el("b",null,pretty(name)),bar,el("span",null,nfmt(x.n))); c.appendChild(r); }
+    if(mob&&mo.length>lim) c.appendChild(el("div","h-note","Showing top "+lim+" · tap Music for all moods"));
+    return c;
+  };
+  const stoCard=mob=>{
+    const c=el("section","h-card"), A2=A?A.bytes:0, tot=m.mbytes+A2+m.other, cap=FREE_GB*GB, tr=el("div","h-bar"); c.style.flex="1 1 300px"; tr.style.height=mob?"12px":"14px";
+    for(const [v,col] of [[m.mbytes,"var(--acc)"],[A2,"var(--keep)"],[m.other,"var(--line)"]]){ const i=document.createElement("i"); i.style.width=pct(v,cap)+"%"; i.style.background=col; tr.appendChild(i); }
+    const big=el("div","h-big",(tot/GB).toFixed(tot<GB?2:1)+" "); const u=el("small",null,"GB"); u.style.color="var(--mut)"; big.appendChild(u);
+    const g=(x)=>(x/GB).toFixed(2), bk=d.bk?" · "+nfmt(d.bk.baks)+" book-text backups":"";
+    if(mob){ const h=el("div","h-hh"); h.append(el("h3",null,"Storage"),el("span","h-note","of "+FREE_GB+" GB free tier")); c.append(h,big,tr,el("div","h-note","Music "+g(m.mbytes)+" · Ambient "+g(A2)+" · Other "+g(m.other)+bk)); }
+    else c.append(el("h3",null,"Storage"),big,tr,lg([["","Music "+g(m.mbytes),"var(--acc)"],["","Ambient "+g(A2),"var(--keep)"],["","Other "+g(m.other),"var(--line)"]]),el("div","h-note","of the "+FREE_GB+" GB free tier (Music and Ambient share it)"+bk));
+    return c;
+  };
+  const actCard=()=>{
+    const c=el("section","h-card"); c.style.flex="1 1 300px"; c.appendChild(el("h3",null,"Recent activity"));
+    if(!ev.length) c.appendChild(el("div","h-note",pend?"Loading…":"Nothing yet."));
+    for(const [t,txt] of ev.slice(0,5)){ const li=el("div","h-li"); li.append(el("span","chip",ago(t)),el("div",null,txt)); c.appendChild(li); }
+    return c;
+  };
+  const go=()=>{ const b=btn("primary","Continue reviewing",()=>goMode("music")); b.style.minHeight="48px"; return b; };
+  /* large screens */
+  const D=el("div","h-wrap h-d"), top=el("div","h-top"), tl=el("div"), tr=el("div","h-tr"), gear=btn("h-ib","⚙",e=>{ e.stopPropagation(); $("gmenu").hidden=!$("gmenu").hidden; }); gear.setAttribute("aria-label","Connection");
+  tl.append(el("div","h-lab","Overview"),el("h2",null,"Your library, live.")); tr.append(el("span","chip hi","Connected"),el("span","chip",upd),gear,btn("primary","Refresh",()=>connect())); top.append(tl,tr);
+  const hero=el("section","h-card h-hero"), hh=el("div","h-hh"); hh.append(el("h3",null,"Music review"),btn("sm","Open",()=>goMode("music")));
+  hero.append(hh,ring(240,56,nfmt(m.n)+" clips"),lg(leg,"c"),go(),el("div","h-note","Keep and delete marks are saved on this device."));
+  const tiles=el("div","h-tiles"); tiles.append(T(0),T(1),T(2),T(3)); const rt=el("div","h-rt"); rt.append(tiles,moodCard(8)); const cols=el("div","h-cols"); cols.append(hero,rt);
+  const bot=el("div","h-cols"); bot.append(attCard(),stoCard(),actCard()); D.append(top,cols,bot);
+  /* phones */
+  const M=el("div","h-wrap h-m"), bar=el("div","h-mbar"), lm=el("div","h-lm"); lm.appendChild(ic("pulse",18));
+  const rf=btn("h-ib",null,()=>connect()); rf.appendChild(ic("ref",20)); rf.setAttribute("aria-label","Refresh"); bar.append(lm,el("h1",null,"Overview"),rf);
+  const chips=el("div","h-chips"); chips.append(el("span","chip hi","Connected"),el("span","h-note",upd));
+  const heroM=el("section","h-card h-hero"), row=el("div","h-hrow"), side=el("div"), mb=el("div","h-big",nfmt(m.n)), mu=el("small",null," clips"); mu.style.color="var(--mut)"; mb.appendChild(mu); mb.style.fontSize="34px";
+  side.append(el("div","h-lab","Music review"),mb,lg(leg,"v")); row.append(ring(112,24),side); heroM.append(row,go());
+  const g2=el("div","h-g2"); g2.append(T(0,true),T(1,true));
+  M.append(bar,chips,heroM,attCard(true),g2,T(2,true),T(3,true),moodCard(4,true),stoCard(true),actCard());
+  const keep=p.scrollTop; p.textContent=""; p.append(D,M); p.scrollTop=keep;
+}
+$("bkq").oninput=()=>{ bk.shown=150; bkFilter(); bk.sel=bk.rows[0]||null; renderBk(); };
+document.querySelectorAll("#bkfl button").forEach(b=>b.onclick=()=>{ bk.fl=(bk.fl===b.dataset.f)?"":b.dataset.f; bk.shown=150; bkFilter(); bk.sel=bk.rows[0]||null; renderBk(); });
+$("bken").onchange=()=>{ bk.en=$("bken").checked; bk.shown=150; bkFilter(); bk.sel=bk.rows[0]||null; renderBk(); };
+$("bkdel").onclick=bkDelete;
+$("bksave").onclick=async()=>{ const v=$("bkbase").value.trim().replace(/\/+$/,""); if(!/^https?:\/\//.test(v)){ alert("Enter a full address that starts with https://"); return; }
+  ls("bk-base",v); const c=$("bkcat").value.trim(); if(/^https?:\/\//.test(c)) ls("cov-catalog",c); await bkLoadBooks(); bkFilter(); bk.sel=bk.rows[0]||null; renderBk(); };
+
+
+/* ---------- Reviews: moderate book ratings and reviews (Reviews Worker: tools/reviews-admin-worker) ---------- */
+const rv={base:ls("rv-base")||"",tab:"queue",min:"3",items:[],next:null,loading:false,err:null,scan:null,scanning:"",scanErr:null,chk:null,log:null,logErr:null,cat:null};
+async function rvApi(path,body){
+  if(!rv.base) throw new Error("The Reviews Worker address is not set.");
+  let r; try{ r=await fetch(rv.base.replace(/\/+$/,"")+path,{method:body?"POST":"GET",headers:Object.assign({Authorization:"Bearer "+st.tok},body?{"content-type":"application/json"}:{}),body:body?JSON.stringify(body):undefined}); }
+  catch(e){ throw new Error("Can't reach the Reviews Worker. Check its address under “Reviews Worker address”."); }
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok){ const e=new Error(r.status===401?"The Reviews Worker did not accept the token (401). Its ADMIN_TOKEN must be the same as your Admin token.":((j&&j.error)||("HTTP "+r.status))); e.code=r.status; e.hint=j&&j.hint; throw e; }
+  return j;
+}
+async function rvCat(){
+  if(rv.cat) return rv.cat; rv.cat={};
+  try{ const rc=await fetch(catUrl(),{cache:"no-cache"}); if(rc.ok){ const j=JSON.parse(await rc.text()), rows=Array.isArray(j)?j:(Array.isArray(j&&j.b)?j.b:(Object.values(j||{}).find(v=>Array.isArray(v))||[]));
+    for(const row of rows) if(Array.isArray(row)&&/^\d+$/.test(String(row[0]))) rv.cat[row[0]]=String(row[1]||""); } }catch(e){}
+  return rv.cat;
+}
+const rvTitle=id=>(rv.cat&&rv.cat[id])||"Book #"+id;
+const rvShort=u=>u.length>10?u.slice(0,8)+"…":u;
+const rvDate=t=>{ const d=t?new Date(typeof t==="number"?t*1000:t):null; return d&&!isNaN(d)?d.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}):""; };
+const RV_WHY={spam:"Spam",offensive:"Offensive",spoiler:"Spoiler",other:"Other"};
+
+function rvSetup(first){
+  const c=el("div","card2"); c.appendChild(el("h4",null,first?"Set up the Reviews Worker":"Reviews Worker address"));
+  if(first) c.appendChild(el("p",null,"One-time setup. Deploy tools/reviews-admin-worker (see its README), then paste its address here. It uses the same admin token as this page."));
+  const row=el("div","rv-in"), inp=el("input"); inp.placeholder="https://wordtrail-reviews.…workers.dev"; inp.value=rv.base; inp.setAttribute("aria-label","Reviews Worker address");
+  const b=el("button","primary","Save & test"); b.onclick=async()=>{
+    const v=inp.value.trim().replace(/\/+$/,""); if(!/^https:\/\//.test(v)){ toast("Enter a full address that starts with https://"); return; }
+    rv.base=v; b.disabled=true;
+    try{ const j=await rvApi("/rv/ping"); ls("rv-base",v); toast("Connected to the Reviews Worker (Firebase project "+j.project+")."); rv.items=[]; rv.next=null; rvLoadQueue(true); }
+    catch(e){ rv.base=ls("rv-base")||""; toast(e.message); b.disabled=false; }
+  };
+  row.append(inp,b); c.appendChild(row); return c;
+}
+function rvErr(e){ const c=el("div","card2 rv-err"); c.appendChild(el("b",null,"Could not load")); c.appendChild(el("p",null,e.message)); if(e.hint) c.appendChild(el("p","note",e.hint)); return c; }
+
+function rvRender(){
+  const p=$("rvpane"); if(!p||st.which!=="rv") return; const keep=p.scrollTop, w=el("div","rv-wrap"); p.textContent=""; p.appendChild(w);
+  if(!rv.base){ w.appendChild(rvSetup(true)); return; }
+  const bar=el("div","rv-bar"); [["queue","Queue"],["check","Totals check"],["sig","Signals"],["log","Log"]].forEach(([k,t])=>{ const b=el("button",rv.tab===k?"on":"",t); b.onclick=()=>{ rv.tab=k; if(k==="log"&&!rv.log) rvLoadLog(); rvRender(); }; bar.appendChild(b); });
+  bar.appendChild(el("span","rv-sp")); const rf=el("button",null,"Refresh"); rf.onclick=()=>{ if(rv.tab==="log") rvLoadLog(); else if(rv.tab==="queue") rvLoadQueue(true); else rvScanAll(); }; bar.appendChild(rf); w.appendChild(bar);
+  w.appendChild(rv.tab==="queue"?rvQueueView():rv.tab==="check"?rvCheckView():rv.tab==="sig"?rvSigView():rvLogView());
+  const d=el("details"); d.appendChild(el("summary","note","Reviews Worker address")); d.appendChild(rvSetup(false)); w.appendChild(d);
+  p.scrollTop=keep;
+}
+
+/* --- Queue --- */
+async function rvLoadQueue(reset){
+  if(rv.loading) return; rv.loading=true; rv.err=null; if(reset){ rv.items=[]; rv.next=null; } rvRender();
+  try{ await rvCat(); const j=await rvApi("/rv/queue?min="+rv.min+(rv.next?"&cursor="+encodeURIComponent(rv.next):"")); rv.items=rv.items.concat(j.items); rv.next=j.next; }
+  catch(e){ rv.err=e; }
+  rv.loading=false; rvRender();
+}
+function rvQueueView(){
+  const v=el("div","rv-view"), f=el("div","rv-seg");
+  [["3","Hidden from readers (3+ reports)"],["1","All reported (1+)"]].forEach(([k,t])=>{ const b=el("button",rv.min===k?"on":"",t); b.onclick=()=>{ rv.min=k; rvLoadQueue(true); }; f.appendChild(b); });
+  v.appendChild(f);
+  if(rv.err){ v.appendChild(rvErr(rv.err)); return v; }
+  if(rv.loading&&!rv.items.length){ v.appendChild(el("div","note","Loading…")); return v; }
+  if(!rv.items.length){ const c=el("div","card2"); c.append(el("h4",null,"Nothing to review"),el("p",null,rv.min==="3"?"No review has 3 or more reports.":"No review has been reported.")); v.appendChild(c); return v; }
+  rv.items.forEach(it=>v.appendChild(rvCard(it)));
+  if(rv.next){ const b=el("button",null,rv.loading?"Loading…":"Load more"); b.disabled=rv.loading; b.onclick=()=>rvLoadQueue(false); v.appendChild(b); }
+  return v;
+}
+function rvCard(it){
+  const c=el("section","card2 rv-card"), gone=!it.c, hid=it.x>=3;
+  const hd=el("div","rv-hd"), t=el("b",null,rvTitle(it.book)); hd.append(t,el("span","note","Book #"+it.book+" · reviewer "+(it.n||"(no name)")+" · "+rvShort(it.uid)+(rvDate(it.t)?" · "+rvDate(it.t):""))); c.appendChild(hd);
+  const m=el("div","rv-meta"); m.appendChild(el("span","rv-st","★".repeat(it.r)+"☆".repeat(Math.max(0,5-it.r))));
+  m.appendChild(el("span",gone?"chip no":hid?"chip no":"chip hi",gone?"Text removed":hid?"Hidden from readers":"Visible"));
+  m.appendChild(el("span","chip",it.x+" report"+(it.x===1?"":"s")));
+  Object.keys(it.reasons).forEach(k=>m.appendChild(el("span","chip",(RV_WHY[k]||k)+" ×"+it.reasons[k]))); c.appendChild(m);
+  c.appendChild(el("blockquote","rv-txt"+(gone?" gone":""),gone?"(text removed)":it.c));
+  if(gone&&it.saved) c.appendChild(el("div","note","Saved copy, comes back on Restore: “"+it.saved+"”"));
+  if(gone&&it.saved===null) c.appendChild(el("div","note","No saved copy of the text, so Restore only clears the reports."));
+  const a=el("div","rv-act"), bs=[], add=(cls,txt,act)=>{ const b=el("button",cls,txt); b.onclick=()=>rvDo(it,act,bs); bs.push(b); a.appendChild(b); };
+  if(it.c) add("danger","Hide text","hide");
+  if(gone||hid) add("","Restore","restore"); else if(it.x>0) add("","Dismiss reports","dismiss");
+  c.appendChild(a); return c;
+}
+async function rvDo(it,act,bs){
+  const msg={hide:"Hide this review's text?\n\nThe stars still count and the vote is kept. A copy of the text is saved so you can restore it.",
+    restore:"Restore this review?\n\nIts reports are cleared"+(!it.c&&it.saved?" and the saved text comes back.":" and readers can see it again."),
+    dismiss:"Dismiss the "+it.x+" report(s)?\n\nThe review stays visible and its reports are cleared."}[act];
+  if(!confirm(msg)) return; bs.forEach(b=>b.disabled=true);
+  try{ await rvApi("/rv/act",{book:it.book,uid:it.uid,act,ut:it.ut}); toast({hide:"Text hidden.",restore:"Review restored.",dismiss:"Reports dismissed."}[act]); rv.log=null; rv.scan=null; await rvLoadQueue(true); }
+  catch(e){ toast(e.message); bs.forEach(b=>b.disabled=false); if(e.code===409) rvLoadQueue(true); }
+}
+
+/* --- Totals check --- */
+async function rvScanAll(){
+  if(rv.scanning) return; rv.scanErr=null; const rows=[], tr=[]; let after=null, tk=null; rv.scanning="Reading votes…"; rvRender();
+  try{ await rvCat();
+    do{ const j=await rvApi("/rv/scan"+(after?"?after="+encodeURIComponent(after):"")); rows.push(...j.rows); after=j.next; rv.scanning="Reading votes… "+nfmt(rows.length); rvRender(); }while(after);
+    rv.scanning="Reading totals…"; rvRender();
+    do{ const j=await rvApi("/rv/totals"+(tk?"?pageToken="+encodeURIComponent(tk):"")); tr.push(...j.rows); tk=j.next; }while(tk);
+    rv.scan={rows,totals:tr,at:Date.now()};
+  }catch(e){ rv.scanErr=e; }
+  rv.scanning=""; rvRender();
+}
+function rvDiff(){
+  const cnt={}, tot={}; for(const r of rv.scan.rows){ if(r[2]<1||r[2]>5) continue; (cnt[r[0]]||(cnt[r[0]]=[0,0,0,0,0,0]))[r[2]]++; }
+  for(const t of rv.scan.totals) tot[t[0]]=t.slice(1);
+  const out=[]; for(const b of new Set([...Object.keys(cnt),...Object.keys(tot)])){ const c=cnt[b]||[0,0,0,0,0,0], exp=[c[1]+c[2]+c[3]+c[4]+c[5],c[1]+2*c[2]+3*c[3]+4*c[4]+5*c[5],c[1],c[2],c[3],c[4],c[5]], got=tot[b]||null;
+    if(got?exp.some((x,i)=>x!==got[i]):exp[0]>0) out.push({b,exp,got}); }
+  return out;
+}
+const rvFmt=a=>a?a[0]+" rating"+(a[0]===1?"":"s")+", sum "+a[1]:"missing";
+async function rvRepair(book,btn){
+  if(!confirm("Rewrite the totals of “"+rvTitle(book)+"” from its votes?\n\nNo vote is changed or deleted.")) return false;
+  if(btn) btn.disabled=true;
+  try{ const j=await rvApi("/rv/repair",{book}); if(rv.scan&&j.totals){ const k=Object.keys(j.totals), row=[book,...["n","s","c1","c2","c3","c4","c5"].map(x=>j.totals[x])]; const i=rv.scan.totals.findIndex(t=>t[0]===book); if(i>=0) rv.scan.totals[i]=row; else rv.scan.totals.push(row); } rv.log=null; toast("Totals repaired."); return true; }
+  catch(e){ toast(e.message); if(btn) btn.disabled=false; return false; }
+}
+function rvCheckView(){
+  const v=el("div","rv-view"), one=el("div","card2"); one.append(el("h4",null,"Check one book"),el("p",null,"Counts a book's votes and compares them with its stored average."));
+  const row=el("div","rv-in"), inp=el("input"), go=el("button","primary","Check"); inp.placeholder="Book number"; inp.inputMode="numeric"; inp.setAttribute("aria-label","Book number");
+  const res=el("div"); const show=()=>{ res.textContent=""; const k=rv.chk; if(!k) return; if(k.err){ res.appendChild(rvErr(k.err)); return; }
+    const r=el("div","rv-row"), d=el("div"); d.append(el("b",null,rvTitle(k.book)),el("span","note",k.ok?"Totals match the votes ("+rvFmt([k.counted.n,k.counted.s])+").":"Stored: "+rvFmt(k.stored?[k.stored.n,k.stored.s]:null)+" · Votes: "+rvFmt([k.counted.n,k.counted.s])));
+    r.append(el("span","chip "+(k.ok?"hi":"no"),k.ok?"OK":"Mismatch"),d); if(!k.ok){ const b=el("button",null,"Repair"); b.onclick=async()=>{ if(await rvRepair(k.book,b)){ k.ok=true; k.stored=k.counted; show(); } }; r.appendChild(b); } res.appendChild(r); };
+  go.onclick=async()=>{ const b=inp.value.trim().replace(/^#/,""); if(!/^[A-Za-z0-9_-]{1,40}$/.test(b)){ toast("Enter a book number."); return; } go.disabled=true; try{ await rvCat(); const j=await rvApi("/rv/check?book="+encodeURIComponent(b)); rv.chk=j; }catch(e){ rv.chk={err:e}; } go.disabled=false; show(); };
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter") go.click(); }); row.append(inp,go); one.append(row,res); show(); v.appendChild(one);
+  const all=el("div","card2"); all.append(el("h4",null,"Check all books"),el("p",null,"Reads every vote and every totals document, then lists the books whose average is wrong. Nothing is changed until you press Repair."));
+  const sb=el("button","primary",rv.scanning||(rv.scan?"Scan again":"Scan all books")); sb.disabled=!!rv.scanning; sb.onclick=rvScanAll; all.appendChild(sb);
+  if(rv.scanErr) all.appendChild(rvErr(rv.scanErr));
+  if(rv.scan){ const bad=rvDiff(); all.appendChild(el("p",null,nfmt(rv.scan.rows.length)+" votes · "+nfmt(rv.scan.totals.length)+" books with totals · "+(bad.length?nfmt(bad.length)+" book(s) with wrong totals":"all totals match")+" · "+new Date(rv.scan.at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})));
+    bad.slice(0,100).forEach(x=>{ const r=el("div","rv-row"), d=el("div"); d.append(el("b",null,rvTitle(x.b)),el("span","note","Stored: "+rvFmt(x.got&&[x.got[0],x.got[1]])+" · Votes: "+rvFmt([x.exp[0],x.exp[1]])));
+      const b=el("button",null,"Repair"); b.onclick=async()=>{ if(await rvRepair(x.b,b)) rvRender(); }; r.append(d,b); all.appendChild(r); });
+    if(bad.length>100) all.appendChild(el("div","note","Showing the first 100."));
+    if(bad.length>1){ const ra=el("button","danger","Repair all "+bad.length+" books"); ra.onclick=async()=>{ if(!confirm("Rewrite the totals of "+bad.length+" books from their votes?\n\nNo vote is changed or deleted.")) return; ra.disabled=true; let n=0; for(const x of bad){ try{ const j=await rvApi("/rv/repair",{book:x.b}); if(j.totals){ const row=[x.b,...["n","s","c1","c2","c3","c4","c5"].map(k=>j.totals[k])], i=rv.scan.totals.findIndex(t=>t[0]===x.b); if(i>=0) rv.scan.totals[i]=row; else rv.scan.totals.push(row); } n++; }catch(e){ toast(e.message); break; } } rv.log=null; toast(n+" book(s) repaired."); rvRender(); }; all.appendChild(ra); } }
+  v.appendChild(all); return v;
+}
+
+/* --- Signals (early signs of abuse; not proof) --- */
+function rvSignals(rows){
+  const by={}, per={}; for(const [b,u,r,x,h,t] of rows){ (by[u]||(by[u]=[])).push([b,r,t]); (per[b]||(per[b]=[])).push([u,r]); }
+  const burst=[], same=[], single=[];
+  for(const u in by){ const a=by[u].filter(v=>v[2]).sort((p,q)=>p[2]-q[2]); let best=0; for(let i=0,j=0;i<a.length;i++){ while(a[i][2]-a[j][2]>3600) j++; best=Math.max(best,i-j+1); }
+    if(best>=10) burst.push({u,n:by[u].length,best}); if(by[u].length>=10&&by[u].every(v=>v[1]===by[u][0][1])) same.push({u,n:by[u].length,r:by[u][0][1]}); }
+  for(const b in per) if(per[b].length===1&&(per[b][0][1]===5||per[b][0][1]===1)) single.push({b,u:per[b][0][0],r:per[b][0][1]});
+  return {burst:burst.sort((a,b)=>b.best-a.best),same:same.sort((a,b)=>b.n-a.n),single};
+}
+function rvSigView(){
+  const v=el("div","rv-view"), c=el("div","card2"); c.append(el("h4",null,"Signals"),el("p",null,"Early signs worth a look. None of these is proof of abuse."));
+  const sb=el("button","primary",rv.scanning||(rv.scan?"Scan again":"Scan votes")); sb.disabled=!!rv.scanning; sb.onclick=rvScanAll; c.appendChild(sb); if(rv.scanErr) c.appendChild(rvErr(rv.scanErr)); v.appendChild(c);
+  if(!rv.scan) return v;
+  const g=rvSignals(rv.scan.rows), sec=(title,note,list,line)=>{ const k=el("div","card2"); k.append(el("h4",null,title+" ("+nfmt(list.length)+")"),el("p","note",note)); if(!list.length) k.appendChild(el("p",null,"None found.")); list.slice(0,50).forEach(x=>{ const r=el("div","rv-row"), d=el("div"), l=line(x); d.append(el("b",null,l[0]),el("span","note",l[1])); r.appendChild(d); k.appendChild(r); }); if(list.length>50) k.appendChild(el("div","note","Showing the first 50.")); v.appendChild(k); };
+  sec("Rating bursts","One account with 10 or more ratings inside one hour.",g.burst,x=>["Account "+rvShort(x.u),x.best+" ratings in an hour · "+x.n+" in total · full id "+x.u]);
+  sec("Same star every time","One account with 10 or more ratings, all with the same number of stars.",g.same,x=>["Account "+rvShort(x.u),x.n+" ratings, all "+x.r+" star"+(x.r===1?"":"s")+" · full id "+x.u]);
+  sec("Single 1★ or 5★ ratings","Books with exactly one rating, and it is 1 or 5 stars.",g.single,x=>[rvTitle(x.b),"Book #"+x.b+" · "+x.r+" star"+(x.r===1?"":"s")+" · account "+rvShort(x.u)]);
+  return v;
+}
+
+/* --- Log --- */
+async function rvLoadLog(){ rv.logErr=null; try{ await rvCat(); rv.log=(await rvApi("/rv/log?limit=50")).items; }catch(e){ rv.logErr=e; rv.log=[]; } rvRender(); }
+function rvLogView(){
+  const v=el("div","rv-view"); if(rv.logErr){ v.appendChild(rvErr(rv.logErr)); return v; } if(!rv.log){ v.appendChild(el("div","note","Loading…")); return v; }
+  const c=el("div","card2"); c.appendChild(el("h4",null,"Recent actions")); if(!rv.log.length) c.appendChild(el("p",null,"Nothing has been done here yet."));
+  const NM={hide:"Text hidden",restore:"Restored",dismiss:"Reports dismissed",repair:"Totals repaired"};
+  rv.log.forEach(x=>{ const r=el("div","rv-row"), d=el("div"); d.append(el("b",null,(NM[x.act]||x.act)+" · "+rvTitle(x.book)),el("span","note",[rvDate(x.t),x.uid?"reviewer "+rvShort(x.uid):"",x.note||"",x.c0&&x.act==="hide"?"was: “"+x.c0+"”":""].filter(Boolean).join(" · "))); r.appendChild(d); c.appendChild(r); });
+  v.appendChild(c); return v;
+}
+async function connectRv(){
+  st.amb=false; document.body.classList.remove("amb"); $("summary").textContent="Reviews";
+  $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent;
+  updateSw(); document.body.classList.add("conn"); rvRender(); if(rv.base) rvLoadQueue(true);
+}
+async function hmRv(){ if(!rv.base) return {off:true}; return await rvApi("/rv/summary"); }
+
+
+/* ---------- Errors: the anonymous error reports of the app (Errors Worker: tools/errors-worker) ---------- */
+const er={base:ls("er-base")||"",status:"open",sev:"all",sort:"last",q:"",offset:0,sum:null,list:null,more:false,view:"list",sel:null,det:null,err:null,loading:false};
+const ER_LABEL={error:"App error",promise:"Background task failed",storage:"Storage full",sw:"Offline mode could not start",network:"Connection failed",http:"Server returned an error",audio:"Audio problem",resource:"Image or file did not load"};
+const ER_HINT={error:"Something in the app broke. The steps under “What the user did first” show how to repeat it.",promise:"A background step failed and nothing handled it. Often a connection problem.",storage:"The phone had no room left for the app’s saved data.",sw:"The offline helper could not start. The app still works online.",network:"A request got no answer: weak or no internet, or a blocked website.",http:"A website answered with an error. If it keeps happening for one address, that service may be down.",audio:"The audio could not play or kept stalling: often a weak connection or a damaged file.",resource:"A picture or file did not load; the app usually shows a placeholder."};
+const erN=n=>Number(n||0).toLocaleString();
+const erDate=t=>new Date(t).toLocaleString([],{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const erDay=d=>new Date(d+"T00:00:00Z").toLocaleDateString([],{day:"numeric",month:"short",timeZone:"UTC"});
+function erAgo(t){ const s=Math.max(0,Math.round((Date.now()-t)/1000)); return s<60?"just now":s<3600?Math.round(s/60)+" min ago":s<86400?Math.round(s/3600)+" h ago":Math.round(s/86400)+" d ago"; }
+async function erApi(path,body){
+  if(!er.base) throw new Error("The Errors Worker address is not set.");
+  let r; try{ r=await fetch(er.base.replace(/\/+$/,"")+path,{method:body?"POST":"GET",headers:Object.assign({Authorization:"Bearer "+st.tok},body?{"content-type":"application/json"}:{}),body:body?JSON.stringify(body):undefined}); }
+  catch(e){ throw new Error("Can't reach the Errors Worker. Check its address under “Errors Worker address”."); }
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok){ const e=new Error(r.status===401?"The Errors Worker did not accept the token (401). Its ADMIN_TOKEN must be the same as your Admin token.":((j&&j.error)||("HTTP "+r.status))); e.hint=j&&j.hint; throw e; }
+  return j;
+}
+function erSetup(first){
+  const c=el("div","card2"); c.appendChild(el("h4",null,first?"Set up the Errors Worker":"Errors Worker address"));
+  if(first) c.appendChild(el("p",null,"One-time setup. Deploy tools/errors-worker (see its README), add the secret ADMIN_TOKEN (the same value as your Admin token), then paste its address here."));
+  const row=el("div","rv-in"), inp=el("input"); inp.placeholder="https://wordtrail-errors.…workers.dev"; inp.value=er.base; inp.setAttribute("aria-label","Errors Worker address");
+  const b=el("button","primary","Save & test"); b.onclick=async()=>{
+    const v=inp.value.trim().replace(/\/+$/,""); if(!/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$)/.test(v)){ toast("Enter a full address that starts with https://"); return; }
+    const old=er.base; er.base=v; b.disabled=true;
+    try{ await erApi("/admin/ping"); ls("er-base",v); toast("Connected to the Errors Worker."); erLoad(); }
+    catch(e){ er.base=old; toast(e.message); b.disabled=false; }
+  };
+  row.append(inp,b); c.appendChild(row); return c;
+}
+function erErr(e){ const c=el("div","card2 rv-err"); c.appendChild(el("b",null,"Could not load")); c.appendChild(el("p",null,e.message)); if(e.hint) c.appendChild(el("p","note",e.hint)); return c; }
+async function erLoad(more){
+  if(!er.base){ erRender(); return; } er.loading=true; er.err=null; if(!more) er.offset=0; erRender();
+  try{
+    const qs=new URLSearchParams({status:er.status,sev:er.sev,sort:er.sort,q:er.q,limit:"50",offset:String(er.offset)});
+    const [s,l]=await Promise.all([erApi("/admin/summary"),erApi("/admin/issues?"+qs)]);
+    er.sum=s; er.list=more&&er.list?er.list.concat(l.items):l.items; er.more=l.more;
+  }catch(e){ er.err=e; }
+  er.loading=false; erRender();
+}
+async function erOpen(id){ er.view="detail"; er.sel=id; er.det=null; er.err=null; erRender(); try{ er.det=await erApi("/admin/issue?id="+enc(id)); }catch(e){ er.err=e; } erRender(); }
+
+/* one single-colour bar chart: thin bars, 4px rounded tops, 2px gaps, hover tooltip, a table underneath */
+function erChart(days,title){
+  const NS="http://www.w3.org/2000/svg", W=Math.max(300,Math.min(640,(($("erpane")||{}).clientWidth||640)-60)), H=150, L=34, B=22, T=10, n=days.length, max=Math.max(1,...days.map(d=>d.n)), top=Math.ceil(max/ (max>8?4:1))*(max>8?4:1);
+  const bw=(W-L)/n, sv=el("div","er-chart"), svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.setAttribute("role","img"); svg.setAttribute("aria-label",title+": "+days.reduce((a,d)=>a+d.n,0)+" in "+n+" days");
+  const mk=(t,a)=>{ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); return e; };
+  const y=v=>T+(H-B-T)*(1-v/top);
+  svg.append(mk("line",{class:"gl",x1:L,x2:W,y1:y(top),y2:y(top)}),mk("line",{class:"ax",x1:L,x2:W,y1:y(0),y2:y(0)}));
+  [[0,"0"],[top,String(top)]].forEach(([v,t])=>{ const tx=mk("text",{x:L-6,y:y(v)+4,"text-anchor":"end"}); tx.textContent=t; svg.appendChild(tx); });
+  const tip=$("ertip")||(()=>{ const t=el("div"); t.id="ertip"; t.hidden=true; document.body.appendChild(t); return t; })();
+  days.forEach((d,i)=>{
+    const g=mk("g",{class:"col"}), x=L+i*bw+1, w=Math.max(2,bw-2), h=d.n?Math.max(3,(H-B-T)*d.n/top):0, r=Math.min(4,w/2,h);
+    if(h) g.appendChild(mk("path",{class:"bar",d:"M"+x+" "+y(0)+"v"+(-(h-r))+"a"+r+" "+r+" 0 0 1 "+r+" "+(-r)+"h"+(w-2*r)+"a"+r+" "+r+" 0 0 1 "+r+" "+r+"v"+(h-r)+"z"}));
+    g.appendChild(mk("rect",{class:"hit",x:L+i*bw,y:T,width:bw,height:H-B-T}));
+    const show=ev=>{ tip.hidden=false; tip.textContent=erDay(d.day)+": "+erN(d.n)+(d.e!=null&&d.n?" ("+erN(d.e)+" errors)":""); const r2=g.getBoundingClientRect(); tip.style.left=Math.max(8,Math.min(innerWidth-tip.offsetWidth-8,r2.left+r2.width/2-tip.offsetWidth/2))+"px"; tip.style.top=Math.max(8,r2.top-tip.offsetHeight-8)+"px"; g.classList.add("hot"); };
+    const hide=()=>{ tip.hidden=true; g.classList.remove("hot"); };
+    g.addEventListener("mouseenter",show); g.addEventListener("mouseleave",hide); g.addEventListener("touchstart",show,{passive:true});
+    svg.appendChild(g);
+  });
+  [[0,"start"],[Math.floor((n-1)/2),"middle"],[n-1,"end"]].forEach(([i,a])=>{ const tx=mk("text",{x:L+i*bw+(a==="start"?0:a==="end"?bw:bw/2),y:H-4,"text-anchor":a}); tx.textContent=erDay(days[i].day); svg.appendChild(tx); });
+  sv.appendChild(svg);
+  const dt=el("details"); dt.appendChild(el("summary",null,"Show as table")); const tb=el("table"); const tr0=el("tr"); ["Day","Reports"].concat(days[0]&&days[0].e!=null?["Errors"]:[]).forEach(t=>tr0.appendChild(el("th",null,t))); tb.appendChild(tr0);
+  days.slice().reverse().filter(d=>d.n).forEach(d=>{ const tr=el("tr"); tr.appendChild(el("td",null,erDay(d.day))); tr.appendChild(el("td",null,erN(d.n))); if(d.e!=null) tr.appendChild(el("td",null,erN(d.e))); tb.appendChild(tr); });
+  if(tb.rows.length===1){ const tr=el("tr"),td=el("td",null,"No reports in this period."); td.colSpan=3; tr.appendChild(td); tb.appendChild(tr); }
+  dt.appendChild(tb); sv.appendChild(dt); return sv;
+}
+function erSpark(a){
+  const NS="http://www.w3.org/2000/svg", svg=document.createElementNS(NS,"svg"), W=70, H=22, max=Math.max(...a);
+  svg.setAttribute("class","er-spark"); svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox","0 0 "+W+" "+H); svg.setAttribute("role","img"); svg.setAttribute("aria-label","Last 14 days: "+a.join(", "));
+  if(!max){ const l=document.createElementNS(NS,"line"); l.setAttribute("x1",1);l.setAttribute("x2",W-1);l.setAttribute("y1",H-2);l.setAttribute("y2",H-2); svg.appendChild(l); return svg; }
+  const pl=document.createElementNS(NS,"polyline"); pl.setAttribute("points",a.map((v,i)=>(1+i*(W-2)/(a.length-1)).toFixed(1)+","+(H-2-(H-4)*v/max).toFixed(1)).join(" ")); svg.appendChild(pl); return svg;
+}
+const erSev=s=>el("span","er-sev "+s,s==="error"?"● Error":"▲ Warning");
+const erTile=(v,l,cls)=>{ const t=el("div","er-tile"); t.appendChild(el("b",cls||"",v)); t.appendChild(el("small",null,l)); return t; };
+const erStat=i=>i.status==="fixed"?"Fixed"+(i.fixed_build?" in "+i.fixed_build:""):i.status==="ignored"?"Ignored":"Open";
+
+function erRender(){
+  const p=$("erpane"); if(!p||st.which!=="er") return;
+  const had=document.activeElement&&document.activeElement.id==="er-q", pos=had?document.activeElement.selectionStart:0, keep=p.scrollTop, w=el("div","er-wrap"); p.textContent=""; p.appendChild(w);
+  if(!er.base){ w.appendChild(erSetup(true)); return; }
+  if(er.view==="detail"){ erDetail(w); p.scrollTop=keep; return; }
+  const top=el("div","er-top"); top.appendChild(el("h3",null,"Errors")); const rf=el("button",null,er.loading?"Loading…":"Refresh"); rf.disabled=er.loading; rf.onclick=()=>erLoad(); top.appendChild(rf); w.appendChild(top);
+  if(er.err) w.appendChild(erErr(er.err));
+  const s=er.sum;
+  if(s){
+    const tl=el("div","er-tiles"); tl.append(erTile(erN(s.open),"open problems"),erTile(erN(s.new7),"new this week"),erTile(erN(s.events7),"reports in 7 days"),erTile(erN(s.today),"reports today"),erTile(s.builds.length?s.builds[0][0]:"–","busiest build (7 days)","sm2")); w.appendChild(tl);
+    const c=el("div","card2"); c.appendChild(el("h4",null,"Reports per day, last 30 days")); const er30=s.perDay.reduce((a,d)=>a+d.e,0), t30=s.perDay.reduce((a,d)=>a+d.n,0); c.appendChild(el("small",null,erN(t30)+" reports, "+erN(er30)+" of them errors, the rest warnings")); c.appendChild(erChart(s.perDay,"Reports per day")); w.appendChild(c);
+  }
+  const f=el("div","er-filters");
+  [["open","Open"+(s?" "+s.open:"")],["fixed","Fixed"+(s?" "+s.fixed:"")],["ignored","Ignored"+(s?" "+s.ignored:"")],["all","All"]].forEach(([k,t])=>{ const b=el("button",er.status===k?"on":"",t); b.onclick=()=>{ er.status=k; erLoad(); }; f.appendChild(b); });
+  f.appendChild(el("span","sp")); [["all","Any kind"],["error","Errors"],["warn","Warnings"]].forEach(([k,t])=>{ const b=el("button",er.sev===k?"on":"",t); b.onclick=()=>{ er.sev=k; erLoad(); }; f.appendChild(b); });
+  w.appendChild(f);
+  const f2=el("div","er-filters"), sel=el("select"); sel.setAttribute("aria-label","Sort"); [["last","Newest first"],["total","Most reports"],["sessions","Most sessions"],["first","Newest problem"]].forEach(([k,t])=>{ const o=el("option",null,t); o.value=k; if(er.sort===k) o.selected=true; sel.appendChild(o); }); sel.onchange=()=>{ er.sort=sel.value; erLoad(); };
+  const q=el("input"); q.id="er-q"; q.type="search"; q.placeholder="Search the message…"; q.value=er.q; q.setAttribute("aria-label","Search"); let tm; q.oninput=()=>{ clearTimeout(tm); tm=setTimeout(()=>{ er.q=q.value.trim(); erLoad(); },400); };
+  f2.append(sel,q); w.appendChild(f2);
+  const box=el("div"); w.appendChild(box);
+  if(!er.list){ if(er.loading) box.appendChild(el("p","note","Loading…")); }
+  else if(!er.list.length) box.appendChild(el("div","card2")).appendChild(el("p",null,er.status==="open"&&!er.q&&er.sev==="all"?"No open problems. Nothing has been reported yet, or everything is fixed.":"Nothing matches these filters."));
+  else er.list.forEach(i=>{
+    const b=el("button","er-row"); b.setAttribute("aria-label",(ER_LABEL[i.type]||i.type)+": "+i.msg);
+    const d=el("div"); d.appendChild(el("b",null,ER_LABEL[i.type]||i.type)); d.appendChild(el("div","er-msg",i.msg)); d.appendChild(el("small",null,"Last "+erAgo(i.last_seen)+(i.last_build?" · build "+i.last_build:"")+(i.status!=="open"?" · "+erStat(i):"")));
+    const n=el("div","er-num"); n.appendChild(el("b",null,"×"+erN(i.total))); n.appendChild(el("small",null," "+erN(i.sessions)+(i.sessions===1?" session":" sessions"))); n.appendChild(erSpark(i.trend||[]));
+    b.append(erSev(i.sev),d,n); b.onclick=()=>erOpen(i.id); box.appendChild(b);
+  });
+  if(er.more){ const m=el("button",null,"Show more"); m.onclick=()=>{ er.offset=er.list.length; erLoad(true); }; w.appendChild(m); }
+  const dd=el("details"); dd.appendChild(el("summary","note","Errors Worker address")); dd.appendChild(erSetup(false)); w.appendChild(dd);
+  p.scrollTop=keep; if(had){ const i=$("er-q"); if(i){ i.focus(); i.setSelectionRange(pos,pos); } }
+}
+function erMeter(title,list){
+  const c=el("div","card2"); c.appendChild(el("h4",null,title)); if(!list.length){ c.appendChild(el("small",null,"No data yet")); return c; }
+  const max=list[0][1], m=el("div","er-meter"); list.forEach(([k,v])=>{ m.appendChild(el("span",null,k)); m.appendChild(el("span","er-num",String(v))); const i=el("i"),u=el("u"); u.style.width=Math.max(4,100*v/max)+"%"; i.appendChild(u); m.appendChild(i); }); c.appendChild(m); return c;
+}
+function erDetail(w){
+  const back=el("button","er-back","← All problems"); back.onclick=()=>{ er.view="list"; erRender(); }; w.appendChild(back);
+  if(er.err) w.appendChild(erErr(er.err));
+  const d=er.det; if(!d){ if(!er.err) w.appendChild(el("p","note","Loading…")); return; }
+  const i=d.issue, h=el("div","er-top"); h.appendChild(erSev(i.sev)); h.appendChild(el("h3",null,ER_LABEL[i.type]||i.type)); h.appendChild(el("span","er-st "+i.status,erStat(i))); w.appendChild(h);
+  w.appendChild(el("pre","er-code",i.msg+(i.loc?"\n@ "+i.loc:""))); if(ER_HINT[i.type]) w.appendChild(el("p","note",ER_HINT[i.type]));
+  const tl=el("div","er-tiles"); tl.append(erTile(erN(i.total),"reports"),erTile(erN(i.sessions),i.sessions===1?"session":"sessions"),erTile(erDate(i.first_seen),"first seen","sm2"),erTile(erDate(i.last_seen),"last seen","sm2"),erTile(i.last_build||"–","last build","sm2")); w.appendChild(tl);
+  const c=el("div","card2"); c.appendChild(el("h4",null,"Reports per day, last 30 days")); c.appendChild(erChart(d.trend,"Reports per day")); w.appendChild(c);
+  if(d.builds.length){ const b=el("div","card2"); b.appendChild(el("h4",null,"By app build")); const tb=el("table"),tr0=el("tr"); ["Build","Reports","First day","Last day"].forEach(t=>tr0.appendChild(el("th",null,t))); tb.appendChild(tr0);
+    d.builds.forEach(x=>{ const tr=el("tr"); [x.build||"?",erN(x.n),x.a?erDay(x.a):"",x.b?erDay(x.b):""].forEach(t=>tr.appendChild(el("td",null,t))); tb.appendChild(tr); }); b.appendChild(tb); w.appendChild(b); }
+  const cols=el("div","er-cols"); cols.append(erMeter("Browser",d.devices.br),erMeter("System",d.devices.os),erMeter("App mode",d.devices.mode)); w.appendChild(cols);
+  w.appendChild(el("small",null,"Browser, system and mode count sessions ("+erN(d.ctxCount)+" with details)."));
+  const sm=i.sample||{}; if(sm.at||(sm.crumbs&&sm.crumbs.length)||sm.stack){
+    const c2=el("div","card2"); c2.appendChild(el("h4",null,"What the user did first (first report ever)"));
+    if(sm.at) c2.appendChild(el("p",null,"Screen: "+(sm.at.screen||"?")+(sm.at.book?" · book "+sm.at.book:"")+" · "+(sm.at.online?"online":"offline")));
+    if(sm.crumbs&&sm.crumbs.length){ const ol=el("ol","er-trail"); sm.crumbs.forEach(x=>ol.appendChild(el("li",null,new Date(x.t).toTimeString().slice(0,8)+"  "+x.k+"  "+x.d+(x.n>1?"  (×"+x.n+")":"")))); c2.appendChild(ol); }
+    if(sm.stack) c2.appendChild(el("pre","er-code",sm.stack)); w.appendChild(c2); }
+  const ev=el("div","card2"); ev.appendChild(el("h4",null,"Latest reports")); d.events.forEach(x=>{ const r=el("div","rv-row"),m=el("div"); m.appendChild(el("b",null,erDate(x.ts)+" · +"+x.n)); const cx=x.ctx||{}; m.appendChild(el("small",null,[x.build?"build "+x.build:"",cx.br,cx.os,x.sid?"session "+x.sid:""].filter(Boolean).join(" · "))); r.appendChild(m); ev.appendChild(r); }); w.appendChild(ev);
+}
+async function connectEr(){
+  st.amb=false; document.body.classList.remove("amb"); $("summary").textContent="Errors";
+  $("gwho").textContent="Connected: "+st.root.replace(/^https?:\/\//,""); $("swho").textContent=$("gwho").textContent;
+  updateSw(); document.body.classList.add("conn"); er.view="list"; erRender(); if(er.base) erLoad();
+}
+
+document.addEventListener("keydown",e=>{
+  if(/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return; if(st.which==="home") return; const a=$("a");
+  if(st.which==="cov"){ if(e.key==="ArrowRight") covStep(1); else if(e.key==="ArrowLeft") covStep(-1); return; }
+  if(st.which==="rv"||st.which==="er") return;
+  if(st.which==="bk"){ if(e.key==="ArrowRight") bkStep(1); else if(e.key==="ArrowLeft") bkStep(-1); return; }
+  if(e.code==="Space"){ e.preventDefault(); a.paused?a.play():a.pause(); }
+  else if(e.key==="ArrowRight") play(Math.min(st.rows.length-1,st.idx+1));
+  else if(e.key==="ArrowLeft") play(Math.max(0,st.idx-1));
+  else if(e.key==="k"||e.key==="K") advance("keep");
+  else if(e.key==="d"||e.key==="D") advance("del");
+  else if(e.key==="ArrowDown"&&st.amb){ e.preventDefault(); jumpFolder(1); }
+  else if(e.key==="ArrowUp"&&st.amb){ e.preventDefault(); jumpFolder(-1); }
+  else if((e.key==="b"||e.key==="B")&&st.amb&&st.idx>=0) bestAndNext(st.idx);
+});
+$("tok").addEventListener("keydown",e=>{ if(e.key==="Enter") connect(); }); $("go").onclick=connect; $("retire").onclick=retire; $("purge").onclick=purge; $("delnow").onclick=deleteNow; $("sync").onclick=syncAll; $("fstat").onchange=renderList; $("q").oninput=()=>{ st.idx=-1; renderList(); };
+const DEFAULT_WORKER="https://wordtrail-admin.test-rabiulclaud-1.workers.dev"; $("base").value=ls("r2-base")||DEFAULT_WORKER;
+let t0=ls0("r2-tok")||""; try{ if(!t0){ t0=sessionStorage.getItem("r2-tok")||""; if(t0) $("rem").checked=false; } }catch(e){}
+$("tok").value=t0; updateSw();
+document.querySelectorAll("#rail .nv").forEach(b=>b.onclick=()=>{ if(b.dataset.m===st.which) return; $("a").pause(); st.which=b.dataset.m; ls("r2-which",st.which); updateSw(); connect(); });
+$("gear").onclick=e=>{ e.stopPropagation(); $("gmenu").hidden=!$("gmenu").hidden; };
+document.addEventListener("click",e=>{ if(!$("gmenu").contains(e.target)) $("gmenu").hidden=true; });
+const chgTok=()=>{ $("a").pause(); $("gmenu").hidden=true; document.body.classList.remove("conn"); $("tok").value=""; $("tok").focus(); };
+const forgetAll=()=>{ $("a").pause(); $("gmenu").hidden=true; forgetTok(); $("tok").value=""; document.body.classList.remove("conn"); };
+$("chg").onclick=$("chg2").onclick=chgTok; $("forget").onclick=$("forget2").onclick=forgetAll;
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.t)); setTab("review");
+const mq=matchMedia("(max-width:700px)");
+function place(){ const m=mq.matches, a=m?$("sp-play"):$("fopts"), c=m?$("cbtns"):$("hbtns");
+  ["lmid","lauto","ljson"].forEach(i=>a.appendChild($(i))); ["sync","retire","purge","delnow"].forEach(i=>c.appendChild($(i))); }
+if(mq.addEventListener) mq.addEventListener("change",place); else mq.addListener(place); place();
+if(t0) connect();
+})();
+</script>
+</body>
+</html>

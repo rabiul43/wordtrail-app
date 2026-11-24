@@ -1,0 +1,21 @@
+/* Error finder (error-tracking task 4): the sheet #sheet-errfinder, see 296b-error-finder.js */
+.ef__off { display: flex; gap: .6rem; align-items: center; justify-content: space-between; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); font-size: .88rem; }
+.ef__off[hidden] { display: none; }
+.ef__list { display: grid; gap: .55rem; }
+.ef__empty { color: var(--muted); font-size: .92rem; line-height: 1.5; padding: .4rem 0; }
+.ef__card { border: 1px solid var(--line); border-left-width: 4px; border-radius: 12px; background: var(--surface); overflow: hidden; }
+.ef--error { border-left-color: var(--err, #d33); }
+.ef--warn { border-left-color: var(--warn, #c80); }
+.ef--info, .ef--perf { border-left-color: var(--muted); }
+.ef__card > summary { list-style: none; cursor: pointer; padding: .65rem .8rem; display: grid; gap: .2rem; }
+.ef__card > summary::-webkit-details-marker { display: none; }
+.ef__top { display: flex; gap: .5rem; align-items: baseline; justify-content: space-between; font-weight: 650; font-size: .92rem; }
+.ef__n { color: var(--muted); font-weight: 600; font-size: .82rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ef__msg { font: .78rem/1.35 ui-monospace, Menlo, Consolas, monospace; color: var(--muted); overflow-wrap: anywhere; }
+.ef__when { font-size: .75rem; color: var(--muted); }
+.ef__more { padding: 0 .8rem .8rem; display: grid; gap: .55rem; font-size: .85rem; line-height: 1.45; }
+.ef__more h4 { margin: 0; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 650; }
+.ef__trail { list-style: none; margin: 0; padding: 0; display: grid; gap: .15rem; font: .76rem/1.35 ui-monospace, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
+.ef pre { margin: 0; overflow: auto; max-height: 8rem; font-size: .72rem; background: var(--surface-2); padding: .5rem; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ef__bar { display: flex; gap: .5rem; flex-wrap: wrap; }
+.ef .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }

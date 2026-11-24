@@ -1,0 +1,36 @@
+<script>
+/* Error privacy (error-tracking task 3). Everything the error log keeps goes through D.scrub() FIRST (00-head.html calls it inside add(),
+   00c-error-context.html calls it for breadcrumbs), so a secret never sits in memory, in Settings > Diagnostics > Copy, or in a later report.
+   D.scrub(text, soft): removes what could identify a person or open an account:
+     web addresses lose ?query, #hash and user:password@ | e-mail addresses | Bearer / Authorization values | JWTs |
+     token=, key=, secret=, password=, sig=, sid=... values | known key prefixes (hf_, sk-, ghp_, github_pat_, xox*, AIza) |
+     IP addresses | long digit runs (9+) | home-folder names in file paths | quoted text longer than 40 chars is cut short |
+     long mixed letter+digit strings (24+, likely keys or ids)
+   soft = true (used for breadcrumbs and stacks) skips the last three, so a book id stays readable.
+   D.canSend() = the Settings switch "Send anonymous error reports" (saved as P.errSend, on unless switched off).
+   D.sendable() = the v1 report if sending is allowed and logging is on, otherwise null. The sender (task 5) must use it. */
+(function(){
+var D=window.__wtDiag;if(!D)return;
+var R=[
+[/(https?:\/\/)[^\s\/@]*@/gi,'$1'],
+[/(https?:\/\/[^\s?#)'"]*)[?#][^\s)'"]*/gi,'$1'],
+[/([\w\/.\-])\?[\w%.\-]+=[^\s)'"]*/g,'$1'],
+[/[\w.+\-]+@[\w\-]+(\.[\w\-]+)+/g,'[email]'],
+[/\bBearer\s+[\w.~+\/=\-]+/gi,'Bearer [token]'],
+[/\beyJ[\w\-]{5,}\.[\w\-]{5,}\.[\w\-]*/g,'[token]'],
+[/\b(token|key|secret|passw(?:or)?d|pwd|auth|authorization|sig|signature|apikey|api_key|access_token|session|sid)(["']?\s*[:=]\s*["']?)[^\s"'&,;)]+/gi,'$1$2[x]'],
+[/\b(?:hf_|sk-|ghp_|gho_|github_pat_|xox[a-z]-|AIza)[\w\-]{8,}/g,'[token]'],
+[/\b\d{1,3}(?:\.\d{1,3}){3}\b/g,'[ip]'],
+[/\b\d{9,}\b/g,'[num]'],
+[/((?:[A-Za-z]:\\Users\\)|(?:\/Users\/)|(?:\/home\/))[^\\\/\s]+/g,'$1[user]']
+];
+var HARD=[
+[/(['"])([^'"\n]{41,})\1/g,function(m,q,t){return q+t.slice(0,20)+'…'+q;}],
+[/\b(?=[\w\-]*\d)(?=[\w\-]*[A-Za-z])[\w\-]{24,}\b/g,'[id]']
+];
+function run(s,list){for(var i=0;i<list.length;i++)s=s.replace(list[i][0],list[i][1]);return s;}
+D.scrub=function(s,soft){try{s=String(s==null?'':s);s=run(s,R);if(!soft)s=run(s,HARD);return s;}catch(e){return '';}};
+D.canSend=function(){try{var p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};return p.errSend!==false;}catch(e){return true;}};
+D.sendable=function(){return (D.on&&D.canSend()&&D.report)?D.report():null;};
+})();
+</script>

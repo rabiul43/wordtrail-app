@@ -1,0 +1,66 @@
+<script>
+/* Error collector (error-tracking task 1). Sits on top of the diagnostics log in 00-head.html (window.__wtDiag) and does three things:
+   1. merges the same problem into ONE entry with a count (a fingerprint of type + message, numbers and ids removed),
+   2. also catches what the old log missed: failed network requests, audio errors and stalls, images/scripts that fail to load, storage full,
+   3. keeps the result in report format v1 (D.report()) which the later tasks (Error finder page, sender, Worker, dashboard) all use.
+   Memory only, nothing is sent anywhere yet. It follows the same switch as the log (Settings > Diagnostics, D.on).
+   Report format v1:
+     { v:1, sid:'<random per page load>', t:<ms>, dropped:<problems over the limit>, problems:[
+         { id:'e_<fingerprint>', type, sev:'error'|'warn'|'info'|'perf', msg:'<=300 chars', where:'file:line:col'|'',
+           n:<times seen>, first:<ms>, last:<ms>, stack:'<=4 short lines'|'' } ] }
+   Types: error, promise, storage, sw (sev error) | network, http, audio, resource (warn) | missing = 404/410 (info) | longtask, slow-tap (perf). */
+(function(){
+var D=window.__wtDiag;if(!D)return;
+var MAX_PROBLEMS=40,MAX_N=9999;
+var P={},order=[],dropped=0;
+var sid=(Math.random().toString(36)+'00000000').slice(2,10)+Date.now().toString(36).slice(-4);
+var SEV={error:'error',promise:'error',storage:'error',sw:'error',network:'warn',http:'warn',audio:'warn',resource:'warn',missing:'info',longtask:'perf','slow-tap':'perf'};
+var MEDIA={1:'aborted',2:'network',3:'decode',4:'not-supported'};
+
+/* an address without its query or hash (they can hold tokens or ids): host + path only */
+function scrubUrl(u){u=String(u||'');
+if(/^blob:/i.test(u))return 'blob:';if(/^data:/i.test(u))return 'data:';
+try{var a=new URL(u,location.href);return (a.host===location.host?'':a.host)+a.pathname;}catch(e){return u.split(/[?#]/)[0].slice(0,120);}}
+function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(36);}
+/* fingerprint text: the same problem with a different number or id must give the same text */
+function norm(s){return String(s).replace(/https?:\/\/[^\s)'"]+/g,function(m){return scrubUrl(m);}).replace(/[0-9a-f]{8,}/gi,'#').replace(/\d+/g,'#').slice(0,200);}
+function shortStack(s){if(!s)return '';return String(s).replace(/https?:\/\/[^\s)]*\//g,'').split('\n').slice(0,4).join('\n').slice(0,400);}
+
+function group(type,msg,stk){
+var where='',core=String(msg),m=/\s@([^\s@:]+):(\d+):(\d+)$/.exec(core);
+if(m){where=m[1]+':'+m[2]+':'+m[3];core=core.slice(0,m.index);}
+var key=hash(type+'|'+norm(core)),p=P[key],now=Date.now();
+if(!p){if(order.length>=MAX_PROBLEMS){dropped++;return;}
+p=P[key]={id:'e_'+key,type:type,sev:SEV[type]||'warn',msg:core.slice(0,300),where:where,n:0,first:now,last:now,stack:shortStack(stk)};order.push(key);}
+if(p.n<MAX_N)p.n++;p.last=now;return p;}
+
+D.hook=group;
+D.sid=sid;
+D.problems=function(){return order.map(function(k){return P[k];}).sort(function(a,b){return b.last-a.last;});};
+D.report=function(){return {v:1,sid:sid,t:Date.now(),dropped:dropped,problems:D.problems().map(function(p){return {id:p.id,type:p.type,sev:p.sev,msg:p.msg,where:p.where,n:p.n,first:p.first,last:p.last,stack:p.stack,at:p.at||null,crumbs:p.crumbs||[]};})};};
+var oc=D.clear;D.clear=function(){P={};order=[];dropped=0;if(oc)oc.apply(D,arguments);};
+var ot=D.text;D.text=function(){var s=ot?ot.apply(D,arguments):'';var ps=D.problems();
+if(ps.length)s+='\n\nProblems (the same error merged), session '+sid+'\n'+ps.map(function(p){return p.n+'x  '+p.type+'  '+p.msg+(p.where?'  @'+p.where:'')+'  ['+p.id+']';}).join('\n')+(dropped?'\n(+'+dropped+' more not kept)':'');
+return s;};
+
+/* failed network requests. The original fetch is kept in D.rawFetch: the sender (a later task) must use it, so a failed report is never reported again. */
+try{if(typeof window.fetch==='function'&&!window.fetch.__wt){var of=window.fetch;D.rawFetch=of;
+var nf=function(input,init){var p=of.apply(this,arguments);if(!D.on)return p;
+var u='',mt='GET';try{u=typeof input==='string'?input:((input&&input.url)||String(input));mt=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();}catch(e){}
+if(!u||/^(data|blob):/i.test(u))return p;
+return p.then(function(r){try{if(r&&r.status>=400)D.add(r.status===404||r.status===410?'missing':'http',mt+' '+scrubUrl(u)+' -> '+r.status);}catch(e){}return r;},
+function(err){try{if(!(err&&err.name==='AbortError'))D.add('network',mt+' '+scrubUrl(u)+' -> '+((err&&err.message)||'failed')+(navigator.onLine===false?' (offline)':''));}catch(e){}throw err;});};
+nf.__wt=1;window.fetch=nf;}}catch(e){}
+
+/* elements that fail to load do not bubble to window, so they are caught in the capture phase */
+addEventListener('error',function(e){if(!D.on)return;var t=e&&e.target;if(!t||t===window||!t.tagName)return;var tag=String(t.tagName).toLowerCase();
+try{if(tag==='audio'||tag==='video')D.add('audio','media error '+(MEDIA[t.error&&t.error.code]||'?')+' '+scrubUrl(t.currentSrc||t.src));
+else if(tag==='img'||tag==='script'||tag==='link'){var u=t.currentSrc||t.src||t.href;if(u)D.add('resource',tag+' failed to load '+scrubUrl(u));}}catch(x){}},true);
+addEventListener('stalled',function(e){if(!D.on)return;var t=e&&e.target;
+try{if(t&&(t.tagName==='AUDIO'||t.tagName==='VIDEO'))D.add('audio','stalled '+scrubUrl(t.currentSrc||t.src));}catch(x){}},true);
+
+/* storage full: noted, then the same error goes on to the app exactly as before */
+try{var SP=Storage.prototype,os=SP.setItem;if(!os.__wt){SP.setItem=function(k,v){try{return os.apply(this,arguments);}
+catch(e){try{if(D.on&&e&&(e.name==='QuotaExceededError'||e.code===22||e.code===1014))D.add('storage','storage full, key '+String(k).slice(0,40)+', '+String(v).length+' chars');}catch(x){}throw e;}};SP.setItem.__wt=1;}}catch(e){}
+})();
+</script>

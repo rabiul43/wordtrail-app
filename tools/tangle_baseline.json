@@ -1,10 +1,10 @@
 {
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
-  "files": 144,
-  "dependencies": 1006,
-  "pointing_to_a_later_file": 290,
-  "largest_cycle": 97
+  "files": 146,
+  "dependencies": 1016,
+  "pointing_to_a_later_file": 293,
+  "largest_cycle": 98
  },
  "dependencies": [
   "030-helpers-offline-audio.js -> 040-worker-newreader.js",
@@ -283,6 +283,7 @@
   "140-open-book.js -> 134-version-picker.js",
   "140-open-book.js -> 145-chapter-recap.js",
   "140-open-book.js -> 150-player-reader.js",
+  "140-open-book.js -> 155-listen-only.js",
   "140-open-book.js -> 160-learning-tools.js",
   "140-open-book.js -> 170-sync-points-drift.js",
   "140-open-book.js -> 180-sync-alignment.js",
@@ -320,6 +321,7 @@
   "150-player-reader.js -> 135-ratings.js",
   "150-player-reader.js -> 140-open-book.js",
   "150-player-reader.js -> 145-chapter-recap.js",
+  "150-player-reader.js -> 155-listen-only.js",
   "150-player-reader.js -> 161-live-translate.js",
   "150-player-reader.js -> 161d-old-words.js",
   "150-player-reader.js -> 161e-known-underline.js",
@@ -337,6 +339,11 @@
   "150-player-reader.js -> sound/ambient-scenes.js",
   "150-player-reader.js -> sound/music-state.js",
   "150-player-reader.js -> sound/story-engine.js",
+  "155-listen-only.js -> 030-helpers-offline-audio.js",
+  "155-listen-only.js -> 040-worker-newreader.js",
+  "155-listen-only.js -> 140-open-book.js",
+  "155-listen-only.js -> 150-player-reader.js",
+  "155-listen-only.js -> 270-sheets-nextup-back.js",
   "160-learning-tools.js -> 030-helpers-offline-audio.js",
   "160-learning-tools.js -> 040-worker-newreader.js",
   "160-learning-tools.js -> 070-network-data.js",
@@ -760,6 +767,9 @@
   "296-desktop-bar.js -> 030-helpers-offline-audio.js",
   "296-desktop-bar.js -> 040-worker-newreader.js",
   "296-desktop-bar.js -> 150-player-reader.js",
+  "296b-error-finder.js -> 030-helpers-offline-audio.js",
+  "296b-error-finder.js -> 080-ui-shell-favourites.js",
+  "296b-error-finder.js -> 270-sheets-nextup-back.js",
   "298-pwa.js -> 030-helpers-offline-audio.js",
   "298-pwa.js -> 070-network-data.js",
   "298-pwa.js -> 080-ui-shell-favourites.js",

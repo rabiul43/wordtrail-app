@@ -8,17 +8,36 @@
      recordings; one-off sounds (thunder, bell, birds, creaks, drips, clock, heartbeat) are always generated. */
   const AMB_REC_KEYS = new Set(['rain', 'wind', 'waves', 'river', 'night', 'fire', 'cafe', 'drone', 'engine', 'brown', 'crowd', 'train']);
   const AMB_REC_NAMES = { rain: 'Rain', wind: 'Wind', waves: 'Waves', river: 'River', night: 'Night', fire: 'Fire', cafe: 'Café', drone: 'Drone', engine: 'Engine room', brown: 'Brown noise', crowd: 'Crowd', train: 'Train' };
+  /* The reference level of each sound (AMB_REC_REF, in ambient-scenes.js) is what a recording is levelled to; see ambRecGain below. */
+  const AMB_REC_LIMIT = { maxDb: 36, minDb: -40, peakDb: 6 };   // the levelling gain stays between +36 and -40 dB, and never pushes the loudest sample past +6 dBFS
+  const ambRecNum = (v, lo, hi) => typeof v === 'number' && isFinite(v) && v >= lo && v <= hi;
+  function ambRecGain(k, meta, rmsDb, peak) {   // the gain (as a plain multiplier) that levels a recording; meta = its recordings.json entry (may be empty), rmsDb = measured plain level of the file, peak = its loudest sample
+    try {
+      const ref = AMB_REC_REF[k] || [-23, -18.4];   // a sound not in the table: the old whole-sound target (RMS 0.12)
+      let db = 0, pk = peak;
+      if (meta && ambRecNum(meta.sb, -90, 0)) { db = ref[0] - meta.sb; if (ambRecNum(meta.pk, -90, 20)) pk = Math.pow(10, meta.pk / 20); }
+      else if (ambRecNum(rmsDb, -90, 0)) db = ref[1] - rmsDb;
+      let g = Math.pow(10, Math.max(AMB_REC_LIMIT.minDb, Math.min(AMB_REC_LIMIT.maxDb, db)) / 20);
+      if (pk > 0) g = Math.min(g, Math.pow(10, AMB_REC_LIMIT.peakDb / 20) / pk);
+      return g > 0 && isFinite(g) ? g : 1;
+    } catch (e) { return 1; }
+  }
   const ambRecBuf = k => (P.ambSrc === 'gen' || !AMB_REC_KEYS.has(k)) ? null : (AMB.rec[k] || null);
   function ambRecSrc(k) {   // where this sound's recording comes from: the reader's own test file or link first, then the repo list
     const u = (P.ambRecUser || {})[k];
     if (u && u.kind === 'file') return { key: 'https://wt-rec.invalid/user/' + k, url: '', name: u.name, own: true };
     if (u && u.kind === 'url' && u.url) return { key: u.url, url: u.url, name: u.url, own: true };
-    const m = AMB.recMap[k]; return m ? { key: m.url, url: m.url, name: m.by ? m.by + ' (' + (m.license || 'CC0') + ')' : (m.license || ''), own: false } : null;
+    const m = AMB.recMap[k]; return m ? { key: m.url, url: m.url, name: m.by ? m.by + ' (' + (m.license || 'CC0') + ')' : (m.license || ''), own: false, meta: m } : null;
   }
-  function ambRecPrep(buf) {   // level it to a steady loudness, and blend the end into the start so the loop has no seam
+  function ambRecPrep(buf, k, meta) {   // level it to the reference loudness of its sound, and blend the end into the start so the loop has no seam
     const sr = buf.sampleRate, len = buf.length, ch = buf.numberOfChannels;
-    let sum = 0, n = 0; const d0 = buf.getChannelData(0); for (let i = 0; i < len; i += 7) { sum += d0[i] * d0[i]; n++; }
-    const rms = Math.sqrt(sum / Math.max(1, n)) || 0.1, gain = Math.max(0.15, Math.min(5, 0.12 / rms));
+    let gain = 1;
+    try {   // measure every channel (every 7th sample is plenty): the plain level and the loudest sample, used when the recording has no measured numbers
+      let sum = 0, n = 0, pk = 0;
+      for (let c = 0; c < ch; c++) { const d = buf.getChannelData(c); for (let i = 0; i < len; i += 7) { const v = d[i]; sum += v * v; n++; const a = v < 0 ? -v : v; if (a > pk) pk = a; } }
+      const rms = Math.sqrt(sum / Math.max(1, n));
+      gain = ambRecGain(k, meta, rms > 0 ? 20 * Math.log10(rms) : null, pk);
+    } catch (e) { gain = 1; /* could not measure: play it as it is */ }
     const fade = buf.duration > 6 ? Math.floor(Math.min(1.5, buf.duration * 0.2) * sr) : 0, nl = len - fade;
     const out = AMB.ctx.createBuffer(ch, Math.max(1, nl), sr);
     for (let c = 0; c < ch; c++) {
@@ -49,7 +68,7 @@
         resp = r;
       }
       const buf = await AMB.ctx.decodeAudioData(await resp.arrayBuffer());
-      AMB.rec[k] = ambRecPrep(buf); delete AMB.recFail[k];
+      AMB.rec[k] = ambRecPrep(buf, k, u.meta); delete AMB.recFail[k];
     } catch (e) { AMB.recFail[k] = Date.now(); }
     AMB.recBusy[k] = false; ambRecPaint(); ambSrcRefresh(k);
   }
@@ -86,7 +105,7 @@
   }
   const AMB_R2 = '__WT_HOST_SOUNDS__';   // filled by build.py from hosts.json "sounds" key; never type a web address here
   async function ambRecManifest() {
-    const set = (d) => { if (!d || typeof d !== 'object') return; AMB.recMap = {}; Object.keys(d).forEach(k => { const m = d[k]; if (AMB_REC_KEYS.has(k) && m && m.file) { try { AMB.recMap[k] = { url: new URL(m.file, AMB_R2).href, by: m.by || '', license: m.license || '' }; } catch (e) { /* bad address */ } } }); };
+    const set = (d) => { if (!d || typeof d !== 'object') return; AMB.recMap = {}; Object.keys(d).forEach(k => { const m = d[k]; if (AMB_REC_KEYS.has(k) && m && m.file) { try { AMB.recMap[k] = { url: new URL(m.file, AMB_R2).href, by: m.by || '', license: m.license || '', sb: m.sb, pk: m.pk, st: m.st, sh: m.sh }; } catch (e) { /* bad address */ } } }); };
     try {
       const c = store.get('wt:ambrec', null);
       if (c && c.d) set(c.d);
@@ -120,7 +139,7 @@
       const ab = await file.arrayBuffer();
       const buf = await AMB.ctx.decodeAudioData(ab.slice(0));
       try { const c = await caches.open('wt-amb-rec'); await c.put('https://wt-rec.invalid/user/' + k, new Response(ab, { headers: { 'content-type': file.type || 'audio/mpeg' } })); } catch (e) { /* works for this session only */ }
-      AMB.rec[k] = ambRecPrep(buf); delete AMB.recFail[k];
+      AMB.rec[k] = ambRecPrep(buf, k); delete AMB.recFail[k];
       P.ambRecUser = Object.assign({}, P.ambRecUser, { [k]: { kind: 'file', name: file.name } }); ambRecUse(k);
     } catch (e) { toast('That file could not be read as audio.', 3500); }
   }
@@ -145,7 +164,7 @@
       if (!/^https:\/\//i.test(u)) { toast('The link must start with https://', 3000); return; }
       try { if (!ambBuild()) throw 0; const r = await fetch(u); if (!r.ok) throw 0; const ab = await r.arrayBuffer(); const buf = await AMB.ctx.decodeAudioData(ab.slice(0));
         try { const c = await caches.open('wt-amb-rec'); await c.put(u, new Response(ab, { headers: { 'content-type': r.headers.get('content-type') || 'audio/mpeg' } })); } catch (e) { /* session only */ }
-        AMB.rec[k] = ambRecPrep(buf); delete AMB.recFail[k]; P.ambRecUser = Object.assign({}, P.ambRecUser, { [k]: { kind: 'url', url: u, name: u.replace(/^https:\/\//i, '').slice(0, 40) } }); ambRecUse(k);
+        AMB.rec[k] = ambRecPrep(buf, k); delete AMB.recFail[k]; P.ambRecUser = Object.assign({}, P.ambRecUser, { [k]: { kind: 'url', url: u, name: u.replace(/^https:\/\//i, '').slice(0, 40) } }); ambRecUse(k);
       } catch (e) { toast('That link could not be loaded as audio.', 3500); }
     });
     $('#amb-rec-reset').addEventListener('click', () => { const k = sel.value, o = Object.assign({}, P.ambRecUser); delete o[k]; P.ambRecUser = o; delete AMB.rec[k]; try { caches.open('wt-amb-rec').then(c => c.delete('https://wt-rec.invalid/user/' + k)); } catch (e) { /* nothing cached */ } savePrefs(); ambRecPaint(); ambSrcRefresh(k); if (P.ambSrc !== 'gen') ambRecLoad(k); });

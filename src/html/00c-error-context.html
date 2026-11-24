@@ -1,0 +1,73 @@
+<script>
+/* Error context + breadcrumbs (error-tracking task 2). Builds on 00b-error-collector.html and only ADDS fields to report v1:
+     report.ctx      the phone and app: build, display mode, theme, design, lite graphics, language, online, connection, memory, cores, screen size,
+                     browser, system, service worker, storage used %, seconds since the page loaded, a few non-private settings
+     problem.at      where the user was when the problem FIRST happened: screen (+ open sheet), book id, online
+     problem.crumbs  the last 10 things the user did before it (taps, setting changes, play/pause, going offline...), oldest first
+   Crumbs hold no typed text and no book text: a tap is described by id / aria-label / a few data-* ids only; a setting change gives the
+   setting's id and its on/off or choice value, never what was typed. Memory only, nothing is sent yet. Follows the Settings > Diagnostics switch. */
+(function(){
+var D=window.__wtDiag;if(!D||!D.hook)return;
+var N=10,buf=[],stor=null;
+function now(){return Date.now();}
+function esc(s,n){return String(s==null?'':s).replace(/\s+/g,' ').slice(0,n||40);}
+
+/* the current screen, read from what is visible (no changes in the app itself) */
+var VIEWS=[['player','player'],['detail','book page'],['sp','search'],['seeall','see all'],['collections','collections'],['shelf','my library'],['account','account'],['home','home']];
+function screen(){try{var s='?';for(var i=0;i<VIEWS.length;i++){var e=document.getElementById(VIEWS[i][0]);if(e&&!e.hidden){s=VIEWS[i][1];break;}}
+var sh=document.querySelector('.sheet:not([hidden])');if(sh&&sh.id)s+=' + '+sh.id;return s;}catch(e){return '?';}}
+function bookId(){try{var pl=document.getElementById('player');if(!pl||pl.hidden)return '';var o=JSON.parse(localStorage.getItem('wt:open')||'null');return o&&o.id?String(o.id).slice(0,40):'';}catch(e){return '';}}
+
+/* breadcrumbs: an identical neighbour is merged into one with a count */
+function crumb(k,d){try{if(!D.on)return;d=esc(D.scrub?D.scrub(d,1):d,60);var l=buf[buf.length-1];
+if(l&&l.k===k&&l.d===d){l.n=(l.n||1)+1;l.t=now();return;}
+buf.push({t:now(),k:k,d:d});if(buf.length>N)buf.shift();}catch(e){}}
+function describe(t){try{for(var i=0;i<4&&t&&t.nodeType===1;i++,t=t.parentNode){
+var ds=t.dataset||{},bits=[];['act','id','tab','view','book','sec'].forEach(function(k){if(ds[k]!=null&&ds[k]!=='')bits.push(k+'='+esc(ds[k],20));});
+var lab=t.getAttribute&&t.getAttribute('aria-label');
+if(t.id||bits.length||lab||t.tagName==='BUTTON'||t.tagName==='A'||(t.getAttribute&&t.getAttribute('role')==='button'))
+return (t.id?'#'+t.id:String(t.tagName).toLowerCase())+(bits.length?' '+bits.join(' '):'')+(lab?' "'+esc(lab,30)+'"':'');}}catch(e){}return '';}
+
+var lastScreen='';
+function watchScreen(){setTimeout(function(){var s=screen();if(s!==lastScreen){lastScreen=s;crumb('screen',s);}},300);}
+addEventListener('click',function(e){if(!D.on)return;var d=describe(e&&e.target);if(d)crumb('tap',d);watchScreen();},true);
+addEventListener('popstate',function(){crumb('back','history');watchScreen();});
+addEventListener('change',function(e){if(!D.on)return;var t=e&&e.target;if(!t||!t.tagName)return;var tag=String(t.tagName).toLowerCase(),ty=String(t.type||'').toLowerCase();
+if(tag==='select'||ty==='checkbox'||ty==='radio'||ty==='range')crumb('setting',(t.id||t.name||tag)+' = '+(ty==='checkbox'?(t.checked?'on':'off'):esc(t.value,20)));},true);
+['play','pause','ended','waiting','stalled'].forEach(function(ev){addEventListener(ev,function(e){var t=e&&e.target;if(t&&(t.tagName==='AUDIO'||t.tagName==='VIDEO'))crumb('audio',ev);},true);});
+addEventListener('online',function(){crumb('net','online');});addEventListener('offline',function(){crumb('net','offline');});
+document.addEventListener('visibilitychange',function(){crumb('page',document.visibilityState);});
+
+/* when a problem is seen for the first time, keep where the user was and the trail before it (not for perf/info noise) */
+var oh=D.hook;
+D.hook=function(type,msg,stk){var p=oh(type,msg,stk);
+try{if(p&&p.n===1&&(p.sev==='error'||p.sev==='warn')){p.at={screen:screen(),book:bookId(),online:navigator.onLine!==false};p.crumbs=buf.map(function(c){return {t:c.t,k:c.k,d:c.d,n:c.n};});}
+if(p&&p.n===1&&(p.sev==='error'||p.sev==='warn'))crumb('problem',type+' '+p.id);}catch(e){}return p;};
+
+/* the phone and the app */
+function browser(){var u=navigator.userAgent||'',m;
+var br=(m=/(Edg|OPR|SamsungBrowser|Firefox|FxiOS|CriOS|Chrome)\/(\d+)/.exec(u))?({Edg:'Edge',OPR:'Opera',SamsungBrowser:'Samsung',FxiOS:'Firefox',CriOS:'Chrome'}[m[1]]||m[1])+' '+m[2]:((m=/Version\/(\d+).*Safari/.exec(u))?'Safari '+m[1]:'?');
+var os=/Android ([\d.]+)/.exec(u)?'Android '+RegExp.$1.split('.')[0]:/iPhone|iPad|iPod/.test(u)?'iOS':/Windows/.test(u)?'Windows':/Mac OS X/.test(u)?'macOS':/Linux/.test(u)?'Linux':'?';
+return {br:br,os:os};}
+function pref(){var o={},p;try{p=JSON.parse(localStorage.getItem('wt:prefs')||'{}')||{};}catch(e){p={};}
+['theme','design','speed','calm','liteForce','diag'].forEach(function(k){var v=p[k];if(typeof v==='boolean'||typeof v==='number'||(typeof v==='string'&&v.length<20))o[k]=v;});return o;}
+D.context=function(){var n=navigator,h=document.documentElement,c=n.connection||{},b=browser(),o={};
+try{o={build:'__WT_BUILD__',mode:(matchMedia('(display-mode: standalone)').matches||n.standalone)?'installed':'browser',
+theme:h.getAttribute('data-theme')||'',design:h.getAttribute('data-design')||'',lite:h.hasAttribute('data-lite'),lang:n.language||'',online:n.onLine!==false,
+net:c.effectiveType||'',saver:!!c.saveData,mem:n.deviceMemory||0,cores:n.hardwareConcurrency||0,
+win:innerWidth+'x'+innerHeight,dpr:Math.round((devicePixelRatio||1)*10)/10,br:b.br,os:b.os,
+sw:(n.serviceWorker&&n.serviceWorker.controller)?'on':'off',stor:stor,up:Math.round((now()-D.t0)/1000),prefs:pref()};}catch(e){}return o;};
+D.crumbs=function(){return buf.slice();};
+var orp=D.report;D.report=function(){var r=orp.apply(D,arguments);r.ctx=D.context();return r;};
+var oc=D.clear;D.clear=function(){buf=[];if(oc)oc.apply(D,arguments);};
+var ot=D.text;D.text=function(){var s=ot?ot.apply(D,arguments):'';var c=D.context();
+s+='\n\nContext\n'+['build '+c.build,c.mode,c.br+', '+c.os,'win '+c.win+' @'+c.dpr+'x','mem '+(c.mem||'?')+' GB, cores '+(c.cores||'?'),'net '+(c.online?(c.net||'online'):'OFFLINE'),'theme '+(c.theme||'?')+(c.lite?', lite':''),'sw '+c.sw,'storage '+(c.stor==null?'?':c.stor+'%'),'up '+c.up+'s','screen '+screen()].join(' | ');
+if(buf.length)s+='\n\nLast actions (oldest first)\n'+buf.map(function(x){return new Date(x.t).toTimeString().slice(0,8)+'  '+x.k+'  '+x.d+(x.n>1?'  (x'+x.n+')':'');}).join('\n');
+return s;};
+
+/* storage used (async, so it is read now and again when the page is hidden) */
+function readStor(){try{if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){if(e&&e.quota)stor=Math.round((e.usage||0)/e.quota*1000)/10;}).catch(function(){});}catch(e){}}
+readStor();document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')readStor();});
+lastScreen='';
+})();
+</script>

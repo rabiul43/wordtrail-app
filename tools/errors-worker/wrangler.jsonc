@@ -1,0 +1,7 @@
+{
+  "name": "wordtrail-errors",
+  "main": "index.js",
+  "compatibility_date": "2025-01-01",
+  "d1_databases": [{ "binding": "DB", "database_name": "wordtrail-errors", "database_id": "PUT-YOUR-DATABASE-ID-HERE" }],
+  "triggers": { "crons": ["17 3 * * *"] }
+}

@@ -4,8 +4,8 @@
     python tools/check_audio_data.py --data-dir ../wordtrail-data
     python tools/check_audio_data.py --data-dir ../wordtrail-data --min-clips 4
 
-Reads music.json and openings.json in the data folder (the wordtrail-data repo) and checks them against the files
-on disk. Plain Python, nothing to install. If `mutagen` is installed, it also reads the length of each opening clip.
+Reads music.json, openings.json and (if there) recordings.json in the data folder (the wordtrail-data repo) and checks
+them against the files on disk. Plain Python, nothing to install. If `mutagen` is installed, it also reads the length of each opening clip.
 Exit code: 0 = no errors (warnings are fine), 1 = at least one error, 2 = the data folder or music.json is unusable.
 
 What it reports
@@ -14,6 +14,8 @@ What it reports
                     A mood with fewer clips than --min-clips (default 3) is flagged: it will sound repetitive.
   Opening sounds:   which of the nine opening moods have no clip (the app then plays a sound made on the device),
                     and whether each clip has its file, credit and a sensible length.
+  Ambient recordings: each one has its file and loudness numbers (sb, pk, st, sh); without them the app falls back to a
+                    rough measure while loading. Add them with tools/ambient_prep.py.
   Files on disk not listed in music.json, so you can tidy up or rebuild with music_prep.py.
 """
 import argparse, json, os, sys
@@ -127,8 +129,22 @@ def check_openings(root):
         if sec is not None and sec > OPEN_MAX: warn(f"opening {k}: {sec:.0f} s long; the app plays only the first {OPEN_MAX} s")
         if sec is not None and sec < 8: warn(f"opening {k}: only {sec:.0f} s long")
 
+def check_recordings(root):
+    print("\nAMBIENT RECORDINGS (recordings.json)")
+    d = load(os.path.join(root, "recordings.json"))
+    if d is None: print("  no recordings.json: every ambient sound is made on the device"); return
+    if not isinstance(d, dict): err("recordings.json must be an object like {\"rain\": {\"file\": ...}}"); return
+    for k, m in d.items():
+        if not (isinstance(m, dict) and m.get("file")): err(f"recording '{k}' has no file"); continue
+        if "://" not in m["file"] and not os.path.isfile(os.path.join(root, m["file"])): err(f"recording {k}: file '{m['file']}' is not on disk")
+        nums = [x for x in ("sb", "pk", "st", "sh") if not isinstance(m.get(x), (int, float))]
+        if nums: warn(f"recording {k}: no loudness numbers ({', '.join(nums)}); the app levels it by a rough measure at load. Run tools/ambient_prep.py")
+        if not m.get("by"): warn(f"recording {k}: no author (by)")
+        if not m.get("license"): warn(f"recording {k}: no licence")
+    print(f"  {len(d)} recording(s) listed")
+
 def main():
-    ap = argparse.ArgumentParser(description="Check music.json and openings.json against the files on disk.")
+    ap = argparse.ArgumentParser(description="Check music.json, openings.json and recordings.json against the files on disk.")
     ap.add_argument("--data-dir", default=os.environ.get("WORDTRAIL_DATA", "../wordtrail-data"), help="your wordtrail-data folder")
     ap.add_argument("--min-clips", type=int, default=3, help="fewer clips than this in a mood is flagged as thin (default 3)")
     a = ap.parse_args()
@@ -136,6 +152,7 @@ def main():
     print("Checking " + os.path.abspath(a.data_dir))
     check_music(a.data_dir, a.min_clips)
     check_openings(a.data_dir)
+    check_recordings(a.data_dir)
     print(f"\nSUMMARY: {len(errors)} error(s), {len(warnings)} warning(s)")
     print("\nWHAT TO DO NEXT (full steps: MUSIC-GUIDE.md in the app repo)")
     w = " ".join(warnings + errors)
@@ -143,6 +160,7 @@ def main():
     if "only" in w and "clip(s)" in w or "no clips" in w: print("  - Thin or empty moods: add MP3s to music/_inbox/<mood>/ in the data repo (3 or more each), then:  python tools\\music_prep.py --build --data-dir " + a.data_dir)
     if "memory" in w: print("  - Very long clips use a lot of phone memory: replace them with 60-120 s versions.")
     if "openings" in w or "openings.json" in w: print("  - Opening sounds: optional. Add openings.json and clips in the data repo for recorded openings.")
+    if "loudness numbers" in w: print("  - Measure ambient recordings:  python tools\\ambient_prep.py --data-dir " + a.data_dir)
     if errors: print("  - Fix the ERROR lines first.")
     print("  - Then commit and push the data repo. The app picks it up by itself.")
     sys.exit(1 if errors else 0)
