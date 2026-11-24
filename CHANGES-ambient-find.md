@@ -28,3 +28,12 @@ App
 - The link finds the clip by the file address, then by the file name. This works only if the file names in `recordings.json`
   match the clips in `ambient-candidates.json` / `ambient-index.json`. If they do not, you get the fallback search, not the exact clip.
 - `COV_ADMIN` (from `100-home-covers.js`) is used inside `music-playback.js`; they share one scope, but run the app once to confirm.
+
+## Replace live clip (dashboard)
+
+Delete on the clip the app is playing no longer shows a warning. It opens a box: "This clip is live". It lists the other clips of the
+same folder (kept first, then same author, then best score; clips already marked Delete come last), each with a ▶ to listen.
+"Replace and delete" makes the chosen clip live (ambient-index.json, backed up once per session) and marks ONLY the old clip Delete.
+The other clips stay as they are (the older Make best still marks every other clip Delete). Nothing is erased until Clean-up.
+If the folder has no other clip, the box says so and changes nothing. A "Replace live clip" button also sits next to Delete in the focus view.
+Tested only with a stub (ranking, backup, index write, marks); not with the real bucket.
