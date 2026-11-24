@@ -386,6 +386,7 @@ HOST_SLOTS = {
     "scene":    (b"__WT_HOST_SCENE__",    True,  False),
     "music":    (b"__WT_HOST_MUSIC__",    False, True),
     "admin":    (b"__WT_HOST_ADMIN__",    True,  False),   # the admin Worker: the app reads my cover choices from its public address
+    "dashboard": (b"__WT_HOST_DASHBOARD__", True, False),  # the page where I open the admin dashboard (the wordtrail-admin repo's index.html), NOT the admin Worker; empty = no dashboard links in the app
     "errors":   (b"__WT_HOST_ERRORS__",   True,  False),   # the wordtrail-errors Worker (tools/errors-worker/): empty = error reports are not sent
     "sounds":   (b"__WT_HOST_SOUNDS__",   False, True),   # R2 bucket for real ambient recordings (recordings.json + audio files)
 }

@@ -170,14 +170,15 @@
      One short block at the top of the sound sheet (#amb-now): the music (mood, track, artist), the scene, and the
      opening sound. Each piece is its own element so the translator can match fixed words one by one. */
   /* Ambient names in this strip open the dashboard on the exact clip that is playing. Owner only: off until you tap the word "Ambient" in the strip
-     5 times quickly (tap 5 times again to turn it off). ?dash=1 / ?dash=0 in the address does the same. The address comes from hosts.json "admin"; empty = no links. */
+     5 times quickly (tap 5 times again to turn it off). ?dash=1 / ?dash=0 in the address does the same. The address comes from hosts.json "dashboard" (the page of the wordtrail-admin repo, not the admin Worker); empty = no links. */
   try { const dm = /[?&]dash=([01])/.exec(location.search); if (dm) localStorage.setItem('wt:dashlinks', dm[1]); } catch (e) { /* no storage */ }
+  const AMB_DASH = '__WT_HOST_DASHBOARD__';
   function ambDashHref(k) {
     try {
-      if (!COV_ADMIN || localStorage.getItem('wt:dashlinks') !== '1') return '';
+      if (!AMB_DASH || localStorage.getItem('wt:dashlinks') !== '1') return '';
       const m = AMB.recMap && AMB.recMap[k]; if (!m || !m.url) return '';
       const q = new URLSearchParams({ amb: k, f: String(m.url).split('?')[0].split('/').pop(), u: m.url, by: m.by || '' });
-      return COV_ADMIN.replace(/\/+$/, '') + '/#' + q.toString();
+      return AMB_DASH.replace(/\/+$/, '') + '/#' + q.toString();
     } catch (e) { return ''; }
   }
   const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
@@ -191,7 +192,7 @@
           if (!(ev.target.closest && ev.target.closest('[data-k="Ambient"]'))) return;
           const now = Date.now(); taps = now - last > 2500 ? 1 : taps + 1; last = now;
           if (taps < 5) return; taps = 0;
-          try { const on = localStorage.getItem('wt:dashlinks') !== '1'; localStorage.setItem('wt:dashlinks', on ? '1' : '0'); toast(on ? 'Dashboard links ON' : 'Dashboard links OFF'); sndNowPaint(); } catch (e) { /* no storage */ }
+          try { const on = localStorage.getItem('wt:dashlinks') !== '1'; localStorage.setItem('wt:dashlinks', on ? '1' : '0'); toast(on ? (AMB_DASH ? 'Dashboard links ON' : 'Links ON, but the dashboard address is empty in hosts.json') : 'Dashboard links OFF'); sndNowPaint(); } catch (e) { /* no storage */ }
         });
       }
       const rows = [];

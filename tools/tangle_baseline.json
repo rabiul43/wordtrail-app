@@ -2,7 +2,7 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 146,
-  "dependencies": 1018,
+  "dependencies": 1017,
   "pointing_to_a_later_file": 293,
   "largest_cycle": 98
  },
@@ -908,7 +908,6 @@
   "sound/music-playback.js -> 030-helpers-offline-audio.js",
   "sound/music-playback.js -> 040-worker-newreader.js",
   "sound/music-playback.js -> 080-ui-shell-favourites.js",
-  "sound/music-playback.js -> 100-home-covers.js",
   "sound/music-playback.js -> sound/ambient-engine.js",
   "sound/music-playback.js -> sound/ambient-recordings.js",
   "sound/music-playback.js -> sound/ambient-scenes.js",
