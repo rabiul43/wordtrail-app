@@ -37,3 +37,12 @@ same folder (kept first, then same author, then best score; clips already marked
 The other clips stay as they are (the older Make best still marks every other clip Delete). Nothing is erased until Clean-up.
 If the folder has no other clip, the box says so and changes nothing. A "Replace live clip" button also sits next to Delete in the focus view.
 Tested only with a stub (ranking, backup, index write, marks); not with the real bucket.
+
+## Music too (same idea)
+
+App: in the sound strip, the music title (e.g. "Clear Air") now links to the dashboard Music tab on that exact clip. The same 5 taps
+switch it on, on the word "Ambient" or "Music". It needs the dashboard address in hosts.json "dashboard", like the ambient links.
+Dashboard: Music search now also finds title, author and license (read from music.json, if it is in the bucket); the clip list shows
+title and author under the file name. Link: <dashboard>/#mus=<mood>&f=<file>&by=<author> opens Music, the mood, the clip (flashes it).
+If the exact file is not found it searches the file name. No Replace box for music: music has no single live clip, so Delete works as before.
+Tested only with stub data, not with the real bucket.

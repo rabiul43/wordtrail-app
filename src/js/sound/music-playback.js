@@ -181,15 +181,22 @@
       return AMB_DASH.replace(/\/+$/, '') + '/#' + q.toString();
     } catch (e) { return ''; }
   }
+  function musDashHref(c) {   // the music title in the strip opens that clip in the dashboard (owner only, same switch)
+    try {
+      if (!AMB_DASH || localStorage.getItem('wt:dashlinks') !== '1' || !c || !c.f) return '';
+      const mood = String(c.f).replace(/^music\//, '').split('/')[0] || MUS.mood || '';
+      return AMB_DASH.replace(/\/+$/, '') + '/#' + new URLSearchParams({ mus: mood, f: String(c.f), by: c.by || '' }).toString();
+    } catch (e) { return ''; }
+  }
   const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
   function sndNowPaint() {
     musWarnPaint();
     try {
       const box = $('#amb-now'); if (!box) return;
-      if (!box._dashTap) {   // 5 quick taps on the word "Ambient" switch the dashboard links on or off (owner only)
+      if (!box._dashTap) {   // 5 quick taps on the word "Ambient" or "Music" switch the dashboard links on or off (owner only)
         box._dashTap = true; let taps = 0, last = 0;
         box.addEventListener('click', ev => {
-          if (!(ev.target.closest && ev.target.closest('[data-k="Ambient"]'))) return;
+          if (!(ev.target.closest && ev.target.closest('[data-k="Ambient"],[data-k="Music"]'))) return;
           const now = Date.now(); taps = now - last > 2500 ? 1 : taps + 1; last = now;
           if (taps < 5) return; taps = 0;
           try { const on = localStorage.getItem('wt:dashlinks') !== '1'; localStorage.setItem('wt:dashlinks', on ? '1' : '0'); toast(on ? (AMB_DASH ? 'Dashboard links ON' : 'Links ON, but the dashboard address is empty in hosts.json') : 'Dashboard links OFF'); sndNowPaint(); } catch (e) { /* no storage */ }
@@ -205,7 +212,7 @@
         const p = MUS.playing, c = p && p._clip;
         if (c) {
           const slug = String(c.f).split('/').pop().replace(/\.mp3$/i, '');
-          rows.push(['Music', MUS_MOOD_NAME[MUS.mood] || 'Neutral', c.t || MUS_TITLES[slug] || musPrettyTitle(slug), c.by || '']);
+          const mr = ['Music', MUS_MOOD_NAME[MUS.mood] || 'Neutral', c.t || MUS_TITLES[slug] || musPrettyTitle(slug), c.by || '']; mr.music = c; rows.push(mr);
         } else if (!musNarrating()) rows.push(['Music', OSND.nodes && S.book ? 'starts after the opening' : 'paused']);
         else if (osLeadWait() > 0) rows.push(['Music', 'starts after the opening']);
         else if (MUS.live) rows.push(['Music', 'loading']);
@@ -232,6 +239,7 @@
             const u = ambDashHref(k), nm = AMB_REC_NAMES[k] || k;
             row.append(u ? h('a', { class: 'amb-find', href: u, target: '_blank', rel: 'noopener', title: 'Find this clip in the dashboard', text: nm }) : h('span', { text: nm }));
           });
+          else if (r.music && i === 1) { const u = musDashHref(r.music); row.append(u ? h('a', { class: 'amb-find', href: u, target: '_blank', rel: 'noopener', title: 'Find this clip in the dashboard', text: t }) : h('span', { text: t })); }
           else row.append(h('span', { text: t }));
         });
         box.append(row);
