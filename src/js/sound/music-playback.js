@@ -188,6 +188,16 @@
       return AMB_DASH.replace(/\/+$/, '') + '/#' + new URLSearchParams({ mus: mood, f: String(c.f), by: c.by || '' }).toString();
     } catch (e) { return ''; }
   }
+  async function dashRefreshLists() {   // owner only: fetch recordings.json, ambient-index.json and music.json again now, not after 24 hours
+    try {
+      const old = {}; Object.keys(AMB.recMap || {}).forEach(k => { old[k] = AMB.recMap[k].url; });
+      ['wt:ambrec', 'wt:ambspot'].forEach(k => { const c = store.get(k, null); if (c && c.d) store.set(k, { t: 0, d: c.d }); });
+      AMB.recGoneT = 0; AMB_SPOT.idx = null; AMB_SPOT.idxFail = 0;
+      await Promise.all([ambRecManifest(), ambSpotLoadIdx(), musFetchManifest(true)]);
+      Object.keys(Object.assign({}, old, AMB.recMap || {})).forEach(k => { if (!AMB.recMap || !AMB.recMap[k] || AMB.recMap[k].url !== old[k]) { delete AMB.rec[k]; delete AMB.recFail[k]; } });   // a changed sound loads its new file the next time it plays
+      sndNowPaint(); toast('Lists refreshed. A changed sound loads the next time it plays.');
+    } catch (e) { toast('Could not refresh the lists (offline?)'); }
+  }
   const MUS_MOOD_NAME = { neutral: 'Neutral', dread: 'Dread', danger: 'Danger', peace: 'Peaceful', sorrow: 'Sad', merry: 'Merry', tension: 'Tense', wonder: 'Wonder', romance: 'Romantic', chase: 'Chase' };
   function sndNowPaint() {
     musWarnPaint();
@@ -244,6 +254,7 @@
         });
         box.append(row);
       });
+      if (localStorage.getItem('wt:dashlinks') === '1') box.append(h('div', {}, h('a', { class: 'amb-find', href: '#', text: '\u21bb Refresh lists', onclick: ev => { ev.preventDefault(); dashRefreshLists(); } })));   // owner only
     } catch (e) { /* a status line must never break playback */ }
   }
 

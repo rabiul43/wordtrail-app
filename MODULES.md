@@ -125,7 +125,7 @@ Which file to open: add a **music mood word** -> `music-moods`; add a **story tr
 | `sound/music-moods.js` | 98 | Music: scene mood -> music mood, the finer moods and their word lists (en/bn), genre mood. Edit here to add mood words. `tools/music_mood_check.js` tests this file |
 | `sound/music-bus.js` | 94 | Music: loudness normalising, volume and audio bus, ducking under the narrator, `musNarrating` and the 2 s grace for buffering dips (`sndHeard`) |
 | `sound/music-library.js` | 150 | Music: music.json (manifest), queue, choosing the next clip, fetching and caching clips |
-| `sound/music-playback.js` | 318 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
+| `sound/music-playback.js` | 329 | Music: scheduling and crossfades, resume after a pause, switching mood, stop, play/pause |
 | `sound/music-offline.js` | 205 | Music: "Download music for offline" |
 | `sound/music-wiring.js` | 59 | Music: `musWanted`, `musCtxHeal` (asks the shared wake-up), the Music switch, first-time hint, quick controls, `musicInit` |
 | `sound/music-credits.js` | 47 | Music: credits list (title, artist, licence) |

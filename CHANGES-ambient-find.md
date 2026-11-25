@@ -46,3 +46,21 @@ Dashboard: Music search now also finds title, author and license (read from musi
 title and author under the file name. Link: <dashboard>/#mus=<mood>&f=<file>&by=<author> opens Music, the mood, the clip (flashes it).
 If the exact file is not found it searches the file name. No Replace box for music: music has no single live clip, so Delete works as before.
 Tested only with stub data, not with the real bucket.
+
+## Old sound still plays after Delete / Make live (why, and the three fixes)
+
+Why: (1) Delete only marks a clip in your browser; the app keeps playing it until you Retire it (and Delete retired ~3 days later).
+(2) The app's Wind, Rain, Fire... are read from recordings.json, not from ambient-index.json. "Make live" only writes ambient-index.json,
+which the app uses for one-off sounds (thunder, bells...). (3) The app keeps each list for 24 hours.
+
+Dashboard (index.html):
+1. "App sound…" button on every ambient clip (clip rows and the focus view): pick Rain / Wind / Fire... and that clip becomes the app's sound
+   (recordings.json, backup first). The old level numbers (sb, pk, st, sh) are cleared because they belong to the old file; run
+   tools/ambient_prep.py to measure the new one. Clips that are an app sound show "★ APP Rain"; the filter is now "★ Live / app clips only".
+   An app-sound clip cannot be deleted or retired until another clip takes its place. Needs recordings.json in the same bucket as the clips,
+   and a web address for the clip in ambient-candidates.json.
+2. Reminder bar: "N clips are marked Delete but not retired yet. The app still plays them", with a Retire now… button.
+App (music-playback.js):
+3. "↻ Refresh lists" appears at the end of the sound strip when the dashboard links are on. It fetches recordings.json, ambient-index.json and
+   music.json again now and drops a changed sound so it loads its new file the next time it plays.
+Tested only with stub data, not with the real bucket.

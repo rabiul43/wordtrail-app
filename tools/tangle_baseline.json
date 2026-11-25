@@ -2,8 +2,8 @@
  "note": "Written by tools/tangle_check.py --accept. Each entry means: the first file uses a name declared in the second. A new entry needs a reason; a removed entry is progress.",
  "summary": {
   "files": 146,
-  "dependencies": 1017,
-  "pointing_to_a_later_file": 293,
+  "dependencies": 1018,
+  "pointing_to_a_later_file": 294,
   "largest_cycle": 98
  },
  "dependencies": [
@@ -911,6 +911,7 @@
   "sound/music-playback.js -> sound/ambient-engine.js",
   "sound/music-playback.js -> sound/ambient-recordings.js",
   "sound/music-playback.js -> sound/ambient-scenes.js",
+  "sound/music-playback.js -> sound/ambient-spot.js",
   "sound/music-playback.js -> sound/music-bus.js",
   "sound/music-playback.js -> sound/music-credits.js",
   "sound/music-playback.js -> sound/music-library.js",
